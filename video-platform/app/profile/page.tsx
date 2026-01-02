@@ -57,7 +57,8 @@ function ProfileContent() {
       if (error) throw error;
       setProfile(data);
     } catch (error) {
-      console.error('Error loading profile:', error);
+      // Failed to load profile - will show loading state or empty profile
+      setProfile(null);
     } finally {
       setLoading(false);
     }
@@ -72,7 +73,8 @@ function ProfileContent() {
         setBusiness(data);
       }
     } catch (error) {
-      console.error('Error loading business:', error);
+      // Failed to load business - user may not have one, which is fine
+      setBusiness(null);
     }
   };
 
