@@ -1,5 +1,7 @@
 import { supabase } from './client';
 
+const STORAGE_BUCKET = process.env.NEXT_PUBLIC_SUPABASE_BUCKET || 'videos';
+
 export interface VideoMetadata {
   id?: string;
   user_id: string;
@@ -11,7 +13,6 @@ export interface VideoMetadata {
   category?: 'food' | 'retail' | 'services';
   created_at?: string;
 }
-
 /**
  * Upload video metadata to Supabase
  */
@@ -25,21 +26,42 @@ export async function uploadVideoMetadata(metadata: VideoMetadata) {
   return { data, error };
 }
 
-/**
- * Get all videos for feed
- */
 export async function getVideosFeed(limit = 20, offset = 0) {
-  const { data, error } = await supabase
+  const { data: videosRaw, error: videosError } = await supabase
     .from('videos')
     .select(`
-      *,
+      id,
+      user_id,
+      video_url,
+      caption,
+      created_at,
+      business_id,
       profiles:user_id (
         id,
         username,
         full_name,
         profile_picture_url
-      ),
-      businesses:business_id (
+      )
+    `)
+    .order('created_at', { ascending: false })
+    .range(offset, offset + limit - 1);
+
+  if (videosError) {
+    console.error('getVideosFeed videos error:', videosError);
+    return { data: null, error: videosError };
+  }
+
+  const videosList: any[] = videosRaw || [];
+
+  const businessIds = Array.from(
+    new Set(videosList.map(v => v.business_id).filter(Boolean))
+  );
+
+  let businessesMap: Record<string, any> = {};
+  if (businessIds.length > 0) {
+    const { data: businesses, error: businessesError } = await supabase
+      .from('businesses')
+      .select(`
         id,
         business_name,
         category,
@@ -48,19 +70,69 @@ export async function getVideosFeed(limit = 20, offset = 0) {
         longitude,
         average_rating,
         total_reviews
-      )
-    `)
-    .order('created_at', { ascending: false })
-    .range(offset, offset + limit - 1);
+      `)
+      .in('id', businessIds);
 
-  return { data, error };
+    if (businessesError) {
+      console.warn('getVideosFeed businesses fetch warning:', businessesError);
+    } else if (businesses) {
+      businessesMap = Object.fromEntries(businesses.map((b: any) => [b.id, b]));
+    }
+  }
+
+  const videos = await Promise.all(videosList.map(async (v: any) => {
+    let url = v.video_url;
+    
+    // Logic to determine if we need to sign the URL
+    let pathForSigning = null;
+
+    if (url && typeof url === 'string') {
+      if (!url.startsWith('http')) {
+        // Case A: It's a raw storage path (e.g. "user/video.mp4")
+        pathForSigning = url;
+      } else if (url.includes('/storage/v1/object/public/')) {
+        // Case B: It's a Supabase Public URL, but bucket might be private.
+        // We try to extract the path and sign it just in case.
+        // Format: .../storage/v1/object/public/{bucket}/{path}
+        try {
+          const urlObj = new URL(url);
+          const match = urlObj.pathname.match(/\/storage\/v1\/object\/public\/[^\/]+\/(.+)$/);
+          if (match && match[1]) {
+            pathForSigning = decodeURIComponent(match[1]);
+          }
+        } catch (e) {
+          // invalid url, ignore
+        }
+      }
+    }
+
+    if (pathForSigning) {
+      try {
+        const { data: signed, error: signedErr } = await supabase.storage
+          .from(STORAGE_BUCKET)
+          .createSignedUrl(pathForSigning, 60 * 60); // 1 hour
+        if (!signedErr && signed?.signedUrl) {
+          url = signed.signedUrl;
+        } else {
+          console.warn('createSignedUrl failed for', pathForSigning, signedErr);
+        }
+      } catch (e) {
+        console.error('Error creating signed url for', pathForSigning, e);
+      }
+    }
+
+    return {
+      ...v,
+      video_url: url,
+      businesses: v.business_id ? businessesMap[v.business_id] ?? null : null,
+    };
+  }));
+
+  return { data: videos, error: null };
 }
 
-/**
- * Get video by ID
- */
 export async function getVideoById(videoId: string) {
-  const { data, error } = await supabase
+  const { data: video, error } = await supabase
     .from('videos')
     .select(`
       *,
@@ -69,26 +141,42 @@ export async function getVideoById(videoId: string) {
         username,
         full_name,
         profile_picture_url
-      ),
-      businesses:business_id (
-        *
       )
     `)
     .eq('id', videoId)
     .single();
 
-  return { data, error };
+  if (error) return { data: null, error };
+
+  if (video.business_id) {
+    const { data: business } = await supabase
+      .from('businesses')
+      .select('*')
+      .eq('id', video.business_id)
+      .single();
+    
+    if (business) {
+      video.businesses = business;
+    }
+  }
+
+  // Sign URL 
+  if (video.video_url && !video.video_url.startsWith('http')) {
+     const { data: signed } = await supabase.storage
+        .from(STORAGE_BUCKET)
+        .createSignedUrl(video.video_url, 60 * 60);
+     if (signed?.signedUrl) video.video_url = signed.signedUrl;
+  }
+
+  return { data: video, error: null };
 }
 
-/**
- * Upload video file to Supabase Storage
- */
 export async function uploadVideoFile(file: File, userId: string) {
   const fileExt = file.name.split('.').pop();
   const fileName = `${userId}/${Date.now()}.${fileExt}`;
 
   const { data, error } = await supabase.storage
-    .from('videos')
+    .from(STORAGE_BUCKET)
     .upload(fileName, file, {
       cacheControl: '3600',
       upsert: false,
@@ -98,7 +186,7 @@ export async function uploadVideoFile(file: File, userId: string) {
 
   // Get public URL
   const { data: urlData } = supabase.storage
-    .from('videos')
+    .from(STORAGE_BUCKET)
     .getPublicUrl(fileName);
 
   return { data: { ...data, publicUrl: urlData.publicUrl }, error: null };
