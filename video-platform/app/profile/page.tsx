@@ -13,8 +13,11 @@ import {
   getUserBusiness, 
   updateBusinessInfo,
   ProfileUpdateData,
-  BusinessUpdateData
+  BusinessUpdateData,
+  MAX_PROFILE_PICTURE_SIZE
 } from '@/lib/supabase/profiles';
+
+const BYTES_TO_MB = 1024 * 1024;
 
 export default function ProfilePage() {
   return (
@@ -247,9 +250,10 @@ function ProfileEditForm({ profile, business, user, onSave, onCancel }: ProfileE
         setError('Please select an image file');
         return;
       }
-      // Validate file size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        setError('Image size must be less than 5MB');
+      // Validate file size using constant
+      if (file.size > MAX_PROFILE_PICTURE_SIZE) {
+        const maxSizeMB = MAX_PROFILE_PICTURE_SIZE / BYTES_TO_MB;
+        setError(`Image size must be less than ${maxSizeMB}MB`);
         return;
       }
       setProfilePicture(file);

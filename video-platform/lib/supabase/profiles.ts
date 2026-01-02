@@ -1,6 +1,9 @@
 import { supabase } from './client';
 
 const STORAGE_BUCKET = process.env.NEXT_PUBLIC_SUPABASE_BUCKET || 'videos';
+export const MAX_PROFILE_PICTURE_SIZE = 5 * 1024 * 1024; // 5MB in bytes
+const BYTES_TO_MB = 1024 * 1024;
+const ALLOWED_IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'];
 
 export interface ProfileUpdateData {
   full_name?: string;
@@ -14,12 +17,45 @@ export interface BusinessUpdateData {
 }
 
 /**
+ * Generate a unique ID for file naming
+ * Uses crypto.randomUUID() when available, otherwise falls back to a timestamp-based ID
+ */
+function generateUniqueId(): string {
+  // Try to use crypto.randomUUID() for best security
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+  
+  // Fallback: Use timestamp with high-precision random component
+  // Note: For production, consider adding 'uuid' package for better collision resistance
+  const timestamp = Date.now().toString(36);
+  const randomPart = Math.random().toString(36).substring(2, 15);
+  const randomPart2 = Math.random().toString(36).substring(2, 15);
+  return `${timestamp}-${randomPart}-${randomPart2}`;
+}
+
+/**
  * Upload profile picture to Supabase Storage
  */
 export async function uploadProfilePicture(file: File, userId: string) {
   try {
-    const fileExt = file.name.split('.').pop();
-    const fileName = `profile-pictures/${userId}/${Date.now()}.${fileExt}`;
+    // Extract and validate file extension
+    const fileExt = file.name.split('.').pop()?.toLowerCase();
+    if (!fileExt) {
+      return { data: null, error: new Error('Invalid file name: no extension found') };
+    }
+
+    // Validate file extension is in allowed list
+    if (!ALLOWED_IMAGE_EXTENSIONS.includes(fileExt)) {
+      return { 
+        data: null, 
+        error: new Error(`Invalid file type. Allowed types: ${ALLOWED_IMAGE_EXTENSIONS.join(', ')}`) 
+      };
+    }
+
+    // Generate unique filename for collision prevention
+    const uniqueId = generateUniqueId();
+    const fileName = `profile-pictures/${userId}/${uniqueId}.${fileExt}`;
 
     const { data, error } = await supabase.storage
       .from(STORAGE_BUCKET)
