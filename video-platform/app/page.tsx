@@ -2,18 +2,23 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { useAuth } from '@/contexts/AuthContext';
 import { getVideosFeed } from '@/lib/supabase/videos';
 import { supabase } from '@/lib/supabase/client';
+import { CommentModal } from '@/components/CommentModal';
+import { Toast } from '@/components/Toast';
+import { sharePost } from '@/lib/utils/share';
 
 interface Video {
   id: string;
+  user_id?: string;
   video_url: string;
   caption?: string;
   created_at: string;
   profiles?: {
+    id?: string;
     username: string;
     full_name: string;
     profile_picture_url?: string;
@@ -40,6 +45,7 @@ export default function Home() {
 
 function HomeContent() {
   const { user } = useAuth();
+  const router = useRouter();
   const [videos, setVideos] = useState<Video[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isScrolling, setIsScrolling] = useState(false);
@@ -48,6 +54,9 @@ function HomeContent() {
   const [bookmarkAnimating, setBookmarkAnimating] = useState<string | null>(null);
   const [likedVideos, setLikedVideos] = useState<Set<string>>(new Set());
   const [bookmarkedVideos, setBookmarkedVideos] = useState<Set<string>>(new Set());
+  const [commentModalOpen, setCommentModalOpen] = useState(false);
+  const [commentPostId, setCommentPostId] = useState<string>('');
+  const [toastMessage, setToastMessage] = useState<string>('');
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
@@ -224,6 +233,45 @@ function HomeContent() {
     setTimeout(() => setBookmarkAnimating(null), 300);
   };
 
+  // Navigate to profile page
+  const handleProfileClick = (userId?: string) => {
+    if (!userId) {
+      console.warn('Profile click: userId is missing');
+      return;
+    }
+    router.push(`/profile/${userId}`);
+  };
+
+  // Open comment modal
+  const handleCommentClick = (postId: string) => {
+    setCommentPostId(postId);
+    setCommentModalOpen(true);
+  };
+
+  // Handle share
+  const handleShareClick = async (video: Video) => {
+    const businessName = video.businesses?.business_name || video.profiles?.full_name || 'Business';
+    const url = `${window.location.origin}/video/${video.id}`;
+    
+    const result = await sharePost({
+      title: `Check out ${businessName} on Localy`,
+      text: video.caption || `Watch this video from ${businessName}`,
+      url: url,
+    });
+
+    if (result.success && !result.usedWebShare) {
+      setToastMessage('Link copied to clipboard');
+    }
+  };
+
+  // Handle keyboard events for accessibility
+  const handleKeyDown = (e: React.KeyboardEvent, action: () => void) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      action();
+    }
+  };
+
   if (loading) {
     return (
       <div className="relative h-screen w-screen overflow-hidden bg-black flex items-center justify-center">
@@ -292,9 +340,16 @@ function HomeContent() {
             
             {/* Business Info Overlay */}
             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6 pb-24">
-              <h2 className="text-2xl font-bold text-white mb-2">
-                {currentBusiness?.business_name || video.profiles?.full_name || 'Business'}
-              </h2>
+              <button
+                onClick={() => handleProfileClick(video.user_id)}
+                onKeyDown={(e) => handleKeyDown(e, () => handleProfileClick(video.user_id))}
+                className="text-left focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black/80 rounded"
+                aria-label={`View profile of ${currentBusiness?.business_name || video.profiles?.full_name || 'Business'}`}
+              >
+                <h2 className="text-2xl font-bold text-white mb-2 hover:underline">
+                  {currentBusiness?.business_name || video.profiles?.full_name || 'Business'}
+                </h2>
+              </button>
               <p className="text-white/80 text-sm mb-2">{video.caption || ''}</p>
               <div className="flex items-center gap-4 text-white/90 text-sm">
                 {currentBusiness?.average_rating && (
@@ -327,11 +382,18 @@ function HomeContent() {
       <div className="absolute right-0 top-1/2 -translate-y-1/2 z-20 flex flex-col items-center gap-6 pr-4">
         {/* Profile Picture */}
         <div className="relative">
-          <img
-            src={currentBusiness?.profile_picture_url || currentVideo.profiles?.profile_picture_url || 'https://via.placeholder.com/60'}
-            alt={currentBusiness?.business_name || 'Business'}
-            className="w-14 h-14 rounded-full border-2 border-white object-cover cursor-pointer hover:scale-110 transition-transform duration-200 active:scale-95"
-          />
+          <button
+            onClick={() => handleProfileClick(currentVideo.user_id)}
+            onKeyDown={(e) => handleKeyDown(e, () => handleProfileClick(currentVideo.user_id))}
+            className="focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black rounded-full"
+            aria-label={`View profile of ${currentBusiness?.business_name || currentVideo.profiles?.full_name || 'user'}`}
+          >
+            <img
+              src={currentBusiness?.profile_picture_url || currentVideo.profiles?.profile_picture_url || 'https://via.placeholder.com/60'}
+              alt={currentBusiness?.business_name || 'Business'}
+              className="w-14 h-14 rounded-full border-2 border-white object-cover cursor-pointer hover:scale-110 transition-transform duration-200 active:scale-95"
+            />
+          </button>
         </div>
 
         {/* Like Button */}
@@ -358,7 +420,12 @@ function HomeContent() {
         )}
 
         {/* Reviews Button */}
-        <button className="flex flex-col items-center gap-1 transition-transform duration-200 hover:scale-110 active:scale-95">
+        <button 
+          onClick={() => handleCommentClick(currentVideo.id)}
+          onKeyDown={(e) => handleKeyDown(e, () => handleCommentClick(currentVideo.id))}
+          className="flex flex-col items-center gap-1 transition-transform duration-200 hover:scale-110 active:scale-95"
+          aria-label="Add a comment"
+        >
           <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center hover:bg-white/30 transition-all duration-200">
             <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
@@ -404,7 +471,12 @@ function HomeContent() {
         )}
 
         {/* Share Button */}
-        <button className="flex flex-col items-center gap-1 transition-transform duration-200 hover:scale-110 active:scale-95">
+        <button 
+          onClick={() => handleShareClick(currentVideo)}
+          onKeyDown={(e) => handleKeyDown(e, () => handleShareClick(currentVideo))}
+          className="flex flex-col items-center gap-1 transition-transform duration-200 hover:scale-110 active:scale-95"
+          aria-label="Share this post"
+        >
           <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center hover:bg-white/30 transition-all duration-200">
             <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
@@ -458,6 +530,22 @@ function HomeContent() {
           </span>
         </div>
       </div>
+
+      {/* Comment Modal */}
+      <CommentModal
+        isOpen={commentModalOpen}
+        onClose={() => setCommentModalOpen(false)}
+        postId={commentPostId}
+        businessName={currentBusiness?.business_name || currentVideo.profiles?.full_name}
+      />
+
+      {/* Toast Notification */}
+      {toastMessage && (
+        <Toast
+          message={toastMessage}
+          onClose={() => setToastMessage('')}
+        />
+      )}
     </div>
   );
 }
