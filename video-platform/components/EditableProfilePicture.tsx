@@ -92,8 +92,10 @@ export function EditableProfilePicture({
         }
 
         // Clean up object URL
-        URL.revokeObjectURL(objectUrlRef.current);
-        objectUrlRef.current = null;
+        if (objectUrlRef.current) {
+          URL.revokeObjectURL(objectUrlRef.current);
+          objectUrlRef.current = null;
+        }
         setPreview(data.publicUrl);
         
         // Callback to refresh parent component
