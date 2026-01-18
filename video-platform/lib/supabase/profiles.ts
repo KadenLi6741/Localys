@@ -1,6 +1,6 @@
 import { supabase } from './client';
 
-const STORAGE_BUCKET = process.env.NEXT_PUBLIC_SUPABASE_BUCKET || 'videos';
+const STORAGE_BUCKET = 'avatars';
 export const MAX_PROFILE_PICTURE_SIZE = 5 * 1024 * 1024; // 5MB in bytes
 export const BYTES_TO_MB = 1024 * 1024; // Conversion constant for bytes to megabytes
 const ALLOWED_IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'];
@@ -33,6 +33,42 @@ export interface ProfileUpdateData {
 
 export interface BusinessUpdateData {
   business_name?: string;
+}
+
+/**
+ * Fetch a single profile by user ID
+ * This function includes proper error handling for missing profiles
+ */
+export async function getProfileByUserId(userId: string) {
+  try {
+    if (!userId) {
+      return { data: null, error: new Error('User ID is required') };
+    }
+
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('id, email, username, full_name, bio, profile_picture_url')
+      .eq('id', userId)
+      .single();
+
+    // Handle the specific error when no rows are found
+    if (error && error.code === 'PGRST116') {
+      return { data: null, error: null }; // Profile doesn't exist, but it's not an error
+    }
+
+    if (error) {
+      console.error('Error fetching profile:', {
+        message: error.message,
+        code: error.code,
+      });
+      return { data: null, error };
+    }
+
+    return { data, error: null };
+  } catch (error: any) {
+    console.error('Exception fetching profile:', error);
+    return { data: null, error };
+  }
 }
 
 /**
@@ -81,9 +117,15 @@ export async function uploadProfilePicture(file: File, userId: string) {
       .upload(fileName, file, {
         cacheControl: '3600',
         upsert: false,
+        contentType: file.type, // Explicitly set the content type
       });
 
-    if (error) return { data: null, error };
+    if (error) {
+      console.error('Storage upload error:', {
+        message: error.message,
+      });
+      return { data: null, error };
+    }
 
     // Get public URL
     const { data: urlData } = supabase.storage
@@ -92,6 +134,7 @@ export async function uploadProfilePicture(file: File, userId: string) {
 
     return { data: { ...data, publicUrl: urlData.publicUrl }, error: null };
   } catch (error: any) {
+    console.error('Profile picture upload exception:', error);
     return { data: null, error };
   }
 }
@@ -101,6 +144,16 @@ export async function uploadProfilePicture(file: File, userId: string) {
  */
 export async function updateProfile(userId: string, updates: ProfileUpdateData) {
   try {
+    // Check authentication
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      return { data: null, error: new Error('User not authenticated') };
+    }
+
+    if (user.id !== userId) {
+      return { data: null, error: new Error('Cannot update another user\'s profile') };
+    }
+
     const { data, error } = await supabase
       .from('profiles')
       .update(updates)
@@ -108,9 +161,16 @@ export async function updateProfile(userId: string, updates: ProfileUpdateData) 
       .select()
       .single();
 
-    if (error) return { data: null, error };
+    if (error) {
+      console.error('Profile update error:', {
+        message: error.message,
+        code: error.code,
+      });
+      return { data: null, error };
+    }
     return { data, error: null };
   } catch (error: any) {
+    console.error('Profile update exception:', error);
     return { data: null, error };
   }
 }
