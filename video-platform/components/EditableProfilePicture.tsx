@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { uploadProfilePicture, updateProfile, MAX_PROFILE_PICTURE_SIZE, BYTES_TO_MB } from '@/lib/supabase/profiles';
 
 interface EditableProfilePictureProps {
@@ -26,6 +26,17 @@ export function EditableProfilePicture({
   const [preview, setPreview] = useState<string | null>(currentImageUrl || null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const objectUrlRef = useRef<string | null>(null);
+
+  // Cleanup object URL on unmount
+  useEffect(() => {
+    return () => {
+      if (objectUrlRef.current) {
+        URL.revokeObjectURL(objectUrlRef.current);
+        objectUrlRef.current = null;
+      }
+    };
+  }, []);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -48,8 +59,15 @@ export function EditableProfilePicture({
     setError(null);
 
     try {
+      // Revoke previous object URL if it exists
+      if (objectUrlRef.current) {
+        URL.revokeObjectURL(objectUrlRef.current);
+        objectUrlRef.current = null;
+      }
+
       // Show preview immediately
       const objectUrl = URL.createObjectURL(file);
+      objectUrlRef.current = objectUrl;
       setPreview(objectUrl);
 
       // Upload to Supabase
@@ -74,7 +92,10 @@ export function EditableProfilePicture({
         }
 
         // Clean up object URL
-        URL.revokeObjectURL(objectUrl);
+        if (objectUrlRef.current) {
+          URL.revokeObjectURL(objectUrlRef.current);
+          objectUrlRef.current = null;
+        }
         setPreview(data.publicUrl);
         
         // Callback to refresh parent component
@@ -83,7 +104,11 @@ export function EditableProfilePicture({
     } catch (err: any) {
       console.error('Profile picture update error:', err);
       setError(err.message || 'Failed to update profile picture');
-      // Revert preview on error
+      // Revert preview on error and clean up object URL
+      if (objectUrlRef.current) {
+        URL.revokeObjectURL(objectUrlRef.current);
+        objectUrlRef.current = null;
+      }
       setPreview(currentImageUrl || null);
     } finally {
       setLoading(false);
