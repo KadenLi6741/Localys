@@ -7,6 +7,7 @@ import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { useAuth } from '@/contexts/AuthContext';
 import { signOut } from '@/lib/supabase/auth';
 import { supabase } from '@/lib/supabase/client';
+import { EditableProfilePicture } from '@/components/EditableProfilePicture';
 import { 
   uploadProfilePicture, 
   updateProfile, 
@@ -120,8 +121,10 @@ function ProfileContent() {
         <ProfileView 
           profile={profile}
           business={business}
+          user={user}
           onEditClick={() => setIsEditMode(true)}
           onSignOut={handleSignOut}
+          onProfileUpdated={loadProfile}
           pathname={pathname}
         />
       )}
@@ -132,30 +135,28 @@ function ProfileContent() {
 interface ProfileViewProps {
   profile: Profile | null;
   business: Business | null;
+  user: any;
   onEditClick: () => void;
   onSignOut: () => void;
+  onProfileUpdated: () => void;
   pathname: string;
 }
 
-function ProfileView({ profile, business, onEditClick, onSignOut, pathname }: ProfileViewProps) {
+function ProfileView({ profile, business, user, onEditClick, onSignOut, onProfileUpdated, pathname }: ProfileViewProps) {
   return (
     <>
       <div className="max-w-2xl mx-auto px-4 py-8">
         {/* Profile Header */}
         <div className="flex items-center gap-6 mb-8">
-          <div className="w-24 h-24 rounded-full bg-white/20 flex items-center justify-center overflow-hidden">
-            {profile?.profile_picture_url ? (
-              <img
-                src={profile.profile_picture_url}
-                alt={profile.full_name || 'Profile'}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <span className="text-3xl text-white/60">
-                {profile?.full_name?.[0] || profile?.username?.[0] || '?'}
-              </span>
-            )}
-          </div>
+          <EditableProfilePicture
+            userId={user.id}
+            currentImageUrl={profile?.profile_picture_url}
+            fullName={profile?.full_name}
+            username={profile?.username}
+            isOwnProfile={true}
+            onImageUpdated={onProfileUpdated}
+            className="w-24 h-24"
+          />
           <div className="flex-1">
             <h2 className="text-2xl font-bold mb-2">{profile?.full_name || 'User'}</h2>
             <p className="text-white/60 mb-2">@{profile?.username || 'username'}</p>
