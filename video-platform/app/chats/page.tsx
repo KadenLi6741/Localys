@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { useAuth } from '@/contexts/AuthContext';
-import { getConversations, getOrCreateConversation } from '@/lib/supabase/messages';
-import { supabase } from '@/lib/supabase/client';
+import { useChats } from '@/hooks/useChats';
+import { ChatList } from '@/components/chats/ChatList';
+import { NewChatModal } from '@/components/chats/NewChatModal';
 
 export default function ChatsPage() {
   return (
@@ -18,120 +19,41 @@ export default function ChatsPage() {
 
 function ChatsContent() {
   const { user } = useAuth();
-  const router = useRouter();
   const pathname = usePathname();
-  const [conversations, setConversations] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    if (user) {
-      loadConversations();
-    }
-  }, [user]);
-
-  const loadConversations = async () => {
-    if (!user) return;
-
-    try {
-      const { data, error } = await getConversations(user.id);
-      if (error) throw error;
-      setConversations(data || []);
-    } catch (error) {
-      console.error('Error loading conversations:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleConversationClick = async (conversation: any) => {
-    router.push(`/chats/${conversation.id}`);
-  };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-black text-white pb-20 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
-          <p>Loading conversations...</p>
-        </div>
-      </div>
-    );
-  }
+  const { chats, loading } = useChats(user?.id);
+  const [showNewChatModal, setShowNewChatModal] = useState(false);
 
   return (
     <div className="min-h-screen bg-black text-white pb-20">
       {/* Header */}
       <div className="sticky top-0 z-10 bg-black/80 backdrop-blur-md border-b border-white/10">
-        <div className="max-w-2xl mx-auto px-4 py-4">
+        <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
           <h1 className="text-2xl font-bold">Messages</h1>
+          <button
+            onClick={() => setShowNewChatModal(true)}
+            className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
+            aria-label="New chat"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+          </button>
         </div>
       </div>
 
       {/* Chats Content */}
       <div className="max-w-2xl mx-auto px-4 py-8">
-        {conversations.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-white/60 mb-4">No conversations yet</p>
-            <p className="text-sm text-white/40">Start chatting with businesses from the home feed</p>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {conversations.map((conversation) => {
-              const otherUser = conversation.user_id === user?.id 
-                ? conversation.business 
-                : conversation.user;
-              const unreadCount = conversation.user_id === user?.id
-                ? conversation.unread_count_user
-                : conversation.unread_count_business;
-
-              return (
-                <div
-                  key={conversation.id}
-                  onClick={() => handleConversationClick(conversation)}
-                  className="flex items-center gap-4 p-4 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 transition-all duration-200 cursor-pointer active:scale-98"
-                >
-                  <div className="w-14 h-14 rounded-full bg-white/10 flex-shrink-0 overflow-hidden">
-                    {otherUser?.profile_picture_url ? (
-                      <img
-                        src={otherUser.profile_picture_url}
-                        alt={otherUser.business_name || otherUser.full_name}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-white/60">
-                        {otherUser?.business_name?.[0] || otherUser?.full_name?.[0] || '?'}
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold mb-1 truncate">
-                      {otherUser?.business_name || otherUser?.full_name || 'Unknown'}
-                    </h3>
-                    <p className="text-sm text-white/60 truncate">
-                      {conversation.last_message?.message_text || 'No messages yet'}
-                    </p>
-                  </div>
-                  <div className="text-right flex-shrink-0">
-                    {conversation.last_message_at && (
-                      <p className="text-xs text-white/40 mb-1">
-                        {new Date(conversation.last_message_at).toLocaleTimeString([], { 
-                          hour: '2-digit', 
-                          minute: '2-digit' 
-                        })}
-                      </p>
-                    )}
-                    {unreadCount > 0 && (
-                      <span className="bg-red-500 text-white text-xs rounded-full px-2 py-1 inline-block">
-                        {unreadCount}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
+        <ChatList chats={chats} currentUserId={user?.id || ''} loading={loading} />
       </div>
+
+      {/* New Chat Modal */}
+      {user && (
+        <NewChatModal
+          isOpen={showNewChatModal}
+          onClose={() => setShowNewChatModal(false)}
+          currentUserId={user.id}
+        />
+      )}
 
       {/* Bottom Navigation */}
       <div className="fixed bottom-0 left-0 right-0 z-20 bg-black/50 backdrop-blur-md border-t border-white/10">
