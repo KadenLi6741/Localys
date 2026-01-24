@@ -439,7 +439,7 @@ function HomeContent() {
       {/* Left Side - Logo Only (Search removed) */}
       <div className="absolute top-0 left-0 z-20 p-4">
         <div className="bg-white/10 backdrop-blur-md rounded-lg px-4 py-2">
-          <h1 className="text-xl font-bold text-white">Localy</h1>
+          <h1 className="text-xl font-bold text-white">Localys</h1>
         </div>
       </div>
 
