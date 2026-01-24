@@ -32,6 +32,11 @@ CREATE INDEX IF NOT EXISTS comments_video_parent_created_idx ON public.comments(
 DROP TRIGGER IF EXISTS comments_updated_at ON public.comments;
 DROP TRIGGER IF EXISTS prevent_nested_replies ON public.comments;
 
+-- If an older version of this function exists with a different signature/return
+-- type Postgres will refuse to replace it. Drop first to ensure the CREATE
+-- works regardless of previous definition.
+DROP FUNCTION IF EXISTS public.handle_comments_updated_at() CASCADE;
+
 CREATE OR REPLACE FUNCTION public.handle_comments_updated_at()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -46,6 +51,8 @@ CREATE TRIGGER comments_updated_at
   EXECUTE FUNCTION public.handle_comments_updated_at();
 
 -- Function to prevent nested replies (replies to replies)
+DROP FUNCTION IF EXISTS public.prevent_nested_replies() CASCADE;
+
 CREATE OR REPLACE FUNCTION public.prevent_nested_replies()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -80,6 +87,10 @@ CREATE INDEX IF NOT EXISTS comment_likes_user_id_idx ON public.comment_likes(use
 CREATE INDEX IF NOT EXISTS comment_likes_created_at_idx ON public.comment_likes(created_at DESC);
 
 -- ===== 6. HELPER FUNCTION: GET COMMENT WITH LIKES =====
+-- Drop older definitions (may have different OUT column types) before
+-- recreating the function to avoid "cannot change return type" errors.
+DROP FUNCTION IF EXISTS public.get_comment_with_likes(uuid, uuid) CASCADE;
+
 CREATE OR REPLACE FUNCTION public.get_comment_with_likes(
   p_comment_id UUID,
   p_user_id UUID DEFAULT NULL
@@ -123,6 +134,8 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- ===== 7. HELPER FUNCTION: GET VIDEO COMMENTS =====
+DROP FUNCTION IF EXISTS public.get_video_comments(uuid, uuid, integer, integer) CASCADE;
+
 CREATE OR REPLACE FUNCTION public.get_video_comments(
   p_video_id UUID,
   p_user_id UUID DEFAULT NULL,
@@ -149,21 +162,24 @@ BEGIN
   WITH comment_likes AS (
     SELECT
       comment_id,
-      COUNT(*) AS like_count,
-      CASE WHEN p_user_id IS NOT NULL AND EXISTS(
-        SELECT 1 FROM public.comment_likes cl
-        WHERE cl.comment_id = comment_likes.comment_id AND cl.user_id = p_user_id
-      ) THEN TRUE ELSE FALSE END AS is_liked
+      COUNT(*) AS like_count
     FROM public.comment_likes
     GROUP BY comment_id
   ),
+  user_likes AS (
+    SELECT
+      comment_id,
+      TRUE AS is_liked
+    FROM public.comment_likes
+    WHERE user_id = p_user_id
+  ),
   reply_counts AS (
     SELECT
-      parent_comment_id,
+      parent_comment_id AS pc_id,
       COUNT(*) AS reply_count
-    FROM public.comments
-    WHERE parent_comment_id IS NOT NULL
-    GROUP BY parent_comment_id
+    FROM public.comments comm_inner
+    WHERE comm_inner.parent_comment_id IS NOT NULL
+    GROUP BY comm_inner.parent_comment_id
   )
   SELECT
     c.id,
@@ -174,14 +190,15 @@ BEGIN
     c.created_at,
     c.updated_at,
     COALESCE(cl.like_count, 0) AS like_count,
-    COALESCE(cl.is_liked, FALSE) AS is_liked,
+    COALESCE(ul.is_liked, FALSE) AS is_liked,
     p.username,
     p.full_name,
     p.avatar_url,
     COALESCE(rc.reply_count, 0) AS reply_count
   FROM public.comments c
   LEFT JOIN comment_likes cl ON c.id = cl.comment_id
-  LEFT JOIN reply_counts rc ON c.id = rc.parent_comment_id
+  LEFT JOIN user_likes ul ON c.id = ul.comment_id
+  LEFT JOIN reply_counts rc ON c.id = rc.pc_id
   LEFT JOIN public.profiles p ON c.user_id = p.id
   WHERE c.video_id = p_video_id
     AND c.parent_comment_id IS NULL
@@ -192,6 +209,8 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- ===== 8. HELPER FUNCTION: GET COMMENT REPLIES =====
+DROP FUNCTION IF EXISTS public.get_comment_replies(uuid, uuid, integer, integer) CASCADE;
+
 CREATE OR REPLACE FUNCTION public.get_comment_replies(
   p_parent_comment_id UUID,
   p_user_id UUID DEFAULT NULL,
@@ -217,13 +236,16 @@ BEGIN
   WITH comment_likes AS (
     SELECT
       comment_id,
-      COUNT(*) AS like_count,
-      CASE WHEN p_user_id IS NOT NULL AND EXISTS(
-        SELECT 1 FROM public.comment_likes cl
-        WHERE cl.comment_id = comment_likes.comment_id AND cl.user_id = p_user_id
-      ) THEN TRUE ELSE FALSE END AS is_liked
+      COUNT(*) AS like_count
     FROM public.comment_likes
     GROUP BY comment_id
+  ),
+  user_likes AS (
+    SELECT
+      comment_id,
+      TRUE AS is_liked
+    FROM public.comment_likes
+    WHERE user_id = p_user_id
   )
   SELECT
     c.id,
@@ -234,12 +256,13 @@ BEGIN
     c.created_at,
     c.updated_at,
     COALESCE(cl.like_count, 0) AS like_count,
-    COALESCE(cl.is_liked, FALSE) AS is_liked,
+    COALESCE(ul.is_liked, FALSE) AS is_liked,
     p.username,
     p.full_name,
     p.avatar_url
   FROM public.comments c
   LEFT JOIN comment_likes cl ON c.id = cl.comment_id
+  LEFT JOIN user_likes ul ON c.id = ul.comment_id
   LEFT JOIN public.profiles p ON c.user_id = p.id
   WHERE c.parent_comment_id = p_parent_comment_id
   ORDER BY c.created_at ASC
@@ -307,7 +330,26 @@ CREATE POLICY "Users can delete own likes"
   USING (auth.uid() = user_id);
 
 -- ===== 12. ENABLE REALTIME (OPTIONAL) =====
-ALTER PUBLICATION supabase_realtime DROP TABLE IF EXISTS comments;
-ALTER PUBLICATION supabase_realtime DROP TABLE IF EXISTS comment_likes;
-ALTER PUBLICATION supabase_realtime ADD TABLE public.comments;
-ALTER PUBLICATION supabase_realtime ADD TABLE public.comment_likes;
+-- Modify the supabase_realtime publication safely. "ALTER PUBLICATION ... DROP TABLE IF EXISTS"
+-- is not valid Postgres syntax, so use a PL/pgSQL block that checks pg_publication_tables.
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM pg_publication_tables
+    WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'comments'
+  ) THEN
+    EXECUTE 'ALTER PUBLICATION supabase_realtime DROP TABLE public.comments';
+  END IF;
+
+  IF EXISTS (
+    SELECT 1 FROM pg_publication_tables
+    WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'comment_likes'
+  ) THEN
+    EXECUTE 'ALTER PUBLICATION supabase_realtime DROP TABLE public.comment_likes';
+  END IF;
+
+  -- Ensure the tables are added to the publication (will error if publication doesn't exist).
+  EXECUTE 'ALTER PUBLICATION supabase_realtime ADD TABLE public.comments';
+  EXECUTE 'ALTER PUBLICATION supabase_realtime ADD TABLE public.comment_likes';
+END
+$$;
