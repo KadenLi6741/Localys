@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { useAuth } from '@/contexts/AuthContext';
-import { getVideosFeed } from '@/lib/supabase/videos';
+import { getVideosFeed, getLikeCounts, likeItem, unlikeItem } from '@/lib/supabase/videos';
 import { supabase } from '@/lib/supabase/client';
 import { CommentModal } from '@/components/CommentModal';
 import { Toast } from '@/components/Toast';
@@ -33,6 +33,7 @@ interface Video {
     latitude?: number;
     longitude?: number;
   };
+  like_count?: number; // Add like count to video
 }
 
 export default function Home() {
@@ -54,6 +55,7 @@ function HomeContent() {
   const [bookmarkAnimating, setBookmarkAnimating] = useState<string | null>(null);
   const [likedVideos, setLikedVideos] = useState<Set<string>>(new Set());
   const [bookmarkedVideos, setBookmarkedVideos] = useState<Set<string>>(new Set());
+  const [likeCounts, setLikeCounts] = useState<{ [key: string]: number }>({});
   const [commentModalOpen, setCommentModalOpen] = useState(false);
   const [commentPostId, setCommentPostId] = useState<string>('');
   const [toastMessage, setToastMessage] = useState<string>('');
@@ -74,11 +76,45 @@ function HomeContent() {
       const { data, error } = await getVideosFeed(20, 0);
       if (error) throw error;
       if (data) {
-        setVideos(data as Video[]);
+        const videosData = data as Video[];
+        setVideos(videosData);
+        
+        // Build like counts for all items (businesses and video IDs)
+        const counts: { [key: string]: number } = {};
+        
+        const businessIds = Array.from(new Set(videosData.map(v => v.businesses?.id).filter(Boolean))) as string[];
+        const videoIds = videosData.map(v => v.id);
+
+        // Fetch all likes
+        const { data: allLikes } = await supabase
+          .from('likes')
+          .select('business_id, video_id');
+
+        if (allLikes) {
+          allLikes.forEach((like: any) => {
+            if (like.business_id) {
+              counts[like.business_id] = (counts[like.business_id] || 0) + 1;
+            }
+            if (like.video_id) {
+              counts[like.video_id] = (counts[like.video_id] || 0) + 1;
+            }
+          });
+        }
+
+        // Initialize all items with 0 if not yet in counts
+        [...businessIds, ...videoIds].forEach(id => {
+          if (!(id in counts)) {
+            counts[id] = 0;
+          }
+        });
+
+        setLikeCounts(counts);
+        if (process.env.NODE_ENV === 'development') {
+          console.log('Loaded like counts:', counts);
+        }
       }
     } catch (error) {
       console.error(`Error loading videos: ${error instanceof Error ? error.message : String(error)}`);
-      // Fallback to empty array if Supabase is not configured
     } finally {
       setLoading(false);
     }
@@ -88,14 +124,24 @@ function HomeContent() {
     if (!user) return;
     
     try {
-      // Load likes
+      // Load likes (both business_id and video_id)
       const { data: likes } = await supabase
         .from('likes')
-        .select('business_id')
+        .select('business_id, video_id')
         .eq('user_id', user.id);
-      
+
+      const likedSet = new Set<string>();
+
       if (likes) {
-        setLikedVideos(new Set(likes.map((l: any) => l.business_id).filter(Boolean)));
+        likes.forEach((l: any) => {
+          if (l.business_id) likedSet.add(l.business_id);
+          if (l.video_id) likedSet.add(l.video_id);
+        });
+      }
+
+      setLikedVideos(likedSet);
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Loaded liked items:', Array.from(likedSet));
       }
 
       // Load bookmarks
@@ -171,31 +217,49 @@ function HomeContent() {
 
   // Toggle like
   const toggleLike = async (videoId: string, businessId?: string) => {
-    if (!user || !businessId) return;
+    if (!user) {
+      setToastMessage('Please sign in to like posts');
+      return;
+    }
 
     setLikeAnimating(videoId);
-    const isLiked = likedVideos.has(businessId);
+    const likeKey = businessId || videoId;
+    const itemType = businessId ? 'business' : 'video';
+    const isLiked = likedVideos.has(likeKey);
 
     try {
       if (isLiked) {
-        await supabase
-          .from('likes')
-          .delete()
-          .eq('user_id', user.id)
-          .eq('business_id', businessId);
+        // Unlike
+        const { error } = await unlikeItem(user.id, likeKey, itemType as 'video' | 'business');
+        if (error) throw error;
+        
         setLikedVideos(prev => {
           const next = new Set(prev);
-          next.delete(businessId);
+          next.delete(likeKey);
           return next;
         });
+
+        // Decrement like count
+        setLikeCounts(prev => ({
+          ...prev,
+          [likeKey]: Math.max(0, (prev[likeKey] || 0) - 1)
+        }));
       } else {
-        await supabase
-          .from('likes')
-          .insert({ user_id: user.id, business_id: businessId });
-        setLikedVideos(prev => new Set(prev).add(businessId));
+        // Like
+        const { error } = await likeItem(user.id, likeKey, itemType as 'video' | 'business');
+        if (error) throw error;
+        
+        setLikedVideos(prev => new Set(prev).add(likeKey));
+
+        // Increment like count
+        setLikeCounts(prev => ({
+          ...prev,
+          [likeKey]: (prev[likeKey] || 0) + 1
+        }));
       }
     } catch (error) {
       console.error('Error toggling like:', error);
+      setToastMessage('Could not update like — try again');
     }
 
     setTimeout(() => setLikeAnimating(null), 300);
@@ -301,7 +365,8 @@ function HomeContent() {
 
   const currentVideo = videos[currentIndex];
   const currentBusiness = currentVideo.businesses;
-  const isLiked = currentBusiness?.id ? likedVideos.has(currentBusiness.id) : false;
+  const likeKey = currentBusiness?.id || currentVideo.id;
+  const isLiked = likedVideos.has(likeKey);
   const isBookmarked = currentBusiness?.id ? bookmarkedVideos.has(currentBusiness.id) : false;
 
   // Calculate distance (simplified - would use actual user location in production)
@@ -396,28 +461,30 @@ function HomeContent() {
           </button>
         </div>
 
-        {/* Like Button */}
-        {currentBusiness?.id && (
-          <button
-            onClick={() => toggleLike(currentVideo.id, currentBusiness.id)}
-            className="flex flex-col items-center gap-1 transition-transform duration-200 active:scale-95"
-          >
-            <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 ${
-              isLiked ? 'bg-red-500' : 'bg-white/20 backdrop-blur-md'
-            } ${likeAnimating === currentVideo.id ? 'scale-125' : ''}`}>
-              <svg
-                className={`w-6 h-6 text-white transition-all duration-300 ${
-                  likeAnimating === currentVideo.id ? 'scale-150' : ''
-                }`}
-                fill={isLiked ? 'currentColor' : 'none'}
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-              </svg>
-            </div>
-          </button>
-        )}
+        {/* Like Button - show for all videos */}
+        <button
+          onClick={() => toggleLike(currentVideo.id, currentBusiness?.id)}
+          onKeyDown={(e) => handleKeyDown(e, () => toggleLike(currentVideo.id, currentBusiness?.id))}
+          className="flex flex-col items-center gap-1 transition-transform duration-200 active:scale-95"
+        >
+          <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 ${
+            isLiked ? 'bg-red-500' : 'bg-white/20 backdrop-blur-md'
+          } ${likeAnimating === currentVideo.id ? 'scale-125' : ''}`}>
+            <svg
+              className={`w-6 h-6 text-white transition-all duration-300 ${
+                likeAnimating === currentVideo.id ? 'scale-150' : ''
+              }`}
+              fill={isLiked ? 'currentColor' : 'none'}
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+            </svg>
+          </div>
+          <span className="text-white text-xs font-semibold">
+            {likeCounts[likeKey] || 0}
+          </span>
+        </button>
 
         {/* Reviews Button */}
         <button 
