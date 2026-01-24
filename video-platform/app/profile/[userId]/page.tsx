@@ -6,6 +6,7 @@ import { useParams, usePathname, useRouter } from 'next/navigation';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase/client';
+import { getOrCreateConversation } from '@/lib/supabase/messaging';
 import { getProfileByUserId } from '@/lib/supabase/profiles';
 import { EditableProfilePicture } from '@/components/EditableProfilePicture';
 
@@ -35,6 +36,7 @@ function UserProfileContent() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [messagingLoading, setMessagingLoading] = useState(false);
 
   useEffect(() => {
     if (userId) {
@@ -76,6 +78,27 @@ function UserProfileContent() {
       setError(error?.message || 'Failed to load profile');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleMessageClick = async () => {
+    if (!user || !profile) return;
+    
+    setMessagingLoading(true);
+    try {
+      const { data, error } = await getOrCreateConversation(profile.id);
+      if (error) {
+        alert(`Failed to start conversation: ${error.message}`);
+        return;
+      }
+      
+      if (data) {
+        router.push(`/chats/${data.id}`);
+      }
+    } catch (err: any) {
+      alert(`Error: ${err.message}`);
+    } finally {
+      setMessagingLoading(false);
     }
   };
 
@@ -134,7 +157,7 @@ function UserProfileContent() {
       </div>
 
       {/* Profile Content */}
-      <div className="p-6">
+      <div className="p-6 pb-32">
         <div className="flex flex-col items-center mb-6">
           <EditableProfilePicture
             userId={userId}
@@ -147,8 +170,29 @@ function UserProfileContent() {
           <h2 className="text-2xl font-bold mb-1 mt-4">{profile.full_name}</h2>
           <p className="text-white/60 mb-4">@{profile.username}</p>
           {profile.bio && (
-            <p className="text-white/80 text-center max-w-md">{profile.bio}</p>
+            <p className="text-white/80 text-center max-w-md mb-6">{profile.bio}</p>
           )}
+          
+          {/* Message Button */}
+          <button
+            onClick={handleMessageClick}
+            disabled={messagingLoading}
+            className="bg-white text-black font-semibold px-6 py-2 rounded-lg hover:bg-white/90 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+          >
+            {messagingLoading ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-black"></div>
+                Starting chat...
+              </>
+            ) : (
+              <>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                </svg>
+                Message
+              </>
+            )}
+          </button>
         </div>
 
         {/* Placeholder for videos/posts */}
