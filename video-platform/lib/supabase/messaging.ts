@@ -110,21 +110,74 @@ async function getCurrentUserId(): Promise<string> {
 
 /**
  * Get or create a conversation between the current user and another user
- * Uses the database function to ensure proper ordering and uniqueness
  */
 async function getOrCreateConversationId(otherUserId: string): Promise<string> {
   const currentUserId = await getCurrentUserId();
   
-  const { data, error } = await supabase.rpc('get_or_create_conversation', {
-    p_user_one_id: currentUserId,
-    p_user_two_id: otherUserId,
-  });
+  // Sort the UUIDs for consistent ordering
+  const sortedIds = [
+    currentUserId < otherUserId ? currentUserId : otherUserId,
+    currentUserId < otherUserId ? otherUserId : currentUserId
+  ];
 
-  if (error) {
-    throw new Error(`Failed to get or create conversation: ${error.message}`);
+  // Try to find existing conversation - try multiple ways
+  let { data: existing, error: existingError } = await supabase
+    .from('conversations')
+    .select('id')
+    .eq('is_direct', true)
+    .order('created_at', { ascending: false })
+    .limit(100);
+
+  if (existing && existing.length > 0) {
+    // Find the matching conversation by checking participant_ids
+    for (const conv of existing) {
+      const { data: convData } = await supabase
+        .from('conversations')
+        .select('id, participant_ids')
+        .eq('id', conv.id)
+        .single();
+      
+      if (convData && 
+          Array.isArray(convData.participant_ids) &&
+          convData.participant_ids.length === 2 &&
+          ((convData.participant_ids[0] === sortedIds[0] && convData.participant_ids[1] === sortedIds[1]) ||
+           (convData.participant_ids[0] === sortedIds[1] && convData.participant_ids[1] === sortedIds[0]) ||
+           (convData.participant_ids[0] === currentUserId && convData.participant_ids[1] === otherUserId) ||
+           (convData.participant_ids[0] === otherUserId && convData.participant_ids[1] === currentUserId))) {
+        return convData.id;
+      }
+    }
   }
 
-  return data as string;
+  // Create new conversation
+  const { data: newConv, error } = await supabase
+    .from('conversations')
+    .insert([
+      {
+        is_direct: true,
+        participant_ids: sortedIds,
+      }
+    ])
+    .select('id')
+    .single();
+
+  if (error) {
+    // If duplicate key error, try to find and return the existing conversation
+    if (error.message.includes('duplicate key')) {
+      const { data: found } = await supabase
+        .from('conversations')
+        .select('id')
+        .eq('is_direct', true)
+        .limit(1);
+      
+      if (found && found.length > 0) {
+        return found[0].id;
+      }
+    }
+    throw new Error(`Failed to create conversation: ${error.message}`);
+  }
+
+  return newConv.id;
 }
 
 /**
@@ -167,14 +220,10 @@ export async function getOrCreateConversation(
     // Get or create conversation ID using the database function
     const conversationId = await getOrCreateConversationId(otherUserId);
 
-    // Fetch the conversation with joined profile data
+    // Fetch the conversation
     const { data: conversation, error: fetchError } = await supabase
       .from('conversations')
-      .select(`
-        *,
-        other_user_one:profiles!conversations_user_one_id_fkey(*),
-        other_user_two:profiles!conversations_user_two_id_fkey(*)
-      `)
+      .select('*')
       .eq('id', conversationId)
       .single();
 
@@ -182,21 +231,21 @@ export async function getOrCreateConversation(
       return { data: null, error: new Error(fetchError.message) };
     }
 
-    // Determine which user is the "other user" and compute unread count
-    const otherUser = 
-      conversation.user_one_id === currentUserId
-        ? conversation.other_user_two
-        : conversation.other_user_one;
-    
-    const unreadCount = 
-      conversation.user_one_id === currentUserId
-        ? conversation.user_one_unread_count
-        : conversation.user_two_unread_count;
+    // Fetch the other user's profile
+    const { data: otherUserProfile, error: profileError } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', otherUserId)
+      .single();
+
+    if (profileError) {
+      console.error('Error fetching other user profile:', profileError);
+    }
 
     const formattedConversation: Conversation = {
       ...conversation,
-      other_user: otherUser,
-      unread_count: unreadCount,
+      other_user: otherUserProfile || undefined,
+      unread_count: 0,
     };
 
     // Send first message if provided
@@ -232,36 +281,40 @@ export async function getConversations(): Promise<{ data: Conversation[] | null;
 
     const { data: conversations, error } = await supabase
       .from('conversations')
-      .select(`
-        *,
-        other_user_one:profiles!conversations_user_one_id_fkey(*),
-        other_user_two:profiles!conversations_user_two_id_fkey(*)
-      `)
-      .or(`user_one_id.eq.${currentUserId},user_two_id.eq.${currentUserId}`)
+      .select('*')
+      .eq('is_direct', true)
       .order('last_message_at', { ascending: false, nullsFirst: false });
 
     if (error) {
       return { data: null, error: new Error(error.message) };
     }
 
-    // Format conversations: identify the "other user" and compute unread count
-    const formattedConversations: Conversation[] = (conversations || []).map((conv) => {
-      const otherUser = 
-        conv.user_one_id === currentUserId
-          ? conv.other_user_two
-          : conv.other_user_one;
+    // Filter conversations that include the current user and fetch other user data
+    const formattedConversations: Conversation[] = [];
+    
+    for (const conv of conversations || []) {
+      if (!Array.isArray(conv.participant_ids) || !conv.participant_ids.includes(currentUserId)) {
+        continue;
+      }
       
-      const unreadCount = 
-        conv.user_one_id === currentUserId
-          ? conv.user_one_unread_count
-          : conv.user_two_unread_count;
-
-      return {
-        ...conv,
-        other_user: otherUser,
-        unread_count: unreadCount,
-      };
-    });
+      // Get the other user's ID
+      const otherUserId = conv.participant_ids.find((id: string) => id !== currentUserId);
+      
+      if (otherUserId) {
+        // Fetch the other user's profile
+        const { data: otherUser } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', otherUserId)
+          .single();
+        
+        formattedConversations.push({
+          ...conv,
+          other_user: otherUser || undefined,
+          unread_count: 0,
+        });
+      }
+    }
 
     return { data: formattedConversations, error: null };
   } catch (error: any) {
@@ -340,18 +393,16 @@ export async function sendMessage(
   try {
     const currentUserId = await getCurrentUserId();
 
-    // Get conversation to determine receiver_id
-    const { data: conversation, error: convError } = await getConversation(payload.conversation_id);
+    // Verify user has access to this conversation
+    const { data: conversation } = await supabase
+      .from('conversations')
+      .select('id, participant_ids')
+      .eq('id', payload.conversation_id)
+      .single();
     
-    if (convError || !conversation) {
+    if (!conversation || !Array.isArray(conversation.participant_ids) || !conversation.participant_ids.includes(currentUserId)) {
       return { data: null, error: new Error('Conversation not found or access denied') };
     }
-
-    // Determine receiver_id (the other user in the conversation)
-    const receiverId = 
-      conversation.user_one_id === currentUserId
-        ? conversation.user_two_id
-        : conversation.user_one_id;
 
     // Insert the message
     const { data: message, error: insertError } = await supabase
@@ -359,14 +410,9 @@ export async function sendMessage(
       .insert({
         conversation_id: payload.conversation_id,
         sender_id: currentUserId,
-        receiver_id: receiverId,
         content: payload.content.trim(),
-        is_read: false,
       })
-      .select(`
-        *,
-        sender:profiles!messages_sender_id_fkey(*)
-      `)
+      .select('*')
       .single();
 
     if (insertError) {
@@ -397,23 +443,19 @@ export async function getMessages(
     const currentUserId = await getCurrentUserId();
 
     // Verify user has access to this conversation
-    const { error: accessError } = await supabase
+    const { data: conversation, error: accessError } = await supabase
       .from('conversations')
-      .select('id')
+      .select('id, participant_ids')
       .eq('id', conversationId)
-      .or(`user_one_id.eq.${currentUserId},user_two_id.eq.${currentUserId}`)
       .single();
 
-    if (accessError) {
+    if (accessError || !conversation || !Array.isArray(conversation.participant_ids) || !conversation.participant_ids.includes(currentUserId)) {
       return { data: null, error: new Error('Conversation not found or access denied') };
     }
 
     const { data: messages, error } = await supabase
       .from('messages')
-      .select(`
-        *,
-        sender:profiles!messages_sender_id_fkey(*)
-      `)
+      .select('*')
       .eq('conversation_id', conversationId)
       .order('created_at', { ascending: true })
       .range(offset, offset + limit - 1);
@@ -619,3 +661,13 @@ export function subscribeToAllConversations(
   return channel;
 }
 
+/**
+ * Mark messages as read in a conversation
+ * Alias for markConversationAsRead for backwards compatibility
+ */
+export async function markMessagesAsRead(
+  conversationId: string,
+  userId: string
+): Promise<{ error: Error | null }> {
+  return markConversationAsRead(conversationId);
+}

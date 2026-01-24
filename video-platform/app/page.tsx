@@ -162,7 +162,15 @@ function HomeContent() {
   useEffect(() => {
     const currentVideo = videoRefs.current[currentIndex];
     if (currentVideo) {
-      currentVideo.play().catch(console.error);
+      const playPromise = currentVideo.play();
+      if (playPromise !== undefined) {
+        playPromise.catch((error: any) => {
+          // Silently handle common autoplay errors (power saving, media removed, etc.)
+          if (error.name !== 'AbortError' && error.name !== 'NotAllowedError') {
+            console.error('Video play error:', error);
+          }
+        });
+      }
     }
 
     // Pause other videos

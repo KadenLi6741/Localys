@@ -207,20 +207,20 @@ BEGIN
     c.parent_comment_id,
     c.created_at,
     c.updated_at,
-    COALESCE(lc.like_count, 0)::BIGINT,
-    COALESCE(ul.is_liked, FALSE),
+    COALESCE(like_counts.like_count, 0)::BIGINT,
+    CASE WHEN p_user_id IS NOT NULL THEN COALESCE(user_likes.is_liked, FALSE) ELSE FALSE END,
     c.rating
   FROM public.comments c
   LEFT JOIN (
     SELECT cl.comment_id, COUNT(*) AS like_count
     FROM public.comment_likes cl
     GROUP BY cl.comment_id
-  ) lc ON c.id = lc.comment_id
+  ) like_counts ON c.id = like_counts.comment_id
   LEFT JOIN (
     SELECT cl.comment_id, TRUE AS is_liked
     FROM public.comment_likes cl
     WHERE cl.user_id = p_user_id
-  ) ul ON c.id = ul.comment_id
+  ) user_likes ON c.id = user_likes.comment_id
   WHERE c.id = p_comment_id;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;

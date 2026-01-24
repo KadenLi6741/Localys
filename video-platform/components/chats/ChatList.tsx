@@ -1,9 +1,9 @@
-import { ChatWithDetails } from '@/lib/supabase/messages';
+import { Conversation } from '@/lib/supabase/messaging';
 import { ChatListItem } from './ChatListItem';
 import { useRouter } from 'next/navigation';
 
 interface ChatListProps {
-  chats: ChatWithDetails[];
+  chats: Conversation[];
   currentUserId: string;
   loading?: boolean;
 }
@@ -50,7 +50,7 @@ export function ChatList({ chats, currentUserId, loading }: ChatListProps) {
         <ChatListItem
           key={chat.id}
           chat={chat}
-          onClick={() => handleChatClick(chat.id!)}
+          onClick={() => handleChatClick(chat.id)}
         />
       ))}
     </div>

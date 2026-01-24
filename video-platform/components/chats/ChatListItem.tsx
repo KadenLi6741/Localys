@@ -1,19 +1,19 @@
-import { ChatWithDetails } from '@/lib/supabase/messages';
+import { Conversation } from '@/lib/supabase/messaging';
 
 interface ChatListItemProps {
-  chat: ChatWithDetails;
+  chat: Conversation;
   onClick?: () => void;
 }
 
 export function ChatListItem({ chat, onClick }: ChatListItemProps) {
   const otherUser = chat.other_user;
   const displayName = otherUser?.full_name || otherUser?.username || 'Unknown User';
-  const avatarUrl = otherUser?.profile_picture_url;
-  const lastMessage = chat.last_message;
+  const avatarUrl = otherUser?.avatar_url || otherUser?.profile_picture_url;
+  const lastMessageText = chat.last_message_text || 'No messages yet';
   const unreadCount = chat.unread_count || 0;
 
   // Format timestamp
-  const formatTimestamp = (timestamp: string | undefined) => {
+  const formatTimestamp = (timestamp: string | null | undefined) => {
     if (!timestamp) return '';
     
     const date = new Date(timestamp);
@@ -53,15 +53,15 @@ export function ChatListItem({ chat, onClick }: ChatListItemProps) {
       <div className="flex-1 min-w-0">
         <h3 className="font-semibold mb-1 truncate">{displayName}</h3>
         <p className="text-sm text-white/60 truncate">
-          {lastMessage?.content || 'No messages yet'}
+          {lastMessageText}
         </p>
       </div>
 
       {/* Timestamp and Unread Count */}
       <div className="text-right flex-shrink-0">
-        {lastMessage?.created_at && (
+        {chat.last_message_at && (
           <p className="text-xs text-white/40 mb-1">
-            {formatTimestamp(lastMessage.created_at)}
+            {formatTimestamp(chat.last_message_at)}
           </p>
         )}
         {unreadCount > 0 && (

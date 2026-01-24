@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { getMessages, sendMessage, subscribeToMessages, markMessagesAsRead, Message } from '@/lib/supabase/messages';
+import { getMessages, sendMessage, subscribeToMessages, markMessagesAsRead, Message } from '@/lib/supabase/messaging';
 
 export function useMessages(chatId: string | undefined, userId: string | undefined) {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -23,11 +23,6 @@ export function useMessages(chatId: string | undefined, userId: string | undefin
       
       setMessages(data || []);
       setError(null);
-
-      // Mark messages as read when loading
-      if (userId && chatId) {
-        await markMessagesAsRead(chatId, userId);
-      }
     } catch (err) {
       console.error('Error loading messages:', err);
       setError(err instanceof Error ? err : new Error('Unknown error'));
@@ -57,8 +52,7 @@ export function useMessages(chatId: string | undefined, userId: string | undefin
     try {
       setSending(true);
       const { data, error: sendError } = await sendMessage({
-        chat_id: chatId,
-        sender_id: userId,
+        conversation_id: chatId,
         content: content.trim(),
       });
 

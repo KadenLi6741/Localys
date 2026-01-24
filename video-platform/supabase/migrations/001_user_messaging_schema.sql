@@ -211,32 +211,28 @@ CREATE OR REPLACE FUNCTION public.get_or_create_conversation(
 RETURNS UUID AS $$
 DECLARE
   v_conversation_id UUID;
-  v_sorted_user_one UUID;
-  v_sorted_user_two UUID;
+  v_participant_ids UUID[];
 BEGIN
-  -- Ensure user_one is always the smaller UUID
-  IF p_user_one_id < p_user_two_id THEN
-    v_sorted_user_one := p_user_one_id;
-    v_sorted_user_two := p_user_two_id;
-  ELSE
-    v_sorted_user_one := p_user_two_id;
-    v_sorted_user_two := p_user_one_id;
-  END IF;
+  -- Sort the UUIDs to ensure consistent ordering
+  v_participant_ids := ARRAY[
+    LEAST(p_user_one_id, p_user_two_id),
+    GREATEST(p_user_one_id, p_user_two_id)
+  ];
   
-  -- Try to find existing conversation
+  -- Try to find existing direct conversation
   SELECT id INTO v_conversation_id
   FROM public.conversations
-  WHERE user_one_id = v_sorted_user_one
-    AND user_two_id = v_sorted_user_two;
+  WHERE is_direct = true
+    AND participant_ids = v_participant_ids;
   
   -- Create conversation if it doesn't exist
   IF v_conversation_id IS NULL THEN
-    INSERT INTO public.conversations (user_one_id, user_two_id)
-    VALUES (v_sorted_user_one, v_sorted_user_two)
+    INSERT INTO public.conversations (is_direct, participant_ids)
+    VALUES (true, v_participant_ids)
     RETURNING id INTO v_conversation_id;
   END IF;
   
   RETURN v_conversation_id;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
