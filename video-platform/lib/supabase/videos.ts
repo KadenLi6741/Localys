@@ -218,6 +218,179 @@ export async function uploadVideoFile(file: File, userId: string) {
   return { data: { ...data, publicUrl: urlData.publicUrl }, error: null };
 }
 
+/**
+ * Get like count for a business/video
+ */
+export async function getLikeCount(businessId: string) {
+  try {
+    const { count, error } = await supabase
+      .from('likes')
+      .select('*', { count: 'exact', head: true })
+      .eq('business_id', businessId);
+
+    if (error) {
+      console.error('Error fetching like count:', error);
+      return { data: 0, error };
+    }
+
+    return { data: count || 0, error: null };
+  } catch (error: any) {
+    console.error('Exception fetching like count:', error);
+    return { data: 0, error };
+  }
+}
+
+/**
+ * Get like counts for multiple businesses
+ */
+export async function getLikeCounts(businessIds: string[]) {
+  try {
+    const counts: { [key: string]: number } = {};
+    
+    // Initialize all to 0
+    businessIds.forEach(id => {
+      counts[id] = 0;
+    });
+
+    if (businessIds.length === 0) {
+      return { data: counts, error: null };
+    }
+
+    const { data, error } = await supabase
+      .from('likes')
+      .select('business_id')
+      .in('business_id', businessIds);
+
+    if (error) {
+      console.error('Error fetching like counts:', error);
+      return { data: counts, error };
+    }
+
+    if (data) {
+      data.forEach((like: any) => {
+        if (like.business_id in counts) {
+          counts[like.business_id]++;
+        }
+      });
+    }
+
+    return { data: counts, error: null };
+  } catch (error: any) {
+    console.error('Exception fetching like counts:', error);
+    return { data: {}, error };
+  }
+}
+
+/**
+ * Like a business/video
+ */
+export async function likeVideo(userId: string, businessId: string) {
+  try {
+    const { data, error } = await supabase
+      .from('likes')
+      .insert({ user_id: userId, business_id: businessId })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error liking video:', error);
+      return { data: null, error };
+    }
+
+    return { data, error: null };
+  } catch (error: any) {
+    console.error('Exception liking video:', error);
+    return { data: null, error };
+  }
+}
+
+/**
+ * Unlike a business/video
+ */
+export async function unlikeVideo(userId: string, businessId: string) {
+  try {
+    const { data, error } = await supabase
+      .from('likes')
+      .delete()
+      .eq('user_id', userId)
+      .eq('business_id', businessId);
+
+    if (error) {
+      console.error('Error unliking video:', error);
+      return { data: null, error };
+    }
+
+    return { data, error: null };
+  } catch (error: any) {
+    console.error('Exception unliking video:', error);
+    return { data: null, error };
+  }
+}
+
+/**
+ * Like a video or business (flexible - works with either video_id or business_id)
+ */
+export async function likeItem(userId: string, itemId: string, itemType: 'video' | 'business' = 'video') {
+  try {
+    const insertData = { user_id: userId };
+    if (itemType === 'business') {
+      (insertData as any).business_id = itemId;
+    } else {
+      (insertData as any).video_id = itemId;
+    }
+
+    const { data, error } = await supabase
+      .from('likes')
+      .insert(insertData)
+      .select()
+      .single();
+
+    if (error) {
+      console.error(`Error liking ${itemType}:`, error);
+      return { data: null, error };
+    }
+
+    return { data, error: null };
+  } catch (error: any) {
+    console.error(`Exception liking ${itemType}:`, error);
+    return { data: null, error };
+  }
+}
+
+/**
+ * Unlike a video or business (flexible - works with either video_id or business_id)
+ */
+export async function unlikeItem(userId: string, itemId: string, itemType: 'video' | 'business' = 'video') {
+  try {
+    let query = supabase
+      .from('likes')
+      .delete()
+      .eq('user_id', userId);
+
+    if (itemType === 'business') {
+      query = query.eq('business_id', itemId);
+    } else {
+      query = query.eq('video_id', itemId);
+    }
+
+    const { data, error } = await query;
+
+    if (error) {
+      console.error(`Error unliking ${itemType}:`, error);
+      return { data: null, error };
+    }
+
+    return { data, error: null };
+  } catch (error: any) {
+    console.error(`Exception unliking ${itemType}:`, error);
+    return { data: null, error };
+  }
+}
+
+// Re-export list to help static analyzers and ensure named exports are explicit
+// (explicit export list removed — functions are exported where declared)
+
+
 
 
 
