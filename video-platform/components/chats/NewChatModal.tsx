@@ -20,12 +20,14 @@ export function NewChatModal({ isOpen, onClose, currentUserId }: NewChatModalPro
   const [searchResults, setSearchResults] = useState<UserSearchResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [creating, setCreating] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
     if (!isOpen) {
       setSearchQuery('');
       setSearchResults([]);
+      setError(null);
     }
   }, [isOpen]);
 
@@ -33,12 +35,14 @@ export function NewChatModal({ isOpen, onClose, currentUserId }: NewChatModalPro
     if (!searchQuery.trim()) return;
 
     setLoading(true);
+    setError(null);
     try {
-      const { data, error } = await searchUsers(searchQuery, currentUserId);
-      if (error) throw error;
+      const { data, error: searchError } = await searchUsers(searchQuery, currentUserId);
+      if (searchError) throw searchError;
       setSearchResults(data || []);
-    } catch (error) {
-      console.error('Error searching users:', error);
+    } catch (err: any) {
+      console.error('Error searching users:', err);
+      setError(err.message || 'Failed to search users');
     } finally {
       setLoading(false);
     }
@@ -50,6 +54,7 @@ export function NewChatModal({ isOpen, onClose, currentUserId }: NewChatModalPro
         handleSearch();
       } else {
         setSearchResults([]);
+        setError(null);
       }
     }, 300);
 
@@ -58,16 +63,27 @@ export function NewChatModal({ isOpen, onClose, currentUserId }: NewChatModalPro
 
   const handleSelectUser = async (userId: string) => {
     setCreating(true);
+    setError(null);
     try {
-      const { data, error } = await getOrCreateOneToOneChat(currentUserId, userId);
-      if (error) throw error;
+      console.log('Creating/finding chat between', currentUserId, 'and', userId);
+      
+      const { data, error: chatError } = await getOrCreateOneToOneChat(currentUserId, userId);
+      if (chatError) {
+        console.error('Chat creation error:', chatError);
+        throw chatError;
+      }
       
       if (data) {
+        console.log('Chat found/created:', data.id);
         onClose();
         router.push(`/chats/${data.id}`);
+      } else {
+        console.error('No chat data returned');
+        setError('Failed to create chat');
       }
-    } catch (error) {
-      console.error('Error creating chat:', error);
+    } catch (err: any) {
+      console.error('Error creating chat:', err);
+      setError(err.message || 'Failed to create chat');
     } finally {
       setCreating(false);
     }
@@ -109,6 +125,13 @@ export function NewChatModal({ isOpen, onClose, currentUserId }: NewChatModalPro
             autoFocus
           />
         </div>
+
+        {/* Error Message */}
+        {error && (
+          <div className="px-6 py-3 bg-red-500/20 border-b border-red-500/30 text-red-400 text-sm">
+            {error}
+          </div>
+        )}
 
         {/* Results */}
         <div className="flex-1 overflow-y-auto p-6">

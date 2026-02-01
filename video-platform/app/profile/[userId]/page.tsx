@@ -6,9 +6,8 @@ import { useParams, usePathname, useRouter } from 'next/navigation';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase/client';
-import { getOrCreateConversation } from '@/lib/supabase/messaging';
+import { getOrCreateOneToOneChat } from '@/lib/supabase/messaging';
 import { getProfileByUserId } from '@/lib/supabase/profiles';
-import { EditableProfilePicture } from '@/components/EditableProfilePicture';
 
 interface Profile {
   id: string;
@@ -46,36 +45,17 @@ function UserProfileContent() {
 
   const loadProfile = async () => {
     try {
-      // Check if user is authenticated
-      const { data: { user: authUser } } = await supabase.auth.getUser();
-      
-      if (!authUser) {
-        console.warn('User not authenticated');
-        setError('Please log in to view profiles');
-        setLoading(false);
-        return;
-      }
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, username, full_name, profile_picture_url, bio')
+        .eq('id', userId)
+        .single();
 
-      const { data, error } = await getProfileByUserId(userId);
-
-      if (error) {
-        console.error('Supabase error details:', {
-          message: error.message,
-          code: error.code,
-        });
-        throw error;
-      }
-
-      if (!data) {
-        setError('Profile not found');
-        setLoading(false);
-        return;
-      }
-
+      if (error) throw error;
       setProfile(data);
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error loading profile:', error);
-      setError(error?.message || 'Failed to load profile');
+      setError('Failed to load profile');
     } finally {
       setLoading(false);
     }
@@ -86,17 +66,29 @@ function UserProfileContent() {
     
     setMessagingLoading(true);
     try {
-      const { data, error } = await getOrCreateConversation(profile.id);
+      console.log('Starting chat with user:', profile.id);
+      // Create or get existing one-to-one chat with the other user
+      const { data, error } = await getOrCreateOneToOneChat(user.id, profile.id);
+      
       if (error) {
-        alert(`Failed to start conversation: ${error.message}`);
+        console.error('Chat creation error:', error);
+        const errorMsg = error instanceof Error ? error.message : String(error);
+        alert(`Failed to start conversation: ${errorMsg}`);
         return;
       }
       
-      if (data) {
+      if (data && data.id) {
+        console.log('Chat created/found successfully:', data.id);
+        // Navigate to the chat
         router.push(`/chats/${data.id}`);
+      } else {
+        console.error('No chat data returned:', data);
+        alert('Failed to create or get chat');
       }
     } catch (err: any) {
-      alert(`Error: ${err.message}`);
+      console.error('Unexpected error:', err);
+      const errorMsg = err instanceof Error ? err.message : String(err);
+      alert(`Error: ${errorMsg}`);
     } finally {
       setMessagingLoading(false);
     }
@@ -159,15 +151,12 @@ function UserProfileContent() {
       {/* Profile Content */}
       <div className="p-6 pb-32">
         <div className="flex flex-col items-center mb-6">
-          <EditableProfilePicture
-            userId={userId}
-            currentImageUrl={profile.profile_picture_url}
-            fullName={profile.full_name}
-            username={profile.username}
-            isOwnProfile={false}
-            className="w-32 h-32"
+          <img
+            src={profile.profile_picture_url || 'https://via.placeholder.com/120'}
+            alt={profile.full_name}
+            className="w-32 h-32 rounded-full border-4 border-white/20 object-cover mb-4"
           />
-          <h2 className="text-2xl font-bold mb-1 mt-4">{profile.full_name}</h2>
+          <h2 className="text-2xl font-bold mb-1">{profile.full_name}</h2>
           <p className="text-white/60 mb-4">@{profile.username}</p>
           {profile.bio && (
             <p className="text-white/80 text-center max-w-md mb-6">{profile.bio}</p>

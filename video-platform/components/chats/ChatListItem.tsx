@@ -1,15 +1,15 @@
-import { Conversation } from '@/lib/supabase/messaging';
+import { ChatWithDetails } from '@/lib/supabase/messages';
 
 interface ChatListItemProps {
-  chat: Conversation;
+  chat: ChatWithDetails;
   onClick?: () => void;
 }
 
 export function ChatListItem({ chat, onClick }: ChatListItemProps) {
   const otherUser = chat.other_user;
   const displayName = otherUser?.full_name || otherUser?.username || 'Unknown User';
-  const avatarUrl = otherUser?.avatar_url || otherUser?.profile_picture_url;
-  const lastMessageText = chat.last_message_text || 'No messages yet';
+  const avatarUrl = otherUser?.profile_picture_url;
+  const lastMessageText = chat.last_message?.content || 'No messages yet';
   const unreadCount = chat.unread_count || 0;
 
   // Format timestamp
@@ -59,9 +59,9 @@ export function ChatListItem({ chat, onClick }: ChatListItemProps) {
 
       {/* Timestamp and Unread Count */}
       <div className="text-right flex-shrink-0">
-        {chat.last_message_at && (
+        {chat.last_message?.created_at && (
           <p className="text-xs text-white/40 mb-1">
-            {formatTimestamp(chat.last_message_at)}
+            {formatTimestamp(chat.last_message.created_at)}
           </p>
         )}
         {unreadCount > 0 && (

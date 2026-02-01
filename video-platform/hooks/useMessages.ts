@@ -52,7 +52,8 @@ export function useMessages(chatId: string | undefined, userId: string | undefin
     try {
       setSending(true);
       const { data, error: sendError } = await sendMessage({
-        conversation_id: chatId,
+        chat_id: chatId,
+        sender_id: userId,
         content: content.trim(),
       });
 

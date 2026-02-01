@@ -128,7 +128,14 @@ export async function getVideoComments(
   offset: number = 0
 ): Promise<{ data: Comment[] | null; error: Error | null }> {
   try {
-    const currentUserId = await getCurrentUserId();
+    // Get current user ID if authenticated, otherwise use null
+    let currentUserId: string | null = null;
+    try {
+      currentUserId = await getCurrentUserId();
+    } catch {
+      // User is not authenticated, that's OK - we can still fetch comments
+      currentUserId = null;
+    }
 
     const { data, error } = await supabase.rpc('get_video_comments', {
       p_video_id: videoId,
@@ -138,12 +145,14 @@ export async function getVideoComments(
     });
 
     if (error) {
+      console.error('RPC error fetching comments:', error);
       return { data: null, error: new Error(error.message) };
     }
 
     const comments = (data || []).map(transformCommentData);
     return { data: comments, error: null };
   } catch (error: any) {
+    console.error('Exception in getVideoComments:', error);
     return { data: null, error: error instanceof Error ? error : new Error(String(error)) };
   }
 }
@@ -162,7 +171,14 @@ export async function getCommentReplies(
   offset: number = 0
 ): Promise<{ data: Comment[] | null; error: Error | null }> {
   try {
-    const currentUserId = await getCurrentUserId();
+    // Get current user ID if authenticated, otherwise use null
+    let currentUserId: string | null = null;
+    try {
+      currentUserId = await getCurrentUserId();
+    } catch {
+      // User is not authenticated, that's OK - we can still fetch replies
+      currentUserId = null;
+    }
 
     const { data, error } = await supabase.rpc('get_comment_replies', {
       p_parent_comment_id: parentCommentId,
@@ -172,6 +188,7 @@ export async function getCommentReplies(
     });
 
     if (error) {
+      console.error('RPC error fetching replies:', error);
       return { data: null, error: new Error(error.message) };
     }
 
@@ -194,6 +211,8 @@ export async function createComment(
   try {
     const currentUserId = await getCurrentUserId();
 
+    console.log('Creating comment for video:', payload.video_id, 'user:', currentUserId);
+
     const { data, error } = await supabase
       .from('comments')
       .insert({
@@ -207,8 +226,11 @@ export async function createComment(
       .single();
 
     if (error) {
+      console.error('Insert error:', error);
       return { data: null, error: new Error(error.message) };
     }
+
+    console.log('Comment created successfully:', data.id);
 
     // Get the comment with like data using our helper function
     const { data: commentWithLikes, error: fetchError } = await supabase.rpc('get_comment_with_likes', {
@@ -217,6 +239,7 @@ export async function createComment(
     });
 
     if (fetchError) {
+      console.error('Fetch error:', fetchError);
       return { data: null, error: new Error(fetchError.message) };
     }
 
@@ -228,6 +251,7 @@ export async function createComment(
       .single();
 
     if (profileError) {
+      console.error('Profile error:', profileError);
       return { data: null, error: new Error(profileError.message) };
     }
 

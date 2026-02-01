@@ -64,6 +64,7 @@ export default function CommentSection({ videoId, className = '' }: CommentSecti
       const { data, error: err } = await getVideoComments(videoId, COMMENTS_PER_PAGE, currentOffset);
 
       if (err) {
+        console.error('Error loading comments:', err);
         setError(err.message);
         return;
       }
@@ -88,6 +89,7 @@ export default function CommentSection({ videoId, className = '' }: CommentSecti
         setHasMore(data.length === COMMENTS_PER_PAGE);
       }
     } catch (err: any) {
+      console.error('Exception loading comments:', err);
       setError(err.message || 'Failed to load comments');
     } finally {
       setLoading(false);
@@ -107,12 +109,17 @@ export default function CommentSection({ videoId, className = '' }: CommentSecti
         rating,
       };
 
+      console.log('Submitting comment:', payload);
+
       const { data, error: err } = await createComment(payload);
 
       if (err) {
+        console.error('Comment creation failed:', err);
         alert(`Failed to post comment: ${err.message}`);
         return;
       }
+
+      console.log('Comment created successfully:', data);
 
       // Add comment to the top of the list
       if (data) {
@@ -128,6 +135,7 @@ export default function CommentSection({ videoId, className = '' }: CommentSecti
         }
       }
     } catch (err: any) {
+      console.error('Error creating comment:', err);
       alert(`Error: ${err.message}`);
     } finally {
       setPosting(false);
@@ -157,13 +165,20 @@ export default function CommentSection({ videoId, className = '' }: CommentSecti
     );
   }, []);
 
-  // Set up real-time subscriptions
+  // Load comments when component mounts or videoId changes
   useEffect(() => {
-    if (!user) return;
+    if (!videoId) return;
 
+    // Fetch comments from database (works for authenticated and unauthenticated users)
     loadComments();
 
-    // Subscribe to new comments
+  }, [videoId]);
+
+  // Set up real-time subscriptions
+  useEffect(() => {
+    if (!videoId) return;
+
+    // Subscribe to new comments (works even if not authenticated - public data)
     const commentsChannel = subscribeToVideoComments(videoId, handleNewComment);
 
     // Subscribe to like updates
@@ -174,7 +189,7 @@ export default function CommentSection({ videoId, className = '' }: CommentSecti
       commentsChannel.unsubscribe();
       likesChannel.unsubscribe();
     };
-  }, [user, videoId, loadComments, handleNewComment, handleLikeUpdate]);
+  }, [videoId, handleNewComment, handleLikeUpdate]);
 
   if (loading) {
     return (

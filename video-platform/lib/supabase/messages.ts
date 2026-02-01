@@ -180,46 +180,65 @@ export async function sendMessage(message: Omit<Message, 'id' | 'created_at'>) {
  */
 export async function findOneToOneChat(userId1: string, userId2: string) {
   try {
-    // Optimized query: Find non-group chats that have both users and exactly 2 members
-    const { data: chats, error } = await supabase
-      .from('chats')
-      .select(`
-        id,
-        is_group,
-        metadata,
-        created_at,
-        chat_members!inner(user_id)
-      `)
-      .eq('is_group', false);
+    // Query for non-group chats where current user is a member
+    const { data: userChats, error: userChatsError } = await supabase
+      .from('chat_members')
+      .select('chat_id')
+      .eq('user_id', userId1);
 
-    if (error) throw error;
-    if (!chats || chats.length === 0) {
+    if (userChatsError) {
+      console.error('userChatsError detailed:', userChatsError);
+      throw userChatsError;
+    }
+    if (!userChats || userChats.length === 0) {
+      console.log('No chats found for user:', userId1);
       return { data: null, error: null };
     }
 
-    // Filter in application to find chat with exactly both users
-    for (const chat of chats) {
-      const members = (chat as { chat_members: { user_id: string }[] }).chat_members;
-      if (members.length === 2) {
-        const userIds = members.map(m => m.user_id).sort();
+    const chatIds = userChats.map(m => m.chat_id);
+
+    // Get all chats that match these IDs and are not group chats
+    const { data: potentialChats, error: chatsError } = await supabase
+      .from('chats')
+      .select('id, is_group, metadata, created_at')
+      .in('id', chatIds)
+      .eq('is_group', false);
+
+    if (chatsError) throw chatsError;
+    if (!potentialChats || potentialChats.length === 0) {
+      console.log('No 1:1 chats found');
+      return { data: null, error: null };
+    }
+
+    // For each potential chat, check if it has exactly these two users
+    for (const chat of potentialChats) {
+      const { data: members, error: membersError } = await supabase
+        .from('chat_members')
+        .select('user_id')
+        .eq('chat_id', chat.id);
+
+      if (membersError) {
+        console.error('Error fetching members for chat:', chat.id, membersError);
+        continue;
+      }
+
+      // Check if chat has exactly these two users
+      if (members && members.length === 2) {
+        const memberIds = members.map(m => m.user_id).sort();
         const targetIds = [userId1, userId2].sort();
-        if (userIds[0] === targetIds[0] && userIds[1] === targetIds[1]) {
-          // Found the matching chat, fetch full details
-          const { data: fullChat, error: chatError } = await supabase
-            .from('chats')
-            .select('*')
-            .eq('id', chat.id)
-            .single();
-          
-          return { data: fullChat, error: chatError };
+        
+        if (memberIds[0] === targetIds[0] && memberIds[1] === targetIds[1]) {
+          console.log('Found matching 1:1 chat:', chat.id);
+          return { data: chat, error: null };
         }
       }
     }
 
+    console.log('No matching 1:1 chat found between', userId1, 'and', userId2);
     return { data: null, error: null };
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error finding one-to-one chat:', error);
-    return { data: null, error: error instanceof Error ? error : new Error('Unknown error') };
+    return { data: null, error: error instanceof Error ? error : new Error(String(error)) };
   }
 }
 
@@ -228,15 +247,24 @@ export async function findOneToOneChat(userId1: string, userId2: string) {
  */
 export async function getOrCreateOneToOneChat(userId1: string, userId2: string) {
   try {
+    console.log('Creating/fetching 1:1 chat between', userId1, 'and', userId2);
+    
     // First, try to find existing chat
     const { data: existing, error: findError } = await findOneToOneChat(userId1, userId2);
     
-    if (findError) throw findError;
+    if (findError) {
+      const errorMsg = extractErrorMessage(findError);
+      console.error('Error finding existing chat:', errorMsg);
+      throw new Error(errorMsg);
+    }
+    
     if (existing) {
+      console.log('Found existing 1:1 chat:', existing.id);
       return { data: existing, error: null };
     }
 
     // Create new chat
+    console.log('Creating new 1:1 chat...');
     const { data: newChat, error: chatError } = await supabase
       .from('chats')
       .insert({
@@ -246,9 +274,20 @@ export async function getOrCreateOneToOneChat(userId1: string, userId2: string) 
       .select()
       .single();
 
-    if (chatError) throw chatError;
+    if (chatError) {
+      const errorMsg = extractErrorMessage(chatError);
+      console.error('Error creating chat:', errorMsg, chatError);
+      throw new Error(errorMsg);
+    }
+
+    if (!newChat) {
+      throw new Error('Failed to create chat - no data returned');
+    }
+
+    console.log('Chat created successfully:', newChat.id);
 
     // Add both users as members
+    console.log('Adding members to chat...');
     const { error: membersError } = await supabase
       .from('chat_members')
       .insert([
@@ -256,13 +295,52 @@ export async function getOrCreateOneToOneChat(userId1: string, userId2: string) 
         { chat_id: newChat.id, user_id: userId2, role: 'member' },
       ]);
 
-    if (membersError) throw membersError;
+    if (membersError) {
+      const errorMsg = extractErrorMessage(membersError);
+      console.error('Error adding members:', errorMsg, membersError);
+      throw new Error(errorMsg);
+    }
 
+    console.log('Members added successfully');
     return { data: newChat, error: null };
   } catch (error) {
-    console.error('Error creating one-to-one chat:', error);
-    return { data: null, error: error instanceof Error ? error : new Error('Unknown error') };
+    const errorMsg = extractErrorMessage(error);
+    console.error('Error creating one-to-one chat:', errorMsg, error);
+    return { 
+      data: null, 
+      error: new Error(errorMsg)
+    };
   }
+}
+
+/**
+ * Extract readable error message from Supabase or Error objects
+ */
+function extractErrorMessage(error: any): string {
+  if (!error) return 'Unknown error';
+  
+  // If it's already an Error instance
+  if (error instanceof Error) {
+    return error.message;
+  }
+  
+  // Supabase error object structure: { message, code, details, hint }
+  if (typeof error === 'object') {
+    if (error.message) return error.message;
+    if (error.error_description) return error.error_description;
+    if (error.msg) return error.msg;
+    // Try to stringify it for debugging
+    try {
+      const str = JSON.stringify(error, null, 2);
+      console.log('Full error object:', str);
+      return str;
+    } catch {
+      return 'Unknown error object';
+    }
+  }
+  
+  // Fallback to string conversion
+  return String(error);
 }
 
 /**

@@ -15,7 +15,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import { getOrCreateConversation } from '@/lib/supabase/messaging';
+import { getOrCreateOneToOneChat } from '@/lib/supabase/messages';
 import { supabase } from '@/lib/supabase/client';
 
 interface NewConversationButtonProps {
@@ -65,22 +65,22 @@ export default function NewConversationButton({
 
     setCreating(true);
     try {
-      const { data, error } = await getOrCreateConversation(otherUserId, firstMessage);
+      const { data, error } = await getOrCreateOneToOneChat(user.id, otherUserId);
 
       if (error) {
         alert(`Failed to create conversation: ${error.message}`);
         return;
       }
 
-      if (data) {
+      if (data?.chat_id) {
         setIsOpen(false);
         setSearchQuery('');
         setSearchResults([]);
 
         if (onConversationCreated) {
-          onConversationCreated(data.id);
+          onConversationCreated(data.chat_id);
         } else {
-          router.push(`/chats/${data.id}`);
+          router.push(`/chats/${data.chat_id}`);
         }
       }
     } catch (error: any) {

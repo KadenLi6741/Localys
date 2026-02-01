@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
-import { getConversations, Conversation } from '@/lib/supabase/messaging';
+import { getChats, ChatWithDetails } from '@/lib/supabase/messaging';
 
 export function useChats(userId: string | undefined) {
-  const [chats, setChats] = useState<Conversation[]>([]);
+  const [chats, setChats] = useState<ChatWithDetails[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
@@ -14,14 +14,14 @@ export function useChats(userId: string | undefined) {
 
     try {
       setLoading(true);
-      const { data, error: fetchError } = await getConversations();
+      const { data, error: fetchError } = await getChats(userId);
       
       if (fetchError) throw fetchError;
       
       setChats(data || []);
       setError(null);
     } catch (err) {
-      console.error('Error loading conversations:', err);
+      console.error('Error loading chats:', err);
       setError(err instanceof Error ? err : new Error('Unknown error'));
     } finally {
       setLoading(false);

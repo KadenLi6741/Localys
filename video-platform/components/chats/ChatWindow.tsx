@@ -16,7 +16,7 @@ interface ChatWindowProps {
   messages: MessageWithSender[];
   currentUserId: string;
   loading?: boolean;
-  messagesEndRef?: React.RefObject<HTMLDivElement>;
+  messagesEndRef?: React.RefObject<HTMLDivElement | null>;
 }
 
 export function ChatWindow({ messages, currentUserId, loading, messagesEndRef }: ChatWindowProps) {
