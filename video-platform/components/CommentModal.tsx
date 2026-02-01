@@ -1,7 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import { createComment } from '@/lib/supabase/comments';
+import { useEffect, useState } from 'react';
 import { CommentSection } from '@/components/comments';
 
 interface CommentModalProps {
@@ -12,21 +11,9 @@ interface CommentModalProps {
 }
 
 /**
- * Modal for composing comments on a post
+ * Modal for viewing and composing comments on a post
  */
 export function CommentModal({ isOpen, onClose, postId, businessName }: CommentModalProps) {
-  const [comment, setComment] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-
-  // Focus the textarea when modal opens
-  useEffect(() => {
-    if (isOpen && textareaRef.current) {
-      textareaRef.current.focus();
-    }
-  }, [isOpen]);
-
   // Handle escape key to close modal
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -35,7 +22,9 @@ export function CommentModal({ isOpen, onClose, postId, businessName }: CommentM
       }
     };
 
-    document.addEventListener('keydown', handleEscape);
+    if (isOpen) {
+      document.addEventListener('keydown', handleEscape);
+    }
     return () => document.removeEventListener('keydown', handleEscape);
   }, [isOpen, onClose]);
 
@@ -52,37 +41,6 @@ export function CommentModal({ isOpen, onClose, postId, businessName }: CommentM
   }, [isOpen]);
 
   if (!isOpen) return null;
-
-  const handleSubmit = async (e: React.FormEvent | React.MouseEvent) => {
-    e.preventDefault();
-    
-    const trimmedComment = comment.trim();
-    if (!trimmedComment || isSubmitting) return;
-
-    setIsSubmitting(true);
-    setError(null);
-
-    try {
-      const { data, error: submitError } = await createComment({
-        video_id: postId,
-        content: trimmedComment,
-      });
-
-      if (submitError) {
-        setError(submitError.message || 'Failed to post comment');
-        return;
-      }
-
-      if (data) {
-        setComment('');
-        onClose();
-      }
-    } catch (err: any) {
-      setError(err.message || 'An error occurred while posting');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
 
   const handleBackdropClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {

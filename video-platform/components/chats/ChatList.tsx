@@ -1,9 +1,9 @@
-import { Conversation } from '@/lib/supabase/messaging';
+import { ChatWithDetails } from '@/lib/supabase/messages';
 import { ChatListItem } from './ChatListItem';
 import { useRouter } from 'next/navigation';
 
 interface ChatListProps {
-  chats: Conversation[];
+  chats: ChatWithDetails[];
   currentUserId: string;
   loading?: boolean;
 }

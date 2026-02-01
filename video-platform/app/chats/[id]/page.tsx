@@ -21,7 +21,7 @@ function ChatContent() {
   const router = useRouter();
   const chatId = params.id as string;
   const [newMessage, setNewMessage] = useState('');
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
   
   const { messages, loading, sending, send } = useMessages(chatId, user?.id);
 
