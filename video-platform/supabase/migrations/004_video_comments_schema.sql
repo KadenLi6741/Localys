@@ -162,25 +162,6 @@ RETURNS TABLE (
 ) AS $$
 BEGIN
   RETURN QUERY
-  WITH comment_likes AS (
-    SELECT
-      comment_id,
-      COUNT(*) AS like_count,
-      CASE WHEN p_user_id IS NOT NULL AND EXISTS(
-        SELECT 1 FROM public.comment_likes cl
-        WHERE cl.comment_id = comment_likes.comment_id AND cl.user_id = p_user_id
-      ) THEN TRUE ELSE FALSE END AS is_liked
-    FROM public.comment_likes
-    GROUP BY comment_id
-  ),
-  reply_counts AS (
-    SELECT
-      parent_comment_id,
-      COUNT(*) AS reply_count
-    FROM public.comments
-    WHERE parent_comment_id IS NOT NULL
-    GROUP BY parent_comment_id
-  )
   SELECT
     c.id,
     c.video_id,
@@ -189,18 +170,32 @@ BEGIN
     c.parent_comment_id,
     c.created_at,
     c.updated_at,
-    COALESCE(cl.like_count, 0) AS like_count,
-    COALESCE(cl.is_liked, FALSE) AS is_liked,
+    COALESCE(like_counts.like_count, 0) AS like_count,
+    CASE WHEN p_user_id IS NOT NULL THEN COALESCE(user_likes.is_liked, FALSE) ELSE FALSE END AS is_liked,
     p.username,
     p.full_name,
     p.avatar_url,
-    COALESCE(rc.reply_count, 0) AS reply_count
+    COALESCE(reply_counts.reply_count, 0) AS reply_count
   FROM public.comments c
-  LEFT JOIN comment_likes cl ON c.id = cl.comment_id
-  LEFT JOIN reply_counts rc ON c.id = rc.parent_comment_id
   LEFT JOIN public.profiles p ON c.user_id = p.id
+  LEFT JOIN (
+    SELECT comment_id, COUNT(*) AS like_count
+    FROM public.comment_likes
+    GROUP BY comment_id
+  ) like_counts ON c.id = like_counts.comment_id
+  LEFT JOIN (
+    SELECT comment_id, TRUE AS is_liked
+    FROM public.comment_likes
+    WHERE user_id = p_user_id
+  ) user_likes ON c.id = user_likes.comment_id
+  LEFT JOIN (
+    SELECT parent_comment_id, COUNT(*) AS reply_count
+    FROM public.comments
+    WHERE parent_comment_id IS NOT NULL
+    GROUP BY parent_comment_id
+  ) reply_counts ON c.id = reply_counts.parent_comment_id
   WHERE c.video_id = p_video_id
-    AND c.parent_comment_id IS NULL  -- Only top-level comments
+    AND c.parent_comment_id IS NULL
   ORDER BY c.created_at DESC
   LIMIT p_limit
   OFFSET p_offset;
@@ -230,17 +225,6 @@ RETURNS TABLE (
 ) AS $$
 BEGIN
   RETURN QUERY
-  WITH comment_likes AS (
-    SELECT
-      comment_id,
-      COUNT(*) AS like_count,
-      CASE WHEN p_user_id IS NOT NULL AND EXISTS(
-        SELECT 1 FROM public.comment_likes cl
-        WHERE cl.comment_id = comment_likes.comment_id AND cl.user_id = p_user_id
-      ) THEN TRUE ELSE FALSE END AS is_liked
-    FROM public.comment_likes
-    GROUP BY comment_id
-  )
   SELECT
     c.id,
     c.video_id,
@@ -249,14 +233,23 @@ BEGIN
     c.parent_comment_id,
     c.created_at,
     c.updated_at,
-    COALESCE(cl.like_count, 0) AS like_count,
-    COALESCE(cl.is_liked, FALSE) AS is_liked,
+    COALESCE(like_counts.like_count, 0) AS like_count,
+    CASE WHEN p_user_id IS NOT NULL THEN COALESCE(user_likes.is_liked, FALSE) ELSE FALSE END AS is_liked,
     p.username,
     p.full_name,
     p.avatar_url
   FROM public.comments c
-  LEFT JOIN comment_likes cl ON c.id = cl.comment_id
   LEFT JOIN public.profiles p ON c.user_id = p.id
+  LEFT JOIN (
+    SELECT comment_id, COUNT(*) AS like_count
+    FROM public.comment_likes
+    GROUP BY comment_id
+  ) like_counts ON c.id = like_counts.comment_id
+  LEFT JOIN (
+    SELECT comment_id, TRUE AS is_liked
+    FROM public.comment_likes
+    WHERE user_id = p_user_id
+  ) user_likes ON c.id = user_likes.comment_id
   WHERE c.parent_comment_id = p_parent_comment_id
   ORDER BY c.created_at ASC
   LIMIT p_limit

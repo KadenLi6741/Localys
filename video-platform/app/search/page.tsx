@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
@@ -26,8 +26,8 @@ function SearchContent() {
   const [loading, setLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
 
-  const handleSearch = async () => {
-    if (!query.trim() && !category && !minRating) {
+  const handleSearch = useCallback(async () => {
+    if (!query.trim() && !category && !minRating && (priceRange[0] === 0 && priceRange[1] === 1000)) {
       setResults([]);
       setHasSearched(false);
       return;
@@ -49,28 +49,57 @@ function SearchContent() {
       
       if (error) {
         console.error('Search error:', error);
+        alert(`Search Error: ${error.message || JSON.stringify(error)}`);
         setResults([]);
       } else {
         setResults(data || []);
       }
     } catch (error) {
       console.error('Search error:', error);
+      alert(`Search Error: ${error instanceof Error ? error.message : String(error)}`);
       setResults([]);
     } finally {
       setLoading(false);
     }
-  };
+  }, [query, category, minRating, priceRange]);
 
-  useEffect(() => {
-    // Auto-search when filters change
-    const timeoutId = setTimeout(() => {
-      if (hasSearched) {
-        handleSearch();
+  // Handle category selection with immediate search
+  const handleCategoryChange = (cat: string) => {
+    console.log('handleCategoryChange called with:', cat);
+    setCategory(cat);
+    // Create new filters object with updated category
+    const newFilters: SearchFilters = {
+      query: query.trim() || undefined,
+      category: (cat as 'food' | 'retail' | 'services' | undefined) || undefined,
+      minRating: minRating,
+      priceMin: priceRange[0] > 0 ? priceRange[0] : undefined,
+      priceMax: priceRange[1] < 1000 ? priceRange[1] : undefined,
+    };
+    
+    console.log('newFilters:', newFilters);
+    
+    // Check if empty
+    if (!query.trim() && !cat && !minRating && priceRange[0] === 0 && priceRange[1] === 1000) {
+      console.log('All filters empty, clearing results');
+      setResults([]);
+      setHasSearched(false);
+      return;
+    }
+    
+    setLoading(true);
+    setHasSearched(true);
+    
+    searchVideos(newFilters).then(({ data, error }) => {
+      if (error) {
+        console.error('Search error:', error);
+        setResults([]);
+      } else {
+        console.log('Search returned', data?.length, 'results');
+        setResults(data || []);
       }
-    }, 500);
-
-    return () => clearTimeout(timeoutId);
-  }, [category, minRating, priceRange]);
+      setLoading(false);
+    });
+  };
 
   return (
     <div className="min-h-screen bg-black text-white pb-20">
@@ -85,85 +114,166 @@ function SearchContent() {
       <div className="max-w-2xl mx-auto px-4 py-8">
         <div className="space-y-6">
           {/* Search Bar */}
-          <div className="bg-white/10 border border-white/20 rounded-lg px-4 py-3 flex gap-2">
+          <div className="bg-white/10 border border-white/20 rounded-lg px-4 py-3 flex gap-2 hover:bg-white/15 hover:border-white/30 transition-all duration-200">
+            <svg className="w-5 h-5 text-white/60 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
             <input
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-              placeholder="Search businesses..."
+              placeholder="Search by keywords, business name, category..."
               className="bg-transparent text-white placeholder-white/60 flex-1 outline-none"
+              autoFocus
             />
             <button
               onClick={handleSearch}
-              className="bg-white text-black px-4 py-2 rounded-lg font-semibold hover:bg-white/90 transition-all duration-200 active:scale-95"
+              disabled={loading}
+              className="bg-white text-black px-4 py-2 rounded-lg font-semibold hover:bg-white/90 transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
             >
-              Search
+              {loading ? '...' : 'Search'}
             </button>
           </div>
 
           {/* Filters */}
           <div className="space-y-4">
-            <h2 className="text-lg font-semibold">Filters</h2>
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold">Filters</h2>
+              {(category || minRating || priceRange[0] > 0 || priceRange[1] < 1000) && (
+                <button
+                  onClick={() => {
+                    setCategory('');
+                    setMinRating(undefined);
+                    setPriceRange([0, 1000]);
+                  }}
+                  className="text-sm text-blue-400 hover:text-blue-300"
+                >
+                  Clear All
+                </button>
+              )}
+            </div>
             
-            <div>
-              <label className="block text-sm mb-2">Category</label>
-              <select
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white"
-              >
-                <option value="">All Categories</option>
-                <option value="food">Food</option>
-                <option value="retail">Retail</option>
-                <option value="services">Services</option>
-              </select>
-            </div>
+            <div className="bg-white/5 border border-white/10 rounded-lg p-4 space-y-4">
+              {/* Category Filter */}
+              <div>
+                <label className="block text-sm font-medium mb-2">Category</label>
+                <div className="grid grid-cols-3 gap-2">
+                  <button
+                    onClick={() => {
+                      console.log('Clicking All');
+                      handleCategoryChange('');
+                    }}
+                    className={`py-2 px-3 rounded-lg text-sm font-medium transition-all ${
+                      category === ''
+                        ? 'bg-blue-500 text-white'
+                        : 'bg-white/10 text-gray-300 hover:bg-white/20'
+                    }`}
+                  >
+                    All
+                  </button>
+                  <button
+                    onClick={() => {
+                      console.log('Clicking Food');
+                      handleCategoryChange('food');
+                    }}
+                    className={`py-2 px-3 rounded-lg text-sm font-medium transition-all ${
+                      category === 'food'
+                        ? 'bg-blue-500 text-white'
+                        : 'bg-white/10 text-gray-300 hover:bg-white/20'
+                    }`}
+                  >
+                    Food
+                  </button>
+                  <button
+                    onClick={() => {
+                      console.log('Clicking Retail');
+                      handleCategoryChange('retail');
+                    }}
+                    className={`py-2 px-3 rounded-lg text-sm font-medium transition-all ${
+                      category === 'retail'
+                        ? 'bg-blue-500 text-white'
+                        : 'bg-white/10 text-gray-300 hover:bg-white/20'
+                    }`}
+                  >
+                    Retail
+                  </button>
+                  <button
+                    onClick={() => {
+                      console.log('Clicking Services');
+                      handleCategoryChange('services');
+                    }}
+                    className={`py-2 px-3 rounded-lg text-sm font-medium transition-all ${
+                      category === 'services'
+                        ? 'bg-blue-500 text-white'
+                        : 'bg-white/10 text-gray-300 hover:bg-white/20'
+                    }`}
+                  >
+                    Services
+                  </button>
+                </div>
+              </div>
 
-            <div>
-              <label className="block text-sm mb-2">Minimum Rating</label>
-              <select
-                value={minRating || ''}
-                onChange={(e) => setMinRating(e.target.value ? Number(e.target.value) : undefined)}
-                className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white"
-              >
-                <option value="">Any Rating</option>
-                <option value="4">4+ Stars</option>
-                <option value="4.5">4.5+ Stars</option>
-                <option value="5">5 Stars</option>
-              </select>
-            </div>
+              {/* Minimum Rating Filter */}
+              <div>
+                <label className="block text-sm font-medium mb-2">Minimum Rating</label>
+                <select
+                  value={minRating || ''}
+                  onChange={(e) => setMinRating(e.target.value ? Number(e.target.value) : undefined)}
+                  className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-2 text-white text-sm"
+                >
+                  <option value="">Any Rating</option>
+                  <option value="4">4+ Stars</option>
+                  <option value="4.5">4.5+ Stars</option>
+                  <option value="5">5 Stars</option>
+                </select>
+              </div>
 
-            <div>
-              <label className="block text-sm mb-2">
-                Price Range: ${priceRange[0]} - ${priceRange[1]}
-              </label>
-              <div className="flex gap-4">
-                <input
-                  type="range"
-                  min="0"
-                  max="1000"
-                  value={priceRange[0]}
-                  onChange={(e) => setPriceRange([Number(e.target.value), priceRange[1]])}
-                  className="flex-1"
-                />
-                <input
-                  type="range"
-                  min="0"
-                  max="1000"
-                  value={priceRange[1]}
-                  onChange={(e) => setPriceRange([priceRange[0], Number(e.target.value)])}
-                  className="flex-1"
-                />
+              {/* Price Range Filter */}
+              <div>
+                <label className="block text-sm font-medium mb-3">
+                  Price Range: ${priceRange[0]} - ${priceRange[1]}
+                </label>
+                <div className="space-y-2">
+                  <div className="flex gap-4 items-center">
+                    <input
+                      type="range"
+                      min="0"
+                      max="1000"
+                      value={priceRange[0]}
+                      onChange={(e) => setPriceRange([Number(e.target.value), priceRange[1]])}
+                      className="flex-1 accent-blue-500"
+                    />
+                    <span className="text-sm text-gray-400 w-12">${priceRange[0]}</span>
+                  </div>
+                  <div className="flex gap-4 items-center">
+                    <input
+                      type="range"
+                      min="0"
+                      max="1000"
+                      value={priceRange[1]}
+                      onChange={(e) => setPriceRange([priceRange[0], Number(e.target.value)])}
+                      className="flex-1 accent-blue-500"
+                    />
+                    <span className="text-sm text-gray-400 w-12">${priceRange[1]}</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
 
           {/* Search Results */}
           <div className="mt-8">
-            <h2 className="text-lg font-semibold mb-4">
-              {loading ? 'Searching...' : hasSearched ? `Results (${results.length})` : 'Search Results'}
-            </h2>
+            <div className="mb-4">
+              <h2 className="text-lg font-semibold mb-2">
+                {loading ? 'Searching...' : hasSearched ? `Results (${results.length})` : 'Search Results'}
+              </h2>
+              {category && (
+                <p className="text-sm text-blue-400">
+                  Filtering by: <span className="font-semibold capitalize">{category}</span>
+                </p>
+              )}
+            </div>
             
             {loading ? (
               <div className="text-center py-8">
@@ -171,42 +281,86 @@ function SearchContent() {
               </div>
             ) : results.length > 0 ? (
               <div className="space-y-4">
-                {results.map((result) => (
-                  <Link
-                    key={result.id}
-                    href={`/video/${result.id}`}
-                    className="block bg-white/5 border border-white/10 rounded-lg p-4 hover:bg-white/10 transition-all duration-200"
-                  >
-                    <div className="flex gap-4">
-                      <video
-                        src={result.video_url}
-                        className="w-32 h-24 object-cover rounded-lg"
-                        muted
-                      />
-                      <div className="flex-1">
-                        <h3 className="font-semibold mb-1">
-                          {result.businesses?.business_name || 'Business'}
-                        </h3>
-                        <p className="text-sm text-white/60 mb-2 line-clamp-2">
-                          {result.caption || ''}
-                        </p>
-                        <div className="flex items-center gap-2 text-sm text-white/80">
-                          {result.businesses?.average_rating && (
-                            <span>⭐ {result.businesses.average_rating.toFixed(1)}</span>
-                          )}
-                          {result.businesses?.total_reviews && (
-                            <span>• {result.businesses.total_reviews} reviews</span>
+                {results.map((result) => {
+                  // Highlight matching keywords
+                  const highlightText = (text: string | undefined) => {
+                    if (!text || !query) return text;
+                    const regex = new RegExp(`(${query})`, 'gi');
+                    return text.replace(regex, '<mark>$1</mark>');
+                  };
+
+                  return (
+                    <Link
+                      key={result.id}
+                      href={`/video/${result.id}`}
+                      className="block bg-white/5 border border-white/10 rounded-lg p-4 hover:bg-white/10 transition-all duration-200 group"
+                    >
+                      <div className="flex gap-4">
+                        <div className="relative w-32 h-24 rounded-lg overflow-hidden flex-shrink-0">
+                          <video
+                            src={result.video_url}
+                            className="w-full h-full object-cover"
+                            muted
+                          />
+                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-200 flex items-center justify-center">
+                            <svg className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M8 5v14l11-7z" />
+                            </svg>
+                          </div>
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="font-semibold mb-1 text-white">
+                            {result.businesses?.business_name || result.profiles?.full_name || 'Business'}
+                          </h3>
+                          <p className="text-sm text-white/60 mb-2 line-clamp-2">
+                            {result.caption || 'No description'}
+                          </p>
+                          <div className="flex items-center gap-3 text-sm text-white/80 mb-2">
+                            {result.businesses?.average_rating && (
+                              <>
+                                <span>⭐ {result.businesses.average_rating.toFixed(1)}</span>
+                                <span className="text-white/40">•</span>
+                              </>
+                            )}
+                            {result.businesses?.total_reviews && (
+                              <>
+                                <span>{result.businesses.total_reviews} reviews</span>
+                                <span className="text-white/40">•</span>
+                              </>
+                            )}
+                            {result.businesses?.category && (
+                              <span className="px-2 py-1 bg-white/10 rounded text-xs font-medium">
+                                {result.businesses.category}
+                              </span>
+                            )}
+                          </div>
+                          {query && (
+                            <p className="text-xs text-green-400/80">
+                              ✓ Matched: {result.caption?.includes(query) ? 'Caption' : ''} {result.businesses?.business_name?.includes(query) ? 'Business Name' : ''}
+                            </p>
                           )}
                         </div>
                       </div>
-                    </div>
-                  </Link>
-                ))}
+                    </Link>
+                  );
+                })}
               </div>
             ) : hasSearched ? (
-              <p className="text-white/60 text-center py-8">No results found</p>
+              <div className="text-center py-12">
+                <svg className="w-12 h-12 text-white/40 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                <p className="text-white/60">No results found for "{query}"</p>
+                <p className="text-white/40 text-sm mt-1">Try different keywords or filters</p>
+              </div>
             ) : (
-              <p className="text-white/60">Enter a search term to find businesses...</p>
+              <div className="text-center py-12">
+                <svg className="w-12 h-12 text-white/40 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                <p className="text-white/60">Search for businesses, keywords, or categories</p>
+                <p className="text-white/40 text-sm mt-1">Use filters to narrow down results</p>
+              </div>
             )}
           </div>
         </div>

@@ -53,37 +53,6 @@ export function CommentModal({ isOpen, onClose, postId, businessName }: CommentM
 
   if (!isOpen) return null;
 
-  const handleSubmit = async (e: React.FormEvent | React.MouseEvent) => {
-    e.preventDefault();
-    
-    const trimmedComment = comment.trim();
-    if (!trimmedComment || isSubmitting) return;
-
-    setIsSubmitting(true);
-    setError(null);
-
-    try {
-      const { data, error: submitError } = await createComment({
-        video_id: postId,
-        content: trimmedComment,
-      });
-
-      if (submitError) {
-        setError(submitError.message || 'Failed to post comment');
-        return;
-      }
-
-      if (data) {
-        setComment('');
-        onClose();
-      }
-    } catch (err: any) {
-      setError(err.message || 'An error occurred while posting');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
   const handleBackdropClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
       onClose();
@@ -102,7 +71,7 @@ export function CommentModal({ isOpen, onClose, postId, businessName }: CommentM
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-700">
           <h2 id="comment-modal-title" className="text-lg font-semibold text-white">
-            Add a Comment
+            Comments
           </h2>
           <button
             onClick={onClose}
@@ -117,19 +86,9 @@ export function CommentModal({ isOpen, onClose, postId, businessName }: CommentM
 
         {/* Content */}
         <div className="flex flex-col flex-1 overflow-hidden">
-          <div className="flex-1 p-4 overflow-y-auto bg-gray-900 text-white">
-            {businessName && (
-              <p className="text-sm text-gray-400 mb-4">
-                Commenting on <span className="font-semibold text-white">{businessName}</span>
-              </p>
-            )}
-            
-            {/* Comments List */}
-            <div>
-              <h3 className="text-sm font-semibold text-white mb-3">Comments</h3>
-              <div className="space-y-3">
-                <CommentSection videoId={postId} className="space-y-3" />
-              </div>
+          <div className="flex-1 p-4 overflow-y-auto bg-gray-900 text-white flex items-center justify-center">
+            <div className="text-center">
+              <p className="text-gray-400 text-sm">Comments feature coming soon! 🚀</p>
             </div>
           </div>
 

@@ -36,74 +36,129 @@ export async function searchVideos(filters: SearchFilters) {
 
   let query = supabase
     .from('videos')
-    .select(`
-      *,
-      profiles:user_id (
-        id,
-        username,
-        full_name,
-        profile_picture_url
-      ),
-      businesses:business_id (
-        id,
-        business_name,
-        category,
-        profile_picture_url,
-        latitude,
-        longitude,
-        average_rating,
-        total_reviews,
-        price_range_min,
-        price_range_max
-      )
-    `);
+    .select('*');
 
-  // Apply text search
+  // Apply text search - search in caption
   if (interpretedFilters.query) {
-    query = query.or(`caption.ilike.%${interpretedFilters.query}%,business_name.ilike.%${interpretedFilters.query}%`);
+    const searchTerm = `%${interpretedFilters.query}%`;
+    query = query.ilike('caption', searchTerm);
   }
 
-  // Apply category filter
-  if (interpretedFilters.category) {
-    query = query.eq('businesses.category', interpretedFilters.category);
-  }
-
-  // Apply rating filter
-  if (interpretedFilters.minRating) {
-    query = query.gte('businesses.average_rating', interpretedFilters.minRating);
-  }
-
-  // Apply price range filter
-  if (interpretedFilters.priceMin !== undefined) {
-    query = query.gte('businesses.price_range_min', interpretedFilters.priceMin);
-  }
-  if (interpretedFilters.priceMax !== undefined) {
-    query = query.lte('businesses.price_range_max', interpretedFilters.priceMax);
-  }
-
-  // Apply location filter (if coordinates provided)
-  if (interpretedFilters.latitude && interpretedFilters.longitude && interpretedFilters.maxDistance) {
-    // Note: This is a simplified distance filter
-    // For production, use PostGIS or calculate distance in application
-    // For now, we'll filter by approximate bounding box
-    const latDelta = interpretedFilters.maxDistance / 111; // ~111 km per degree
-    const lngDelta = interpretedFilters.maxDistance / (111 * Math.cos(interpretedFilters.latitude * Math.PI / 180));
-    
-    query = query
-      .gte('businesses.latitude', interpretedFilters.latitude - latDelta)
-      .lte('businesses.latitude', interpretedFilters.latitude + latDelta)
-      .gte('businesses.longitude', interpretedFilters.longitude - lngDelta)
-      .lte('businesses.longitude', interpretedFilters.longitude + lngDelta);
-  }
+  // Apply category filter (if we have business_id)
+  // Note: Category filtering would require joining with businesses table
+  // For now, we filter after fetching related data
 
   const { data, error } = await query
     .order('created_at', { ascending: false })
     .limit(50);
 
-  // Rank results by relevance (when AI is connected, this will be enhanced)
-  const rankedResults = rankSearchResults(data || [], interpretedFilters);
+  if (error) {
+    console.error('Search query error:', error);
+    return { data: [], error };
+  }
 
-  return { data: rankedResults, error };
+  // Now fetch related data for each video
+  const results = await Promise.all(
+    (data || []).map(async (video: any) => {
+      let enrichedVideo = { ...video };
+
+      // Fetch profile if user_id exists
+      if (video.user_id) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('id, username, full_name, profile_picture_url')
+          .eq('id', video.user_id)
+          .single();
+        if (profile) {
+          enrichedVideo.profiles = profile;
+        }
+      }
+
+      // Fetch business if business_id exists
+      if (video.business_id) {
+        console.log(`Fetching business data for video ${video.id} with business_id: ${video.business_id}`);
+        try {
+          const { data: businesses, error: businessError } = await supabase
+            .from('businesses')
+            .select('*')
+            .eq('id', video.business_id);
+          
+          if (businessError) {
+            console.error(`Error fetching business ${video.business_id}:`, businessError);
+          } else if (businesses && businesses.length > 0) {
+            const business = businesses[0];
+            console.log(`Fetched business:`, business);
+            enrichedVideo.businesses = {
+              id: business.id,
+              business_name: business.business_name,
+              category: business.category,
+              profile_picture_url: business.profile_picture_url,
+              latitude: business.latitude,
+              longitude: business.longitude,
+              average_rating: business.average_rating,
+              total_reviews: business.total_reviews,
+              price_range_min: business.price_range_min,
+              price_range_max: business.price_range_max,
+            };
+          } else {
+            console.log(`No business found for business_id: ${video.business_id}`);
+          }
+        } catch (err) {
+          console.error(`Exception fetching business ${video.business_id}:`, err);
+        }
+      }
+
+      return enrichedVideo;
+    })
+  );
+
+  // Filter results by category (if specified)
+  let filteredResults = results;
+  if (interpretedFilters.category) {
+    console.log('Category filter active:', interpretedFilters.category);
+    console.log('Total results before category filter:', results.length);
+    
+    filteredResults = results.filter(video => {
+      // If video has a business, check the business category
+      if (video.businesses?.category) {
+        const match = video.businesses.category === interpretedFilters.category;
+        console.log(`Video: ${video.businesses.business_name}, db_category: "${video.businesses.category}", filter_category: "${interpretedFilters.category}", match: ${match}`);
+        return match;
+      }
+      // Personal videos don't have a category, so exclude them if category filter is active
+      console.log(`Video ${video.id} has no business`);
+      return false;
+    });
+    
+    console.log('Results after category filter:', filteredResults.length);
+  }
+
+  // Apply rating filter
+  if (interpretedFilters.minRating) {
+    filteredResults = filteredResults.filter(video => {
+      return video.businesses?.average_rating && video.businesses.average_rating >= interpretedFilters.minRating!;
+    });
+  }
+
+  // Apply price range filter
+  if (interpretedFilters.priceMin !== undefined || interpretedFilters.priceMax !== undefined) {
+    filteredResults = filteredResults.filter(video => {
+      if (!video.businesses) return false;
+      const minPrice = video.businesses.price_range_min || 0;
+      const maxPrice = video.businesses.price_range_max || 1000;
+      
+      const filterMin = interpretedFilters.priceMin || 0;
+      const filterMax = interpretedFilters.priceMax || 1000;
+      
+      // Check if price range overlaps
+      return !(maxPrice < filterMin || minPrice > filterMax);
+    });
+  }
+
+  // Rank results by relevance (when AI is connected, this will be enhanced)
+  const rankedResults = rankSearchResults(filteredResults, interpretedFilters);
+
+  return { data: rankedResults, error: null };
 }
 
 /**
