@@ -5,7 +5,8 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { useAuth } from '@/contexts/AuthContext';
-import { getVideosFeed, getLikeCounts, likeItem, unlikeItem } from '@/lib/supabase/videos';
+import { getVideosFeed, getLikeCounts, likeItem, unlikeItem, bookmarkVideo, unbookmarkVideo, getWeightedVideoFeed, trackVideoView } from '@/lib/supabase/videos';
+import { getUserCoins } from '@/lib/supabase/profiles';
 import { supabase } from '@/lib/supabase/client';
 import { CommentModal } from '@/components/CommentModal';
 import { Toast } from '@/components/Toast';
@@ -56,9 +57,11 @@ function HomeContent() {
   const [likedVideos, setLikedVideos] = useState<Set<string>>(new Set());
   const [bookmarkedVideos, setBookmarkedVideos] = useState<Set<string>>(new Set());
   const [likeCounts, setLikeCounts] = useState<{ [key: string]: number }>({});
+  const [commentCounts, setCommentCounts] = useState<{ [key: string]: number }>({});
   const [commentModalOpen, setCommentModalOpen] = useState(false);
   const [commentPostId, setCommentPostId] = useState<string>('');
   const [toastMessage, setToastMessage] = useState<string>('');
+  const [userCoins, setUserCoins] = useState(100);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
@@ -68,12 +71,27 @@ function HomeContent() {
     loadVideos();
     if (user) {
       loadUserInteractions();
+      loadUserCoins();
     }
+  }, [user]);
+
+  // Reload coins when page becomes visible (user returns from upload)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden && user) {
+        loadUserCoins();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, [user]);
 
   const loadVideos = async () => {
     try {
-      const { data, error } = await getVideosFeed(20, 0);
+      const { data, error } = await getWeightedVideoFeed(20, 0);
       if (error) throw error;
       if (data) {
         const videosData = data as Video[];
@@ -81,9 +99,13 @@ function HomeContent() {
         
         // Build like counts for all items (businesses and video IDs)
         const counts: { [key: string]: number } = {};
+        const commentCounts: { [key: string]: number } = {};
         
-        const businessIds = Array.from(new Set(videosData.map(v => v.businesses?.id).filter(Boolean))) as string[];
-        const videoIds = videosData.map(v => v.id);
+        const videoIds = videosData
+          .map(v => v.id)
+          .filter((id): id is string => !!id && typeof id === 'string');
+        
+        console.log('Video IDs for comment fetch:', videoIds);
 
         // Fetch all likes
         const { data: allLikes } = await supabase
@@ -101,16 +123,54 @@ function HomeContent() {
           });
         }
 
+        // Fetch comment counts for all videos
+        // TODO: Fix null value issue in videoIds array
+        console.log('Skipping comment fetch due to null value issues');
+        // if (videoIds && videoIds.length > 0) {
+        //   console.log('Fetching comments for video IDs:', videoIds);
+        //   const { data: allComments, error: commentsError } = await supabase
+        //     .from('comments')
+        //     .select('video_id')
+        //     .eq('parent_comment_id', null)
+        //     .in('video_id', videoIds);
+        //
+        //   if (commentsError) {
+        //     const errMsg = commentsError instanceof Error 
+        //       ? commentsError.message 
+        //       : (commentsError as any)?.message
+        //         ? (commentsError as any).message
+        //         : JSON.stringify(commentsError);
+        //     console.error('Error fetching comments:', errMsg, commentsError);
+        //   }
+        //
+        //   if (allComments) {
+        //     console.log('Fetched comments:', allComments.length);
+        //     allComments.forEach((comment: any) => {
+        //       if (comment.video_id) {
+        //         commentCounts[comment.video_id] = (commentCounts[comment.video_id] || 0) + 1;
+        //       }
+        //     });
+        //   }
+        // } else {
+        //   console.warn('No valid video IDs to fetch comments for');
+        // }
+
         // Initialize all items with 0 if not yet in counts
+        const businessIds = Array.from(new Set(videosData.map(v => v.businesses?.id).filter(Boolean))) as string[];
         [...businessIds, ...videoIds].forEach(id => {
           if (!(id in counts)) {
             counts[id] = 0;
           }
+          if (!(id in commentCounts)) {
+            commentCounts[id] = 0;
+          }
         });
 
         setLikeCounts(counts);
+        setCommentCounts(commentCounts);
         if (process.env.NODE_ENV === 'development') {
           console.log('Loaded like counts:', counts);
+          console.log('Loaded comment counts:', commentCounts);
         }
       }
     } catch (error) {
@@ -144,17 +204,34 @@ function HomeContent() {
         console.log('Loaded liked items:', Array.from(likedSet));
       }
 
-      // Load bookmarks
+      // Load video bookmarks
       const { data: bookmarks } = await supabase
-        .from('bookmarks')
-        .select('business_id')
+        .from('video_bookmarks')
+        .select('video_id')
         .eq('user_id', user.id);
       
       if (bookmarks) {
-        setBookmarkedVideos(new Set(bookmarks.map((b: any) => b.business_id).filter(Boolean)));
+        setBookmarkedVideos(new Set(bookmarks.map((b: any) => b.video_id).filter(Boolean)));
       }
     } catch (error) {
       console.error('Error loading interactions:', error);
+    }
+  };
+
+  const loadUserCoins = async () => {
+    if (!user) return;
+    
+    try {
+      const { data, error } = await getUserCoins(user.id);
+      console.log('loadUserCoins - fetched data:', data, 'error:', error);
+      if (!error && data !== null) {
+        console.log('Setting userCoins to:', data);
+        setUserCoins(data);
+      } else {
+        console.error('Error loading coins:', error);
+      }
+    } catch (error) {
+      console.error('Exception loading coins:', error);
     }
   };
 
@@ -181,6 +258,19 @@ function HomeContent() {
     });
   }, [currentIndex, videos]);
 
+  // Track video view when video becomes visible
+  useEffect(() => {
+    if (videos.length > 0 && currentIndex >= 0 && currentIndex < videos.length) {
+      const currentVideo = videos[currentIndex];
+      if (currentVideo && currentVideo.id) {
+        // Track view with user ID if logged in, otherwise without
+        trackVideoView(currentVideo.id, user?.id).catch((error: any) => {
+          console.warn('Failed to track video view:', error);
+        });
+      }
+    }
+  }, [currentIndex, videos, user?.id]);
+
   // Handle scroll to change videos
   const handleScroll = (e: React.WheelEvent) => {
     if (isScrolling || videos.length === 0) return;
@@ -188,10 +278,20 @@ function HomeContent() {
     setIsScrolling(true);
     const delta = e.deltaY;
 
-    if (delta > 0 && currentIndex < videos.length - 1) {
-      setCurrentIndex(currentIndex + 1);
-    } else if (delta < 0 && currentIndex > 0) {
-      setCurrentIndex(currentIndex - 1);
+    if (delta > 0) {
+      // Scroll down - go to next video or loop to beginning
+      if (currentIndex < videos.length - 1) {
+        setCurrentIndex(currentIndex + 1);
+      } else {
+        setCurrentIndex(0); // Loop back to top
+      }
+    } else if (delta < 0) {
+      // Scroll up - go to previous video or loop to end
+      if (currentIndex > 0) {
+        setCurrentIndex(currentIndex - 1);
+      } else {
+        setCurrentIndex(videos.length - 1); // Loop to bottom
+      }
     }
 
     setTimeout(() => setIsScrolling(false), 500);
@@ -216,10 +316,20 @@ function HomeContent() {
     const isUpSwipe = distance > 50;
     const isDownSwipe = distance < -50;
 
-    if (isUpSwipe && currentIndex < videos.length - 1) {
-      setCurrentIndex(currentIndex + 1);
-    } else if (isDownSwipe && currentIndex > 0) {
-      setCurrentIndex(currentIndex - 1);
+    if (isUpSwipe) {
+      // Swipe up - go to next video or loop to beginning
+      if (currentIndex < videos.length - 1) {
+        setCurrentIndex(currentIndex + 1);
+      } else {
+        setCurrentIndex(0); // Loop back to top
+      }
+    } else if (isDownSwipe) {
+      // Swipe down - go to previous video or loop to end
+      if (currentIndex > 0) {
+        setCurrentIndex(currentIndex - 1);
+      } else {
+        setCurrentIndex(videos.length - 1); // Loop to bottom
+      }
     }
   };
 
@@ -274,32 +384,34 @@ function HomeContent() {
   };
 
   // Toggle bookmark
-  const toggleBookmark = async (videoId: string, businessId?: string) => {
-    if (!user || !businessId) return;
+  const toggleBookmark = async (videoId: string) => {
+    if (!user) {
+      setToastMessage('Please sign in to bookmark videos');
+      return;
+    }
 
     setBookmarkAnimating(videoId);
-    const isBookmarked = bookmarkedVideos.has(businessId);
+    const isBookmarked = bookmarkedVideos.has(videoId);
 
     try {
       if (isBookmarked) {
-        await supabase
-          .from('bookmarks')
-          .delete()
-          .eq('user_id', user.id)
-          .eq('business_id', businessId);
+        const { error } = await unbookmarkVideo(user.id, videoId);
+        if (error) throw error;
         setBookmarkedVideos(prev => {
           const next = new Set(prev);
-          next.delete(businessId);
+          next.delete(videoId);
           return next;
         });
+        setToastMessage('Bookmark removed');
       } else {
-        await supabase
-          .from('bookmarks')
-          .insert({ user_id: user.id, business_id: businessId });
-        setBookmarkedVideos(prev => new Set(prev).add(businessId));
+        const { error } = await bookmarkVideo(user.id, videoId);
+        if (error) throw error;
+        setBookmarkedVideos(prev => new Set(prev).add(videoId));
+        setToastMessage('Video bookmarked!');
       }
     } catch (error) {
       console.error('Error toggling bookmark:', error);
+      setToastMessage('Could not update bookmark — try again');
     }
 
     setTimeout(() => setBookmarkAnimating(null), 300);
@@ -372,10 +484,20 @@ function HomeContent() {
   }
 
   const currentVideo = videos[currentIndex];
+  if (!currentVideo) {
+    return (
+      <div className="relative h-screen w-screen overflow-hidden bg-black flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
+          <p className="text-white">Loading video...</p>
+        </div>
+      </div>
+    );
+  }
   const currentBusiness = currentVideo.businesses;
   const likeKey = currentBusiness?.id || currentVideo.id;
   const isLiked = likedVideos.has(likeKey);
-  const isBookmarked = currentBusiness?.id ? bookmarkedVideos.has(currentBusiness.id) : false;
+  const isBookmarked = bookmarkedVideos.has(currentVideo.id);
 
   // Calculate distance (simplified - would use actual user location in production)
   const distance = currentBusiness?.latitude && currentBusiness?.longitude 
@@ -431,7 +553,7 @@ function HomeContent() {
                     <span>•</span>
                   </>
                 )}
-                <span>{currentBusiness?.total_reviews || 0} verified reviews</span>
+                <span>{commentCounts[video.id] || 0} reviews</span>
                 {distance && (
                   <>
                     <span>•</span>
@@ -444,10 +566,19 @@ function HomeContent() {
         ))}
       </div>
 
-      {/* Left Side - Logo Only (Search removed) */}
-      <div className="absolute top-0 left-0 z-20 p-4">
+      {/* Left Side - Logo and Coins */}
+      <div className="absolute top-0 left-0 z-20 p-4 space-y-3">
         <div className="bg-white/10 backdrop-blur-md rounded-lg px-4 py-2">
           <h1 className="text-xl font-bold text-white">Localy</h1>
+        </div>
+        
+        {/* Coin Balance */}
+        <div className="bg-yellow-500/20 backdrop-blur-md border border-yellow-500/50 rounded-lg px-4 py-3 flex items-center gap-2">
+          <span className="text-2xl">🪙</span>
+          <div>
+            <div className="text-xs text-white/70">Coins</div>
+            <div className="text-xl font-bold text-yellow-300">{userCoins}</div>
+          </div>
         </div>
       </div>
 
@@ -523,27 +654,25 @@ function HomeContent() {
         )}
 
         {/* Bookmark Button */}
-        {currentBusiness?.id && (
-          <button
-            onClick={() => toggleBookmark(currentVideo.id, currentBusiness.id)}
-            className="flex flex-col items-center gap-1 transition-transform duration-200 active:scale-95"
-          >
-            <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 ${
-              isBookmarked ? 'bg-yellow-500' : 'bg-white/20 backdrop-blur-md'
-            } ${bookmarkAnimating === currentVideo.id ? 'scale-125' : ''}`}>
-              <svg
-                className={`w-6 h-6 text-white transition-all duration-300 ${
-                  bookmarkAnimating === currentVideo.id ? 'scale-150' : ''
-                }`}
-                fill={isBookmarked ? 'currentColor' : 'none'}
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-              </svg>
-            </div>
-          </button>
-        )}
+        <button
+          onClick={() => toggleBookmark(currentVideo.id)}
+          className="flex flex-col items-center gap-1 transition-transform duration-200 active:scale-95"
+        >
+          <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 ${
+            isBookmarked ? 'bg-yellow-500' : 'bg-white/20 backdrop-blur-md'
+          } ${bookmarkAnimating === currentVideo.id ? 'scale-125' : ''}`}>
+            <svg
+              className={`w-6 h-6 text-white transition-all duration-300 ${
+                bookmarkAnimating === currentVideo.id ? 'scale-150' : ''
+              }`}
+              fill={isBookmarked ? 'currentColor' : 'none'}
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+            </svg>
+          </div>
+        </button>
 
         {/* Share Button */}
         <button 
@@ -594,15 +723,6 @@ function HomeContent() {
             </svg>
             <span className={`text-xs ${pathname === '/profile' ? 'text-white' : 'text-white/60'}`}>Profile</span>
           </Link>
-        </div>
-      </div>
-
-      {/* Video Index Indicator */}
-      <div className="absolute top-4 right-4 z-20">
-        <div className="bg-black/50 backdrop-blur-md rounded-full px-3 py-1">
-          <span className="text-white text-sm">
-            {currentIndex + 1} / {videos.length}
-          </span>
         </div>
       </div>
 

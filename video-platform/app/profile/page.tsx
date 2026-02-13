@@ -8,6 +8,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { signOut } from '@/lib/supabase/auth';
 import { supabase } from '@/lib/supabase/client';
 import { EditableProfilePicture } from '@/components/EditableProfilePicture';
+import { BookmarkedVideos } from '@/components/BookmarkedVideos';
+import { PostedVideos } from '@/components/PostedVideos';
 import { 
   uploadProfilePicture, 
   updateProfile, 
@@ -176,6 +178,38 @@ function ProfileView({ profile, business, user, onEditClick, onSignOut, onProfil
         >
           Edit Profile
         </button>
+
+        {/* Coin Balance & Buy Coins Buttons */}
+        <div className="flex gap-4 mb-6">
+          <div className="flex-1 bg-yellow-500/10 border border-yellow-500/30 rounded-lg py-3 px-4 text-center">
+            <p className="text-yellow-400/80 text-xs mb-1">Coin Balance</p>
+            <p className="text-yellow-400 text-2xl font-bold">
+              🪙 {profile?.coin_balance || 0}
+            </p>
+          </div>
+          <Link
+            href="/buy-coins"
+            className="flex-1 bg-yellow-500 hover:bg-yellow-400 text-black font-semibold rounded-lg py-3 px-4 transition-all duration-200 hover:scale-[1.02] active:scale-98 text-center"
+          >
+            Buy Coins
+          </Link>
+        </div>
+
+        {/* Posted Videos Section */}
+        <div className="mb-8">
+          <h3 className="text-xl font-semibold mb-4">My Videos</h3>
+          <div className="bg-white/5 border border-white/10 rounded-lg p-6">
+            <PostedVideos userId={user.id} />
+          </div>
+        </div>
+
+        {/* Bookmarked Videos Section */}
+        <div className="mb-8">
+          <h3 className="text-xl font-semibold mb-4">Bookmarked Videos</h3>
+          <div className="bg-white/5 border border-white/10 rounded-lg p-6">
+            <BookmarkedVideos userId={user.id} />
+          </div>
+        </div>
 
         {/* Settings Section */}
         <div className="space-y-2 mb-8">

@@ -206,3 +206,93 @@ export async function updateBusinessInfo(businessId: string, updates: BusinessUp
     return { data: null, error };
   }
 }
+/**
+ * Get user's coin balance
+ */
+export async function getUserCoins(userId: string) {
+  try {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('coin_balance')
+      .eq('id', userId)
+      .single();
+
+    if (error) return { data: null, error };
+    return { data: data?.coin_balance || 100, error: null };
+  } catch (error: any) {
+    return { data: null, error };
+  }
+}
+
+/**
+ * Deduct coins from user account (for promotions)
+ */
+export async function deductCoins(userId: string, amount: number) {
+  try {
+    if (amount < 0) {
+      return { data: null, error: new Error('Amount must be positive') };
+    }
+
+    // First get current balance
+    const { data: profile, error: fetchError } = await supabase
+      .from('profiles')
+      .select('coin_balance')
+      .eq('id', userId)
+      .single();
+
+    if (fetchError) return { data: null, error: fetchError };
+
+    const currentBalance = profile?.coin_balance || 100;
+    if (currentBalance < amount) {
+      return { data: null, error: new Error('Insufficient coins') };
+    }
+
+    // Deduct coins
+    const { data, error } = await supabase
+      .from('profiles')
+      .update({ coin_balance: currentBalance - amount })
+      .eq('id', userId)
+      .select('coin_balance')
+      .single();
+
+    if (error) return { data: null, error };
+    return { data: data?.coin_balance, error: null };
+  } catch (error: any) {
+    return { data: null, error };
+  }
+}
+
+/**
+ * Add coins to user account (admin/rewards)
+ */
+export async function addCoins(userId: string, amount: number) {
+  try {
+    if (amount < 0) {
+      return { data: null, error: new Error('Amount must be positive') };
+    }
+
+    // First get current balance
+    const { data: profile, error: fetchError } = await supabase
+      .from('profiles')
+      .select('coin_balance')
+      .eq('id', userId)
+      .single();
+
+    if (fetchError) return { data: null, error: fetchError };
+
+    const currentBalance = profile?.coin_balance || 100;
+
+    // Add coins
+    const { data, error } = await supabase
+      .from('profiles')
+      .update({ coin_balance: currentBalance + amount })
+      .eq('id', userId)
+      .select('coin_balance')
+      .single();
+
+    if (error) return { data: null, error };
+    return { data: data?.coin_balance, error: null };
+  } catch (error: any) {
+    return { data: null, error };
+  }
+}

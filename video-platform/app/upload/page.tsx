@@ -1,11 +1,13 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { useAuth } from '@/contexts/AuthContext';
 import { uploadVideoFile, uploadVideoMetadata } from '@/lib/supabase/videos';
+import { getUserCoins } from '@/lib/supabase/profiles';
+import { PromotionModal } from '@/components/PromotionModal';
 import { supabase } from '@/lib/supabase/client';
 
 export default function UploadPage() {
@@ -27,7 +29,21 @@ function UploadContent() {
   const [category, setCategory] = useState<string>('');
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState('');
+  const [showPromotionModal, setShowPromotionModal] = useState(false);
+  const [uploadedVideoId, setUploadedVideoId] = useState<string | null>(null);
+  const [userCoins, setUserCoins] = useState(100);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Load user coins on mount
+  useEffect(() => {
+    const loadCoins = async () => {
+      if (!user) return;
+      const { data: coins } = await getUserCoins(user.id);
+      setUserCoins(coins || 100);
+      console.log('Loaded user coins:', coins);
+    };
+    loadCoins();
+  }, [user]);
 
   const handleVideoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -96,9 +112,22 @@ function UploadContent() {
 
       if (metadataError) throw metadataError;
 
-      // Success - redirect to home
-      router.push('/');
-      router.refresh();
+      // Step 4: Load user coins 
+      const { data: coins } = await getUserCoins(user.id);
+      setUserCoins(coins || 100);
+      setUploadedVideoId(videoData.id);
+      
+      // Reset form
+      setSelectedVideo(null);
+      setVideoPreview(null);
+      setCaption('');
+      setBusinessName('');
+      setCategory('');
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+      
+      setIsUploading(false);
     } catch (err: any) {
       setError(err.message || 'Failed to upload video');
       setIsUploading(false);
@@ -125,8 +154,59 @@ function UploadContent() {
         </div>
       </div>
 
+      {/* Success Screen */}
+      {uploadedVideoId && !showPromotionModal && (
+        <div className="max-w-2xl mx-auto px-4 py-16 flex items-center justify-center min-h-[calc(100vh-120px)]">
+          <div className="text-center space-y-6">
+            <div className="flex justify-center">
+              <div className="w-16 h-16 bg-green-500/20 border border-green-500 rounded-full flex items-center justify-center">
+                <svg className="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+            </div>
+            
+            <div>
+              <h2 className="text-3xl font-bold mb-2">Video Uploaded!</h2>
+              <p className="text-white/60">Your video is now live in the feed</p>
+            </div>
+
+            <div className="bg-white/5 border border-white/10 rounded-lg p-6 my-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-white/80 text-sm">Your Coins</p>
+                  <p className="text-3xl font-bold text-yellow-400">🪙 {userCoins}</p>
+                </div>
+                <svg className="w-12 h-12 text-yellow-400/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 10h-2m0 0h-2m2 0v-2m0 2v2m0-6h4v4m0 0h-2m2 0v-2m0 2v2" />
+                </svg>
+              </div>
+            </div>
+
+            <p className="text-white/70 text-sm">Boost your video to get more exposure in the feed</p>
+
+            <div className="flex gap-3 justify-center pt-4">
+              <button
+                onClick={() => router.push('/')}
+                className="px-6 py-3 bg-white/10 hover:bg-white/20 rounded-lg font-semibold transition-all"
+              >
+                View Feed
+              </button>
+              <button
+                onClick={() => setShowPromotionModal(true)}
+                className="px-6 py-3 bg-yellow-500 hover:bg-yellow-600 text-black rounded-lg font-semibold transition-all flex items-center gap-2"
+              >
+                <span>🚀</span>
+                <span>Boost Video</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Main Content */}
-      <div className="max-w-2xl mx-auto px-4 py-8">
+      {!uploadedVideoId && (
+        <div className="max-w-2xl mx-auto px-4 py-8">
         <form onSubmit={handleSubmit} className="space-y-6">
           {error && (
             <div className="bg-red-500/20 border border-red-500 text-red-200 px-4 py-3 rounded-lg">
@@ -244,6 +324,19 @@ function UploadContent() {
                 </select>
               </div>
             )}
+
+            {/* Boost Button */}
+            <button
+              type="button"
+              onClick={() => {
+                setUploadedVideoId('temp');
+                setShowPromotionModal(true);
+              }}
+              className="w-full mt-4 bg-yellow-500/20 hover:bg-yellow-500/30 border border-yellow-500/50 text-yellow-300 font-semibold py-3 rounded-lg transition-all duration-200 flex items-center justify-center gap-2"
+            >
+              <span>🚀</span>
+              <span>Learn About Boosting</span>
+            </button>
           </div>
 
           {/* Submit Button */}
@@ -266,6 +359,7 @@ function UploadContent() {
           </button>
         </form>
       </div>
+      )}
 
       {/* Bottom Navigation */}
       <div className="fixed bottom-0 left-0 right-0 z-20 bg-black/50 backdrop-blur-md border-t border-white/10">
@@ -303,6 +397,33 @@ function UploadContent() {
           </Link>
         </div>
       </div>
+
+      {/* Promotion Modal */}
+      {uploadedVideoId && (
+        <PromotionModal
+          isOpen={showPromotionModal}
+          onClose={() => {
+            setShowPromotionModal(false);
+            // Only redirect if it's a real video (not preview mode)
+            if (uploadedVideoId !== 'temp') {
+              router.push('/');
+              router.refresh();
+            }
+            // Reset preview state when closing
+            if (uploadedVideoId === 'temp') {
+              setUploadedVideoId(null);
+            }
+          }}
+          videoId={uploadedVideoId}
+          userCoins={userCoins}
+          onSuccess={(newBoost, coinsSpent, remainingCoins) => {
+            setUserCoins(remainingCoins);
+            setShowPromotionModal(false);
+            router.push('/');
+            router.refresh();
+          }}
+        />
+      )}
     </div>
   );
 }

@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { useAuth } from '@/contexts/AuthContext';
+
+import { supabase } from '@/lib/supabase/client';
 import { searchVideos, searchBusinesses, SearchFilters, SearchMode } from '@/lib/supabase/search';
 import { haversineDistance } from '@/lib/utils/geo';
 
@@ -40,6 +42,7 @@ function SearchContent() {
   const [results, setResults] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
+  const [commentCounts, setCommentCounts] = useState<{ [key: string]: number }>({});
 
   // Advanced filter state
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
@@ -93,10 +96,46 @@ function SearchContent() {
         : await searchVideos(filters);
 
       if (error) {
-        console.error('Search error:', error);
+        const errorMsg = error instanceof Error 
+          ? error.message 
+          : typeof error === 'object' && error !== null && 'message' in error
+            ? (error as any).message
+            : JSON.stringify(error);
+        console.error('Search error:', errorMsg);
         setResults([]);
       } else {
-        setResults(data || []);
+        const resultsData = data || [];
+        setResults(resultsData);
+        
+        // Load comment counts for search results
+        // TODO: Fix null value issue in videoIds array
+        console.log('Skipping comment fetch due to null value issues');
+        // const videoIds = resultsData.map((r: any) => r.id).filter(Boolean);
+        // if (videoIds.length > 0) {
+        //   const { data: comments, error: commentsError } = await supabase
+        //     .from('comments')
+        //     .select('video_id')
+        //     .eq('parent_comment_id', null)
+        //     .in('video_id', videoIds);
+        //   
+        //   if (commentsError) {
+        //     const errMsg = commentsError instanceof Error 
+        //       ? commentsError.message 
+        //       : (commentsError as any)?.message
+        //         ? (commentsError as any).message
+        //         : JSON.stringify(commentsError);
+        //     console.error('Error fetching comments:', errMsg, commentsError);
+        //   }
+        //   
+        //   const counts: { [key: string]: number } = {};
+        //   if (comments) {
+        //     console.log('Fetched comments from search:', comments.length);
+        //     comments.forEach((comment: any) => {
+        //       counts[comment.video_id] = (counts[comment.video_id] || 0) + 1;
+        //     });
+        //   }
+        //   setCommentCounts(counts);
+        // }
       }
     } catch (error) {
       console.error('Search error:', error);
@@ -434,6 +473,25 @@ function SearchContent() {
                         hoveredId={hoveredBusiness?.id}
                         onHover={setHoveredBusiness}
                       />
+                      <div className="flex-1">
+                        <h3 className="font-semibold mb-1">
+                          {result.businesses?.business_name || 'Business'}
+                        </h3>
+                        <p className="text-sm text-white/60 mb-2 line-clamp-2">
+                          {result.caption || ''}
+                        </p>
+                        <div className="flex items-center gap-2 text-sm text-white/80">
+                          {result.businesses?.average_rating && (
+                            <span>⭐ {result.businesses.average_rating.toFixed(1)}</span>
+                          )}
+                          {(commentCounts[result.id] || 0) > 0 && (
+                            <span>• {commentCounts[result.id]} reviews</span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
                     ))
                   : results.map((result) => (
                       <VideoResultCard key={result.id} result={result} query={query} />
