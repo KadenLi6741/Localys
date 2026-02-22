@@ -67,7 +67,6 @@ function UserProfileContent() {
     setMessagingLoading(true);
     try {
       console.log('Starting chat with user:', profile.id);
-      // Create or get existing one-to-one chat with the other user
       const { data, error } = await getOrCreateOneToOneChat(user.id, profile.id);
       
       if (error) {
@@ -79,7 +78,6 @@ function UserProfileContent() {
       
       if (data && data.id) {
         console.log('Chat created/found successfully:', data.id);
-        // Navigate to the chat
         router.push(`/chats/${data.id}`);
       } else {
         console.error('No chat data returned:', data);
@@ -94,7 +92,6 @@ function UserProfileContent() {
     }
   };
 
-  // Redirect to own profile page if viewing own profile
   useEffect(() => {
     if (user && userId === user.id) {
       router.push('/profile');

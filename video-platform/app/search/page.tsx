@@ -10,7 +10,6 @@ import { supabase } from '@/lib/supabase/client';
 import { searchVideos, searchBusinesses, SearchFilters, SearchMode } from '@/lib/supabase/search';
 import { haversineDistance } from '@/lib/utils/geo';
 
-// Filter option definitions
 const CUISINE_TYPES = ['Italian', 'Mexican', 'Chinese', 'Japanese', 'Korean', 'Indian', 'Thai', 'Vietnamese', 'Mediterranean', 'American', 'French', 'Middle Eastern'];
 const FORMALITY_TYPES = ['Restaurant', 'Cafe', 'Bar'];
 const SPECIAL_TYPES = ['Bakery', 'Bubble Tea', 'Fast Food'];
@@ -33,7 +32,6 @@ function SearchContent() {
   const { user } = useAuth();
   const pathname = usePathname();
 
-  // Core state
   const [query, setQuery] = useState('');
   const [searchMode, setSearchMode] = useState<SearchMode>('businesses');
   const [category, setCategory] = useState<string>('');
@@ -44,7 +42,6 @@ function SearchContent() {
   const [hasSearched, setHasSearched] = useState(false);
   const [commentCounts, setCommentCounts] = useState<{ [key: string]: number }>({});
 
-  // Advanced filter state
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [cuisineType, setCuisineType] = useState('');
   const [formality, setFormality] = useState('');
@@ -55,13 +52,11 @@ function SearchContent() {
   const [payment, setPayment] = useState<string[]>([]);
   const [tags, setTags] = useState<string[]>([]);
 
-  // Location state
   const [nearMe, setNearMe] = useState(false);
   const [radius, setRadius] = useState(10);
   const [userLat, setUserLat] = useState<number | undefined>();
   const [userLng, setUserLng] = useState<number | undefined>();
 
-  // Hover preview state
   const [hoveredBusiness, setHoveredBusiness] = useState<any>(null);
 
   const toggleArrayFilter = (arr: string[], setArr: (v: string[]) => void, value: string) => {
@@ -107,35 +102,8 @@ function SearchContent() {
         const resultsData = data || [];
         setResults(resultsData);
         
-        // Load comment counts for search results
-        // TODO: Fix null value issue in videoIds array
         console.log('Skipping comment fetch due to null value issues');
-        // const videoIds = resultsData.map((r: any) => r.id).filter(Boolean);
-        // if (videoIds.length > 0) {
-        //   const { data: comments, error: commentsError } = await supabase
-        //     .from('comments')
-        //     .select('video_id')
-        //     .eq('parent_comment_id', null)
-        //     .in('video_id', videoIds);
-        //   
-        //   if (commentsError) {
-        //     const errMsg = commentsError instanceof Error 
-        //       ? commentsError.message 
-        //       : (commentsError as any)?.message
-        //         ? (commentsError as any).message
-        //         : JSON.stringify(commentsError);
-        //     console.error('Error fetching comments:', errMsg, commentsError);
-        //   }
-        //   
-        //   const counts: { [key: string]: number } = {};
-        //   if (comments) {
-        //     console.log('Fetched comments from search:', comments.length);
-        //     comments.forEach((comment: any) => {
-        //       counts[comment.video_id] = (counts[comment.video_id] || 0) + 1;
-        //     });
-        //   }
-        //   setCommentCounts(counts);
-        // }
+      
       }
     } catch (error) {
       console.error('Search error:', error);
@@ -147,14 +115,12 @@ function SearchContent() {
 
   const handleSearch = useCallback(() => {
     const filters = buildFilters();
-    // Execute search immediately, allowing blank or filter-only queries
     executeSearch(filters, searchMode);
   }, [query, category, minRating, priceRange, cuisineType, formality, specialType, dietary, features, amenities, payment, tags, nearMe, radius, userLat, userLng, searchMode, executeSearch]);
 
   const handleCategoryChange = (cat: string) => {
     setCategory(cat);
     const filters = buildFilters(cat);
-    // Execute search immediately when category changes
     executeSearch(filters, searchMode);
   };
 

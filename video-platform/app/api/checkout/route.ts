@@ -26,7 +26,6 @@ const COIN_PACKAGES: Record<
 
 export async function POST(request: NextRequest) {
   try {
-    // Check if Stripe key is available
     if (!process.env.STRIPE_SECRET_KEY) {
       console.error('STRIPE_SECRET_KEY is not set in environment variables');
       return NextResponse.json(
@@ -53,7 +52,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if we can connect to Stripe
     if (!stripe || !stripe.checkout) {
       return NextResponse.json(
         { error: 'Stripe not initialized properly' },
@@ -61,7 +59,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create Stripe checkout session
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [

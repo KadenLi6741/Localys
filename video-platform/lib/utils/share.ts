@@ -19,29 +19,23 @@ export interface ShareResult {
  * otherwise copy to clipboard as fallback
  */
 export async function sharePost(data: ShareData): Promise<ShareResult> {
-  // Check if Web Share API is available
   if (navigator.share) {
     try {
       await navigator.share(data);
       return { success: true, usedWebShare: true };
     } catch (error) {
-      // User cancelled share or error occurred
       if (error instanceof Error && error.name === 'AbortError') {
         return { success: false, usedWebShare: true, error: 'Share cancelled' };
       }
-      // Fall through to clipboard fallback
       console.warn('Web Share API failed, falling back to clipboard:', error);
     }
   }
 
-  // Fallback: copy to clipboard
   try {
     if (navigator.clipboard && navigator.clipboard.writeText) {
       await navigator.clipboard.writeText(data.url);
       return { success: true, usedWebShare: false };
     } else {
-      // Legacy fallback for browsers without clipboard API
-      // Note: execCommand is deprecated but provides compatibility for older browsers
       const textArea = document.createElement('textarea');
       textArea.value = data.url;
       textArea.style.position = 'fixed';

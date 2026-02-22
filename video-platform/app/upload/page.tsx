@@ -34,7 +34,6 @@ function UploadContent() {
   const [userCoins, setUserCoins] = useState(100);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Load user coins on mount
   useEffect(() => {
     const loadCoins = async () => {
       if (!user) return;
@@ -62,17 +61,14 @@ function UploadContent() {
     setIsUploading(true);
 
     try {
-      // Step 1: Upload video file to Supabase Storage
       const { data: uploadData, error: uploadError } = await uploadVideoFile(selectedVideo, user.id);
       
       if (uploadError || !uploadData?.publicUrl) {
         throw new Error(uploadError?.message || 'Failed to upload video');
       }
 
-      // Step 2: Create or get business (if business name provided)
       let businessId: string | undefined;
       if (businessName && category) {
-        // Check if business exists
         const { data: existingBusiness } = await supabase
           .from('businesses')
           .select('id')
@@ -83,7 +79,6 @@ function UploadContent() {
         if (existingBusiness) {
           businessId = existingBusiness.id;
         } else {
-          // Create new business
           const { data: newBusiness, error: businessError } = await supabase
             .from('businesses')
             .insert({
@@ -91,7 +86,7 @@ function UploadContent() {
               business_name: businessName,
               category: category as 'food' | 'retail' | 'services',
               video_url: uploadData.publicUrl,
-              latitude: 0, // Would get from user location
+              latitude: 0,
               longitude: 0,
             })
             .select()
@@ -102,7 +97,6 @@ function UploadContent() {
         }
       }
 
-      // Step 3: Save video metadata
       const { data: videoData, error: metadataError } = await uploadVideoMetadata({
         user_id: user.id,
         video_url: uploadData.publicUrl,
@@ -112,12 +106,10 @@ function UploadContent() {
 
       if (metadataError) throw metadataError;
 
-      // Step 4: Load user coins 
       const { data: coins } = await getUserCoins(user.id);
       setUserCoins(coins || 100);
       setUploadedVideoId(videoData.id);
       
-      // Reset form
       setSelectedVideo(null);
       setVideoPreview(null);
       setCaption('');
@@ -404,12 +396,10 @@ function UploadContent() {
           isOpen={showPromotionModal}
           onClose={() => {
             setShowPromotionModal(false);
-            // Only redirect if it's a real video (not preview mode)
             if (uploadedVideoId !== 'temp') {
               router.push('/');
               router.refresh();
             }
-            // Reset preview state when closing
             if (uploadedVideoId === 'temp') {
               setUploadedVideoId(null);
             }

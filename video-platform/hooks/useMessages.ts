@@ -31,14 +31,11 @@ export function useMessages(chatId: string | undefined, userId: string | undefin
     }
   }, [chatId, userId]);
 
-  // Debounced mark as read function
   const debouncedMarkAsRead = useCallback((chatId: string, userId: string) => {
-    // Clear existing timeout
     if (markAsReadTimeoutRef.current) {
       clearTimeout(markAsReadTimeoutRef.current);
     }
 
-    // Set new timeout to mark as read after 1 second
     markAsReadTimeoutRef.current = setTimeout(() => {
       markMessagesAsRead(chatId, userId);
     }, 1000);
@@ -59,7 +56,6 @@ export function useMessages(chatId: string | undefined, userId: string | undefin
 
       if (sendError) throw sendError;
 
-      // Optimistically add message to list if not already there
       if (data && !messages.find(m => m.id === data.id)) {
         setMessages(prev => [...prev, data]);
       }
@@ -76,18 +72,15 @@ export function useMessages(chatId: string | undefined, userId: string | undefin
   useEffect(() => {
     loadMessages();
 
-    // Subscribe to new messages
     if (chatId && userId) {
       subscriptionRef.current = subscribeToMessages(chatId, (newMessage) => {
         setMessages(prev => {
-          // Avoid duplicates
           if (prev.find(m => m.id === newMessage.id)) {
             return prev;
           }
           return [...prev, newMessage];
         });
 
-        // Mark as read if not from current user (debounced)
         if (newMessage.sender_id !== userId) {
           debouncedMarkAsRead(chatId, userId);
         }

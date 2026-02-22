@@ -36,7 +36,6 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  // Handle checkout.session.completed event
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object as Stripe.Checkout.Session;
 
@@ -52,7 +51,6 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      // Get user's current coin balance
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('coin_balance')
@@ -69,7 +67,6 @@ export async function POST(request: NextRequest) {
 
       const newBalance = (profile?.coin_balance || 0) + coins;
 
-      // Update user's coin balance
       const { error: updateError } = await supabase
         .from('profiles')
         .update({ coin_balance: newBalance })
@@ -85,7 +82,6 @@ export async function POST(request: NextRequest) {
 
       console.log(`Added ${coins} coins to user ${userId}. New balance: ${newBalance}`);
 
-      // Optionally: Create a record of the purchase
       await supabase.from('coin_purchases').insert({
         user_id: userId,
         coins,

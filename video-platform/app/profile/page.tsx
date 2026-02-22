@@ -60,7 +60,6 @@ function ProfileContent() {
       if (error) throw error;
       setProfile(data);
     } catch (error) {
-      // Failed to load profile - will show loading state or empty profile
       setProfile(null);
     } finally {
       setLoading(false);
@@ -76,7 +75,6 @@ function ProfileContent() {
         setBusiness(data);
       }
     } catch (error) {
-      // Failed to load business - user may not have one, which is fine
       setBusiness(null);
     }
   };
@@ -280,7 +278,6 @@ function ProfileEditForm({ profile, business, user, onSave, onCancel }: ProfileE
   const [success, setSuccess] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Cleanup object URL on unmount or when new file is selected
   useEffect(() => {
     return () => {
       if (profilePicturePreview && profilePicturePreview.startsWith('blob:')) {
@@ -292,18 +289,15 @@ function ProfileEditForm({ profile, business, user, onSave, onCancel }: ProfileE
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // Validate file type
       if (!file.type.startsWith('image/')) {
         setError('Please select an image file');
         return;
       }
-      // Validate file size using constant
       if (file.size > MAX_PROFILE_PICTURE_SIZE) {
         const maxSizeMB = MAX_PROFILE_PICTURE_SIZE / BYTES_TO_MB;
         setError(`Image size must be less than ${maxSizeMB}MB`);
         return;
       }
-      // Revoke previous object URL before creating new one
       if (profilePicturePreview && profilePicturePreview.startsWith('blob:')) {
         URL.revokeObjectURL(profilePicturePreview);
       }
@@ -322,7 +316,6 @@ function ProfileEditForm({ profile, business, user, onSave, onCancel }: ProfileE
     try {
       let profilePictureUrl = profile?.profile_picture_url;
 
-      // Upload profile picture if changed
       if (profilePicture) {
         const { data, error: uploadError } = await uploadProfilePicture(profilePicture, user.id);
         if (uploadError) {
@@ -333,32 +326,27 @@ function ProfileEditForm({ profile, business, user, onSave, onCancel }: ProfileE
         }
       }
 
-      // Prepare profile updates
       const profileUpdates: ProfileUpdateData = {
         full_name: fullName,
         username: username,
         bio: bio,
       };
 
-      // Only include profile_picture_url if it changed
       if (profilePictureUrl !== profile?.profile_picture_url) {
         profileUpdates.profile_picture_url = profilePictureUrl;
       }
 
-      // Update profile
       const { error: profileError } = await updateProfile(user.id, profileUpdates);
       if (profileError) {
         throw new Error('Failed to update profile: ' + profileError.message);
       }
 
-      // Update business if it exists and business name changed
       if (business && businessName !== business.business_name) {
         const businessUpdates: BusinessUpdateData = {
           business_name: businessName,
         };
         const { error: businessError } = await updateBusinessInfo(business.id, businessUpdates);
         if (businessError) {
-          // Business update failed but profile succeeded - inform user
           setSuccess('Profile updated successfully! Note: Business name update failed.');
           setTimeout(() => {
             onSave();
@@ -373,7 +361,6 @@ function ProfileEditForm({ profile, business, user, onSave, onCancel }: ProfileE
       }, 1000);
     } catch (err: any) {
       setError(err.message || 'Failed to update profile');
-      // Error is already displayed to user via setError
     } finally {
       setLoading(false);
     }
