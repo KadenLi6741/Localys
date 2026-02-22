@@ -1,53 +1,28 @@
 import { supabase } from './client';
 import { haversineDistance } from '../utils/geo';
+import type { SearchMode, SearchFilters } from '../../models/Search';
 
-export type SearchMode = 'videos' | 'businesses';
-
-export interface SearchFilters {
-  query?: string;
-  category?: 'food' | 'retail' | 'services';
-  minRating?: number;
-  maxDistance?: number; // in km
-  priceMin?: number;
-  priceMax?: number;
-  latitude?: number;
-  longitude?: number;
-  // New filter fields
-  cuisineType?: string;
-  formality?: string;
-  specialType?: string;
-  dietary?: string[];
-  features?: string[];
-  amenities?: string[];
-  payment?: string[];
-  tags?: string[];
-  openNow?: boolean;
-}
+export type { SearchMode, SearchFilters };
 
 /**
  * Semantic keyword mapping for food search
  * Maps common search terms to related terms for broader matching
  */
 const SEMANTIC_MAP: Record<string, string[]> = {
-  // Noodle-related
   noodle: ['pho', 'ramen', 'spaghetti', 'pasta', 'udon', 'soba', 'lo mein', 'chow mein', 'pad thai', 'laksa', 'noodle'],
   pho: ['pho', 'noodle', 'vietnamese', 'soup'],
   ramen: ['ramen', 'noodle', 'japanese', 'soup'],
   pasta: ['pasta', 'spaghetti', 'fettuccine', 'penne', 'linguine', 'italian', 'noodle'],
   spaghetti: ['spaghetti', 'pasta', 'italian', 'noodle'],
   udon: ['udon', 'noodle', 'japanese', 'soup'],
-  // Rice-related
   rice: ['rice', 'fried rice', 'biryani', 'risotto', 'sushi', 'poke', 'bibimbap'],
   sushi: ['sushi', 'sashimi', 'japanese', 'rice', 'maki', 'nigiri'],
-  // Bread/baked
   bread: ['bread', 'bakery', 'baguette', 'sourdough', 'croissant', 'pastry'],
   pizza: ['pizza', 'italian', 'flatbread', 'calzone'],
   burger: ['burger', 'hamburger', 'cheeseburger', 'fast food', 'american'],
-  // Drinks
   coffee: ['coffee', 'espresso', 'latte', 'cappuccino', 'cafe', 'mocha', 'americano'],
   tea: ['tea', 'boba', 'bubble tea', 'matcha', 'chai', 'bbt'],
   boba: ['boba', 'bubble tea', 'bbt', 'tea', 'milk tea', 'taro'],
-  // Cuisine
   chinese: ['chinese', 'dim sum', 'dumpling', 'wonton', 'szechuan', 'cantonese'],
   japanese: ['japanese', 'sushi', 'ramen', 'udon', 'tempura', 'teriyaki', 'izakaya'],
   korean: ['korean', 'bbq', 'bibimbap', 'kimchi', 'bulgogi', 'tteokbokki'],
@@ -56,7 +31,6 @@ const SEMANTIC_MAP: Record<string, string[]> = {
   indian: ['indian', 'curry', 'naan', 'biryani', 'tandoori', 'masala'],
   thai: ['thai', 'pad thai', 'curry', 'tom yum', 'satay', 'green curry'],
   vietnamese: ['vietnamese', 'pho', 'banh mi', 'spring roll', 'bun'],
-  // General
   dessert: ['dessert', 'cake', 'ice cream', 'pastry', 'gelato', 'pie', 'cookie', 'brownie'],
   breakfast: ['breakfast', 'brunch', 'pancake', 'waffle', 'eggs', 'bacon', 'toast'],
   seafood: ['seafood', 'fish', 'shrimp', 'lobster', 'crab', 'oyster', 'salmon'],
@@ -80,7 +54,6 @@ export function expandSearchQuery(query: string): string[] {
   const normalizedQuery = query.toLowerCase().trim();
   const terms = new Set<string>([normalizedQuery]);
 
-  // Check each word in the query against the semantic map
   const words = normalizedQuery.split(/\s+/);
   for (const word of words) {
     const related = SEMANTIC_MAP[word];
@@ -97,14 +70,6 @@ export function expandSearchQuery(query: string): string[] {
  * This can be extended to call actual AI services (e.g., DeepSeek)
  */
 export async function aiAssistedSearch(filters: SearchFilters) {
-  // For now, this is a clean abstraction that can be extended
-  // When AI is connected, this function will:
-  // 1. Send query to AI service
-  // 2. Get interpreted intent (keywords, location, category)
-  // 3. Rank results by relevance
-  // 4. Return enhanced search results
-
-  // Placeholder: Return filters as-is for now
   return filters;
 }
 
@@ -114,15 +79,12 @@ export async function aiAssistedSearch(filters: SearchFilters) {
 export async function searchVideos(filters: SearchFilters) {
   const interpretedFilters = await aiAssistedSearch(filters);
 
-  // Use left join instead of inner join
   let query = supabase
     .from('videos')
     .select('*, profiles:user_id(id, username, full_name, profile_picture_url)');
 
-  // Apply text search with semantic expansion
   if (interpretedFilters.query) {
     const expandedTerms = expandSearchQuery(interpretedFilters.query);
-    // Create a simple OR filter for caption only - we'll filter by business name after fetching
     const captionFilters = expandedTerms
       .map(term => `caption.ilike.%${term}%`)
       .join(',');
@@ -138,7 +100,6 @@ export async function searchVideos(filters: SearchFilters) {
     return { data: [], error };
   }
 
-  // Now fetch related data for each video
   const results = await Promise.all(
     (data || []).map(async (video: any) => {
       let enrichedVideo = { ...video };
@@ -156,7 +117,6 @@ export async function searchVideos(filters: SearchFilters) {
 
       if (video.business_id) {
         try {
-          // Changed from 'businesses' table to 'profiles' table
           const { data: business, error: businessError } = await supabase
             .from('profiles')
             .select('*')
@@ -167,7 +127,7 @@ export async function searchVideos(filters: SearchFilters) {
             enrichedVideo.businesses = {
               id: business.id,
               business_name: business.full_name || business.username,
-              category: business.category, // May be undefined
+              category: business.category,
               profile_picture_url: business.profile_picture_url,
               latitude: business.latitude,
               longitude: business.longitude,
@@ -186,28 +146,23 @@ export async function searchVideos(filters: SearchFilters) {
     })
   );
 
-  // Apply client-side filters
   let filteredResults = results;
 
-  // Filter by business name if query provided
   if (interpretedFilters.query) {
     const expandedTerms = expandSearchQuery(interpretedFilters.query);
     filteredResults = filteredResults.filter((video) => {
-      // Check caption
       if (video.caption) {
         const captionLower = video.caption.toLowerCase();
         if (expandedTerms.some(term => captionLower.includes(term.toLowerCase()))) {
           return true;
         }
       }
-      // Check business name
       if (video.businesses?.business_name) {
         const businessNameLower = video.businesses.business_name.toLowerCase();
         if (expandedTerms.some(term => businessNameLower.includes(term.toLowerCase()))) {
           return true;
         }
       }
-      // Check profile full_name
       if (video.profiles?.full_name) {
         const fullNameLower = video.profiles.full_name.toLowerCase();
         if (expandedTerms.some(term => fullNameLower.includes(term.toLowerCase()))) {
@@ -254,12 +209,10 @@ export async function searchVideos(filters: SearchFilters) {
 export async function searchBusinesses(filters: SearchFilters) {
   const interpretedFilters = await aiAssistedSearch(filters);
 
-  // Search profiles table directly
   let query = supabase
     .from('profiles')
     .select('*');
 
-  // Removed DB-level category and rating filters as they cause 42703 errors
   if (interpretedFilters.query) {
     const expandedTerms = expandSearchQuery(interpretedFilters.query);
     const orFilter = expandedTerms
@@ -269,13 +222,12 @@ export async function searchBusinesses(filters: SearchFilters) {
   }
 
   const { data, error } = await query
-    .limit(50); // Removed .order() on average_rating to prevent potential column errors
+    .limit(50);
 
   if (error) {
     console.error('Business search error:', error);
   }
 
-  // Transform profiles into the search result shape
   let filteredResults = (data || []).map((profile: any) => ({
     ...profile,
     business_name: profile.full_name || profile.username,
@@ -287,7 +239,6 @@ export async function searchBusinesses(filters: SearchFilters) {
     },
   }));
 
-  // Apply filters client-side now that we have the data
   if (interpretedFilters.category) {
     filteredResults = filteredResults.filter(biz => biz.category === interpretedFilters.category);
   }
@@ -296,7 +247,6 @@ export async function searchBusinesses(filters: SearchFilters) {
     filteredResults = filteredResults.filter(biz => (biz.average_rating || 0) >= interpretedFilters.minRating!);
   }
 
-  // Apply price range filter client-side
   if (interpretedFilters.priceMin !== undefined || interpretedFilters.priceMax !== undefined) {
     filteredResults = filteredResults.filter((biz: any) => {
       const minPrice = biz.price_range_min || 0;
@@ -307,7 +257,6 @@ export async function searchBusinesses(filters: SearchFilters) {
     });
   }
 
-  // Apply distance filter client-side if user location available
   if (
     interpretedFilters.maxDistance &&
     interpretedFilters.latitude !== undefined &&
@@ -325,7 +274,6 @@ export async function searchBusinesses(filters: SearchFilters) {
     });
   }
 
-  // Rank results
   const rankedResults = rankBusinessResults(filteredResults, interpretedFilters);
   return { data: rankedResults, error: null };
 }
@@ -356,15 +304,12 @@ function rankBusinessResults(results: any[], filters: SearchFilters) {
     let scoreA = 0;
     let scoreB = 0;
 
-    // Boost by rating
     if (a.average_rating) scoreA += a.average_rating * 20;
     if (b.average_rating) scoreB += b.average_rating * 20;
 
-    // Boost by review count
     if (a.total_reviews) scoreA += Math.min(a.total_reviews, 50);
     if (b.total_reviews) scoreB += Math.min(b.total_reviews, 50);
 
-    // If user location available, boost closer results
     if (filters.latitude && filters.longitude) {
       if (a.latitude && a.longitude) {
         const distA = haversineDistance(filters.latitude, filters.longitude, a.latitude, a.longitude);
