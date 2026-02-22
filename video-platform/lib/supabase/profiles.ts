@@ -1,39 +1,12 @@
 import { supabase } from './client';
+import type { Profile, Business, ProfileUpdateData, BusinessUpdateData } from '../../models/Profile';
+
+export type { Profile, Business, ProfileUpdateData, BusinessUpdateData };
 
 const STORAGE_BUCKET = 'avatars';
 export const MAX_PROFILE_PICTURE_SIZE = 5 * 1024 * 1024; // 5MB in bytes
 export const BYTES_TO_MB = 1024 * 1024; // Conversion constant for bytes to megabytes
 const ALLOWED_IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'];
-
-export interface Profile {
-  id: string;
-  email: string;
-  full_name: string;
-  username: string;
-  bio?: string;
-  profile_picture_url?: string;
-}
-
-export interface Business {
-  id: string;
-  owner_id: string;
-  business_name: string;
-  latitude: number;
-  longitude: number;
-  category?: string;
-  profile_picture_url?: string;
-}
-
-export interface ProfileUpdateData {
-  full_name?: string;
-  username?: string;
-  bio?: string;
-  profile_picture_url?: string;
-}
-
-export interface BusinessUpdateData {
-  business_name?: string;
-}
 
 /**
  * Fetch a single profile by user ID
@@ -51,9 +24,8 @@ export async function getProfileByUserId(userId: string) {
       .eq('id', userId)
       .single();
 
-    // Handle the specific error when no rows are found
     if (error && error.code === 'PGRST116') {
-      return { data: null, error: null }; // Profile doesn't exist, but it's not an error
+      return { data: null, error: null };
     }
 
     if (error) {
@@ -76,13 +48,10 @@ export async function getProfileByUserId(userId: string) {
  * Uses crypto.randomUUID() when available, otherwise falls back to a timestamp-based ID
  */
 function generateUniqueId(): string {
-  // Try to use crypto.randomUUID() for best security
   if (typeof crypto !== 'undefined' && crypto.randomUUID) {
     return crypto.randomUUID();
   }
   
-  // Fallback: Use timestamp with high-precision random component
-  // Note: For production, consider adding 'uuid' package for better collision resistance
   const timestamp = Date.now().toString(36);
   const randomPart = Math.random().toString(36).substring(2, 15);
   const randomPart2 = Math.random().toString(36).substring(2, 15);
@@ -94,13 +63,11 @@ function generateUniqueId(): string {
  */
 export async function uploadProfilePicture(file: File, userId: string) {
   try {
-    // Extract and validate file extension
     const fileExt = file.name.split('.').pop()?.toLowerCase();
     if (!fileExt) {
       return { data: null, error: new Error('Invalid file name: no extension found') };
     }
 
-    // Validate file extension is in allowed list
     if (!ALLOWED_IMAGE_EXTENSIONS.includes(fileExt)) {
       return { 
         data: null, 
@@ -108,7 +75,6 @@ export async function uploadProfilePicture(file: File, userId: string) {
       };
     }
 
-    // Generate unique filename for collision prevention
     const uniqueId = generateUniqueId();
     const fileName = `profile-pictures/${userId}/${uniqueId}.${fileExt}`;
 
@@ -117,7 +83,7 @@ export async function uploadProfilePicture(file: File, userId: string) {
       .upload(fileName, file, {
         cacheControl: '3600',
         upsert: false,
-        contentType: file.type, // Explicitly set the content type
+        contentType: file.type,
       });
 
     if (error) {
@@ -127,7 +93,6 @@ export async function uploadProfilePicture(file: File, userId: string) {
       return { data: null, error };
     }
 
-    // Get public URL
     const { data: urlData } = supabase.storage
       .from(STORAGE_BUCKET)
       .getPublicUrl(fileName);
@@ -176,7 +141,6 @@ export async function getUserBusiness(userId: string) {
       .eq('owner_id', userId)
       .single();
 
-    // If no business found, return null instead of error
     if (error && error.code === 'PGRST116') {
       return { data: null, error: null };
     }
@@ -233,7 +197,6 @@ export async function deductCoins(userId: string, amount: number) {
       return { data: null, error: new Error('Amount must be positive') };
     }
 
-    // First get current balance
     const { data: profile, error: fetchError } = await supabase
       .from('profiles')
       .select('coin_balance')
@@ -247,7 +210,6 @@ export async function deductCoins(userId: string, amount: number) {
       return { data: null, error: new Error('Insufficient coins') };
     }
 
-    // Deduct coins
     const { data, error } = await supabase
       .from('profiles')
       .update({ coin_balance: currentBalance - amount })
@@ -271,7 +233,6 @@ export async function addCoins(userId: string, amount: number) {
       return { data: null, error: new Error('Amount must be positive') };
     }
 
-    // First get current balance
     const { data: profile, error: fetchError } = await supabase
       .from('profiles')
       .select('coin_balance')
@@ -282,7 +243,6 @@ export async function addCoins(userId: string, amount: number) {
 
     const currentBalance = profile?.coin_balance || 100;
 
-    // Add coins
     const { data, error } = await supabase
       .from('profiles')
       .update({ coin_balance: currentBalance + amount })
