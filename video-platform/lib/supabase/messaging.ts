@@ -5,10 +5,8 @@
  * with existing code while using the correct Supabase schema.
  */
 
-// Re-export types from messages.ts
 export type { Message, Chat, ChatMember, ChatWithDetails } from './messages';
 
-// Re-export functions from messages.ts
 export { 
   getChats,
   getMessages,
@@ -20,5 +18,4 @@ export {
   searchUsers,
 } from './messages';
 
-// Aliases for backward compatibility
 export { getOrCreateOneToOneChat as getOrCreateConversation } from './messages';
