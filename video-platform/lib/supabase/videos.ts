@@ -1,18 +1,10 @@
 import { supabase } from './client';
+import type { VideoMetadata } from '../../models/Video';
+
+export type { VideoMetadata };
 
 const STORAGE_BUCKET = process.env.NEXT_PUBLIC_SUPABASE_BUCKET || 'videos';
 
-export interface VideoMetadata {
-  id?: string;
-  user_id: string;
-  business_id?: string;
-  video_url: string;
-  thumbnail_url?: string;
-  caption?: string;
-  business_name?: string;
-  category?: 'food' | 'retail' | 'services';
-  created_at?: string;
-}
 /**
  * Upload video metadata to Supabase
  */
@@ -26,7 +18,6 @@ export async function uploadVideoMetadata(metadata: VideoMetadata) {
   return { data, error };
 }
 
-// eslint-disable no-console
 export async function getVideosFeed(limit = 20, offset = 0) {
   const { data: videosRaw, error: videosError } = await supabase
     .from('videos')
@@ -43,11 +34,9 @@ export async function getVideosFeed(limit = 20, offset = 0) {
     .range(offset, offset + limit - 1);
 
   if (videosError) {
-    // Log full error with detailed information
     const errorMsg = `Supabase error - Message: ${videosError?.message || 'unknown'}, Code: ${videosError?.code || 'unknown'}, Details: ${videosError?.details || 'none'}, Hint: ${videosError?.hint || 'none'}`;
     console.error(errorMsg);
 
-    // Log Supabase client config (without revealing secrets)
     const configMsg = `Supabase config - hasUrl: ${!!process.env.NEXT_PUBLIC_SUPABASE_URL}, hasKey: ${!!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`;
     console.error(configMsg);
 
@@ -56,7 +45,6 @@ export async function getVideosFeed(limit = 20, offset = 0) {
 
   const videosList: any[] = videosRaw || [];
 
-  // Fetch user profiles for all videos
   const userIds = Array.from(
     new Set(videosList.map(v => v.user_id).filter(Boolean))
   );
@@ -108,17 +96,12 @@ export async function getVideosFeed(limit = 20, offset = 0) {
   const videos = await Promise.all(videosList.map(async (v: any) => {
     let url = v.video_url;
     
-    // Logic to determine if we need to sign the URL
     let pathForSigning = null;
 
     if (url && typeof url === 'string') {
       if (!url.startsWith('http')) {
-        // Case A: It's a raw storage path (e.g. "user/video.mp4")
         pathForSigning = url;
       } else if (url.includes('/storage/v1/object/public/')) {
-        // Case B: It's a Supabase Public URL, but bucket might be private.
-        // We try to extract the path and sign it just in case.
-        // Format: .../storage/v1/object/public/{bucket}/{path}
         try {
           const urlObj = new URL(url);
           const match = urlObj.pathname.match(/\/storage\/v1\/object\/public\/[^\/]+\/(.+)$/);
@@ -126,7 +109,6 @@ export async function getVideosFeed(limit = 20, offset = 0) {
             pathForSigning = decodeURIComponent(match[1]);
           }
         } catch (e) {
-          // invalid url, ignore
         }
       }
     }
@@ -156,7 +138,6 @@ export async function getVideosFeed(limit = 20, offset = 0) {
 
   return { data: videos, error: null };
 }
-// eslint-enable no-console
 
 export async function getVideoById(videoId: string) {
   const { data: video, error } = await supabase
@@ -187,7 +168,6 @@ export async function getVideoById(videoId: string) {
     }
   }
 
-  // Sign URL 
   if (video.video_url && !video.video_url.startsWith('http')) {
      const { data: signed } = await supabase.storage
         .from(STORAGE_BUCKET)
@@ -211,7 +191,6 @@ export async function uploadVideoFile(file: File, userId: string) {
 
   if (error) return { data: null, error };
 
-  // Get public URL
   const { data: urlData } = supabase.storage
     .from(STORAGE_BUCKET)
     .getPublicUrl(fileName);
@@ -248,7 +227,6 @@ export async function getLikeCounts(businessIds: string[]) {
   try {
     const counts: { [key: string]: number } = {};
     
-    // Initialize all to 0
     businessIds.forEach(id => {
       counts[id] = 0;
     });
@@ -439,7 +417,6 @@ export async function unbookmarkVideo(userId: string, videoId: string) {
  */
 export async function getUserBookmarkedVideos(userId: string, limit = 20, offset = 0) {
   try {
-    // Get bookmarked video IDs
     const { data: bookmarks, error: bookmarksError } = await supabase
       .from('video_bookmarks')
       .select('video_id')
@@ -458,7 +435,6 @@ export async function getUserBookmarkedVideos(userId: string, limit = 20, offset
 
     const videoIds = bookmarks.map((b: any) => b.video_id);
 
-    // Get full video data
     const { data: videos, error: videosError } = await supabase
       .from('videos')
       .select(`
@@ -477,7 +453,6 @@ export async function getUserBookmarkedVideos(userId: string, limit = 20, offset
       return { data: null, error: videosError };
     }
 
-    // Get profiles and businesses for all videos
     let profilesMap: { [key: string]: any } = {};
     let businessesMap: { [key: string]: any } = {};
 
@@ -534,7 +509,6 @@ const PROMOTION_COOLDOWN_HOURS = 24;
  */
 export async function promoteVideo(userId: string, videoId: string, coinsTospend: number) {
   try {
-    // Validate coin amount
     if (coinsTospend < MIN_COINS_TO_PROMOTE || coinsTospend > MAX_COINS_TO_PROMOTE) {
       return { 
         data: null, 
@@ -542,7 +516,6 @@ export async function promoteVideo(userId: string, videoId: string, coinsTospend
       };
     }
 
-    // Get user's current coin balance FIRST before any other checks
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('coin_balance')
@@ -556,13 +529,11 @@ export async function promoteVideo(userId: string, videoId: string, coinsTospend
 
     console.log(`User balance: ${profile.coin_balance}, trying to spend: ${coinsTospend}`);
 
-    // Check if user has enough coins
     if (profile.coin_balance < coinsTospend) {
       console.error(`Insufficient coins: ${profile.coin_balance} < ${coinsTospend}`);
       return { data: null, error: new Error(`Insufficient coins. You have ${profile.coin_balance} coins but need ${coinsTospend}`) };
     }
 
-    // Get current video data
     const { data: video, error: videoError } = await supabase
       .from('videos')
       .select('boost_value, coins_spent_on_promotion, last_promoted_at')
@@ -574,7 +545,6 @@ export async function promoteVideo(userId: string, videoId: string, coinsTospend
       return { data: null, error: videoError };
     }
 
-    // Deduct coins from user BEFORE updating video
     const newBalance = profile.coin_balance - coinsTospend;
     const { error: updateBalanceError } = await supabase
       .from('profiles')
@@ -588,22 +558,18 @@ export async function promoteVideo(userId: string, videoId: string, coinsTospend
 
     console.log(`Successfully deducted ${coinsTospend} coins. New balance: ${newBalance}`);
 
-    // Check cooldown (optional - can promote again after 24 hours)
     const lastPromoted = video?.last_promoted_at ? new Date(video.last_promoted_at) : null;
     const now = new Date();
     if (lastPromoted) {
       const hoursSincePromotion = (now.getTime() - lastPromoted.getTime()) / (1000 * 60 * 60);
       if (hoursSincePromotion < PROMOTION_COOLDOWN_HOURS) {
-        // Allow re-promotion but maybe add a penalty or warning later
       }
     }
 
-    // Calculate new boost
     const currentBoost = video?.boost_value || 1;
     const newBoost = Math.min(currentBoost + (coinsTospend * BOOST_MULTIPLIER), MAX_BOOST_VALUE);
     const totalCoinsSpent = (video?.coins_spent_on_promotion || 0) + coinsTospend;
 
-    // Update video with new boost
     const { data: updatedVideo, error: updateError } = await supabase
       .from('videos')
       .update({
@@ -620,7 +586,6 @@ export async function promoteVideo(userId: string, videoId: string, coinsTospend
       return { data: null, error: updateError };
     }
 
-    // Record in promotion history
     await supabase
       .from('promotion_history')
       .insert({
@@ -671,7 +636,6 @@ export async function getVideoBoost(videoId: string) {
  */
 export async function getWeightedVideoFeed(limit = 20, offset = 0) {
   try {
-    // Fetch all videos with boost values
     const { data: allVideos, error: videosError } = await supabase
       .from('videos')
       .select(`
@@ -690,19 +654,15 @@ export async function getWeightedVideoFeed(limit = 20, offset = 0) {
       return { data: [], error: null };
     }
 
-    // Create weighted selection pool
     const weightedPool: string[] = [];
     allVideos.forEach((video: any) => {
       const boost = video.boost_value || 1;
-      // Multiply by 20 for even stronger weighting (promoted videos appear 2x more often)
       const weight = Math.ceil(boost * 20);
-      // Add video ID multiple times based on weight
       for (let i = 0; i < weight; i++) {
         weightedPool.push(video.id);
       }
     });
 
-    // Select random videos with weighted probability
     const selectedVideoIds = new Set<string>();
     const maxAttempts = limit * 5;
     let attempts = 0;
@@ -713,7 +673,6 @@ export async function getWeightedVideoFeed(limit = 20, offset = 0) {
       attempts++;
     }
 
-    // Get full video data for selected IDs
     const selectedIds = Array.from(selectedVideoIds);
     const { data: selectedVideos } = await supabase
       .from('videos')
@@ -732,7 +691,6 @@ export async function getWeightedVideoFeed(limit = 20, offset = 0) {
       return { data: [], error: null };
     }
 
-    // Get profiles and businesses
     let profilesMap: { [key: string]: any } = {};
     let businessesMap: { [key: string]: any } = {};
 
@@ -811,11 +769,4 @@ export async function trackVideoView(
     return { success: false, error };
   }
 }
-
-// Re-export list to help static analyzers and ensure named exports are explicit
-// (explicit export list removed — functions are exported where declared)
-
-
-
-
 
