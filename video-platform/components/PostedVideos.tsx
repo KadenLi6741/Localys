@@ -31,7 +31,6 @@ export function PostedVideos({ userId }: PostedVideosProps) {
     try {
       setLoading(true);
 
-      // Get all videos by this user
       const { data: userVideos, error: videosError } = await supabase
         .from('videos')
         .select('id, video_url, caption, created_at, boost_value, coins_spent_on_promotion, view_count')
@@ -44,7 +43,6 @@ export function PostedVideos({ userId }: PostedVideosProps) {
         return;
       }
 
-      // Get likes for all videos
       const { data: allLikes } = await supabase
         .from('likes')
         .select('video_id');
@@ -58,13 +56,11 @@ export function PostedVideos({ userId }: PostedVideosProps) {
         });
       }
 
-      // Get comments for all videos by this user - try multiple approaches
       const videoIds = userVideos.map(v => v.id);
       console.log('PostedVideos - Loading comments for videos:', videoIds.slice(0, 3), '... (' + videoIds.length + ' total)');
 
       let allComments: any[] = [];
 
-      // First try: Get all comments where video_id matches and parent_comment_id is null
       try {
         if (videoIds.length > 0) {
           const { data, error } = await supabase
@@ -86,7 +82,6 @@ export function PostedVideos({ userId }: PostedVideosProps) {
         console.error('Exception fetching comments with .in():', err);
       }
 
-      // Second try: If no comments found and video IDs exist, fetch all comments and filter
       if (allComments.length === 0 && videoIds.length > 0) {
         try {
           console.log('PostedVideos - Trying fallback: fetch all parent comments');
@@ -114,7 +109,6 @@ export function PostedVideos({ userId }: PostedVideosProps) {
       });
       console.log('PostedVideos - Final comments map:', commentsMap);
 
-      // Combine data
       const videosWithStats = userVideos.map((video: any) => ({
         ...video,
         likes: likesMap[video.id] || 0,

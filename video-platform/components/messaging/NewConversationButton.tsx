@@ -47,7 +47,7 @@ export default function NewConversationButton({
         .from('profiles')
         .select('id, username, full_name, avatar_url')
         .ilike('username', `%${query}%`)
-        .neq('id', user?.id) // Exclude current user
+        .neq('id', user?.id)
         .limit(10);
 
       if (error) throw error;

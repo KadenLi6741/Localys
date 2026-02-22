@@ -1,9 +1,7 @@
-// Comment Components
 export { default as CommentSection } from './CommentSection';
 export { default as CommentItem } from './CommentItem';
 export { default as CommentForm } from './CommentForm';
 
-// Re-export types and utilities
 export type {
   Comment,
   CreateCommentPayload,

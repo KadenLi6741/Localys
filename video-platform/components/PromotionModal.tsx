@@ -23,11 +23,9 @@ export function PromotionModal({ isOpen, onClose, videoId, userCoins, onSuccess 
   const [estimatedBoost, setEstimatedBoost] = useState(2);
   const isPreviewMode = videoId === 'temp';
 
-  // Cap the max coins at user's balance
   const maxCoinsAllowed = Math.min(MAX_COINS, userCoins);
 
   useEffect(() => {
-    // Calculate estimated boost (10 coins = 2 boost)
     const boost = (coinsToSpend * 0.2);
     setEstimatedBoost(Math.round(boost * 10) / 10);
   }, [coinsToSpend]);

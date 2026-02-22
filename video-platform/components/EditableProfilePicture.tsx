@@ -28,7 +28,6 @@ export function EditableProfilePicture({
   const [error, setError] = useState<string | null>(null);
   const objectUrlRef = useRef<string | null>(null);
 
-  // Cleanup object URL on unmount
   useEffect(() => {
     return () => {
       if (objectUrlRef.current) {
@@ -42,13 +41,11 @@ export function EditableProfilePicture({
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validate file type
     if (!file.type.startsWith('image/')) {
       setError('Please select an image file');
       return;
     }
 
-    // Validate file size
     if (file.size > MAX_PROFILE_PICTURE_SIZE) {
       const maxSizeMB = MAX_PROFILE_PICTURE_SIZE / BYTES_TO_MB;
       setError(`Image size must be less than ${maxSizeMB}MB`);
@@ -59,18 +56,15 @@ export function EditableProfilePicture({
     setError(null);
 
     try {
-      // Revoke previous object URL if it exists
       if (objectUrlRef.current) {
         URL.revokeObjectURL(objectUrlRef.current);
         objectUrlRef.current = null;
       }
 
-      // Show preview immediately
       const objectUrl = URL.createObjectURL(file);
       objectUrlRef.current = objectUrl;
       setPreview(objectUrl);
 
-      // Upload to Supabase
       console.log('Uploading profile picture for userId:', userId);
       const { data, error: uploadError } = await uploadProfilePicture(file, userId);
       if (uploadError) {
@@ -80,7 +74,6 @@ export function EditableProfilePicture({
 
       console.log('Upload successful, updating profile with URL:', data?.publicUrl);
 
-      // Update profile with new image URL
       if (data?.publicUrl) {
         const { error: updateError } = await updateProfile(userId, {
           profile_picture_url: data.publicUrl,
@@ -91,20 +84,17 @@ export function EditableProfilePicture({
           throw new Error('Failed to update profile: ' + updateError.message);
         }
 
-        // Clean up object URL
         if (objectUrlRef.current) {
           URL.revokeObjectURL(objectUrlRef.current);
           objectUrlRef.current = null;
         }
         setPreview(data.publicUrl);
         
-        // Callback to refresh parent component
         onImageUpdated?.();
       }
     } catch (err: any) {
       console.error('Profile picture update error:', err);
       setError(err.message || 'Failed to update profile picture');
-      // Revert preview on error and clean up object URL
       if (objectUrlRef.current) {
         URL.revokeObjectURL(objectUrlRef.current);
         objectUrlRef.current = null;

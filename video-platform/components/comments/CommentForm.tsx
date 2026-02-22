@@ -30,7 +30,6 @@ export default function CommentForm({
   const [rating, setRating] = useState<number | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Auto-resize textarea
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
@@ -38,7 +37,6 @@ export default function CommentForm({
     }
   }, [content]);
 
-  // Auto-focus when requested
   useEffect(() => {
     if (autoFocus && textareaRef.current) {
       textareaRef.current.focus();
@@ -56,7 +54,6 @@ export default function CommentForm({
       setContent('');
       setRating(null);
     } catch (error) {
-      // Error handling is done in parent component
     }
   };
 

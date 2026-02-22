@@ -36,9 +36,8 @@ export default function CommentItem({ comment, videoId, onLikeUpdate, isReply = 
   const [liking, setLiking] = useState(false);
   const [postingReply, setPostingReply] = useState(false);
 
-  // Load replies when expanded
   const loadReplies = async () => {
-    if (replies.length > 0) return; // Already loaded
+    if (replies.length > 0) return;
 
     setLoadingReplies(true);
     try {
@@ -55,7 +54,6 @@ export default function CommentItem({ comment, videoId, onLikeUpdate, isReply = 
     }
   };
 
-  // Handle reply creation
   const handleCreateReply = async (content: string) => {
     if (!user || postingReply) return;
 
@@ -73,7 +71,6 @@ export default function CommentItem({ comment, videoId, onLikeUpdate, isReply = 
         return;
       }
 
-      // Add reply to the list
       if (data) {
         setReplies(prev => [...prev, data]);
         setShowReplies(true);
@@ -86,7 +83,6 @@ export default function CommentItem({ comment, videoId, onLikeUpdate, isReply = 
     }
   };
 
-  // Handle like toggle
   const handleLikeToggle = async () => {
     if (!user || liking) return;
 
@@ -99,7 +95,6 @@ export default function CommentItem({ comment, videoId, onLikeUpdate, isReply = 
         return;
       }
 
-      // Update local state immediately for better UX
       const newLikeCount = comment.is_liked ? comment.like_count - 1 : comment.like_count + 1;
       const newIsLiked = !comment.is_liked;
 
@@ -115,7 +110,6 @@ export default function CommentItem({ comment, videoId, onLikeUpdate, isReply = 
     }
   };
 
-  // Handle show replies toggle
   const handleShowReplies = () => {
     setShowReplies(!showReplies);
     if (!showReplies && replies.length === 0) {
@@ -123,13 +117,11 @@ export default function CommentItem({ comment, videoId, onLikeUpdate, isReply = 
     }
   };
 
-  // Subscribe to new replies
   useEffect(() => {
     if (!showReplies) return;
 
     const channel = subscribeToCommentReplies(comment.id, (newReply) => {
       setReplies(prev => {
-        // Avoid duplicates
         if (prev.some(r => r.id === newReply.id)) {
           return prev;
         }

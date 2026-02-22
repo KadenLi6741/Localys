@@ -14,7 +14,6 @@ interface CommentModalProps {
  * Modal for viewing and composing comments on a post
  */
 export function CommentModal({ isOpen, onClose, postId, businessName }: CommentModalProps) {
-  // Handle escape key to close modal
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isOpen) {
@@ -28,7 +27,6 @@ export function CommentModal({ isOpen, onClose, postId, businessName }: CommentM
     return () => document.removeEventListener('keydown', handleEscape);
   }, [isOpen, onClose]);
 
-  // Prevent body scroll when modal is open
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';

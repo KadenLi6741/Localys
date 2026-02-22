@@ -12,7 +12,6 @@ export function ChatListItem({ chat, onClick }: ChatListItemProps) {
   const lastMessageText = chat.last_message?.content || 'No messages yet';
   const unreadCount = chat.unread_count || 0;
 
-  // Format timestamp
   const formatTimestamp = (timestamp: string | null | undefined) => {
     if (!timestamp) return '';
     

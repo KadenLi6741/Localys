@@ -36,28 +36,23 @@ export default function ChatList({ onSelectConversation }: ChatListProps) {
   const [error, setError] = useState<string | null>(null);
   const subscriptionRef = useState<RealtimeChannel | null>(null)[0];
 
-  // Load conversations on mount
   useEffect(() => {
     if (!user) return;
 
     loadConversations();
 
-    // Subscribe to real-time updates
     const channel = subscribeToAllConversations((updatedConversation) => {
       setConversations((prev) => {
-        // Update existing conversation or add new one
         const index = prev.findIndex((c) => c.id === updatedConversation.id);
         if (index >= 0) {
           const updated = [...prev];
           updated[index] = updatedConversation;
-          // Sort by last_message_at
           return updated.sort(
             (a, b) =>
               new Date(b.last_message_at || 0).getTime() -
               new Date(a.last_message_at || 0).getTime()
           );
         } else {
-          // New conversation - add to list
           return [...prev, updatedConversation].sort(
             (a, b) =>
               new Date(b.last_message_at || 0).getTime() -
@@ -67,7 +62,6 @@ export default function ChatList({ onSelectConversation }: ChatListProps) {
       });
     });
 
-    // Cleanup subscription on unmount
     return () => {
       channel.unsubscribe();
     };

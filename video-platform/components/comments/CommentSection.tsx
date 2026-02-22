@@ -48,7 +48,6 @@ export default function CommentSection({ videoId, className = '' }: CommentSecti
 
   const COMMENTS_PER_PAGE = 20;
 
-  // Load initial comments
   const loadComments = useCallback(async (loadMore = false) => {
     try {
       if (loadMore) {
@@ -77,7 +76,6 @@ export default function CommentSection({ videoId, className = '' }: CommentSecti
           setComments(data);
           setOffset(data.length);
           
-          // Load average rating on initial load
           const { data: ratingData, error: ratingErr } = await getVideoAverageRating(videoId);
           if (!ratingErr && ratingData) {
             setAverageRating(ratingData.average_rating);
@@ -85,7 +83,6 @@ export default function CommentSection({ videoId, className = '' }: CommentSecti
           }
         }
 
-        // Check if there are more comments
         setHasMore(data.length === COMMENTS_PER_PAGE);
       }
     } catch (err: any) {
@@ -97,7 +94,6 @@ export default function CommentSection({ videoId, className = '' }: CommentSecti
     }
   }, [videoId, offset]);
 
-  // Handle new comment submission
   const handleCreateComment = async (content: string, rating?: number) => {
     if (!user || posting) return;
 
@@ -121,11 +117,9 @@ export default function CommentSection({ videoId, className = '' }: CommentSecti
 
       console.log('Comment created successfully:', data);
 
-      // Add comment to the top of the list
       if (data) {
         setComments(prev => [data, ...prev]);
         
-        // Refresh average rating if a rating was provided
         if (rating) {
           const { data: ratingData, error: ratingErr } = await getVideoAverageRating(videoId);
           if (!ratingErr && ratingData) {
@@ -142,19 +136,15 @@ export default function CommentSection({ videoId, className = '' }: CommentSecti
     }
   };
 
-  // Handle real-time comment updates
   const handleNewComment = useCallback((newComment: Comment) => {
     setComments(prev => {
-      // Avoid duplicates
       if (prev.some(c => c.id === newComment.id)) {
         return prev;
       }
-      // Add to the top
       return [newComment, ...prev];
     });
   }, []);
 
-  // Handle real-time like updates
   const handleLikeUpdate = useCallback((likeData: { comment_id: string; like_count: number; user_liked: boolean }) => {
     setComments(prev =>
       prev.map(comment =>
@@ -165,26 +155,19 @@ export default function CommentSection({ videoId, className = '' }: CommentSecti
     );
   }, []);
 
-  // Load comments when component mounts or videoId changes
   useEffect(() => {
     if (!videoId) return;
 
-    // Fetch comments from database (works for authenticated and unauthenticated users)
     loadComments();
 
   }, [videoId]);
 
-  // Set up real-time subscriptions
   useEffect(() => {
     if (!videoId) return;
 
-    // Subscribe to new comments (works even if not authenticated - public data)
     const commentsChannel = subscribeToVideoComments(videoId, handleNewComment);
-
-    // Subscribe to like updates
     const likesChannel = subscribeToCommentLikes(handleLikeUpdate);
 
-    // Cleanup subscriptions
     return () => {
       commentsChannel.unsubscribe();
       likesChannel.unsubscribe();
