@@ -1,79 +1,15 @@
-/**
- * Video Comments, Likes, and Replies System
- *
- * This module provides TypeScript utilities for a video commenting system
- * built on Supabase. It includes functions for:
- * - Creating/fetching comments and replies
- * - Liking/unliking comments
- * - Real-time subscriptions for live updates
- * - Efficient pagination and ordering
- *
- * All functions respect Row Level Security (RLS) policies.
- */
-
 import { supabase } from './client';
 import { RealtimeChannel } from '@supabase/supabase-js';
+import type {
+  Comment,
+  CreateCommentPayload,
+  CreateReplyPayload,
+  UpdateCommentPayload,
+  CommentSubscriptionCallback,
+  LikeSubscriptionCallback,
+} from '../../models/Comment';
 
-// =====================================================
-// TYPES
-// =====================================================
-
-/**
- * Comment data structure
- */
-export interface Comment {
-  id: string;
-  video_id: string;
-  user_id: string;
-  content: string;
-  parent_comment_id: string | null;
-  created_at: string;
-  updated_at: string;
-  like_count: number;
-  is_liked: boolean;
-  username: string;
-  full_name: string | null;
-  avatar_url: string | null;
-  reply_count?: number;
-  replies?: Comment[];
-  rating: number | null;
-}
-
-/**
- * Payload for creating a new comment
- */
-export interface CreateCommentPayload {
-  video_id: string;
-  content: string;
-  rating?: number;
-}
-
-/**
- * Payload for creating a reply
- */
-export interface CreateReplyPayload {
-  parent_comment_id: string;
-  content: string;
-  rating?: number;
-}
-
-/**
- * Payload for updating a comment
- */
-export interface UpdateCommentPayload {
-  comment_id: string;
-  content: string;
-}
-
-/**
- * Real-time subscription callbacks
- */
-export type CommentSubscriptionCallback = (comment: Comment) => void;
-export type LikeSubscriptionCallback = (data: { comment_id: string; like_count: number; user_liked: boolean }) => void;
-
-// =====================================================
-// HELPER FUNCTIONS
-// =====================================================
+export type { Comment, CreateCommentPayload, CreateReplyPayload, UpdateCommentPayload, CommentSubscriptionCallback, LikeSubscriptionCallback };
 
 /**
  * Get the current authenticated user's ID
@@ -109,10 +45,6 @@ function transformCommentData(rawComment: any): Comment {
   };
 }
 
-// =====================================================
-// COMMENT FUNCTIONS
-// =====================================================
-
 /**
  * Get comments for a video with pagination
  * Includes like counts and user's like status
@@ -128,12 +60,10 @@ export async function getVideoComments(
   offset: number = 0
 ): Promise<{ data: Comment[] | null; error: Error | null }> {
   try {
-    // Get current user ID if authenticated, otherwise use null
     let currentUserId: string | null = null;
     try {
       currentUserId = await getCurrentUserId();
     } catch {
-      // User is not authenticated, that's OK - we can still fetch comments
       currentUserId = null;
     }
 
@@ -171,12 +101,10 @@ export async function getCommentReplies(
   offset: number = 0
 ): Promise<{ data: Comment[] | null; error: Error | null }> {
   try {
-    // Get current user ID if authenticated, otherwise use null
     let currentUserId: string | null = null;
     try {
       currentUserId = await getCurrentUserId();
     } catch {
-      // User is not authenticated, that's OK - we can still fetch replies
       currentUserId = null;
     }
 
@@ -232,7 +160,6 @@ export async function createComment(
 
     console.log('Comment created successfully:', data.id);
 
-    // Get the comment with like data using our helper function
     const { data: commentWithLikes, error: fetchError } = await supabase.rpc('get_comment_with_likes', {
       p_comment_id: data.id,
       p_user_id: currentUserId,
@@ -243,7 +170,6 @@ export async function createComment(
       return { data: null, error: new Error(fetchError.message) };
     }
 
-    // Get user profile data
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('username, full_name')
@@ -282,7 +208,6 @@ export async function createReply(
   try {
     const currentUserId = await getCurrentUserId();
 
-    // First verify the parent comment exists and get video_id
     const { data: parentComment, error: parentError } = await supabase
       .from('comments')
       .select('video_id')
@@ -309,7 +234,6 @@ export async function createReply(
       return { data: null, error: new Error(error.message) };
     }
 
-    // Get the reply with like data
     const { data: replyWithLikes, error: fetchError } = await supabase.rpc('get_comment_with_likes', {
       p_comment_id: data.id,
       p_user_id: currentUserId,
@@ -319,7 +243,6 @@ export async function createReply(
       return { data: null, error: new Error(fetchError.message) };
     }
 
-    // Get user profile data
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('username, full_name')
@@ -404,10 +327,6 @@ export async function deleteComment(
   }
 }
 
-// =====================================================
-// LIKE FUNCTIONS
-// =====================================================
-
 /**
  * Like a comment
  *
@@ -428,7 +347,7 @@ export async function likeComment(
       });
 
     if (error) {
-      // If it's a duplicate key error, the user already liked it
+      // Duplicate key - user already liked this comment
       if (error.code === '23505') {
         return { error: new Error('You have already liked this comment') };
       }
@@ -487,10 +406,6 @@ export async function toggleCommentLike(
   }
 }
 
-// =====================================================
-// REALTIME SUBSCRIPTIONS
-// =====================================================
-
 /**
  * Subscribe to new comments on a video
  *
@@ -513,7 +428,6 @@ export function subscribeToVideoComments(
         filter: `video_id=eq.${videoId}`,
       },
       async (payload) => {
-        // Only process top-level comments (not replies)
         if (!payload.new.parent_comment_id) {
           const currentUserId = (await supabase.auth.getUser()).data.user?.id;
           if (currentUserId) {
@@ -523,7 +437,6 @@ export function subscribeToVideoComments(
             });
 
             if (commentWithLikes && commentWithLikes[0]) {
-              // Get user profile data
               const { data: profile } = await supabase
                 .from('profiles')
                 .select('username, full_name')
@@ -579,7 +492,6 @@ export function subscribeToCommentReplies(
           });
 
           if (replyWithLikes && replyWithLikes[0]) {
-            // Get user profile data
             const { data: profile } = await supabase
               .from('profiles')
               .select('username, full_name')
@@ -625,7 +537,6 @@ export function subscribeToCommentLikes(
       async (payload) => {
         const commentId = (payload.new as any)?.comment_id || (payload.old as any)?.comment_id;
         if (commentId) {
-          // Get updated like count
           const { data: likeData, error } = await supabase
             .from('comment_likes')
             .select('user_id', { count: 'exact' })
