@@ -55,6 +55,49 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ received: true });
       }
 
+      // Handle preorder payments
+      const preorderId = session.metadata?.preorderId;
+      if (preorderId && session.metadata?.type === 'preorder') {
+        const { data: preorder, error: poError } = await supabase
+          .from('preorders')
+          .select('*')
+          .eq('id', preorderId)
+          .single();
+
+        if (poError || !preorder) {
+          console.error('Preorder not found for webhook:', preorderId);
+          return NextResponse.json({ error: 'Preorder not found' }, { status: 400 });
+        }
+
+        if (preorder.status === 'pending_payment') {
+          const chargeAmount = Math.round(preorder.subtotal * (preorder.upfront_pct / 100) * 100) / 100;
+
+          await supabase
+            .from('preorders')
+            .update({
+              status: 'confirmed',
+              amount_paid: chargeAmount,
+              amount_remaining: Math.round((preorder.subtotal - chargeAmount) * 100) / 100,
+              stripe_session_id: session.id,
+              confirmed_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', preorderId);
+
+          if (preorder.table_id) {
+            await supabase
+              .from('restaurant_tables')
+              .update({ status: 'reserved' })
+              .eq('id', preorder.table_id);
+          }
+
+          console.log(`Preorder ${preorder.order_code} confirmed via webhook`);
+        }
+
+        return NextResponse.json({ success: true });
+      }
+
+      // Handle coin purchases
       const userId = session.metadata?.userId;
       const coins = parseInt(session.metadata?.coins || '0');
 

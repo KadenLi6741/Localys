@@ -11,6 +11,7 @@ import { getOrCreateOneToOneChat } from '@/lib/supabase/messaging';
 import { getUserBusiness, getBusinessLocations, Business, BusinessHours, BusinessLocation } from '@/lib/supabase/profiles';
 import { MenuList } from '@/components/MenuList';
 import { PostedVideos } from '@/components/PostedVideos';
+import { BusyTimesDisplay } from '@/components/busytimes/BusyTimesDisplay';
 
 const BusinessLocationMap = dynamic(
   () => import('@/components/BusinessLocationMap'),
@@ -305,6 +306,36 @@ function UserProfileContent() {
             <div className="bg-white/5 border border-white/10 rounded-lg p-6">
               <MenuList userId={userId} isOwnProfile={false} />
             </div>
+          </div>
+        )}
+
+        {/* Popular Times Section (business only) */}
+        {business && (
+          <div className="mt-8">
+            <h3 className="text-xl font-semibold mb-4">Popular Times</h3>
+            <div className="bg-white/5 border border-white/10 rounded-lg p-6">
+              <BusyTimesDisplay businessId={business.id} />
+            </div>
+          </div>
+        )}
+
+        {/* Pre-Order CTA (business only) */}
+        {business && (
+          <div className="mt-8">
+            <Link
+              href={`/preorder/${business.id}`}
+              className="block bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 rounded-lg p-6 hover:from-blue-500/30 hover:to-purple-500/30 transition-all duration-200"
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-white font-semibold text-lg mb-1">Pre-Order Now</h3>
+                  <p className="text-white/60 text-sm">Browse the menu, pick a table & time, and have your food ready when you arrive</p>
+                </div>
+                <svg className="w-6 h-6 text-white/60 flex-shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
+            </Link>
           </div>
         )}
 
