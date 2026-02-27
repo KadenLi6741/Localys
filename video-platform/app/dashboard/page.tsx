@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
+import { ensureUserBusiness } from '@/lib/supabase/profiles';
 import { DashboardNav } from '@/components/dashboard/DashboardNav';
 import { DashboardOverviewCards } from '@/components/dashboard/DashboardOverviewCards';
 import { OrderQueue } from '@/components/dashboard/OrderQueue';
@@ -22,17 +23,13 @@ export default function DashboardPage() {
   const loadDashboard = async () => {
     if (!user) return;
 
-    const { data: biz } = await supabase
-      .from('businesses')
-      .select('*')
-      .eq('owner_id', user.id)
-      .single();
-
-    if (!biz) {
-      setLoading(false);
-      return;
-    }
-    setBusiness(biz);
+    try {
+      const { data: biz, error } = await ensureUserBusiness(user.id);
+      if (error || !biz) {
+        setLoading(false);
+        return;
+      }
+      setBusiness(biz);
 
     // Get active orders count
     const { count: activeCount } = await supabase
@@ -65,6 +62,10 @@ export default function DashboardPage() {
 
     setStats({ activeOrders: activeCount || 0, todayRevenue, occupancyRate });
     setLoading(false);
+    } catch (error) {
+      console.error('Error loading dashboard:', error);
+      setLoading(false);
+    }
   };
 
   if (loading) {
