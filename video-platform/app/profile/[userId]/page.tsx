@@ -100,10 +100,20 @@ function UserProfileContent() {
         console.log('Business hours value:', data.business_hours); // DEBUG
         setBusiness(data as Business);
       } else if (error) {
-        console.error('Business fetch error:', error);
+        console.error('Business fetch error:', {
+          message: error.message,
+          code: error.code,
+          status: error.status,
+          details: error.details,
+          hint: error.hint,
+          fullError: error
+        });
       }
     } catch (error) {
-      console.error('Business load error:', error); // DEBUG
+      console.error('Business load error:', {
+        message: error instanceof Error ? error.message : String(error),
+        error: error
+      }); // DEBUG
       // Business doesn't exist, which is fine
       setBusiness(null);
     }

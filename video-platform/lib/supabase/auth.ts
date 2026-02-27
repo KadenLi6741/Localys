@@ -21,18 +21,24 @@ export async function signUp({ email, password, name, username, accountType, bus
     if (authError) throw authError;
     if (!authData.user) throw new Error('User creation failed');
 
-    const { error: profileError } = await supabase
-      .from('profiles')
-      .insert({
+    // Create profile using server-side API to bypass RLS policy
+    const profileResponse = await fetch('/api/auth/create-profile', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
         id: authData.user.id,
         email,
         full_name: name,
         username,
-      });
+      }),
+    });
 
-    if (profileError) {
-      console.error('Profile creation failed:', profileError);
-      throw profileError;
+    if (!profileResponse.ok) {
+      const errorData = await profileResponse.json();
+      console.error('Profile creation failed:', errorData);
+      throw new Error(errorData.error || 'Failed to create profile');
     }
 
     // If business account, create business record
@@ -96,11 +102,33 @@ export async function signOut() {
 }
 
 /**
- * Get current session
+ * Get current session with improved error handling for refresh token issues
  */
 export async function getSession() {
-  const { data: { session }, error } = await supabase.auth.getSession();
-  return { session, error };
+  try {
+    const { data: { session }, error } = await supabase.auth.getSession();
+    
+    if (error) {
+      // If it's a refresh token error, clear the session
+      if (error.message?.includes('refresh token') || error.message?.includes('Refresh Token')) {
+        console.warn('Refresh token issue detected, clearing session:', error.message);
+        // Clear corrupted session data
+        try {
+          localStorage.removeItem('sb-dbqkpcwnzteljwxjoudj-auth-token');
+        } catch (e) {
+          // Ignore localStorage errors
+        }
+        return { session: null, error: null };
+      }
+      return { session, error };
+    }
+    
+    return { session, error };
+  } catch (error: any) {
+    console.error('Unexpected error in getSession:', error);
+    // Return null session on any error to prevent app from breaking
+    return { session: null, error };
+  }
 }
 
 /**
