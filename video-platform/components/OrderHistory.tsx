@@ -2,7 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { getUserCoinPurchases, getUserItemPurchases, getBusinessItemSales } from '@/lib/supabase/profiles';
+import { getCustomerPreOrders, getBusinessPreOrders } from '@/lib/supabase/preorders';
 import type { CoinPurchase, ItemPurchase } from '@/models/Order';
+import type { PreOrder } from '@/models/PreOrder';
+import { PreOrderStatusBadge } from '@/components/preorder/PreOrderStatusBadge';
 import { useTranslation } from '@/hooks/useTranslation';
 
 interface OrderHistoryProps {
@@ -16,8 +19,9 @@ export function OrderHistory({ userId, businessId, isBusiness = false }: OrderHi
   const [coinPurchases, setCoinPurchases] = useState<CoinPurchase[]>([]);
   const [itemPurchases, setItemPurchases] = useState<ItemPurchase[]>([]);
   const [itemSales, setItemSales] = useState<ItemPurchase[]>([]);
+  const [preOrders, setPreOrders] = useState<PreOrder[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'purchases' | 'sales'>('purchases');
+  const [activeTab, setActiveTab] = useState<'purchases' | 'sales' | 'preorders'>('purchases');
   const [tablesExist, setTablesExist] = useState(true);
 
   useEffect(() => {
@@ -30,7 +34,7 @@ export function OrderHistory({ userId, businessId, isBusiness = false }: OrderHi
       // Load user's purchases
       const { data: coins } = await getUserCoinPurchases(userId);
       const { data: items } = await getUserItemPurchases(userId);
-      
+
       setCoinPurchases(coins || []);
       setItemPurchases(items || []);
 
@@ -38,15 +42,24 @@ export function OrderHistory({ userId, businessId, isBusiness = false }: OrderHi
       if (isBusiness) {
         const { data: sales } = await getBusinessItemSales(userId);
         setItemSales(sales || []);
+        // Load business pre-orders
+        if (businessId) {
+          const { data: bizPreOrders } = await getBusinessPreOrders(businessId);
+          setPreOrders(bizPreOrders || []);
+        }
+      } else {
+        // Load customer pre-orders
+        const { data: custPreOrders } = await getCustomerPreOrders(userId);
+        setPreOrders(custPreOrders || []);
       }
 
       setTablesExist(true);
     } catch (error) {
       console.error('Error loading orders:', error);
-      // Silently fail - component will show empty state
       setCoinPurchases([]);
       setItemPurchases([]);
       setItemSales([]);
+      setPreOrders([]);
       setTablesExist(false);
     } finally {
       setLoading(false);
@@ -76,12 +89,13 @@ export function OrderHistory({ userId, businessId, isBusiness = false }: OrderHi
     );
   }
 
-  // For businesses, show both purchases and sales
+  // For businesses, show purchases, sales, and pre-orders
   if (isBusiness) {
     const hasPurchases = coinPurchases.length > 0 || itemPurchases.length > 0;
     const hasSales = itemSales.length > 0;
+    const hasPreOrders = preOrders.length > 0;
 
-    if (!hasPurchases && !hasSales) {
+    if (!hasPurchases && !hasSales && !hasPreOrders) {
       return (
         <div className="text-center py-8 text-white/60">
           <p>No orders yet</p>
@@ -113,6 +127,16 @@ export function OrderHistory({ userId, businessId, isBusiness = false }: OrderHi
           >
             Sales {hasSales ? `(${itemSales.length})` : ''}
           </button>
+          <button
+            onClick={() => setActiveTab('preorders')}
+            className={`px-4 py-2 font-medium transition-colors ${
+              activeTab === 'preorders'
+                ? 'text-blue-400 border-b-2 border-blue-400'
+                : 'text-white/60 hover:text-white/80'
+            }`}
+          >
+            Pre-Orders {hasPreOrders ? `(${preOrders.length})` : ''}
+          </button>
         </div>
 
         {/* Content */}
@@ -139,15 +163,79 @@ export function OrderHistory({ userId, businessId, isBusiness = false }: OrderHi
             )}
           </div>
         )}
+
+        {activeTab === 'preorders' && (
+          <div className="space-y-3">
+            {preOrders.length === 0 ? (
+              <p className="text-center py-4 text-white/40 text-sm">No pre-orders yet</p>
+            ) : (
+              preOrders.map((po) => (
+                <PreOrderHistoryItem key={po.id} preOrder={po} />
+              ))
+            )}
+          </div>
+        )}
       </div>
     );
   }
 
-  // For regular users, show only purchases
-  if (allPurchases.length === 0) {
+  // For regular users, show purchases and pre-orders
+  const hasPreOrders = preOrders.length > 0;
+
+  if (allPurchases.length === 0 && !hasPreOrders) {
     return (
       <div className="text-center py-8 text-white/60">
         <p>No orders yet</p>
+      </div>
+    );
+  }
+
+  // If user has pre-orders, show tabs
+  if (hasPreOrders) {
+    return (
+      <div className="space-y-4">
+        <div className="flex gap-4 border-b border-white/10">
+          <button
+            onClick={() => setActiveTab('purchases')}
+            className={`px-4 py-2 font-medium transition-colors ${
+              activeTab === 'purchases'
+                ? 'text-blue-400 border-b-2 border-blue-400'
+                : 'text-white/60 hover:text-white/80'
+            }`}
+          >
+            Purchases {allPurchases.length > 0 ? `(${allPurchases.length})` : ''}
+          </button>
+          <button
+            onClick={() => setActiveTab('preorders')}
+            className={`px-4 py-2 font-medium transition-colors ${
+              activeTab === 'preorders'
+                ? 'text-blue-400 border-b-2 border-blue-400'
+                : 'text-white/60 hover:text-white/80'
+            }`}
+          >
+            Pre-Orders ({preOrders.length})
+          </button>
+        </div>
+
+        {activeTab === 'purchases' && (
+          <div className="space-y-3">
+            {allPurchases.length === 0 ? (
+              <p className="text-center py-4 text-white/40 text-sm">No purchases</p>
+            ) : (
+              allPurchases.map((order, idx) => (
+                <OrderItem key={idx} order={order} />
+              ))
+            )}
+          </div>
+        )}
+
+        {activeTab === 'preorders' && (
+          <div className="space-y-3">
+            {preOrders.map((po) => (
+              <PreOrderHistoryItem key={po.id} preOrder={po} />
+            ))}
+          </div>
+        )}
       </div>
     );
   }
@@ -245,13 +333,53 @@ function SaleItem({ sale }: { sale: ItemPurchase }) {
       </div>
       <div className="mt-2 flex items-center gap-2">
         <span className={`text-xs px-2 py-1 rounded-full font-medium capitalize ${
-          sale.status === 'completed' 
+          sale.status === 'completed'
             ? 'bg-green-500/20 text-green-300'
             : 'bg-yellow-500/20 text-yellow-300'
         }`}>
           {sale.status}
         </span>
       </div>
+    </div>
+  );
+}
+
+function PreOrderHistoryItem({ preOrder }: { preOrder: PreOrder }) {
+  const date = new Date(preOrder.scheduled_time);
+  const formattedDate = date.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric'
+  });
+  const formattedTime = date.toLocaleTimeString('en-US', {
+    hour: 'numeric',
+    minute: '2-digit',
+  });
+
+  return (
+    <div className="bg-white/5 border border-purple-500/30 rounded-lg p-4 hover:bg-white/10 transition-colors">
+      <div className="flex justify-between items-start">
+        <div className="flex items-center gap-3 flex-1">
+          <div className="text-2xl">{preOrder.order_type === 'dine-in' ? '🍽️' : '📦'}</div>
+          <div>
+            <p className="font-medium text-white">
+              {preOrder.order_code}
+            </p>
+            <p className="text-white/60 text-sm capitalize">
+              {preOrder.order_type} &middot; {formattedDate} at {formattedTime}
+            </p>
+          </div>
+        </div>
+        <div className="text-right">
+          <p className="font-medium text-purple-400">${Number(preOrder.subtotal).toFixed(2)}</p>
+          <PreOrderStatusBadge status={preOrder.status} />
+        </div>
+      </div>
+      {preOrder.amount_remaining > 0 && preOrder.status !== 'cancelled' && (
+        <p className="text-white/40 text-xs mt-2">
+          ${Number(preOrder.amount_remaining).toFixed(2)} due at restaurant
+        </p>
+      )}
     </div>
   );
 }

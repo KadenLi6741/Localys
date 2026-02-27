@@ -23,7 +23,6 @@ html, body {
   height: 100%;
   margin: 0;
   padding: 0;
-  overflow: auto;
 }
 
 body {
@@ -38,22 +37,23 @@ body {
 
 html.light {
   color-scheme: light;
-  background-color: #ffffff;
+  --background: #fafafa;
+  --foreground: #111111;
+  --muted-foreground: #575757;
+  --surface-1: rgba(0, 0, 0, 0.05);
+  --surface-2: rgba(0, 0, 0, 0.1);
+  --surface-overlay: rgba(250, 250, 250, 0.88);
+  --border-color: rgba(0, 0, 0, 0.14);
 }
 
-html.light body {
-  background-color: #ffffff;
-  color: #000000;
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
 }
 
 html.dark {
   color-scheme: dark;
-  background-color: #0a0a0a;
-}
-
-html.dark body {
-  background-color: #0a0a0a;
-  color: #ededed;
 }
 
 /* Typography Hierarchy */
@@ -186,116 +186,6 @@ code, pre {
   animation: fadeIn 0.3s ease-out;
 }
 
-/* Light Mode Overrides */
-html.light {
-  /* Text colors */
-  --text-white: #000000;
-  --text-white-80: #1a1a1a;
-  --text-white-60: #404040;
-  --text-white-40: #666666;
-  --text-white-20: #999999;
-  
-  /* Background colors */
-  --bg-white-10: #f0f0f0;
-  --bg-white-5: #f8f8f8;
-  --bg-black: #ffffff;
-  --bg-gray-900: #f5f5f5;
-  --bg-gray-800: #ebebeb;
-  --bg-gray-700: #e0e0e0;
-  
-  /* Border colors */
-  --border-white-20: #e0e0e0;
-  --border-white-10: #f0f0f0;
-}
-
-html.light {
-  /* Override critical components */
-  background-color: #ffffff !important;
-}
-
-html.light body {
-  background-color: #ffffff;
-  color: #000000;
-}
-
-/* Apply light mode styles via CSS variables */
-html.light .bg-black {
-  @apply bg-white;
-}
-
-html.light .bg-white {
-  @apply bg-black;
-}
-
-html.light .text-white {
-  @apply text-black;
-}
-
-html.light .text-black {
-  @apply text-white;
-}
-
-html.light .bg-gray-900 {
-  @apply bg-gray-100;
-}
-
-html.light .bg-gray-800 {
-  @apply bg-gray-200;
-}
-
-html.light .border-white {
-  @apply border-black;
-}
-
-html.light .border-white\/10 {
-  @apply border-black/10;
-}
-
-html.light .border-white\/20 {
-  @apply border-black/20;
-}
-
-html.light .bg-white\/10 {
-  @apply bg-black/5;
-}
-
-html.light .bg-white\/20 {
-  @apply bg-black/10;
-}
-
-html.light .bg-white\/5 {
-  @apply bg-black/2;
-}
-
-html.light .text-white\/80 {
-  @apply text-black/80;
-}
-
-html.light .text-white\/60 {
-  @apply text-black/60;
-}
-
-html.light .text-white\/40 {
-  @apply text-black/40;
-}
-
-html.light .text-white\/20 {
-  @apply text-black/20;
-}
-
-html.light .hover\:bg-white\/20:hover {
-  @apply bg-black/10;
-}
-
-html.light .hover\:bg-gray-700:hover {
-  @apply bg-gray-300;
-}
-
-html.light .hover\:bg-white\/10:hover {
-  @apply bg-black/5;
-}
-
-
 /* Smooth transitions for interactive elements */
 button, a {
   transition: transform 0.2s ease, background-color 0.2s ease, color 0.2s ease;
@@ -303,4 +193,36 @@ button, a {
 
 button:active, a:active {
   transform: scale(0.95);
+}
+
+/* Dual-thumb range slider */
+.dual-range-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  margin: 0;
+}
+
+.dual-range-thumb::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 18px;
+  width: 18px;
+  border-radius: 50%;
+  background: #3b82f6;
+  border: 2px solid #fff;
+  cursor: pointer;
+  pointer-events: all;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+
+.dual-range-thumb::-moz-range-thumb {
+  height: 18px;
+  width: 18px;
+  border-radius: 50%;
+  background: #3b82f6;
+  border: 2px solid #fff;
+  cursor: pointer;
+  pointer-events: all;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
 }

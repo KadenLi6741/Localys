@@ -17,9 +17,10 @@ interface PostedVideo {
 
 interface PostedVideosProps {
   userId: string;
+  isOwnProfile?: boolean;
 }
 
-export function PostedVideos({ userId }: PostedVideosProps) {
+export function PostedVideos({ userId, isOwnProfile = true }: PostedVideosProps) {
   const [videos, setVideos] = useState<PostedVideo[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingVideoId, setDeletingVideoId] = useState<string | null>(null);
@@ -221,16 +222,18 @@ export function PostedVideos({ userId }: PostedVideosProps) {
             </div>
 
             {/* Delete Button */}
-            <div className="flex flex-col justify-center ml-2">
-              <button
-                onClick={() => deleteVideo(video.id)}
-                disabled={deletingVideoId === video.id}
-                className="text-red-400 hover:text-red-300 transition-colors text-sm font-medium px-3 py-1.5 rounded hover:bg-red-500/10 disabled:opacity-50 disabled:cursor-not-allowed"
-                title="Delete this video"
-              >
-                {deletingVideoId === video.id ? '...' : '🗑️ Delete'}
-              </button>
-            </div>
+            {isOwnProfile && (
+              <div className="flex flex-col justify-center ml-2">
+                <button
+                  onClick={() => deleteVideo(video.id)}
+                  disabled={deletingVideoId === video.id}
+                  className="text-red-400 hover:text-red-300 transition-colors text-sm font-medium px-3 py-1.5 rounded hover:bg-red-500/10 disabled:opacity-50 disabled:cursor-not-allowed"
+                  title="Delete this video"
+                >
+                  {deletingVideoId === video.id ? '...' : '🗑️ Delete'}
+                </button>
+              </div>
+            )}
           </div>
         </div>
       ))}

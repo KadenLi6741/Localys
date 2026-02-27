@@ -50,7 +50,7 @@ export function ChatList({ chats, currentUserId, loading }: ChatListProps) {
         <ChatListItem
           key={chat.id}
           chat={chat}
-          onClick={() => handleChatClick(chat.id)}
+          onClick={() => chat.id && handleChatClick(chat.id)}
         />
       ))}
     </div>

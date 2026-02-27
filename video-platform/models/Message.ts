@@ -1,7 +1,8 @@
 export interface Message {
   id?: string;
-  chat_id: string;
-  sender_id: string;
+  chat_id?: string;
+  conversation_id?: string;
+  sender_id?: string;
   content: string;
   created_at?: string;
   edited_at?: string;
@@ -46,6 +47,9 @@ export interface ChatWithDetails extends Chat {
 }
 
 export interface Conversation extends Chat {
+  last_message_at?: string;
+  last_message_text?: string;
+  unread_count?: number;
   members?: ChatMember[];
   other_user?: {
     id: string;

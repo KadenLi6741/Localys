@@ -4,9 +4,41 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { signUp } from '@/lib/supabase/auth';
+import TurnstileWidget from '@/components/TurnstileWidget';
+
+const DEFAULT_LOCAL_TURNSTILE_SITE_KEY = '1x00000000000000000000AA';
+
+function resolveTurnstileSiteKey(): string {
+  const prodKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? '';
+
+  if (typeof window === 'undefined') {
+    return prodKey;
+  }
+
+  const hostname = window.location.hostname;
+  const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '::1';
+
+  if (!isLocalhost) {
+    return prodKey;
+  }
+
+  const localKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY_LOCAL ?? '';
+  return localKey || prodKey || DEFAULT_LOCAL_TURNSTILE_SITE_KEY;
+}
+
+async function verifyTurnstile(token: string): Promise<boolean> {
+  const res = await fetch('/api/verify-turnstile', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token }),
+  });
+  const data = await res.json();
+  return data.success === true;
+}
 
 export default function SignUpPage() {
   const router = useRouter();
+  const siteKey = resolveTurnstileSiteKey();
   const [name, setName] = useState('');
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
@@ -14,7 +46,15 @@ export default function SignUpPage() {
   const [accountType, setAccountType] = useState<'business' | 'user'>('user');
   const [businessType, setBusinessType] = useState<'food' | 'retail' | 'service' | ''>('');
   const [error, setError] = useState('');
+  const [verificationEmail, setVerificationEmail] = useState('');
   const [loading, setLoading] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const [turnstileResetKey, setTurnstileResetKey] = useState(0);
+
+  const resetTurnstile = () => {
+    setTurnstileToken(null);
+    setTurnstileResetKey((prev) => prev + 1);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,7 +65,20 @@ export default function SignUpPage() {
       return;
     }
 
+    if (!turnstileToken) {
+      setError('Please wait for the security check to complete.');
+      return;
+    }
+
     setLoading(true);
+
+    const verified = await verifyTurnstile(turnstileToken);
+    if (!verified) {
+      setError('Security check failed. Please try again.');
+      resetTurnstile();
+      setLoading(false);
+      return;
+    }
 
     const { data, error: signUpError } = await signUp({
       email,
@@ -33,19 +86,26 @@ export default function SignUpPage() {
       name,
       username,
       accountType,
-      businessType: accountType === 'business' ? businessType : undefined,
+      businessType: accountType === 'business' && businessType ? businessType : undefined,
     });
 
     if (signUpError) {
       setError(signUpError.message || 'Failed to create account');
+      resetTurnstile();
       setLoading(false);
       return;
     }
 
-    if (data?.user) {
-      router.push('/');
+    if (data?.session) {
+      router.push('/onboarding');
       router.refresh();
+      return;
     }
+
+    setVerificationEmail(email);
+    setPassword('');
+    resetTurnstile();
+    setLoading(false);
   };
 
   return (
@@ -56,12 +116,22 @@ export default function SignUpPage() {
           <p className="text-white/60">Create your account</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {error && (
-            <div className="bg-red-500/20 border border-red-500 text-red-200 px-4 py-3 rounded-lg">
-              {error}
+        {verificationEmail ? (
+          <div className="space-y-6">
+            <div className="bg-green-500/20 border border-green-500 text-green-200 px-4 py-3 rounded-lg">
+              Account created. Check <span className="font-semibold">{verificationEmail}</span> to verify your account before signing in.
             </div>
-          )}
+            <p className="text-white/70 text-sm">
+              If you don&apos;t see the email, check spam/junk and try again in a minute.
+            </p>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {error && (
+              <div className="bg-red-500/20 border border-red-500 text-red-200 px-4 py-3 rounded-lg">
+                {error}
+              </div>
+            )}
 
           <div>
             <label className="block text-sm font-medium mb-2">Account Type</label>
@@ -176,14 +246,23 @@ export default function SignUpPage() {
             <p className="text-xs text-white/40 mt-1">At least 6 characters</p>
           </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-white text-black font-semibold py-3 rounded-lg disabled:bg-white/20 disabled:text-white/40 disabled:cursor-not-allowed hover:bg-white/90 active:scale-98 transition-all duration-200"
-          >
-            {loading ? 'Creating account...' : 'Sign Up'}
-          </button>
-        </form>
+          <TurnstileWidget
+            siteKey={siteKey}
+            onVerify={setTurnstileToken}
+            onExpire={() => setTurnstileToken(null)}
+            theme="dark"
+            resetKey={turnstileResetKey}
+          />
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-white text-black font-semibold py-3 rounded-lg disabled:bg-white/20 disabled:text-white/40 disabled:cursor-not-allowed hover:bg-white/90 active:scale-98 transition-all duration-200"
+            >
+              {loading ? 'Creating account...' : 'Sign Up'}
+            </button>
+          </form>
+        )}
 
         <p className="text-center text-white/60">
           Already have an account?{' '}
@@ -195,7 +274,3 @@ export default function SignUpPage() {
     </div>
   );
 }
-
-
-
-

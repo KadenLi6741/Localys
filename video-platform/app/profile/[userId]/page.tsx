@@ -2,14 +2,24 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import { useParams, usePathname, useRouter } from 'next/navigation';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase/client';
 import { getOrCreateOneToOneChat } from '@/lib/supabase/messaging';
-import { getProfileByUserId, Business, BusinessHours } from '@/lib/supabase/profiles';
+import { getUserBusiness, getBusinessLocations, Business, BusinessHours, BusinessLocation } from '@/lib/supabase/profiles';
 import { MenuList } from '@/components/MenuList';
 import { PostedVideos } from '@/components/PostedVideos';
+import { BusyTimesDisplay } from '@/components/busytimes/BusyTimesDisplay';
+
+const BusinessLocationMap = dynamic(
+  () => import('@/components/BusinessLocationMap'),
+  {
+    ssr: false,
+    loading: () => <div className="h-[300px] bg-white/5 animate-pulse rounded-t-none" />,
+  }
+);
 
 interface Profile {
   id: string;
@@ -17,6 +27,7 @@ interface Profile {
   full_name: string;
   profile_picture_url?: string;
   bio?: string;
+  type?: string | null;
 }
 
 export default function UserProfilePage() {
@@ -36,6 +47,7 @@ function UserProfileContent() {
   
   const [profile, setProfile] = useState<Profile | null>(null);
   const [business, setBusiness] = useState<Business | null>(null);
+  const [businessLocations, setBusinessLocations] = useState<BusinessLocation[]>([]);
   const [showBusinessHours, setShowBusinessHours] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -44,15 +56,29 @@ function UserProfileContent() {
   useEffect(() => {
     if (userId) {
       loadProfile();
-      loadBusiness();
     }
   }, [userId]);
+
+  useEffect(() => {
+    if (profile?.type) {
+      loadBusiness();
+      loadLocations();
+    } else {
+      setBusiness(null);
+      setBusinessLocations([]);
+    }
+  }, [profile?.type]);
+
+  const loadLocations = async () => {
+    const { data } = await getBusinessLocations(userId);
+    setBusinessLocations(data ?? []);
+  };
 
   const loadProfile = async () => {
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, username, full_name, profile_picture_url, bio')
+        .select('id, username, full_name, profile_picture_url, bio, type')
         .eq('id', userId)
         .single();
 
@@ -300,19 +326,66 @@ function UserProfileContent() {
           </div>
         )}
 
-        {/* Services Section */}
-        <div className="mt-8">
-          <h3 className="text-xl font-semibold mb-4">⚙️ Services</h3>
-          <div className="bg-white/5 border border-white/10 rounded-lg p-6">
-            <MenuList userId={userId} isOwnProfile={false} />
+        {/* Business Location Map */}
+        {businessLocations.length > 0 && (
+          <div className="mt-8">
+            <h3 className="text-xl font-semibold mb-4">
+              📍 Location{businessLocations.length > 1 ? 's' : ''}
+            </h3>
+            <div className="bg-white/5 border border-white/10 rounded-lg overflow-hidden">
+              <BusinessLocationMap
+                locations={businessLocations}
+                businessName={business?.business_name ?? ''}
+              />
+            </div>
           </div>
-        </div>
+        )}
+
+        {/* Services Section (business only) */}
+        {profile.type && (
+          <div className="mt-8">
+            <h3 className="text-xl font-semibold mb-4">⚙️ Services</h3>
+            <div className="bg-white/5 border border-white/10 rounded-lg p-6">
+              <MenuList userId={userId} isOwnProfile={false} />
+            </div>
+          </div>
+        )}
+
+        {/* Popular Times Section (business only) */}
+        {business && (
+          <div className="mt-8">
+            <h3 className="text-xl font-semibold mb-4">Popular Times</h3>
+            <div className="bg-white/5 border border-white/10 rounded-lg p-6">
+              <BusyTimesDisplay businessId={business.id} />
+            </div>
+          </div>
+        )}
+
+        {/* Pre-Order CTA (business only) */}
+        {business && (
+          <div className="mt-8">
+            <Link
+              href={`/preorder/${business.id}`}
+              className="block bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 rounded-lg p-6 hover:from-blue-500/30 hover:to-purple-500/30 transition-all duration-200"
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-white font-semibold text-lg mb-1">Pre-Order Now</h3>
+                  <p className="text-white/60 text-sm">Browse the menu, pick a table & time, and have your food ready when you arrive</p>
+                </div>
+                <svg className="w-6 h-6 text-white/60 flex-shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
+            </Link>
+          </div>
+        )}
 
         {/* Videos Section */}
         <div className="mt-8">
           <h3 className="text-xl font-semibold mb-4">📹 Videos</h3>
           <div className="bg-white/5 border border-white/10 rounded-lg p-6">
-            <PostedVideos userId={userId} />
+            <PostedVideos userId={userId} isOwnProfile={false} />
           </div>
         </div>
       </div>

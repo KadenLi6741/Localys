@@ -166,7 +166,7 @@ export function NewChatModal({ isOpen, onClose, currentUserId }: NewChatModalPro
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-white/60 text-lg font-semibold">
-                        {(user.full_name || user.username)[0]?.toUpperCase() || '?'}
+                        {(user.full_name || user.username || '?')[0]?.toUpperCase() || '?'}
                       </div>
                     )}
                   </div>

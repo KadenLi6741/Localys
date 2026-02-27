@@ -150,7 +150,7 @@ export default function ChatList({ onSelectConversation }: ChatListProps) {
         {conversations.map((conversation) => (
           <button
             key={conversation.id}
-            onClick={() => handleConversationClick(conversation.id)}
+            onClick={() => conversation.id && handleConversationClick(conversation.id)}
             className="w-full px-4 py-3 hover:bg-white/5 transition-colors border-b border-white/5 flex items-center gap-3"
           >
             {/* Avatar */}

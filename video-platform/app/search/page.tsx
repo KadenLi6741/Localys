@@ -4,11 +4,10 @@ import { useState, useCallback } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
-import { useAuth } from '@/contexts/AuthContext';
-
-import { supabase } from '@/lib/supabase/client';
 import { searchVideos, searchBusinesses, SearchFilters, SearchMode } from '@/lib/supabase/search';
 import { haversineDistance } from '@/lib/utils/geo';
+import { AppBottomNav } from '@/components/AppBottomNav';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 const CUISINE_TYPES = ['Italian', 'Mexican', 'Chinese', 'Japanese', 'Korean', 'Indian', 'Thai', 'Vietnamese', 'Mediterranean', 'American', 'French', 'Middle Eastern'];
 const FORMALITY_TYPES = ['Restaurant', 'Cafe', 'Bar'];
@@ -29,9 +28,6 @@ export default function SearchPage() {
 }
 
 function SearchContent() {
-  const { user } = useAuth();
-  const pathname = usePathname();
-
   const [query, setQuery] = useState('');
   const [searchMode, setSearchMode] = useState<SearchMode>('businesses');
   const [category, setCategory] = useState<string>('');
@@ -40,7 +36,6 @@ function SearchContent() {
   const [results, setResults] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
-  const [commentCounts, setCommentCounts] = useState<{ [key: string]: number }>({});
 
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [cuisineType, setCuisineType] = useState('');
@@ -178,9 +173,10 @@ function SearchContent() {
       <StarSymbolDefs />
 
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-black/80 backdrop-blur-md border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-4 py-4">
+      <div className="sticky top-0 z-10 border-b border-[var(--border-color)] bg-[var(--surface-overlay)] backdrop-blur-md">
+        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
           <h1 className="text-2xl font-bold">Search</h1>
+          <ThemeToggle />
         </div>
       </div>
 
@@ -189,13 +185,13 @@ function SearchContent() {
         <div className="grid grid-cols-1 lg:grid-cols-[340px_minmax(0,1fr)] gap-6 lg:gap-8">
           <aside className="space-y-6 lg:sticky lg:top-24 lg:self-start max-h-[calc(100vh-7rem)] overflow-y-auto overflow-x-hidden pr-1">
             {/* Search Mode Toggle */}
-            <div className="flex bg-white/10 rounded-lg p-1">
+            <div className="flex rounded-xl border border-[var(--border-color)] bg-[var(--surface-1)] p-1">
               <button
                 onClick={() => setSearchMode('businesses')}
                 className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all ${
                   searchMode === 'businesses'
                     ? 'bg-blue-500 text-white shadow-sm'
-                    : 'text-gray-300 hover:text-white'
+                    : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)]'
                 }`}
               >
                 🏪 Businesses
@@ -205,7 +201,7 @@ function SearchContent() {
                 className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all ${
                   searchMode === 'videos'
                     ? 'bg-blue-500 text-white shadow-sm'
-                    : 'text-gray-300 hover:text-white'
+                    : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)]'
                 }`}
               >
                 🎬 Videos
@@ -213,8 +209,8 @@ function SearchContent() {
             </div>
 
             {/* Search Bar */}
-            <div className="bg-white/10 border border-white/20 rounded-lg px-4 py-3 flex gap-2 hover:bg-white/15 hover:border-white/30 transition-all duration-200">
-              <svg className="w-5 h-5 text-white/60 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="mx-1 flex gap-2 rounded-xl border border-[var(--border-color)] bg-[var(--surface-1)] px-4 py-3 transition-all duration-200 hover:bg-[var(--surface-2)]">
+              <svg className="mt-0.5 h-5 w-5 flex-shrink-0 text-[var(--muted-foreground)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
               <input
@@ -223,13 +219,13 @@ function SearchContent() {
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 placeholder={searchMode === 'businesses' ? 'Search businesses, cuisine, keywords...' : 'Search videos by keywords, business name...'}
-                className="bg-transparent text-white placeholder-white/60 flex-1 outline-none"
+                className="min-w-0 flex-1 bg-transparent text-[var(--foreground)] placeholder-[var(--muted-foreground)] outline-none"
                 autoFocus
               />
               <button
                 onClick={handleSearch}
                 disabled={loading}
-                className="bg-white text-black px-4 py-2 rounded-lg font-semibold hover:bg-white/90 transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
+                className="flex-shrink-0 rounded-lg bg-[var(--foreground)] px-4 py-2 font-semibold text-[var(--background)] transition-all duration-200 hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {loading ? '...' : 'Search'}
               </button>
@@ -247,7 +243,7 @@ function SearchContent() {
                   )}
                   <button
                     onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
-                    className="text-sm text-white/60 hover:text-white flex items-center gap-1"
+                    className="flex items-center gap-1 text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
                   >
                     {showAdvancedFilters ? 'Less' : 'More'} Filters
                     <svg className={`w-4 h-4 transition-transform ${showAdvancedFilters ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -257,7 +253,7 @@ function SearchContent() {
                 </div>
               </div>
 
-              <div className="bg-white/5 border border-white/10 rounded-lg p-4 space-y-4">
+              <div className="space-y-4 rounded-xl border border-[var(--border-color)] bg-[var(--surface-1)] p-4">
                 {/* Category Filter */}
                 <div>
                   <label className="block text-sm font-medium mb-2">Category</label>
@@ -269,7 +265,7 @@ function SearchContent() {
                         className={`py-2 px-3 rounded-lg text-sm font-medium transition-all ${
                           category === cat
                             ? 'bg-blue-500 text-white'
-                            : 'bg-white/10 text-gray-300 hover:bg-white/20'
+                            : 'bg-[var(--surface-2)] text-[var(--muted-foreground)] hover:text-[var(--foreground)]'
                         }`}
                       >
                         {cat === '' ? 'All' : cat === 'service' ? 'Services' : cat.charAt(0).toUpperCase() + cat.slice(1)}
@@ -314,19 +310,47 @@ function SearchContent() {
                   <label className="block text-sm font-medium mb-3">
                     Price Range: ${priceRange[0]} - ${priceRange[1]}
                   </label>
-                  <div className="space-y-2">
-                    <div className="flex gap-4 items-center">
-                      <input type="range" min="0" max="1000" value={priceRange[0]}
-                        onChange={(e) => setPriceRange([Number(e.target.value), priceRange[1]])}
-                        className="flex-1 accent-blue-500" />
-                      <span className="text-sm text-gray-400 w-12">${priceRange[0]}</span>
-                    </div>
-                    <div className="flex gap-4 items-center">
-                      <input type="range" min="0" max="1000" value={priceRange[1]}
-                        onChange={(e) => setPriceRange([priceRange[0], Number(e.target.value)])}
-                        className="flex-1 accent-blue-500" />
-                      <span className="text-sm text-gray-400 w-12">${priceRange[1]}</span>
-                    </div>
+                  <div className="relative h-6 flex items-center">
+                    {/* Track background */}
+                    <div className="absolute left-0 right-0 h-1.5 rounded-full bg-white/10" />
+                    {/* Active range highlight */}
+                    <div
+                      className="absolute h-1.5 rounded-full bg-blue-500"
+                      style={{
+                        left: `${(priceRange[0] / 1000) * 100}%`,
+                        right: `${100 - (priceRange[1] / 1000) * 100}%`,
+                      }}
+                    />
+                    {/* Min thumb */}
+                    <input
+                      type="range"
+                      min="0"
+                      max="1000"
+                      value={priceRange[0]}
+                      onChange={(e) => {
+                        const val = Math.min(Number(e.target.value), priceRange[1]);
+                        setPriceRange([val, priceRange[1]]);
+                      }}
+                      className="dual-range-thumb absolute w-full pointer-events-none appearance-none bg-transparent"
+                      style={{ zIndex: priceRange[0] > 900 ? 5 : 3 }}
+                    />
+                    {/* Max thumb */}
+                    <input
+                      type="range"
+                      min="0"
+                      max="1000"
+                      value={priceRange[1]}
+                      onChange={(e) => {
+                        const val = Math.max(Number(e.target.value), priceRange[0]);
+                        setPriceRange([priceRange[0], val]);
+                      }}
+                      className="dual-range-thumb absolute w-full pointer-events-none appearance-none bg-transparent"
+                      style={{ zIndex: 4 }}
+                    />
+                  </div>
+                  <div className="flex justify-between text-xs text-[var(--muted-foreground)] mt-1">
+                    <span>$0</span>
+                    <span>$1000</span>
                   </div>
                 </div>
               </div>
@@ -376,14 +400,14 @@ function SearchContent() {
                       <button
                         onClick={handleNearMe}
                         className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                          nearMe ? 'bg-blue-500 text-white' : 'bg-white/10 text-gray-300 hover:bg-white/20'
+                          nearMe ? 'bg-blue-500 text-white' : 'bg-[var(--surface-2)] text-[var(--muted-foreground)] hover:text-[var(--foreground)]'
                         }`}
                       >
                         📍 Near Me
                       </button>
                       {nearMe && (
                         <div>
-                          <label className="block text-sm text-gray-400 mb-1">Radius: {radius} km</label>
+                          <label className="mb-1 block text-sm text-[var(--muted-foreground)]">Radius: {radius} km</label>
                           <input type="range" min="1" max="50" value={radius}
                             onChange={(e) => setRadius(Number(e.target.value))}
                             className="w-full accent-blue-500" />
@@ -444,7 +468,7 @@ function SearchContent() {
           {/* Search Results */}
           <section className="min-w-0">
             <div className="mb-4">
-              <h2 className="text-lg font-semibold mb-2">
+              <h2 className="mb-2 text-lg font-semibold">
                 {loading ? 'Searching...' : hasSearched ? `Results (${results.length})` : 'Search Results'}
               </h2>
               {category && (
@@ -456,7 +480,7 @@ function SearchContent() {
 
             {loading ? (
               <div className="text-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto"></div>
+                <div className="mx-auto h-8 w-8 animate-spin rounded-full border-b-2 border-current"></div>
               </div>
             ) : results.length > 0 ? (
               <div className="space-y-4">
@@ -465,7 +489,6 @@ function SearchContent() {
                       <BusinessResultCard
                         key={biz.id}
                         business={biz}
-                        query={query}
                         userLat={userLat}
                         userLng={userLng}
                         hoveredId={hoveredBusiness?.id}
@@ -478,63 +501,28 @@ function SearchContent() {
               </div>
             ) : hasSearched ? (
               <div className="text-center py-12">
-                <svg className="w-12 h-12 text-white/40 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="mx-auto mb-3 h-12 w-12 text-[var(--muted-foreground)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
-                <p className="text-white/60">No results found{query ? ` for "${query}"` : ''}</p>
-                <p className="text-white/40 text-sm mt-1">Try different keywords or filters</p>
+                <p className="text-[var(--muted-foreground)]">No results found{query ? ` for "${query}"` : ''}</p>
+                <p className="mt-1 text-sm text-[var(--muted-foreground)]">Try different keywords or filters</p>
               </div>
             ) : (
               <div className="text-center py-12">
-                <svg className="w-12 h-12 text-white/40 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="mx-auto mb-3 h-12 w-12 text-[var(--muted-foreground)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
-                <p className="text-white/60">
+                <p className="text-[var(--muted-foreground)]">
                   Search for {searchMode === 'businesses' ? 'businesses, cuisine types, or categories' : 'videos by keywords or business name'}
                 </p>
-                <p className="text-white/40 text-sm mt-1">Use filters to narrow down results</p>
+                <p className="mt-1 text-sm text-[var(--muted-foreground)]">Use filters to narrow down results</p>
               </div>
             )}
           </section>
         </div>
       </div>
 
-      {/* Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 z-20 bg-black/50 backdrop-blur-md border-t border-white/10">
-        <div className="flex items-center justify-around py-3">
-          <Link href="/" className="flex flex-col items-center gap-1 transition-transform duration-200 hover:scale-110 active:scale-95">
-            <svg className="w-6 h-6 text-white/60" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
-            </svg>
-            <span className="text-white/60 text-xs">Home</span>
-          </Link>
-          <Link href="/search" className="flex flex-col items-center gap-1 transition-transform duration-200 hover:scale-110 active:scale-95">
-            <svg className={`w-6 h-6 ${pathname === '/search' ? 'text-white' : 'text-white/60'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-            <span className={`text-xs ${pathname === '/search' ? 'text-white' : 'text-white/60'}`}>Search</span>
-          </Link>
-          <Link href="/upload" className="flex flex-col items-center gap-1 transition-transform duration-200 hover:scale-110 active:scale-95">
-            <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
-              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-            </div>
-          </Link>
-          <Link href="/chats" className="flex flex-col items-center gap-1 transition-transform duration-200 hover:scale-110 active:scale-95">
-            <svg className="w-6 h-6 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-            </svg>
-            <span className="text-white/60 text-xs">Chats</span>
-          </Link>
-          <Link href="/profile" className="flex flex-col items-center gap-1 transition-transform duration-200 hover:scale-110 active:scale-95">
-            <svg className="w-6 h-6 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-            </svg>
-            <span className="text-white/60 text-xs">Profile</span>
-          </Link>
-        </div>
-      </div>
+      <AppBottomNav />
     </div>
   );
 }
@@ -543,7 +531,7 @@ function SearchContent() {
 
 function FilterSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="bg-white/5 border border-white/10 rounded-lg p-4">
+    <div className="rounded-xl border border-[var(--border-color)] bg-[var(--surface-1)] p-4">
       <label className="block text-sm font-medium mb-3">{title}</label>
       {children}
     </div>
@@ -557,7 +545,7 @@ function ChipButton({ label, active, onClick }: { label: string; active: boolean
       className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
         active
           ? 'bg-blue-500 text-white'
-          : 'bg-white/10 text-gray-300 hover:bg-white/20'
+          : 'bg-[var(--surface-2)] text-[var(--muted-foreground)] hover:text-[var(--foreground)]'
       }`}
     >
       {label}
@@ -603,14 +591,12 @@ function StarSymbolDefs() {
 
 function BusinessResultCard({
   business,
-  query,
   userLat,
   userLng,
   hoveredId,
   onHover,
 }: {
   business: any;
-  query: string;
   userLat?: number;
   userLng?: number;
   hoveredId?: string;
@@ -640,14 +626,14 @@ function BusinessResultCard({
 
   return (
     <div
-      className="relative block bg-white/5 border border-white/10 rounded-lg p-4 hover:bg-white/10 transition-all duration-200 group cursor-pointer"
+      className="group relative block cursor-pointer rounded-xl border border-[var(--border-color)] bg-[var(--surface-1)] p-4 transition-all duration-200 hover:bg-[var(--surface-2)]"
       onMouseEnter={() => onHover(business)}
       onMouseLeave={() => onHover(null)}
       onClick={handleClick}
     >
       <div className="flex gap-4">
         {/* Business avatar */}
-        <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 bg-white/10 flex items-center justify-center">
+        <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center overflow-hidden rounded-lg bg-[var(--surface-2)]">
           {business.profile_picture_url ? (
             <img src={business.profile_picture_url} alt={business.business_name} className="w-full h-full object-cover" />
           ) : (
@@ -656,22 +642,22 @@ function BusinessResultCard({
         </div>
 
         <div className="flex-1 min-w-0">
-          <h3 className="font-semibold text-white truncate">{businessName}</h3>
+          <h3 className="truncate font-semibold text-[var(--foreground)]">{businessName}</h3>
 
-          <div className="flex items-center gap-2 text-sm text-white/70 mt-1 flex-wrap">
+          <div className="mt-1 flex flex-wrap items-center gap-2 text-sm text-[var(--muted-foreground)]">
             {business.average_rating != null && (
               <span>⭐ {Number(business.average_rating).toFixed(1)}</span>
             )}
             {business.total_reviews != null && (
-              <span className="text-white/40">({business.total_reviews} reviews)</span>
+              <span>({business.total_reviews} reviews)</span>
             )}
             {business.category && (
-              <span className="px-2 py-0.5 bg-white/10 rounded text-xs font-medium capitalize">
+              <span className="rounded px-2 py-0.5 text-xs font-medium capitalize bg-[var(--surface-2)] text-[var(--foreground)]">
                 {business.category}
               </span>
             )}
             {distance != null && (
-              <span className="text-white/50">📍 {distance.toFixed(1)} km</span>
+              <span>📍 {distance.toFixed(1)} km</span>
             )}
           </div>
 
@@ -683,33 +669,33 @@ function BusinessResultCard({
 
       {/* Hover preview tooltip */}
       {isHovered && (
-        <div className="mt-3 bg-gray-900 border border-white/20 rounded-lg p-4 shadow-xl transition-all duration-200">
+        <div className="mt-3 rounded-lg border border-[var(--border-color)] bg-[var(--surface-overlay)] p-4 shadow-xl transition-all duration-200">
           <div className="grid grid-cols-2 gap-3 text-sm">
             <div>
-              <p className="text-white/50 text-xs">Rating</p>
-              <p className="text-white font-medium">
+              <p className="text-xs text-[var(--muted-foreground)]">Rating</p>
+              <p className="font-medium text-[var(--foreground)]">
                 {business.average_rating ? `⭐ ${Number(business.average_rating).toFixed(1)} / 5` : 'No ratings yet'}
               </p>
             </div>
             <div>
-              <p className="text-white/50 text-xs">Reviews</p>
-              <p className="text-white font-medium">
+              <p className="text-xs text-[var(--muted-foreground)]">Reviews</p>
+              <p className="font-medium text-[var(--foreground)]">
                 {business.total_reviews ?? 0} reviews
               </p>
             </div>
             <div>
-              <p className="text-white/50 text-xs">Avg Price</p>
-              <p className="text-white font-medium">{avgPrice || 'N/A'}</p>
+              <p className="text-xs text-[var(--muted-foreground)]">Avg Price</p>
+              <p className="font-medium text-[var(--foreground)]">{avgPrice || 'N/A'}</p>
             </div>
             {distance != null && (
               <div>
-                <p className="text-white/50 text-xs">Distance</p>
-                <p className="text-white font-medium">{distance.toFixed(1)} km away</p>
+                <p className="text-xs text-[var(--muted-foreground)]">Distance</p>
+                <p className="font-medium text-[var(--foreground)]">{distance.toFixed(1)} km away</p>
               </div>
             )}
             <div className="col-span-2">
-              <p className="text-white/50 text-xs">Category</p>
-              <p className="text-white font-medium capitalize">{business.category || 'General'}</p>
+              <p className="text-xs text-[var(--muted-foreground)]">Category</p>
+              <p className="font-medium capitalize text-[var(--foreground)]">{business.category || 'General'}</p>
             </div>
           </div>
         </div>
@@ -728,7 +714,7 @@ function VideoResultCard({ result, query }: { result: any; query: string }) {
   return (
     <Link
       href={`/video/${result.id}`}
-      className="block bg-white/5 border border-white/10 rounded-lg p-4 hover:bg-white/10 transition-all duration-200 group"
+      className="group block rounded-xl border border-[var(--border-color)] bg-[var(--surface-1)] p-4 transition-all duration-200 hover:bg-[var(--surface-2)]"
     >
       <div className="flex gap-4">
         <div className="relative w-32 h-24 rounded-lg overflow-hidden flex-shrink-0">
@@ -740,35 +726,35 @@ function VideoResultCard({ result, query }: { result: any; query: string }) {
           </div>
         </div>
         <div className="flex-1">
-          <h3 className="font-semibold mb-1 text-white">
+          <h3 className="mb-1 font-semibold text-[var(--foreground)]">
             {result.businesses?.business_name || result.profiles?.full_name || 'Business'}
           </h3>
-          <p className="text-xs text-white/50 mb-1">
+          <p className="mb-1 text-xs text-[var(--muted-foreground)]">
             By {authorName}
           </p>
-          <p className="text-sm text-white/60 mb-2 line-clamp-2">
+          <p className="mb-2 line-clamp-2 text-sm text-[var(--muted-foreground)]">
             {result.caption || 'No description'}
           </p>
-          <div className="flex items-center gap-2 text-xs text-white/55 mb-2">
+          <div className="mb-2 flex items-center gap-2 text-xs text-[var(--muted-foreground)]">
             <span>{postedDate}</span>
             <span>•</span>
             <span>{views.toLocaleString()} views</span>
           </div>
-          <div className="flex items-center gap-3 text-sm text-white/80 mb-2">
+          <div className="mb-2 flex items-center gap-3 text-sm text-[var(--foreground)]">
             {result.businesses?.average_rating && (
               <>
                 <span>⭐ {result.businesses.average_rating.toFixed(1)}</span>
-                <span className="text-white/40">•</span>
+                <span className="text-[var(--muted-foreground)]">•</span>
               </>
             )}
             {result.businesses?.total_reviews && (
               <>
                 <span>{result.businesses.total_reviews} reviews</span>
-                <span className="text-white/40">•</span>
+                <span className="text-[var(--muted-foreground)]">•</span>
               </>
             )}
             {result.businesses?.category && (
-              <span className="px-2 py-1 bg-white/10 rounded text-xs font-medium">
+              <span className="rounded bg-[var(--surface-2)] px-2 py-1 text-xs font-medium">
                 {result.businesses.category}
               </span>
             )}

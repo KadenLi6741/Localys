@@ -1,15 +1,29 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function CheckoutSuccessPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-black text-white flex items-center justify-center p-4">
+        <p className="text-white/70">Loading confirmation...</p>
+      </div>
+    }>
+      <CheckoutSuccessContent />
+    </Suspense>
+  );
+}
+
+function CheckoutSuccessContent() {
   const { user } = useAuth();
   const searchParams = useSearchParams();
   const sessionId = searchParams.get('session_id');
   const [confirmationNumber, setConfirmationNumber] = useState('');
+  const [verificationMessage, setVerificationMessage] = useState('Verifying payment and updating your coins...');
+  const [verified, setVerified] = useState(false);
 
   useEffect(() => {
     if (!sessionId || !user) return;
@@ -22,9 +36,22 @@ export default function CheckoutSuccessPage() {
         if (data.confirmationNumber) {
           setConfirmationNumber(data.confirmationNumber);
         }
+
+        if (data.success) {
+          setVerified(true);
+          setVerificationMessage(
+            data.alreadyProcessed
+              ? '✓ Your coins were already added for this payment.'
+              : '✓ Your coins were added to your account.'
+          );
+        } else {
+          setVerified(false);
+          setVerificationMessage(data.message || 'Payment received, but coin update is still pending.');
+        }
       } catch (error) {
         console.error('Error:', error);
-        // Still show confirmation page even if API fails
+        setVerified(false);
+        setVerificationMessage('Payment received, but verification failed. Please contact support with the session ID below.');
       }
     };
 
@@ -61,9 +88,9 @@ export default function CheckoutSuccessPage() {
           )}
 
           {/* Status Message */}
-          <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4 mb-6">
-            <p className="text-blue-400 text-sm">
-              ✓ Your coins will be added to your account shortly
+          <div className={`rounded-lg p-4 mb-6 ${verified ? 'bg-blue-500/10 border border-blue-500/20' : 'bg-yellow-500/10 border border-yellow-500/30'}`}>
+            <p className={`text-sm ${verified ? 'text-blue-400' : 'text-yellow-300'}`}>
+              {verificationMessage}
             </p>
           </div>
 

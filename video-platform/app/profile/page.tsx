@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import { usePathname, useRouter } from 'next/navigation';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { useAuth } from '@/contexts/AuthContext';
@@ -14,9 +15,9 @@ import { BookmarkedVideos } from '@/components/BookmarkedVideos';
 import { PostedVideos } from '@/components/PostedVideos';
 import { MenuList } from '@/components/MenuList';
 import { 
-  uploadProfilePicture, 
-  updateProfile, 
-  getUserBusiness, 
+  uploadProfilePicture,
+  updateProfile,
+  getUserBusiness,
   updateBusinessInfo,
   createBusiness,
   ensureUserBusiness,
@@ -30,6 +31,12 @@ import {
 } from '@/lib/supabase/profiles';
 import { OrderHistory } from '@/components/OrderHistory';
 import { CouponList } from '@/components/CouponList';
+import { AnalyticsDashboard } from '@/components/analytics';
+
+const LocationManager = dynamic(
+  () => import('@/components/LocationManager'),
+  { ssr: false, loading: () => <div className="h-24 bg-white/5 rounded-lg animate-pulse" /> }
+);
 
 export default function ProfilePage() {
   return (
@@ -52,9 +59,16 @@ function ProfileContent() {
   useEffect(() => {
     if (user) {
       loadProfile();
-      loadBusiness();
     }
   }, [user]);
+
+  useEffect(() => {
+    if (profile?.type) {
+      loadBusiness();
+    } else {
+      setBusiness(null);
+    }
+  }, [profile?.type]);
 
   const loadProfile = async () => {
     if (!user) return;
@@ -134,7 +148,7 @@ function ProfileContent() {
           user={user}
           onSave={async () => {
             await loadProfile();
-            await loadBusiness();
+            if (profile?.type) await loadBusiness();
             setIsEditMode(false);
           }}
           onCancel={() => setIsEditMode(false)}
@@ -246,8 +260,28 @@ function ProfileView({ profile, business, user, onEditClick, onSignOut, onProfil
           </div>
         )}
 
+        {/* Restaurant Dashboard Link (business only) */}
+        {business && (
+          <Link
+            href="/dashboard"
+            className="block w-full bg-gradient-to-r from-purple-500/20 to-pink-500/20 hover:from-purple-500/30 hover:to-pink-500/30 border border-purple-500/30 rounded-lg py-3 px-4 mb-6 transition-all duration-200 hover:scale-[1.02] active:scale-98"
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <svg className="w-5 h-5 text-purple-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                </svg>
+                <span className="text-white font-medium">Restaurant Dashboard</span>
+              </div>
+              <svg className="w-5 h-5 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
+          </Link>
+        )}
+
         {/* Edit Profile Button */}
-        <button 
+        <button
           onClick={onEditClick}
           className="w-full bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg py-3 mb-6 transition-all duration-200 hover:scale-[1.02] active:scale-98"
         >
@@ -255,34 +289,41 @@ function ProfileView({ profile, business, user, onEditClick, onSignOut, onProfil
         </button>
 
         {/* Coin Balance & Buy Coins Buttons */}
-        <div className="flex gap-4 mb-6">
-          <div className="flex-1 bg-yellow-500/10 border border-yellow-500/30 rounded-lg py-3 px-4 text-center">
-            <p className="text-yellow-400/80 text-xs mb-1">Coin Balance</p>
-            <p className="text-yellow-400 text-2xl font-bold">
-              🪙 {profile?.coin_balance || 0}
-            </p>
+        {profile?.type !== null && (
+          <div className="flex gap-4 mb-6">
+            <div className="flex-1 bg-yellow-500/10 border border-yellow-500/30 rounded-lg py-3 px-4 text-center">
+              <p className="text-yellow-400/80 text-xs mb-1">Coin Balance</p>
+              <p className="text-yellow-400 text-2xl font-bold">
+                🪙 {profile?.coin_balance || 0}
+              </p>
+            </div>
+            <Link
+              href="/buy-coins"
+              className="flex-1 bg-yellow-500 hover:bg-yellow-400 text-black font-semibold rounded-lg py-3 px-4 transition-all duration-200 hover:scale-[1.02] active:scale-98 text-center"
+            >
+              {t('nav.buy_coins')}
+            </Link>
           </div>
-          <Link
-            href="/buy-coins"
-            className="flex-1 bg-yellow-500 hover:bg-yellow-400 text-black font-semibold rounded-lg py-3 px-4 transition-all duration-200 hover:scale-[1.02] active:scale-98 text-center"
-          >
-            {t('nav.buy_coins')}
-          </Link>
-        </div>
+        )}
 
-        {/* Services Section */}
-        <div className="mb-8">
-          <h3 className="text-xl font-semibold mb-4">⚙️ Services</h3>
-          <div className="bg-white/5 border border-white/10 rounded-lg p-6">
-            <MenuList userId={user.id} businessId={business?.id} isOwnProfile={true} />
+        {/* Analytics Dashboard Section */}
+        <AnalyticsDashboard userId={user.id} />
+
+        {/* Services Section (business only) */}
+        {business && (
+          <div className="mb-8">
+            <h3 className="text-xl font-semibold mb-4">⚙️ Services</h3>
+            <div className="bg-white/5 border border-white/10 rounded-lg p-6">
+              <MenuList userId={user.id} businessId={business?.id} isOwnProfile={true} />
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Posted Videos Section */}
         <div className="mb-8">
           <h3 className="text-xl font-semibold mb-4">{t('profile.videos')}</h3>
           <div className="bg-white/5 border border-white/10 rounded-lg p-6">
-            <PostedVideos userId={user.id} />
+            <PostedVideos userId={user.id} isOwnProfile={true} />
           </div>
         </div>
 
@@ -298,7 +339,7 @@ function ProfileView({ profile, business, user, onEditClick, onSignOut, onProfil
         <div className="mb-8">
           <h3 className="text-xl font-semibold mb-4">📋 Order History</h3>
           <div className="bg-white/5 border border-white/10 rounded-lg p-6">
-            <OrderHistory userId={user.id} isBusiness={!!business} />
+            <OrderHistory userId={user.id} businessId={business?.id} isBusiness={!!business} />
           </div>
         </div>
 
@@ -604,8 +645,8 @@ function ProfileEditForm({ profile, business, user, onSave, onCancel }: ProfileE
           />
         </div>
 
-        {/* Business Name (if business exists) */}
-        {business && (
+        {/* Business Name (if business user) */}
+        {profile?.type && business && (
           <>
             <div>
               <label className="block text-white/80 text-sm font-medium mb-2">Business Name</label>
@@ -740,6 +781,15 @@ function ProfileEditForm({ profile, business, user, onSave, onCancel }: ProfileE
               </button>
               <p className="text-white/40 text-xs mt-2">
                 Add up to 5 quick messages that customers can click on your videos
+              </p>
+            </div>
+
+            {/* Business Locations */}
+            <div>
+              <label className="block text-white/80 text-sm font-medium mb-3">Business Locations</label>
+              <LocationManager profileId={user.id} />
+              <p className="text-white/40 text-xs mt-2">
+                Add one or more locations so customers can find you on the map
               </p>
             </div>
           </>
