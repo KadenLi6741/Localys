@@ -73,11 +73,11 @@ echo $NEXT_PUBLIC_BASE_URL
 ## Environment Variables Needed
 
 ```
-# Required
-STRIPE_SECRET_KEY=sk_test_51T3pP6El4n6psv8uSSqe4TToLXQTvbiia8cbElDqwJjloFVcJRYEvq7k0rbzw1oCe93biodq0yXjYquQD0pOcJa400mVSRHCW2
+# Required (KEEP SECRET - DO NOT COMMIT)
+STRIPE_SECRET_KEY=sk_test_your_actual_secret_key_here
 
 # Public (safe to expose)
-NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_51T3pP6El4n6psv8uSSqe4TToLXQTvbiia8cbElDqwJjloFVcJRYEvq7k0rbzw1oCe93biodq0yXjYquQD0pOcJa400mVSRHCW2
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_your_actual_publishable_key_here
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 NEXT_PUBLIC_BASE_URL=https://yourdomain.com (or http://localhost:3000 for dev)
