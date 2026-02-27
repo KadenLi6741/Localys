@@ -28,12 +28,36 @@ export async function signUp({ email, password, name, username, accountType, bus
         email,
         full_name: name,
         username,
-        type: accountType === 'business' ? businessType : null,
       });
 
     if (profileError) {
       console.error('Profile creation failed:', profileError);
       throw profileError;
+    }
+
+    // If business account, create business record
+    if (accountType === 'business' && businessType) {
+      const { error: businessError } = await supabase
+        .from('businesses')
+        .insert({
+          owner_id: authData.user.id,
+          business_name: name || username,
+          business_type: businessType,
+          business_hours: {
+            monday: { open: '09:00', close: '17:00' },
+            tuesday: { open: '09:00', close: '17:00' },
+            wednesday: { open: '09:00', close: '17:00' },
+            thursday: { open: '09:00', close: '17:00' },
+            friday: { open: '09:00', close: '17:00' },
+            saturday: { open: '10:00', close: '16:00' },
+            sunday: { closed: true },
+          },
+        });
+
+      if (businessError) {
+        console.warn('Business creation failed:', businessError);
+        // Don't throw - business creation failure shouldn't block signup
+      }
     }
 
     // Create welcome coupon for new user

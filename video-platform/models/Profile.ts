@@ -27,6 +27,8 @@ export interface Business {
   business_type?: string;
   business_hours?: BusinessHours;
   custom_messages?: string[];
+  average_rating?: number | null;
+  total_reviews?: number;
 }
 
 export interface ProfileUpdateData {

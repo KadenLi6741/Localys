@@ -83,11 +83,19 @@ function ProfileContent() {
       if (!error && data) {
         // Parse business_hours if it's a string
         if (data.business_hours && typeof data.business_hours === 'string') {
-          data.business_hours = JSON.parse(data.business_hours);
+          try {
+            data.business_hours = JSON.parse(data.business_hours);
+          } catch (parseError) {
+            console.error('Error parsing business_hours:', parseError);
+            data.business_hours = null;
+          }
         }
         setBusiness(data);
+      } else if (error) {
+        console.error('loadBusiness error:', error);
       }
     } catch (error) {
+      console.error('loadBusiness exception:', error);
       setBusiness(null);
     }
   };
@@ -181,43 +189,59 @@ function ProfileView({ profile, business, user, onEditClick, onSignOut, onProfil
               <p className="text-white/80 text-sm mb-2">{profile.bio}</p>
             )}
             {business && (
-              <div className="flex items-center gap-2 flex-wrap">
-                <p className="text-blue-400 text-sm">🏪 {business.business_name}</p>
-                {business.business_type && (
-                  <span className="bg-blue-500/30 text-blue-200 text-xs px-2 py-1 rounded-full capitalize">
-                    {business.business_type === 'hybrid' ? '📦 Pickup & Delivery' : `🏷️ ${business.business_type}`}
-                  </span>
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <p className="text-blue-400 text-sm">🏪 {business.business_name}</p>
+                  {business.business_type && (
+                    <span className="bg-blue-500/30 text-blue-200 text-xs px-2 py-1 rounded-full capitalize">
+                      {business.business_type === 'hybrid' ? '📦 Pickup & Delivery' : `🏷️ ${business.business_type}`}
+                    </span>
+                  )}
+                  <button
+                    onClick={() => setShowBusinessHours(!showBusinessHours)}
+                    className="bg-blue-500/20 text-blue-200 text-xs px-3 py-2 rounded-full hover:bg-blue-500/30 transition-colors font-semibold"
+                  >
+                    {showBusinessHours ? '⏰ Hide Hours' : '⏰ Show Hours'}
+                  </button>
+                </div>
+                
+                {/* Average Rating Display */}
+                {typeof (business as any).average_rating === 'number' && (business as any).average_rating !== null && (
+                  <div className="flex items-center gap-2 bg-yellow-500/10 border border-yellow-500/30 rounded-full px-3 py-1 w-fit">
+                    <span className="text-lg">⭐</span>
+                    <span className="font-semibold text-yellow-300">{((business as any).average_rating as number).toFixed(2)}</span>
+                    <span className="text-white/70 text-xs">({(business as any).total_reviews} reviews)</span>
+                  </div>
                 )}
-                <button
-                  onClick={() => setShowBusinessHours(!showBusinessHours)}
-                  className="bg-blue-500/20 text-blue-200 text-xs px-2 py-1 rounded-full hover:bg-blue-500/30 transition-colors"
-                >
-                  {showBusinessHours ? '⏰ Hide Hours' : '⏰ Show Hours'}
-                </button>
               </div>
             )}
           </div>
         </div>
 
         {/* Business Hours Display */}
-        {showBusinessHours && (
+        {business && showBusinessHours && (
           <div className="bg-white/5 border border-white/10 rounded-lg p-6 mb-8 space-y-2">
             <h3 className="text-lg font-semibold mb-4">⏰ Business Hours</h3>
-            {business?.business_hours ? (
-              ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'].map((day) => (
-                <div key={day} className="flex justify-between items-center text-sm">
-                  <span className="text-white/80 capitalize font-medium">{day}</span>
-                  <span className="text-white/60">
-                    {business.business_hours?.[day]?.closed ? (
-                      'Closed'
-                    ) : (
-                      `${business.business_hours?.[day]?.open || ''} - ${business.business_hours?.[day]?.close || ''}`
-                    )}
-                  </span>
-                </div>
-              ))
+            {business.business_hours && Object.keys(business.business_hours).length > 0 ? (
+              ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'].map((day) => {
+                const dayHours = business.business_hours?.[day];
+                return (
+                  <div key={day} className="flex justify-between items-center text-sm">
+                    <span className="text-white/80 capitalize font-medium w-24">{day}</span>
+                    <span className="text-white/60 text-right">
+                      {dayHours?.closed ? (
+                        <span className="text-red-400">Closed</span>
+                      ) : dayHours?.open && dayHours?.close ? (
+                        `${dayHours.open} - ${dayHours.close}`
+                      ) : (
+                        <span className="text-gray-400">Not set</span>
+                      )}
+                    </span>
+                  </div>
+                );
+              })
             ) : (
-              <p className="text-white/60 text-center py-4">Business hours not set</p>
+              <p className="text-white/60 text-center py-4">Business hours not yet set</p>
             )}
           </div>
         )}
@@ -447,17 +471,27 @@ function ProfileEditForm({ profile, business, user, onSave, onCancel }: ProfileE
           businessName,
           businessType,
           businessHours,
+          businessHoursType: typeof businessHours,
+          businessHoursKeys: businessHours ? Object.keys(businessHours) : 'N/A',
           customMessages,
           originalBusiness: business,
         });
 
+        const businessHsChanged = JSON.stringify(businessHours) !== JSON.stringify(business.business_hours);
+        console.log('Business hours comparison:', { 
+          new: JSON.stringify(businessHours),
+          old: JSON.stringify(business.business_hours),
+          changed: businessHsChanged,
+        }); // DEBUG
+
         const businessHasChanges = 
           businessName !== business.business_name ||
           businessType !== business.business_type ||
-          JSON.stringify(businessHours) !== JSON.stringify(business.business_hours) ||
+          businessHsChanged ||
           JSON.stringify(customMessages) !== JSON.stringify(business.custom_messages);
 
         console.log('Business has changes:', businessHasChanges); // DEBUG
+        console.log('Business ID:', business.id); // DEBUG
 
         if (businessHasChanges) {
           const businessUpdates: BusinessUpdateData = {
@@ -467,9 +501,11 @@ function ProfileEditForm({ profile, business, user, onSave, onCancel }: ProfileE
             custom_messages: customMessages,
           };
           console.log('Calling updateBusinessInfo with:', businessUpdates); // DEBUG
+          console.log('Business hours structure:', JSON.stringify(businessHours, null, 2)); // DEBUG
           const { error: businessError } = await updateBusinessInfo(business.id, businessUpdates);
           if (businessError) {
             console.error('Business update error:', businessError); // DEBUG
+            console.error('Business update error details:', JSON.stringify(businessError)); // DEBUG
             setSuccess('Profile updated successfully! Note: Business info update failed.');
             setTimeout(() => {
               onSave();
