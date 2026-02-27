@@ -169,7 +169,7 @@ function SearchContent() {
     || amenities.length > 0 || payment.length > 0 || tags.length > 0 || nearMe;
 
   return (
-    <div className="min-h-screen bg-background text-foreground pb-20">
+    <div className="min-h-screen bg-black text-white pb-20 overflow-x-hidden">
       <StarSymbolDefs />
 
       {/* Header */}
@@ -181,9 +181,9 @@ function SearchContent() {
       </div>
 
       {/* Search Content */}
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[420px_minmax(0,1fr)] lg:gap-8">
-          <aside className="space-y-6 pr-1 lg:sticky lg:top-24 lg:self-start lg:h-[calc(100dvh-8.5rem)] lg:overflow-hidden lg:pr-2">
+      <div className="max-w-7xl mx-auto px-4 py-8 overflow-hidden">
+        <div className="grid grid-cols-1 lg:grid-cols-[340px_minmax(0,1fr)] gap-6 lg:gap-8">
+          <aside className="space-y-6 lg:sticky lg:top-24 lg:self-start max-h-[calc(100vh-7rem)] overflow-y-auto overflow-x-hidden pr-1">
             {/* Search Mode Toggle */}
             <div className="flex rounded-xl border border-[var(--border-color)] bg-[var(--surface-1)] p-1">
               <button

@@ -302,33 +302,36 @@ export async function getOrCreateOneToOneChat(userId1: string, userId2: string) 
     }
 
     console.log('Creating new 1:1 chat...');
-    const { data: newChat, error: chatError } = await supabase
+    
+    // Step 1: Generate a UUID for the chat on the client side
+    // This avoids the RLS issue with insert().select()
+    const chatId = crypto.randomUUID();
+    console.log('Generated chat ID:', chatId);
+    
+    // Step 2: Insert chat with the generated ID
+    const { error: insertError } = await supabase
       .from('chats')
       .insert({
+        id: chatId,
         is_group: false,
         metadata: {},
-      })
-      .select()
-      .single();
+      });
 
-    if (chatError) {
-      const errorMsg = extractErrorMessage(chatError);
-      console.error('Error creating chat:', errorMsg, chatError);
+    if (insertError) {
+      const errorMsg = extractErrorMessage(insertError);
+      console.error('Error inserting chat:', errorMsg, insertError);
       throw new Error(errorMsg);
     }
 
-    if (!newChat) {
-      throw new Error('Failed to create chat - no data returned');
-    }
+    console.log('Chat inserted successfully');
 
-    console.log('Chat created successfully:', newChat.id);
-
-    console.log('Adding members to chat...');
+    // Step 3: Add both users as chat members
+    console.log('Adding chat members...');
     const { error: membersError } = await supabase
       .from('chat_members')
       .insert([
-        { chat_id: newChat.id, user_id: initiatorUserId, role: 'member' },
-        { chat_id: newChat.id, user_id: userId2, role: 'member' },
+        { chat_id: chatId, user_id: userId1, role: 'member' },
+        { chat_id: chatId, user_id: userId2, role: 'member' },
       ]);
 
     if (membersError) {
@@ -338,6 +341,20 @@ export async function getOrCreateOneToOneChat(userId1: string, userId2: string) 
     }
 
     console.log('Members added successfully');
+
+    // Step 4: Query and return the chat
+    const { data: newChat, error: selectError } = await supabase
+      .from('chats')
+      .select('*')
+      .eq('id', chatId)
+      .single();
+    
+    if (selectError || !newChat) {
+      console.error('Error fetching created chat:', selectError);
+      throw new Error('Failed to fetch created chat');
+    }
+
+    console.log('Chat created successfully:', newChat.id);
     return { data: newChat, error: null };
   } catch (error) {
     const errorMsg = extractErrorMessage(error);

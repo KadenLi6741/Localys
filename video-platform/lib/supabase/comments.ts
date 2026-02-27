@@ -40,6 +40,7 @@ function transformCommentData(rawComment: any): Comment {
     username: rawComment.username,
     full_name: rawComment.full_name,
     avatar_url: rawComment.avatar_url ?? null,
+    image_url: rawComment.image_url ?? null,
     reply_count: rawComment.reply_count || 0,
     rating: rawComment.rating ?? null,
   };
@@ -75,8 +76,9 @@ export async function getVideoComments(
     });
 
     if (error) {
-      console.error('RPC error fetching comments:', error);
-      return { data: null, error: new Error(error.message) };
+      const errorMessage = error.message || error.hint || JSON.stringify(error) || 'Failed to fetch comments';
+      console.error('RPC error fetching comments:', errorMessage, error);
+      return { data: null, error: new Error(errorMessage) };
     }
 
     const comments = (data || []).map(transformCommentData);
@@ -116,8 +118,9 @@ export async function getCommentReplies(
     });
 
     if (error) {
-      console.error('RPC error fetching replies:', error);
-      return { data: null, error: new Error(error.message) };
+      const errorMessage = error.message || error.hint || error.code || 'Failed to fetch replies';
+      console.error('RPC error fetching replies:', errorMessage, error);
+      return { data: null, error: new Error(errorMessage) };
     }
 
     const replies = (data || []).map(transformCommentData);
@@ -156,7 +159,11 @@ export async function createComment(
 
     if (error) {
       console.error('Insert error:', error);
-      return { data: null, error: new Error(error.message) };
+      console.error('Error code:', error.code);
+      console.error('Error message:', error.message);
+      console.error('Full error:', JSON.stringify(error, null, 2));
+      const errorMessage = error.message || error.code || 'Failed to create comment';
+      return { data: null, error: new Error(errorMessage) };
     }
 
     console.log('Comment created successfully:', data.id);
@@ -167,8 +174,9 @@ export async function createComment(
     });
 
     if (fetchError) {
-      console.error('Fetch error:', fetchError);
-      return { data: null, error: new Error(fetchError.message) };
+      const errorMessage = fetchError.message || fetchError.hint || fetchError.code || 'Failed to fetch comment details';
+      console.error('Fetch error:', errorMessage, fetchError);
+      return { data: null, error: new Error(errorMessage) };
     }
 
     const { data: profile, error: profileError } = await supabase
@@ -179,7 +187,8 @@ export async function createComment(
 
     if (profileError) {
       console.error('Profile error:', profileError);
-      return { data: null, error: new Error(profileError.message) };
+      const errorMessage = profileError.message || profileError.code || 'Failed to fetch user profile';
+      return { data: null, error: new Error(errorMessage) };
     }
 
     const comment: Comment = {
@@ -233,7 +242,8 @@ export async function createReply(
       .single();
 
     if (error) {
-      return { data: null, error: new Error(error.message) };
+      const errorMessage = error.message || error.code || 'Failed to create reply';
+      return { data: null, error: new Error(errorMessage) };
     }
 
     const { data: replyWithLikes, error: fetchError } = await supabase.rpc('get_comment_with_likes', {
@@ -242,7 +252,8 @@ export async function createReply(
     });
 
     if (fetchError) {
-      return { data: null, error: new Error(fetchError.message) };
+      const errorMessage = fetchError.message || fetchError.hint || fetchError.code || 'Failed to fetch reply details';
+      return { data: null, error: new Error(errorMessage) };
     }
 
     const { data: profile, error: profileError } = await supabase
@@ -252,7 +263,8 @@ export async function createReply(
       .single();
 
     if (profileError) {
-      return { data: null, error: new Error(profileError.message) };
+      const errorMessage = profileError.message || profileError.code || 'Failed to fetch user profile';
+      return { data: null, error: new Error(errorMessage) };
     }
 
     const reply: Comment = {
@@ -292,7 +304,8 @@ export async function updateComment(
       .eq('user_id', currentUserId);
 
     if (error) {
-      return { error: new Error(error.message) };
+      const errorMessage = error.message || error.code || 'Failed to update comment';
+      return { error: new Error(errorMessage) };
     }
 
     return { error: null };
@@ -320,7 +333,8 @@ export async function deleteComment(
       .eq('user_id', currentUserId);
 
     if (error) {
-      return { error: new Error(error.message) };
+      const errorMessage = error.message || error.code || 'Failed to update comment';
+      return { error: new Error(errorMessage) };
     }
 
     return { error: null };
@@ -353,7 +367,8 @@ export async function likeComment(
       if (error.code === '23505') {
         return { error: new Error('You have already liked this comment') };
       }
-      return { error: new Error(error.message) };
+      const errorMessage = error.message || error.hint || error.code || 'Failed to like comment';
+      return { error: new Error(errorMessage) };
     }
 
     return { error: null };
@@ -381,7 +396,8 @@ export async function unlikeComment(
       .eq('user_id', currentUserId);
 
     if (error) {
-      return { error: new Error(error.message) };
+      const errorMessage = error.message || error.code || 'Failed to remove like';
+      return { error: new Error(errorMessage) };
     }
 
     return { error: null };
@@ -391,7 +407,7 @@ export async function unlikeComment(
 }
 
 /**
- * Toggle like status for a comment
+ * Toggle (like/unlike) a comment
  *
  * @param commentId - The ID of the comment
  * @param isLiked - Current like status
@@ -577,7 +593,8 @@ export async function getVideoAverageRating(
     });
 
     if (error) {
-      return { data: null, error: new Error(error.message) };
+      const errorMessage = error.message || error.hint || error.code || 'Failed to fetch average rating';
+      return { data: null, error: new Error(errorMessage) };
     }
 
     if (data && data.length > 0) {

@@ -28,6 +28,12 @@ export interface Business {
   business_type?: string;
   business_hours?: BusinessHours;
   custom_messages?: string[];
+
+  // Ratings
+  average_rating?: number | null;
+  total_reviews?: number;
+
+  // Payments
   upfront_payment_pct?: number;
 }
 

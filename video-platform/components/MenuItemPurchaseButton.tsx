@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useCoupon } from '@/contexts/CouponContext';
 
 interface MenuItemPurchaseProps {
   itemId: string;
@@ -21,6 +22,7 @@ export function MenuItemPurchaseButton({
 }: MenuItemPurchaseProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { activeCoupon, getDiscountedPrice, clearActiveCoupon } = useCoupon();
 
   if (isOwnBusiness) {
     return null; // Don't show buy button for your own items
@@ -31,16 +33,19 @@ export function MenuItemPurchaseButton({
     setError(null);
 
     try {
+      const finalPrice = activeCoupon ? getDiscountedPrice(itemPrice) : itemPrice;
+      
       const response = await fetch('/api/checkout-item', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           itemId,
           itemName,
-          itemPrice,
+          itemPrice: finalPrice, // Send discounted price
           itemImage,
           sellerId,
           buyerId,
+          couponCode: activeCoupon?.coupon?.code || undefined,
         }),
       });
 
@@ -63,6 +68,8 @@ export function MenuItemPurchaseButton({
     }
   };
 
+  const finalPrice = activeCoupon ? getDiscountedPrice(itemPrice) : itemPrice;
+
   return (
     <div>
       {error && (
@@ -81,10 +88,28 @@ export function MenuItemPurchaseButton({
         ) : (
           <>
             <span>💳 Buy Now</span>
-            <span className="text-sm">${itemPrice.toFixed(2)}</span>
+            <div className="flex flex-col items-end text-sm">
+              {activeCoupon && (
+                <span className="line-through text-white/60">${itemPrice.toFixed(2)}</span>
+              )}
+              <span>${finalPrice.toFixed(2)}</span>
+            </div>
           </>
         )}
       </button>
+      {activeCoupon && (
+        <div className="flex items-center justify-between gap-2 mt-1">
+          <p className="text-green-300 text-xs">
+            ✓ {activeCoupon.coupon?.code || 'Coupon'} applied ({activeCoupon.coupon?.discount_percentage}% off)
+          </p>
+          <button
+            onClick={() => clearActiveCoupon()}
+            className="text-red-300 hover:text-red-200 text-xs underline transition-colors"
+          >
+            Turn off
+          </button>
+        </div>
+      )}
     </div>
   );
 }

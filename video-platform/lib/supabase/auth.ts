@@ -23,12 +23,12 @@ async function ensureOwnProfile({ id, email, name, username }: EnsureProfileInpu
     id,
     email: profileEmail,
     full_name: name ?? null,
-    username: sanitizedUsername || (email ? email.split('@')[0].toLowerCase().replace(/[^a-z0-9_]/g, '').slice(0, 30) : fallbackUsername),
+    username:
+      sanitizedUsername ||
+      (email ? email.split('@')[0].toLowerCase().replace(/[^a-z0-9_]/g, '').slice(0, 30) : fallbackUsername),
   };
 
-  const firstAttempt = await supabase
-    .from('profiles')
-    .upsert(profilePayload, { onConflict: 'id' });
+  const firstAttempt = await supabase.from('profiles').upsert(profilePayload, { onConflict: 'id' });
 
   if (!firstAttempt.error) {
     return firstAttempt;
@@ -43,15 +43,13 @@ async function ensureOwnProfile({ id, email, name, username }: EnsureProfileInpu
     return firstAttempt;
   }
 
-  return supabase
-    .from('profiles')
-    .upsert(
-      {
-        ...profilePayload,
-        username: `${fallbackUsername}_${id.replace(/-/g, '').slice(0, 4)}`,
-      },
-      { onConflict: 'id' }
-    );
+  return supabase.from('profiles').upsert(
+    {
+      ...profilePayload,
+      username: `${fallbackUsername}_${id.replace(/-/g, '').slice(0, 4)}`,
+    },
+    { onConflict: 'id' }
+  );
 }
 
 /**
@@ -80,9 +78,8 @@ export async function signUp({ email, password, name, username, accountType, bus
       throw new Error('An account with this email already exists. Please sign in.');
     }
 
-    const emailRedirectTo = typeof window !== 'undefined'
-      ? `${window.location.origin}/auth/verified`
-      : undefined;
+    const emailRedirectTo =
+      typeof window !== 'undefined' ? `${window.location.origin}/auth/verified` : undefined;
 
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email: normalizedEmail,
@@ -101,15 +98,48 @@ export async function signUp({ email, password, name, username, accountType, bus
     if (authError) throw authError;
     if (!authData.user) throw new Error('User creation failed');
 
+    // If Supabase returned a user with no identities it can indicate a conflict / existing account
     const hasNoIdentities =
-      Array.isArray(authData.user.identities) &&
-      authData.user.identities.length === 0;
+      Array.isArray(authData.user.identities) && authData.user.identities.length === 0;
 
     if (hasNoIdentities) {
       throw new Error('An account with this email already exists. Please sign in.');
     }
 
-    if (authData.session) {
+    // Prefer server-side creation of profile (bypass RLS) when running in browser and endpoint exists.
+    // Fallback to client-side ensureOwnProfile if server endpoint fails or we're in a server environment.
+    let profileCreated = false;
+
+    if (typeof window !== 'undefined') {
+      try {
+        const profileResponse = await fetch('/api/auth/create-profile', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            id: authData.user.id,
+            email: normalizedEmail,
+            name,
+            username,
+          }),
+        });
+
+        if (!profileResponse.ok) {
+          const errorData = await profileResponse.json().catch(() => ({}));
+          console.warn('Profile creation via server endpoint failed:', errorData);
+          // fall through to client-side ensureOwnProfile fallback
+        } else {
+          profileCreated = true;
+        }
+      } catch (err) {
+        console.warn('Error calling server profile creation endpoint:', err);
+        // fall through to client-side ensureOwnProfile fallback
+      }
+    }
+
+    if (!profileCreated) {
+      // Attempt to create/update the profile client-side (ensureOwnProfile handles username conflicts).
       const { error: profileError } = await ensureOwnProfile({
         id: authData.user.id,
         email: normalizedEmail,
@@ -118,18 +148,48 @@ export async function signUp({ email, password, name, username, accountType, bus
       });
 
       if (profileError) {
-        console.error('Profile creation failed:', profileError);
+        console.error('Profile creation failed (client fallback):', profileError);
         throw profileError;
       }
     }
 
-    // Create welcome coupon for new user
-    const { data: couponData, error: couponError } = await createWelcomeCoupon(authData.user.id);
-    if (couponError) {
-      console.warn('Failed to create welcome coupon:', couponError);
-      // Don't throw - coupon creation failure shouldn't block signup
-    } else {
-      console.log('Welcome coupon created:', couponData);
+    // If business account, attempt to create business record (non-blocking)
+    if (accountType === 'business' && businessType) {
+      try {
+        const { error: businessError } = await supabase.from('businesses').insert({
+          owner_id: authData.user.id,
+          business_name: name || username,
+          business_type: businessType,
+          business_hours: {
+            monday: { open: '09:00', close: '17:00' },
+            tuesday: { open: '09:00', close: '17:00' },
+            wednesday: { open: '09:00', close: '17:00' },
+            thursday: { open: '09:00', close: '17:00' },
+            friday: { open: '09:00', close: '17:00' },
+            saturday: { open: '10:00', close: '16:00' },
+            sunday: { closed: true },
+          },
+        });
+
+        if (businessError) {
+          console.warn('Business creation failed:', businessError);
+          // don't throw - business creation failure shouldn't block signup
+        }
+      } catch (err) {
+        console.warn('Unexpected error creating business record:', err);
+      }
+    }
+
+    // Create welcome coupon for new user (non-blocking)
+    try {
+      const { data: couponData, error: couponError } = await createWelcomeCoupon(authData.user.id);
+      if (couponError) {
+        console.warn('Failed to create welcome coupon:', couponError);
+      } else {
+        console.log('Welcome coupon created:', couponData);
+      }
+    } catch (err) {
+      console.warn('Unexpected error creating welcome coupon:', err);
     }
 
     return { data: authData, error: null };
@@ -199,11 +259,36 @@ export async function signOut() {
 }
 
 /**
- * Get current session
+ * Get current session with improved error handling for refresh token issues
  */
 export async function getSession() {
-  const { data: { session }, error } = await supabase.auth.getSession();
-  return { session, error };
+  try {
+    const {
+      data: { session },
+      error,
+    } = await supabase.auth.getSession();
+
+    if (error) {
+      // If it's a refresh token error, clear the session
+      if (error.message?.includes('refresh token') || error.message?.includes('Refresh Token')) {
+        console.warn('Refresh token issue detected, clearing session:', error.message);
+        // Clear corrupted session data
+        try {
+          localStorage.removeItem('sb-dbqkpcwnzteljwxjoudj-auth-token');
+        } catch (e) {
+          // Ignore localStorage errors
+        }
+        return { session: null, error: null };
+      }
+      return { session, error };
+    }
+
+    return { session, error };
+  } catch (error: any) {
+    console.error('Unexpected error in getSession:', error);
+    // Return null session on any error to prevent app from breaking
+    return { session: null, error };
+  }
 }
 
 /**
@@ -237,4 +322,3 @@ export async function updatePassword(newPassword: string) {
 export function onAuthStateChange(callback: (event: string, session: any) => void) {
   return supabase.auth.onAuthStateChange(callback);
 }
-

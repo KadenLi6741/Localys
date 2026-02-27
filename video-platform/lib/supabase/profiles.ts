@@ -171,19 +171,30 @@ export async function updateBusinessInfo(businessId: string, updates: BusinessUp
   try {
     console.log('updateBusinessInfo called with:', { businessId, updates }); // DEBUG
     
+    // Ensure business_hours is properly formatted as JSONB
+    const processedUpdates = {
+      ...updates,
+      business_hours: updates.business_hours ? JSON.parse(JSON.stringify(updates.business_hours)) : null,
+    };
+    
+    console.log('Processed updates:', processedUpdates); // DEBUG
+    
     const { data, error } = await supabase
       .from('businesses')
-      .update(updates)
+      .update(processedUpdates)
       .eq('id', businessId)
       .select()
       .single();
 
     if (error) {
       console.error('updateBusinessInfo error:', error); // DEBUG
+      console.error('Error code:', error.code); // DEBUG
+      console.error('Error details:', error.details); // DEBUG
       return { data: null, error };
     }
     
     console.log('updateBusinessInfo success:', data); // DEBUG
+    console.log('Updated business_hours:', data?.business_hours); // DEBUG
     return { data, error: null };
   } catch (error: any) {
     console.error('updateBusinessInfo exception:', error); // DEBUG
@@ -917,7 +928,143 @@ export async function getUserCoinPurchases(userId: string) {
     return { data: [], error: null };
   }
 }
+/**
+ * Get all businesses with their average ratings
+ */
+export async function getBusinessesWithRatings() {
+  try {
+    const { data, error } = await supabase
+      .from('businesses')
+      .select(`
+        id,
+        business_name,
+        category,
+        average_rating,
+        total_reviews,
+        profile_picture_url,
+        latitude,
+        longitude,
+        owner_id
+      `)
+      .order('average_rating', { ascending: false });
 
+    if (error) {
+      console.error('Error fetching businesses with ratings:', error);
+      return { data: [], error };
+    }
+
+    return { data: data || [], error: null };
+  } catch (error: any) {
+    console.error('Exception fetching businesses with ratings:', error);
+    return { data: [], error };
+  }
+}
+
+/**
+ * Get a specific business with its average rating and photos
+ */
+export async function getBusinessWithRatings(businessId: string) {
+  try {
+    const { data, error } = await supabase
+      .from('businesses')
+      .select(`
+        id,
+        business_name,
+        category,
+        average_rating,
+        total_reviews,
+        profile_picture_url,
+        latitude,
+        longitude,
+        owner_id,
+        business_hours,
+        business_type,
+        description
+      `)
+      .eq('id', businessId)
+      .single();
+
+    if (error && error.code === 'PGRST116') {
+      return { data: null, error: null };
+    }
+
+    if (error) {
+      console.error('Error fetching business with ratings:', error);
+      return { data: null, error };
+    }
+
+    // Parse business_hours if it's a string
+    if (data && data.business_hours && typeof data.business_hours === 'string') {
+      data.business_hours = JSON.parse(data.business_hours);
+    }
+
+    return { data, error: null };
+  } catch (error: any) {
+    console.error('Exception fetching business with ratings:', error);
+    return { data: null, error };
+  }
+}
+
+/**
+ * Get the average rating for a specific business using the SQL function
+ */
+export async function getBusinessAverageRating(businessId: string) {
+  try {
+    const { data, error } = await supabase
+      .rpc('get_business_average_rating', { p_business_id: businessId });
+
+    if (error) {
+      console.error('Error getting business average rating:', error);
+      return { data: null, error };
+    }
+
+    return { data: data?.[0] || null, error: null };
+  } catch (error: any) {
+    console.error('Exception getting business average rating:', error);
+    return { data: null, error };
+  }
+}
+
+/**
+ * Get all business average ratings using the SQL function
+ */
+export async function getAllBusinessAverageRatings() {
+  try {
+    const { data, error } = await supabase
+      .rpc('get_all_business_ratings');
+
+    if (error) {
+      console.error('Error getting all business average ratings:', error);
+      return { data: [], error };
+    }
+
+    return { data: data || [], error: null };
+  } catch (error: any) {
+    console.error('Exception getting all business average ratings:', error);
+    return { data: [], error };
+  }
+}
+
+/**
+ * Manually update all business ratings based on their comments
+ * This can be useful if you need to recalculate ratings outside of the trigger
+ */
+export async function updateAllBusinessRatings() {
+  try {
+    const { data, error } = await supabase
+      .rpc('update_business_ratings');
+
+    if (error) {
+      console.error('Error updating all business ratings:', error);
+      return { data: null, error };
+    }
+
+    return { data, error: null };
+  } catch (error: any) {
+    console.error('Exception updating business ratings:', error);
+    return { data: null, error };
+  }
+}
 /**
  * Get item purchases where user is the buyer
  */
