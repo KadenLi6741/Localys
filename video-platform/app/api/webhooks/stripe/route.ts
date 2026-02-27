@@ -109,6 +109,17 @@ export async function POST(request: NextRequest) {
         );
       }
 
+      const { data: existingPurchase } = await supabase
+        .from('coin_purchases')
+        .select('id')
+        .eq('stripe_session_id', session.id)
+        .single();
+
+      if (existingPurchase) {
+        console.log(`Coin purchase for session ${session.id} already processed`);
+        return NextResponse.json({ success: true, alreadyProcessed: true });
+      }
+
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('coin_balance')

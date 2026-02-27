@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { ensureUserBusiness } from '@/lib/supabase/profiles';
 import { DashboardNav } from '@/components/dashboard/DashboardNav';
 import { FloorPlanBuilder } from '@/components/floorplan/FloorPlanBuilder';
-import { supabase } from '@/lib/supabase/client';
 
 export default function FloorPlanPage() {
   const [business, setBusiness] = useState<any>(null);
@@ -17,7 +17,7 @@ export default function FloorPlanPage() {
 
   const loadBusiness = async () => {
     if (!user) return;
-    const { data } = await supabase.from('businesses').select('*').eq('owner_id', user.id).single();
+    const { data, error } = await ensureUserBusiness(user.id);
     setBusiness(data);
     setLoading(false);
   };

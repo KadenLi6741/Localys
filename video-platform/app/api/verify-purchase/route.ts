@@ -4,7 +4,7 @@ import { createClient } from '@supabase/supabase-js';
 
 function getSupabaseAdminClient() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   if (!supabaseUrl || !supabaseKey) {
     return null;
@@ -24,11 +24,14 @@ export async function GET(request: NextRequest) {
   try {
     const stripeKey = process.env.STRIPE_SECRET_KEY;
     if (!stripeKey) {
-      return NextResponse.json({
-        success: true,
-        confirmationNumber,
-        message: 'Order confirmed - will be processed',
-      });
+      return NextResponse.json(
+        {
+          success: false,
+          confirmationNumber,
+          message: 'Payment verification is not configured on server',
+        },
+        { status: 500 }
+      );
     }
 
     const stripe = new Stripe(stripeKey);
@@ -36,11 +39,10 @@ export async function GET(request: NextRequest) {
     const sessionId = request.nextUrl.searchParams.get('session_id');
     
     if (!sessionId) {
-      // Return success even if no session ID
       return NextResponse.json({
-        success: true,
+        success: false,
         confirmationNumber,
-        message: 'Order confirmed',
+        message: 'Missing session_id',
       });
     }
 
@@ -48,46 +50,67 @@ export async function GET(request: NextRequest) {
     const session = await stripe.checkout.sessions.retrieve(sessionId);
 
     if (!session) {
-      // Session not found but return success anyway
       return NextResponse.json({
-        success: true,
+        success: false,
         confirmationNumber,
-        message: 'Order confirmed',
+        message: 'Session not found',
+      });
+    }
+
+    if (session.payment_status !== 'paid') {
+      return NextResponse.json({
+        success: false,
+        confirmationNumber,
+        message: `Payment is not completed (status: ${session.payment_status})`,
       });
     }
 
     const userId = session.metadata?.userId;
     const coins = parseInt(session.metadata?.coins || '0');
 
-    // Process the order in background
-    if (userId && coins) {
-      // Don't wait for DB operations, user gets confirmation immediately
-      processOrderInBackground(userId, coins, sessionId);
+    if (!userId || !coins) {
+      return NextResponse.json({
+        success: false,
+        confirmationNumber,
+        message: 'Missing purchase metadata',
+      });
+    }
+
+    const result = await processCoinPurchase(userId, coins, sessionId, session.amount_total ?? null);
+
+    if (!result.success) {
+      return NextResponse.json(
+        {
+          success: false,
+          confirmationNumber,
+          message: result.message,
+        },
+        { status: 500 }
+      );
     }
 
     return NextResponse.json({
       success: true,
       confirmationNumber,
       coinsAdded: coins,
+      alreadyProcessed: result.alreadyProcessed,
     });
   } catch (error) {
     console.error('Error processing order:', error);
-    // Always return success so user sees confirmation
     return NextResponse.json({
-      success: true,
+      success: false,
       confirmationNumber,
-      message: 'Order confirmed - will be processed',
+      message: 'Failed to verify payment',
     });
   }
 }
 
-// Process the actual coin addition in background - don't block user response
-async function processOrderInBackground(userId: string, coins: number, sessionId: string) {
+async function processCoinPurchase(userId: string, coins: number, sessionId: string, amountCents: number | null) {
   try {
     const supabase = getSupabaseAdminClient();
     if (!supabase) {
       console.error('Supabase environment variables are missing; skipping coin processing');
-      return;
+      return { success: false, message: 'Supabase service role is not configured', alreadyProcessed: false };
     }
 
     // Check if already processed
@@ -99,7 +122,7 @@ async function processOrderInBackground(userId: string, coins: number, sessionId
 
     if (existing) {
       console.log(`Order already processed for session ${sessionId}`);
-      return;
+      return { success: true, message: 'Already processed', alreadyProcessed: true };
     }
 
     // Get current balance
@@ -111,7 +134,7 @@ async function processOrderInBackground(userId: string, coins: number, sessionId
 
     if (profileError) {
       console.error('Error fetching profile:', profileError);
-      return;
+      return { success: false, message: 'Failed to fetch profile', alreadyProcessed: false };
     }
 
     const newBalance = (profile?.coin_balance || 0) + coins;
@@ -124,20 +147,25 @@ async function processOrderInBackground(userId: string, coins: number, sessionId
 
     if (updateError) {
       console.error('Error updating balance:', updateError);
-      return;
+      return { success: false, message: 'Failed to update coin balance', alreadyProcessed: false };
     }
 
-    // Record purchase
-    await supabase.from('coin_purchases').insert({
+    const { error: purchaseError } = await supabase.from('coin_purchases').insert({
       user_id: userId,
       coins,
-      amount_cents: null,
+      amount_cents: amountCents,
       stripe_session_id: sessionId,
       created_at: new Date().toISOString(),
     });
 
+    if (purchaseError) {
+      console.error('Error inserting coin purchase record:', purchaseError);
+    }
+
     console.log(`Order processed: +${coins} coins for user ${userId}`);
+    return { success: true, message: 'Processed', alreadyProcessed: false };
   } catch (error) {
     console.error('Error in background processing:', error);
+    return { success: false, message: 'Unexpected processing error', alreadyProcessed: false };
   }
 }
