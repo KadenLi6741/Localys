@@ -4,3 +4,4 @@ export type { Profile, Business, ProfileUpdateData, BusinessUpdateData } from '.
 export type { VideoMetadata } from './Video';
 export type { SignUpData, SignInData } from './Auth';
 export type { SearchMode, SearchFilters } from './Search';
+export type { Coupon, UserCoupon, CouponValidateResult } from './Coupon';

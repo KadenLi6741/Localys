@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAuth } from '@/contexts/AuthContext';
+import { useCoupon } from '@/contexts/CouponContext';
 import { Menu, getUserMenus, getUserMenu, deleteMenu } from '@/lib/supabase/profiles';
 import { MenuModal } from './MenuModal';
 import { MenuItemPurchaseButton } from './MenuItemPurchaseButton';
@@ -17,6 +18,7 @@ interface MenuListProps {
 export function MenuList({ userId, businessId, isOwnProfile, onMenusLoaded }: MenuListProps) {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const { activeCoupon, getDiscountedPrice } = useCoupon();
   const [menus, setMenus] = useState<Menu[]>([]);
   const [primaryMenu, setPrimaryMenu] = useState<Menu | null>(null);
   const [loading, setLoading] = useState(true);
@@ -206,9 +208,16 @@ export function MenuList({ userId, businessId, isOwnProfile, onMenusLoaded }: Me
                                 <p className="text-white/40 text-xs mt-1">{t('menu.category')}: {item.category}</p>
                               )}
                             </div>
-                            <span className="text-yellow-400 font-bold whitespace-nowrap ml-2">
-                              ${item.price.toFixed(2)}
-                            </span>
+                            <div className="flex items-baseline gap-2 ml-2 whitespace-nowrap">
+                              <span className="text-yellow-400 font-bold">
+                                ${getDiscountedPrice(item.price).toFixed(2)}
+                              </span>
+                              {activeCoupon && (
+                                <span className="text-white/50 line-through text-sm">
+                                  ${item.price.toFixed(2)}
+                                </span>
+                              )}
+                            </div>
                           </div>
 
                           {item.description && (

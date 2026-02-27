@@ -3,6 +3,7 @@ import { Outfit, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
+import { CouponProvider } from "@/contexts/CouponContext";
 
 const outfit = Outfit({
   variable: "--font-outfit",
@@ -33,7 +34,9 @@ export default function RootLayout({
       >
         <AuthProvider>
           <LanguageProvider>
-            {children}
+            <CouponProvider>
+              {children}
+            </CouponProvider>
           </LanguageProvider>
         </AuthProvider>
       </body>

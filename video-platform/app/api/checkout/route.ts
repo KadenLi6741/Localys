@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
+import { createClient } from '@supabase/supabase-js';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '');
+
+// Supabase client for validating coupons
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 const COIN_PACKAGES: Record<
   string,
@@ -29,13 +35,23 @@ export async function POST(request: NextRequest) {
     if (!process.env.STRIPE_SECRET_KEY) {
       console.error('STRIPE_SECRET_KEY is not set in environment variables');
       return NextResponse.json(
-        { error: 'Payment system not configured' },
+        { error: 'Payment system not configured. Please contact support.' },
         { status: 500 }
       );
     }
 
-    const body = await request.json();
-    const { packageId, userId } = body;
+    let body;
+    try {
+      body = await request.json();
+    } catch (parseError) {
+      console.error('Failed to parse request body:', parseError);
+      return NextResponse.json(
+        { error: 'Invalid request format' },
+        { status: 400 }
+      );
+    }
+
+    const { packageId, userId, couponCode } = body;
 
     if (!packageId || !userId) {
       return NextResponse.json(
@@ -52,53 +68,95 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    let finalPrice = pkg.price;
+    let discountText = '';
+    const metadata: Record<string, string> = {
+      userId,
+      packageId,
+      coins: pkg.coins.toString(),
+    };
+
+    // Validate and apply coupon if provided
+    if (couponCode) {
+      try {
+        // Get the coupon from database
+        const { data: coupon } = await supabase
+          .from('coupons')
+          .select('*')
+          .eq('code', couponCode.toUpperCase())
+          .eq('is_active', true)
+          .single();
+
+        if (coupon && coupon.discount_percentage > 0) {
+          const discount = Math.round(pkg.price * (coupon.discount_percentage / 100));
+          finalPrice = Math.max(0, pkg.price - discount);
+          discountText = `${coupon.discount_percentage}% discount applied`;
+          metadata.couponCode = couponCode;
+          metadata.discountPercentage = coupon.discount_percentage.toString();
+          metadata.discountAmount = discount.toString();
+          
+          console.log(`Coupon ${couponCode} applied: ${discount} cents discount, final price: ${finalPrice}`);
+        }
+      } catch (couponError) {
+        console.warn(`Could not apply coupon ${couponCode}:`, couponError);
+        // Continue without coupon if there's an error
+      }
+    }
+
     if (!stripe || !stripe.checkout) {
+      console.error('Stripe not initialized properly');
       return NextResponse.json(
-        { error: 'Stripe not initialized properly' },
+        { error: 'Payment system initialization failed' },
         { status: 500 }
       );
     }
 
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
-      line_items: [
-        {
-          price_data: {
-            currency: 'usd',
-            product_data: {
-              name: pkg.name,
-              description: `Get ${pkg.coins.toLocaleString()} coins for your account`,
-              images: ['https://img.icons8.com/color/96/000000/coin.png'],
+    try {
+      const session = await stripe.checkout.sessions.create({
+        payment_method_types: ['card'],
+        line_items: [
+          {
+            price_data: {
+              currency: 'usd',
+              product_data: {
+                name: pkg.name,
+                description: `Get ${pkg.coins.toLocaleString()} coins for your account${discountText ? ` - ${discountText}` : ''}`,
+                images: ['https://img.icons8.com/color/96/000000/coin.png'],
+              },
+              unit_amount: finalPrice,
             },
-            unit_amount: pkg.price,
+            quantity: 1,
           },
-          quantity: 1,
-        },
-      ],
-      mode: 'payment',
-      success_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/buy-coins/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/buy-coins?canceled=true`,
-      metadata: {
-        userId,
-        packageId,
-        coins: pkg.coins.toString(),
-      },
-    });
+        ],
+        mode: 'payment',
+        success_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/buy-coins/success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/buy-coins?canceled=true`,
+        metadata,
+      });
 
-    if (!session || !session.url) {
+      if (!session || !session.url) {
+        console.error('Stripe session created but no URL returned');
+        return NextResponse.json(
+          { error: 'Failed to create checkout session - no payment URL' },
+          { status: 500 }
+        );
+      }
+
+      console.log(`Checkout session created: ${session.id}`);
+      return NextResponse.json({ url: session.url });
+    } catch (stripeError) {
+      console.error('Stripe API error:', stripeError);
+      const errorMessage = stripeError instanceof Error ? stripeError.message : 'Stripe error occurred';
       return NextResponse.json(
-        { error: 'Failed to create checkout session' },
+        { error: `Payment processing error: ${errorMessage}` },
         { status: 500 }
       );
     }
-
-    return NextResponse.json({ url: session.url });
   } catch (error) {
-    console.error('Stripe checkout error:', error);
-    const errorMessage =
-      error instanceof Error ? error.message : 'Failed to create checkout session';
+    console.error('Checkout route error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
     return NextResponse.json(
-      { error: errorMessage },
+      { error: `Checkout failed: ${errorMessage}` },
       { status: 500 }
     );
   }

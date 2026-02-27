@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { getUserCoins } from '@/lib/supabase/profiles';
-import { getUserCoupons, validateCoupon } from '@/lib/supabase/coupons';
+import { getUserCoupons } from '@/lib/supabase/coupons';
 import { useEffect } from 'react';
 import Link from 'next/link';
 import type { UserCoupon } from '@/lib/supabase/coupons';
@@ -43,6 +43,7 @@ export default function BuyCoinsPage() {
   const [availableCoupons, setAvailableCoupons] = useState<UserCoupon[]>([]);
   const [selectedCoupon, setSelectedCoupon] = useState<UserCoupon | null>(null);
   const [discountAmount, setDiscountAmount] = useState(0);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   useEffect(() => {
     if (!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) {
@@ -90,24 +91,29 @@ export default function BuyCoinsPage() {
     try {
       // Validate coupon
       const couponCode = (coupon.coupon as any)?.code || '';
-      const { data: validatedCoupon, error: validateError } = await validateCoupon(
-        couponCode,
-        user?.id || ''
-      );
-
-      if (validateError || !validatedCoupon) {
-        setError(validateError?.message || 'Invalid coupon');
+      const pkg = COIN_PACKAGES.find(p => p.id === selectedPackage);
+      
+      if (!pkg) {
+        setError('Invalid package');
         return;
       }
 
-      setSelectedCoupon(coupon);
-      
-      // Calculate discount
-      const pkg = COIN_PACKAGES.find(p => p.id === selectedPackage);
-      if (pkg) {
-        const discount = Math.ceil(pkg.price * (validatedCoupon.discount_percentage / 100));
-        setDiscountAmount(discount);
+      // Calculate discount from coupon
+      const couponData = coupon.coupon as any;
+      if (!couponData || !couponData.discount_percentage) {
+        setError('Invalid coupon');
+        return;
       }
+
+      const discount = Math.ceil(pkg.price * (couponData.discount_percentage / 100));
+      
+      setSelectedCoupon(coupon);
+      setDiscountAmount(discount);
+      setError(null);
+      setSuccessMessage(`✓ Coupon "${couponCode}" applied! You're saving $${(discount / 100).toFixed(2)}`);
+      
+      // Auto-clear success message after 3 seconds
+      setTimeout(() => setSuccessMessage(null), 3000);
     } catch (err) {
       console.error('Error applying coupon:', err);
       setError('Failed to apply coupon');
@@ -137,21 +143,37 @@ export default function BuyCoinsPage() {
         }),
       });
 
+      // Log response details for debugging
+      console.log('Checkout response status:', response.status);
+      console.log('Checkout response headers:', response.headers.get('content-type'));
+
+      // Handle response
+      let data;
       const contentType = response.headers.get('content-type');
-      if (!contentType || !contentType.includes('application/json')) {
-        throw new Error('Server error: Please try again later');
+      
+      if (contentType && contentType.includes('application/json')) {
+        try {
+          data = await response.json();
+        } catch (parseError) {
+          console.error('Failed to parse JSON response:', parseError);
+          console.error('Response status:', response.status);
+          throw new Error('Invalid response from server. Please try again.');
+        }
+      } else {
+        // If not JSON, handle based on status
+        const text = await response.text();
+        console.error('Non-JSON response:', text);
+        throw new Error(`Server error (HTTP ${response.status}). Please try again later.`);
       }
 
       if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || 'Failed to create checkout session');
+        throw new Error(data.error || `Failed to create checkout session (HTTP ${response.status})`);
       }
 
-      const data = await response.json();
       if (data.url) {
         window.location.href = data.url;
       } else {
-        throw new Error('No checkout URL returned');
+        throw new Error('No checkout URL returned from server');
       }
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : 'Checkout failed';
@@ -234,12 +256,30 @@ export default function BuyCoinsPage() {
           </div>
         )}
 
-        {/* Coupon Applied Not */}
-        {selectedCoupon && (
-          <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 mb-8">
-            <p className="text-blue-400 text-sm">
-              ✓ Coupon applied! You'll save ${discountAmount} on your purchase.
+        {/* Success Message */}
+        {successMessage && (
+          <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-4 mb-8">
+            <p className="text-green-400 text-sm">
+              {successMessage}
             </p>
+          </div>
+        )}
+
+        {/* Coupon Applied Note */}
+        {selectedCoupon && (
+          <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 mb-8 flex items-center justify-between">
+            <p className="text-blue-400 text-sm">
+              ✓ Coupon applied! You'll save ${(discountAmount / 100).toFixed(2)} on your purchase.
+            </p>
+            <button
+              onClick={() => {
+                setSelectedCoupon(null);
+                setDiscountAmount(0);
+              }}
+              className="text-blue-400 hover:text-blue-300 text-sm font-semibold"
+            >
+              Remove
+            </button>
           </div>
         )}
 
@@ -291,14 +331,17 @@ export default function BuyCoinsPage() {
                 <div className="text-center mb-8 border-t border-b border-white/10 py-6">
                   <div className="flex items-center justify-center gap-2">
                     <p className="text-4xl font-bold">
-                      ${selectedCoupon && selectedPackage === pkg.id ? Math.max(0, pkg.price - discountAmount) : pkg.price}
+                      ${selectedCoupon && selectedPackage === pkg.id 
+                        ? ((pkg.price - discountAmount) / 100).toFixed(2)
+                        : (pkg.price / 100).toFixed(2)
+                      }
                     </p>
                     {selectedCoupon && selectedPackage === pkg.id && (
-                      <p className="text-white/40 line-through text-lg">${pkg.price}</p>
+                      <p className="text-white/40 line-through text-lg">${(pkg.price / 100).toFixed(2)}</p>
                     )}
                   </div>
                   <p className="text-white/60 text-sm">
-                    {(pkg.coins / pkg.price).toFixed(0)} coins per dollar
+                    {(pkg.coins / (pkg.price / 100)).toFixed(0)} coins per dollar
                   </p>
                 </div>
 

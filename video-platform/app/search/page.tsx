@@ -174,7 +174,7 @@ function SearchContent() {
     || amenities.length > 0 || payment.length > 0 || tags.length > 0 || nearMe;
 
   return (
-    <div className="min-h-screen bg-black text-white pb-20">
+    <div className="min-h-screen bg-black text-white pb-20 overflow-x-hidden">
       <StarSymbolDefs />
 
       {/* Header */}
@@ -185,9 +185,9 @@ function SearchContent() {
       </div>
 
       {/* Search Content */}
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-4 py-8 overflow-hidden">
         <div className="grid grid-cols-1 lg:grid-cols-[340px_minmax(0,1fr)] gap-6 lg:gap-8">
-          <aside className="space-y-6 lg:sticky lg:top-24 lg:self-start max-h-[calc(100vh-7rem)] overflow-y-auto pr-1">
+          <aside className="space-y-6 lg:sticky lg:top-24 lg:self-start max-h-[calc(100vh-7rem)] overflow-y-auto overflow-x-hidden pr-1">
             {/* Search Mode Toggle */}
             <div className="flex bg-white/10 rounded-lg p-1">
               <button

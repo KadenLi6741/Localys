@@ -29,6 +29,7 @@ import {
   BYTES_TO_MB
 } from '@/lib/supabase/profiles';
 import { OrderHistory } from '@/components/OrderHistory';
+import { CouponList } from '@/components/CouponList';
 
 export default function ProfilePage() {
   return (
@@ -275,6 +276,11 @@ function ProfileView({ profile, business, user, onEditClick, onSignOut, onProfil
           <div className="bg-white/5 border border-white/10 rounded-lg p-6">
             <OrderHistory userId={user.id} isBusiness={!!business} />
           </div>
+        </div>
+
+        {/* Coupons Section */}
+        <div className="mb-8">
+          <CouponList />
         </div>
 
         {/* Settings Section */}
