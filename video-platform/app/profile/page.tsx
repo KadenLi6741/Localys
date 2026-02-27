@@ -235,8 +235,28 @@ function ProfileView({ profile, business, user, onEditClick, onSignOut, onProfil
           </div>
         )}
 
+        {/* Restaurant Dashboard Link (business only) */}
+        {business && (
+          <Link
+            href="/dashboard"
+            className="block w-full bg-gradient-to-r from-purple-500/20 to-pink-500/20 hover:from-purple-500/30 hover:to-pink-500/30 border border-purple-500/30 rounded-lg py-3 px-4 mb-6 transition-all duration-200 hover:scale-[1.02] active:scale-98"
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <svg className="w-5 h-5 text-purple-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                </svg>
+                <span className="text-white font-medium">Restaurant Dashboard</span>
+              </div>
+              <svg className="w-5 h-5 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
+          </Link>
+        )}
+
         {/* Edit Profile Button */}
-        <button 
+        <button
           onClick={onEditClick}
           className="w-full bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg py-3 mb-6 transition-all duration-200 hover:scale-[1.02] active:scale-98"
         >
@@ -294,7 +314,7 @@ function ProfileView({ profile, business, user, onEditClick, onSignOut, onProfil
         <div className="mb-8">
           <h3 className="text-xl font-semibold mb-4">📋 Order History</h3>
           <div className="bg-white/5 border border-white/10 rounded-lg p-6">
-            <OrderHistory userId={user.id} isBusiness={!!business} />
+            <OrderHistory userId={user.id} businessId={business?.id} isBusiness={!!business} />
           </div>
         </div>
 

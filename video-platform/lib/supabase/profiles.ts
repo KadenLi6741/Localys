@@ -995,3 +995,50 @@ export async function getBusinessItemSales(userId: string) {
     return { data: [], error: null };
   }
 }
+
+// ============================================
+// BUSINESS PAYMENT CONFIGURATION
+// ============================================
+
+export async function getBusinessPaymentConfig(businessId: string) {
+  try {
+    const { data, error } = await supabase
+      .from('businesses')
+      .select('id, upfront_payment_pct')
+      .eq('id', businessId)
+      .single();
+
+    if (error) {
+      console.error('Error fetching payment config:', error);
+      return { data: null, error };
+    }
+
+    return { data, error: null };
+  } catch (error: any) {
+    console.error('Exception fetching payment config:', error);
+    return { data: null, error };
+  }
+}
+
+export async function updateBusinessPaymentConfig(businessId: string, upfrontPct: number) {
+  try {
+    const clamped = Math.max(0, Math.min(100, Math.round(upfrontPct)));
+
+    const { data, error } = await supabase
+      .from('businesses')
+      .update({ upfront_payment_pct: clamped })
+      .eq('id', businessId)
+      .select('id, upfront_payment_pct')
+      .single();
+
+    if (error) {
+      console.error('Error updating payment config:', error);
+      return { data: null, error };
+    }
+
+    return { data, error: null };
+  } catch (error: any) {
+    console.error('Exception updating payment config:', error);
+    return { data: null, error };
+  }
+}

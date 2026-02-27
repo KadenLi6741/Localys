@@ -28,6 +28,7 @@ export interface Business {
   business_type?: string;
   business_hours?: BusinessHours;
   custom_messages?: string[];
+  upfront_payment_pct?: number;
 }
 
 export interface ProfileUpdateData {
