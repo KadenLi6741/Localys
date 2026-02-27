@@ -55,114 +55,109 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ received: true });
       }
 
-      const metadata = session.metadata || {};
-      const couponCode = metadata.couponCode;
-      
-      // Determine if this is a coin or item purchase
-      const coins = parseInt(metadata.coins || '0');
-      const itemId = metadata.itemId;
-      const buyerId = metadata.buyerId;
-
-      // Handle coin purchases
-      if (coins > 0 && metadata.userId) {
-        const userId = metadata.userId;
-
-        const { data: profile, error: profileError } = await supabase
-          .from('profiles')
-          .select('coin_balance')
-          .eq('id', userId)
+      // Handle preorder payments
+      const preorderId = session.metadata?.preorderId;
+      if (preorderId && session.metadata?.type === 'preorder') {
+        const { data: preorder, error: poError } = await supabase
+          .from('preorders')
+          .select('*')
+          .eq('id', preorderId)
           .single();
 
-        if (profileError) {
-          console.error('Error fetching profile:', profileError);
-          return NextResponse.json(
-            { error: 'Failed to fetch profile' },
-            { status: 500 }
-          );
+        if (poError || !preorder) {
+          console.error('Preorder not found for webhook:', preorderId);
+          return NextResponse.json({ error: 'Preorder not found' }, { status: 400 });
         }
 
-        const newBalance = (profile?.coin_balance || 0) + coins;
+        if (preorder.status === 'pending_payment') {
+          const chargeAmount = Math.round(preorder.subtotal * (preorder.upfront_pct / 100) * 100) / 100;
 
-        const { error: updateError } = await supabase
-          .from('profiles')
-          .update({ coin_balance: newBalance })
-          .eq('id', userId);
+          await supabase
+            .from('preorders')
+            .update({
+              status: 'confirmed',
+              amount_paid: chargeAmount,
+              amount_remaining: Math.round((preorder.subtotal - chargeAmount) * 100) / 100,
+              stripe_session_id: session.id,
+              confirmed_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', preorderId);
 
-        if (updateError) {
-          console.error('Error updating coin balance:', updateError);
-          return NextResponse.json(
-            { error: 'Failed to update balance' },
-            { status: 500 }
-          );
-        }
-
-        console.log(`Added ${coins} coins to user ${userId}. New balance: ${newBalance}`);
-
-        await supabase.from('coin_purchases').insert({
-          user_id: userId,
-          coins,
-          amount_cents: session.amount_total,
-          stripe_session_id: session.id,
-          created_at: new Date().toISOString(),
-        });
-      }
-
-      // Handle item purchases
-      if (itemId && buyerId) {
-        console.log(`Processing item purchase: itemId=${itemId}, buyerId=${buyerId}, session=${session.id}`);
-        // Item purchase handling can be extended here if needed
-        // For now, we just log it and process the coupon marking below
-      }
-
-      // Mark coupon as used if one was applied (works for both coin and item purchases)
-      if (couponCode) {
-        try {
-          // Get the coupon
-          const { data: coupon } = await supabase
-            .from('coupons')
-            .select('id')
-            .eq('code', couponCode.toUpperCase())
-            .single();
-
-          if (coupon) {
-            // Determine which user to mark the coupon for
-            const couponUserId = metadata.userId || buyerId;
-
-            if (couponUserId) {
-              // Mark user's coupon as used
-              await supabase
-                .from('user_coupons')
-                .update({
-                  is_used: true,
-                  used_at: new Date().toISOString(),
-                })
-                .eq('user_id', couponUserId)
-                .eq('coupon_id', coupon.id);
-
-              // Increment the coupon's used count
-              const { data: couponData } = await supabase
-                .from('coupons')
-                .select('used_count')
-                .eq('id', coupon.id)
-                .single();
-
-              if (couponData) {
-                await supabase
-                  .from('coupons')
-                  .update({
-                    used_count: (couponData.used_count || 0) + 1,
-                  })
-                  .eq('id', coupon.id);
-              }
-
-              console.log(`Marked coupon ${couponCode} as used for user ${couponUserId}`);
-            }
+          if (preorder.table_id) {
+            await supabase
+              .from('restaurant_tables')
+              .update({ status: 'reserved' })
+              .eq('id', preorder.table_id);
           }
-        } catch (couponError) {
-          console.warn(`Failed to mark coupon ${couponCode} as used:`, couponError);
-          // Don't fail the entire webhook if coupon marking fails
+
+          console.log(`Preorder ${preorder.order_code} confirmed via webhook`);
         }
+
+        return NextResponse.json({ success: true });
       }
+
+      // Handle coin purchases
+      const userId = session.metadata?.userId;
+      const coins = parseInt(session.metadata?.coins || '0');
+
+      if (!userId || !coins) {
+        console.error('Missing userId or coins in metadata');
+        return NextResponse.json(
+          { error: 'Missing metadata' },
+          { status: 400 }
+        );
+      }
+
+      const { data: existingPurchase } = await supabase
+        .from('coin_purchases')
+        .select('id')
+        .eq('stripe_session_id', session.id)
+        .single();
+
+      if (existingPurchase) {
+        console.log(`Coin purchase for session ${session.id} already processed`);
+        return NextResponse.json({ success: true, alreadyProcessed: true });
+      }
+
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('coin_balance')
+        .eq('id', userId)
+        .single();
+
+      if (profileError) {
+        console.error('Error fetching profile:', profileError);
+        return NextResponse.json(
+          { error: 'Failed to fetch profile' },
+          { status: 500 }
+        );
+      }
+
+      const newBalance = (profile?.coin_balance || 0) + coins;
+
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ coin_balance: newBalance })
+        .eq('id', userId);
+
+      if (updateError) {
+        console.error('Error updating coin balance:', updateError);
+        return NextResponse.json(
+          { error: 'Failed to update balance' },
+          { status: 500 }
+        );
+      }
+
+      console.log(`Added ${coins} coins to user ${userId}. New balance: ${newBalance}`);
+
+      await supabase.from('coin_purchases').insert({
+        user_id: userId,
+        coins,
+        amount_cents: session.amount_total,
+        stripe_session_id: session.id,
+        created_at: new Date().toISOString(),
+      });
 
       return NextResponse.json({ success: true });
     } catch (error) {

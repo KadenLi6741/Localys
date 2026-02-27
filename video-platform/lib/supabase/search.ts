@@ -112,8 +112,7 @@ async function getBusinessMetrics(businessIds: string[]) {
     };
   }
 
-  // Query the businesses table for average_rating and total_reviews by owner_id
-  const [videosByBusinessRes, videosByUserRes, menuItemsRes, businessesRes] = await Promise.all([
+  const [videosByBusinessRes, videosByUserRes, menuItemsRes] = await Promise.all([
     supabase
       .from('videos')
       .select('id, business_id, user_id')
@@ -127,20 +126,7 @@ async function getBusinessMetrics(businessIds: string[]) {
       .select('user_id, price, category')
       .in('user_id', uniqueBusinessIds)
       .ilike('category', 'main'),
-    supabase
-      .from('businesses')
-      .select('owner_id, average_rating, total_reviews')
-      .in('owner_id', uniqueBusinessIds),
   ]);
-
-  // First, populate ratings from businesses table if available
-  const businessesData = businessesRes.data || [];
-  for (const business of businessesData) {
-    if (business.owner_id && businessIdSet.has(business.owner_id)) {
-      businessMetricsMap[business.owner_id].average_rating = business.average_rating;
-      businessMetricsMap[business.owner_id].total_reviews = business.total_reviews || 0;
-    }
-  }
 
   const videoBusinessMap: Record<string, string> = {};
   const videosByBusiness = videosByBusinessRes.data || [];
