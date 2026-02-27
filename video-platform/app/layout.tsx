@@ -3,7 +3,6 @@ import { Outfit, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
-import { CouponProvider } from "@/contexts/CouponContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 
 const outfit = Outfit({
@@ -33,13 +32,13 @@ export default function RootLayout({
       <body
         className={`${outfit.variable} ${jetbrainsMono.variable} antialiased h-full dark`}
       >
-        <AuthProvider>
-          <LanguageProvider>
-            <CouponProvider>
+        <ThemeProvider>
+          <AuthProvider>
+            <LanguageProvider>
               {children}
-            </CouponProvider>
-          </LanguageProvider>
-        </AuthProvider>
+            </LanguageProvider>
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
