@@ -8,12 +8,13 @@ interface CommentModalProps {
   onClose: () => void;
   postId: string;
   businessName?: string;
+  onCommentAdded?: () => void;
 }
 
 /**
  * Modal for viewing and composing comments on a post
  */
-export function CommentModal({ isOpen, onClose, postId, businessName }: CommentModalProps) {
+export function CommentModal({ isOpen, onClose, postId, businessName, onCommentAdded }: CommentModalProps) {
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isOpen) {
@@ -73,7 +74,7 @@ export function CommentModal({ isOpen, onClose, postId, businessName }: CommentM
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto">
-          <CommentSection videoId={postId} />
+          <CommentSection videoId={postId} onCommentAdded={onCommentAdded} />
         </div>
       </div>
     </div>

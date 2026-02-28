@@ -7,7 +7,7 @@ import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase/client';
 import { getOrCreateOneToOneChat } from '@/lib/supabase/messaging';
-import { getProfileByUserId, Business, BusinessHours } from '@/lib/supabase/profiles';
+import { getProfileByUserId, getUserBusiness, Business, BusinessHours } from '@/lib/supabase/profiles';
 import { MenuList } from '@/components/MenuList';
 import { PostedVideos } from '@/components/PostedVideos';
 
@@ -68,25 +68,13 @@ function UserProfileContent() {
 
   const loadBusiness = async () => {
     try {
-      const { data, error } = await supabase
-        .from('businesses')
-        .select(`
-          id,
-          owner_id,
-          business_name,
-          business_type,
-          business_hours,
-          average_rating,
-          total_reviews,
-          created_at,
-          updated_at
-        `)
-        .eq('owner_id', userId)
-        .single();
+      const { data, error } = await getUserBusiness(userId);
 
-      console.log('Business fetch result:', { data, error }); // DEBUG
-
-      if (!error && data) {
+      if (error) {
+        console.error('Business fetch error:', error.message);
+        // Not all users have a business, which is fine
+        setBusiness(null);
+      } else if (data) {
         // Parse business_hours if it's a string
         if (data.business_hours && typeof data.business_hours === 'string') {
           try {
@@ -96,25 +84,14 @@ function UserProfileContent() {
             data.business_hours = null;
           }
         }
-        console.log('Business after parsing:', data); // DEBUG
-        console.log('Business hours value:', data.business_hours); // DEBUG
         setBusiness(data as Business);
-      } else if (error) {
-        console.error('Business fetch error:', {
-          message: error.message,
-          code: error.code,
-          status: error.status,
-          details: error.details,
-          hint: error.hint,
-          fullError: error
-        });
+      } else {
+        // User is not a business owner, which is normal
+        setBusiness(null);
       }
     } catch (error) {
-      console.error('Business load error:', {
-        message: error instanceof Error ? error.message : String(error),
-        error: error
-      }); // DEBUG
-      // Business doesn't exist, which is fine
+      console.error('Business load error:', error instanceof Error ? error.message : String(error));
+      // Not all users have a business, which is fine
       setBusiness(null);
     }
   };

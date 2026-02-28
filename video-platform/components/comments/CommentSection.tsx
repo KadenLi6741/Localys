@@ -32,9 +32,10 @@ import CommentForm from './CommentForm';
 interface CommentSectionProps {
   videoId: string;
   className?: string;
+  onCommentAdded?: () => void;
 }
 
-export default function CommentSection({ videoId, className = '' }: CommentSectionProps) {
+export default function CommentSection({ videoId, className = '', onCommentAdded }: CommentSectionProps) {
   const { user } = useAuth();
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -120,6 +121,11 @@ export default function CommentSection({ videoId, className = '' }: CommentSecti
 
       if (data) {
         setComments(prev => [data, ...prev]);
+        
+        // Call the onCommentAdded callback to update parent component
+        if (onCommentAdded) {
+          onCommentAdded();
+        }
         
         if (rating) {
           const { data: ratingData, error: ratingErr } = await getVideoAverageRating(videoId);

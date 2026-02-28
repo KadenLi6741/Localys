@@ -6,6 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { useAuth } from '@/contexts/AuthContext';
 import { getVideosFeed, getLikeCounts, likeItem, unlikeItem, bookmarkVideo, unbookmarkVideo, getWeightedVideoFeed, trackVideoView } from '@/lib/supabase/videos';
+import { getVideoAverageRating } from '@/lib/supabase/comments';
 import { getUserCoins } from '@/lib/supabase/profiles';
 import { supabase } from '@/lib/supabase/client';
 import { CommentModal } from '@/components/CommentModal';
@@ -103,7 +104,7 @@ function HomeContent() {
           .map(v => v.id)
           .filter((id): id is string => !!id && typeof id === 'string');
         
-        console.log('Video IDs for comment fetch:', videoIds);
+        console.log('Video IDs for rating fetch:', videoIds);
 
         const { data: allLikes } = await supabase
           .from('likes')
@@ -120,9 +121,17 @@ function HomeContent() {
           });
         }
 
-        console.log('Skipping comment fetch due to null value issues');
+        // Fetch rating counts for each video
+        for (const videoId of videoIds) {
+          try {
+            const { data: ratingData } = await getVideoAverageRating(videoId);
+            commentCounts[videoId] = ratingData?.total_rated_comments || 0;
+          } catch (err) {
+            console.error(`Error fetching ratings for video ${videoId}:`, err);
+            commentCounts[videoId] = 0;
+          }
+        }
 
-       
         const businessIds = Array.from(new Set(videosData.map(v => v.businesses?.id).filter(Boolean))) as string[];
         [...businessIds, ...videoIds].forEach(id => {
           if (!(id in counts)) {
@@ -137,7 +146,7 @@ function HomeContent() {
         setCommentCounts(commentCounts);
         if (process.env.NODE_ENV === 'development') {
           console.log('Loaded like counts:', counts);
-          console.log('Loaded comment counts:', commentCounts);
+          console.log('Loaded rating counts:', commentCounts);
         }
       }
     } catch (error) {
@@ -387,6 +396,21 @@ function HomeContent() {
     setCommentModalOpen(true);
   };
 
+  const handleCommentAdded = async () => {
+    // Refresh the rating count for the current video
+    if (commentPostId) {
+      try {
+        const { data: ratingData } = await getVideoAverageRating(commentPostId);
+        setCommentCounts(prev => ({
+          ...prev,
+          [commentPostId]: ratingData?.total_rated_comments || 0
+        }));
+      } catch (err) {
+        console.error('Error updating rating count:', err);
+      }
+    }
+  };
+
   const handleShareClick = async (video: Video) => {
     const businessName = video.businesses?.business_name || video.profiles?.full_name || 'Business';
     const url = `${window.location.origin}/video/${video.id}`;
@@ -608,7 +632,7 @@ function HomeContent() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
             </svg>
           </div>
-          <span className="text-white text-xs font-semibold">{currentBusiness?.total_reviews || 0}</span>
+          <span className="text-white text-xs font-semibold">{commentCounts[currentVideo.id] || 0}</span>
         </button>
 
         {/* Location Button */}
@@ -703,6 +727,7 @@ function HomeContent() {
         onClose={() => setCommentModalOpen(false)}
         postId={commentPostId}
         businessName={currentBusiness?.business_name || currentVideo.profiles?.full_name}
+        onCommentAdded={handleCommentAdded}
       />
 
       {/* Toast Notification */}
