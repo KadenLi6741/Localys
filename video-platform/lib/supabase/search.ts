@@ -1,5 +1,7 @@
 import { supabase } from './client';
+import { cacheGet, cacheSet } from '../cache';
 import { haversineDistance } from '../utils/geo';
+import { computeRoundedPriceRange } from '../utils/pricing';
 import type { SearchMode, SearchFilters } from '../../models/Search';
 
 export type { SearchMode, SearchFilters };
@@ -81,59 +83,23 @@ function geometricMean(values: number[]): number | null {
   return Math.exp(logSum / safeValues.length);
 }
 
-function computeRoundedPriceRange(prices: number[]): { min: number; max: number } | null {
-  if (!prices.length) return null;
-
-  const avg = prices.reduce((sum, price) => sum + price, 0) / prices.length;
-  const variance = prices.reduce((sum, price) => sum + (price - avg) ** 2, 0) / prices.length;
-  const stdDev = Math.sqrt(variance);
-
-  let minPrice: number;
-  let maxPrice: number;
-
-  if (avg < 70) {
-    minPrice = Math.floor(avg / 10) * 10;
-    maxPrice = minPrice + 10;
-
-    if (stdDev > avg * 0.35) {
-      maxPrice += 10;
-    }
-  } else {
-    minPrice = Math.round(avg / 25) * 25;
-    maxPrice = minPrice + 25;
-
-    if (stdDev > avg * 0.3) {
-      maxPrice += 25;
-    }
-  }
-
-  if (minPrice < 0) minPrice = 0;
-  if (maxPrice <= minPrice) maxPrice = minPrice + 10;
-
-  const minimumTightLowerBound = maxPrice / 2;
-  if (minPrice < minimumTightLowerBound) {
-    const roundingStep = maxPrice >= 100 ? 10 : 5;
-    minPrice = Math.ceil(minimumTightLowerBound / roundingStep) * roundingStep;
-    if (minPrice >= maxPrice) {
-      minPrice = Math.max(0, maxPrice - roundingStep);
-    }
-  }
-
-  return { min: minPrice, max: maxPrice };
-}
-
 async function getBusinessMetrics(businessIds: string[]) {
-  const uniqueBusinessIds = [...new Set(businessIds.filter(Boolean))];
+  const uniqueBusinessIds = [...new Set(businessIds.filter(Boolean))].sort();
+
+  if (!uniqueBusinessIds.length) {
+    return {} as Record<string, { average_rating: number | null; total_reviews: number; price_range_min: number | null; price_range_max: number | null }>;
+  }
+
+  const cacheKey = `business-metrics:${uniqueBusinessIds.join(',')}`;
+  const cached = cacheGet<Record<string, { average_rating: number | null; total_reviews: number; price_range_min: number | null; price_range_max: number | null }>>(cacheKey);
+  if (cached) return cached;
+
   const businessMetricsMap: Record<string, {
     average_rating: number | null;
     total_reviews: number;
     price_range_min: number | null;
     price_range_max: number | null;
   }> = {};
-
-  if (!uniqueBusinessIds.length) {
-    return businessMetricsMap;
-  }
 
   const businessIdSet = new Set(uniqueBusinessIds);
 
@@ -146,8 +112,7 @@ async function getBusinessMetrics(businessIds: string[]) {
     };
   }
 
-  // Query the businesses table for average_rating and total_reviews by owner_id
-  const [videosByBusinessRes, videosByUserRes, menuItemsRes, businessesRes] = await Promise.all([
+  const [videosByBusinessRes, videosByUserRes, menuItemsRes] = await Promise.all([
     supabase
       .from('videos')
       .select('id, business_id, user_id')
@@ -161,20 +126,7 @@ async function getBusinessMetrics(businessIds: string[]) {
       .select('user_id, price, category')
       .in('user_id', uniqueBusinessIds)
       .ilike('category', 'main'),
-    supabase
-      .from('businesses')
-      .select('owner_id, average_rating, total_reviews')
-      .in('owner_id', uniqueBusinessIds),
   ]);
-
-  // First, populate ratings from businesses table if available
-  const businessesData = businessesRes.data || [];
-  for (const business of businessesData) {
-    if (business.owner_id && businessIdSet.has(business.owner_id)) {
-      businessMetricsMap[business.owner_id].average_rating = business.average_rating;
-      businessMetricsMap[business.owner_id].total_reviews = business.total_reviews || 0;
-    }
-  }
 
   const videoBusinessMap: Record<string, string> = {};
   const videosByBusiness = videosByBusinessRes.data || [];
@@ -249,6 +201,7 @@ async function getBusinessMetrics(businessIds: string[]) {
     }
   }
 
+  cacheSet(cacheKey, businessMetricsMap, 5 * 60 * 1000); // 5 min TTL
   return businessMetricsMap;
 }
 
@@ -397,7 +350,7 @@ export async function searchBusinesses(filters: SearchFilters) {
 
   let query = supabase
     .from('profiles')
-    .select('*')
+    .select('id, full_name, username, profile_picture_url, type, category, bio, latitude, longitude, average_rating, total_reviews, price_range_min, price_range_max')
     .in('type', ['food', 'retail', 'service']);
 
   if (interpretedFilters.query) {

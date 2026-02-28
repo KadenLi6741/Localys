@@ -8,11 +8,6 @@ import {
   getUserCoins,
   deductCoins,
   addCoins,
-  getBusinessesWithRatings,
-  getBusinessWithRatings,
-  getBusinessAverageRating,
-  getAllBusinessAverageRatings,
-  updateAllBusinessRatings,
 } from '../lib/supabase/profiles';
 
 export class ProfileService {
@@ -46,26 +41,6 @@ export class ProfileService {
 
   async addCoins(userId: string, amount: number) {
     return addCoins(userId, amount);
-  }
-
-  async getBusinessesWithRatings() {
-    return getBusinessesWithRatings();
-  }
-
-  async getBusinessWithRatings(businessId: string) {
-    return getBusinessWithRatings(businessId);
-  }
-
-  async getBusinessAverageRating(businessId: string) {
-    return getBusinessAverageRating(businessId);
-  }
-
-  async getAllBusinessAverageRatings() {
-    return getAllBusinessAverageRatings();
-  }
-
-  async updateAllBusinessRatings() {
-    return updateAllBusinessRatings();
   }
 }
 

@@ -8,6 +8,6 @@ export interface SignUpData {
 }
 
 export interface SignInData {
-  email: string;
+  identifier: string;
   password: string;
 }

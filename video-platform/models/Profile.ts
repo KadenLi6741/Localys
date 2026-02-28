@@ -6,6 +6,7 @@ export interface Profile {
   bio?: string;
   profile_picture_url?: string;
   coin_balance?: number;
+  type?: string | null;
 }
 
 export interface BusinessHours {
@@ -27,8 +28,7 @@ export interface Business {
   business_type?: string;
   business_hours?: BusinessHours;
   custom_messages?: string[];
-  average_rating?: number | null;
-  total_reviews?: number;
+  upfront_payment_pct?: number;
 }
 
 export interface ProfileUpdateData {

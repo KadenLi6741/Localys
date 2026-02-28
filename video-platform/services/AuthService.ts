@@ -1,5 +1,5 @@
 import type { SignUpData, SignInData } from '../models/Auth';
-import { signUp, signIn, signOut, getSession, getCurrentUser, onAuthStateChange } from '../lib/supabase/auth';
+import { signUp, signIn, signOut, getSession, getCurrentUser, onAuthStateChange, resetPasswordForEmail, updatePassword } from '../lib/supabase/auth';
 
 export class AuthService {
   async signUp(data: SignUpData) {
@@ -24,6 +24,14 @@ export class AuthService {
 
   onAuthStateChange(callback: (event: string, session: any) => void) {
     return onAuthStateChange(callback);
+  }
+
+  async resetPasswordForEmail(email: string) {
+    return resetPasswordForEmail(email);
+  }
+
+  async updatePassword(newPassword: string) {
+    return updatePassword(newPassword);
   }
 }
 

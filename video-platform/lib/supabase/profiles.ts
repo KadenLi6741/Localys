@@ -1,4 +1,5 @@
 import { supabase } from './client';
+import { cacheGet, cacheSet, cacheInvalidate } from '../cache';
 import type { Profile, Business, ProfileUpdateData, BusinessUpdateData, BusinessHours } from '../../models/Profile';
 
 export type { Profile, Business, ProfileUpdateData, BusinessUpdateData, BusinessHours };
@@ -81,7 +82,7 @@ export async function uploadProfilePicture(file: File, userId: string) {
     const { data, error } = await supabase.storage
       .from(STORAGE_BUCKET)
       .upload(fileName, file, {
-        cacheControl: '3600',
+        cacheControl: '31536000',
         upsert: false,
         contentType: file.type,
       });
@@ -137,22 +138,27 @@ export async function getUserBusiness(userId: string) {
   try {
     const { data, error } = await supabase
       .from('businesses')
-      .select('*')
+      .select('id, owner_id, business_name, business_type, category, profile_picture_url, business_hours, custom_messages, updated_at, created_at')
       .eq('owner_id', userId)
-      .single();
+      .order('updated_at', { ascending: false })
+      .order('created_at', { ascending: false })
+      .limit(1);
 
-    if (error && error.code === 'PGRST116') {
+    if (error) {
+      return { data: null, error };
+    }
+
+    if (!data || data.length === 0) {
       return { data: null, error: null };
     }
 
-    if (error) return { data: null, error };
-    
-    // Parse business_hours if it's a string
-    if (data && data.business_hours && typeof data.business_hours === 'string') {
-      data.business_hours = JSON.parse(data.business_hours);
+    const business = data[0];
+
+    if (business?.business_hours && typeof business.business_hours === 'string') {
+      business.business_hours = JSON.parse(business.business_hours);
     }
-    
-    return { data, error: null };
+
+    return { data: business, error: null };
   } catch (error: any) {
     return { data: null, error };
   }
@@ -165,30 +171,19 @@ export async function updateBusinessInfo(businessId: string, updates: BusinessUp
   try {
     console.log('updateBusinessInfo called with:', { businessId, updates }); // DEBUG
     
-    // Ensure business_hours is properly formatted as JSONB
-    const processedUpdates = {
-      ...updates,
-      business_hours: updates.business_hours ? JSON.parse(JSON.stringify(updates.business_hours)) : null,
-    };
-    
-    console.log('Processed updates:', processedUpdates); // DEBUG
-    
     const { data, error } = await supabase
       .from('businesses')
-      .update(processedUpdates)
+      .update(updates)
       .eq('id', businessId)
       .select()
       .single();
 
     if (error) {
       console.error('updateBusinessInfo error:', error); // DEBUG
-      console.error('Error code:', error.code); // DEBUG
-      console.error('Error details:', error.details); // DEBUG
       return { data: null, error };
     }
     
     console.log('updateBusinessInfo success:', data); // DEBUG
-    console.log('Updated business_hours:', data?.business_hours); // DEBUG
     return { data, error: null };
   } catch (error: any) {
     console.error('updateBusinessInfo exception:', error); // DEBUG
@@ -235,28 +230,29 @@ export async function ensureUserBusiness(userId: string) {
     // Check if business exists
     const { data: existing, error: checkError } = await supabase
       .from('businesses')
-      .select('*')
+      .select('id, owner_id, business_name, business_type, category, profile_picture_url, business_hours, custom_messages, updated_at, created_at')
       .eq('owner_id', userId)
-      .single();
+      .order('updated_at', { ascending: false })
+      .order('created_at', { ascending: false })
+      .limit(1);
 
     // If business exists, return it
-    if (!checkError && existing) {
-      // Parse business_hours if it's a string
-      if (existing.business_hours && typeof existing.business_hours === 'string') {
-        existing.business_hours = JSON.parse(existing.business_hours);
+    const existingBusiness = existing?.[0] || null;
+
+    if (!checkError && existingBusiness) {
+      if (existingBusiness.business_hours && typeof existingBusiness.business_hours === 'string') {
+        existingBusiness.business_hours = JSON.parse(existingBusiness.business_hours);
       }
-      return { data: existing, error: null };
+      return { data: existingBusiness, error: null };
+    }
+
+    // If business exists, return it
+    if (existingBusiness) {
+      return { data: existingBusiness, error: null };
     }
 
     // If business doesn't exist, create one
-    if (checkError?.code === 'PGRST116') {
-      return await createBusiness(userId);
-    }
-
-    // If different error, return it
-    if (checkError) return { data: null, error: checkError };
-
-    return { data: existing, error: null };
+    return await createBusiness(userId);
   } catch (error: any) {
     return { data: null, error };
   }
@@ -267,6 +263,12 @@ export async function ensureUserBusiness(userId: string) {
  */
 export async function getUserCoins(userId: string) {
   try {
+    const cacheKey = `user-coins:${userId}`;
+    const cached = cacheGet<number>(cacheKey);
+    if (cached !== null) {
+      return { data: cached, error: null };
+    }
+
     const { data, error } = await supabase
       .from('profiles')
       .select('coin_balance')
@@ -274,7 +276,9 @@ export async function getUserCoins(userId: string) {
       .single();
 
     if (error) return { data: null, error };
-    return { data: data?.coin_balance || 100, error: null };
+    const balance = data?.coin_balance || 100;
+    cacheSet(cacheKey, balance, 30 * 1000); // 30 sec TTL
+    return { data: balance, error: null };
   } catch (error: any) {
     return { data: null, error };
   }
@@ -310,6 +314,7 @@ export async function deductCoins(userId: string, amount: number) {
       .single();
 
     if (error) return { data: null, error };
+    cacheInvalidate(`user-coins:${userId}`);
     return { data: data?.coin_balance, error: null };
   } catch (error: any) {
     return { data: null, error };
@@ -343,6 +348,7 @@ export async function addCoins(userId: string, amount: number) {
       .single();
 
     if (error) return { data: null, error };
+    cacheInvalidate(`user-coins:${userId}`);
     return { data: data?.coin_balance, error: null };
   } catch (error: any) {
     return { data: null, error };
@@ -756,6 +762,68 @@ export async function getMenuItems(menuId: string) {
   }
 }
 
+// ============================================
+// BUSINESS LOCATIONS
+// ============================================
+
+export interface BusinessLocation {
+  id: string;
+  profile_id: string;
+  label: string;
+  latitude: number;
+  longitude: number;
+  created_at: string;
+}
+
+export async function getBusinessLocations(profileId: string) {
+  try {
+    const { data, error } = await supabase
+      .from('business_locations')
+      .select('*')
+      .eq('profile_id', profileId)
+      .order('created_at', { ascending: true });
+
+    if (error) return { data: null, error };
+    return { data: data as BusinessLocation[], error: null };
+  } catch (error: any) {
+    return { data: null, error };
+  }
+}
+
+export async function addBusinessLocation(
+  profileId: string,
+  label: string,
+  latitude: number,
+  longitude: number
+) {
+  try {
+    const { data, error } = await supabase
+      .from('business_locations')
+      .insert({ profile_id: profileId, label, latitude, longitude })
+      .select()
+      .single();
+
+    if (error) return { data: null, error };
+    return { data: data as BusinessLocation, error: null };
+  } catch (error: any) {
+    return { data: null, error };
+  }
+}
+
+export async function deleteBusinessLocation(locationId: string) {
+  try {
+    const { error } = await supabase
+      .from('business_locations')
+      .delete()
+      .eq('id', locationId);
+
+    if (error) return { error };
+    return { error: null };
+  } catch (error: any) {
+    return { error };
+  }
+}
+
 /**
  * Upload a menu item image to Supabase Storage
  */
@@ -785,7 +853,7 @@ export async function uploadMenuItemImage(file: File, userId: string, menuId: st
     const { data, error } = await supabase.storage
       .from('avatars')
       .upload(fileName, file, {
-        cacheControl: '3600',
+        cacheControl: '31536000',
         upsert: false,
         contentType: file.type,
       });
@@ -849,143 +917,7 @@ export async function getUserCoinPurchases(userId: string) {
     return { data: [], error: null };
   }
 }
-/**
- * Get all businesses with their average ratings
- */
-export async function getBusinessesWithRatings() {
-  try {
-    const { data, error } = await supabase
-      .from('businesses')
-      .select(`
-        id,
-        business_name,
-        category,
-        average_rating,
-        total_reviews,
-        profile_picture_url,
-        latitude,
-        longitude,
-        owner_id
-      `)
-      .order('average_rating', { ascending: false });
 
-    if (error) {
-      console.error('Error fetching businesses with ratings:', error);
-      return { data: [], error };
-    }
-
-    return { data: data || [], error: null };
-  } catch (error: any) {
-    console.error('Exception fetching businesses with ratings:', error);
-    return { data: [], error };
-  }
-}
-
-/**
- * Get a specific business with its average rating and photos
- */
-export async function getBusinessWithRatings(businessId: string) {
-  try {
-    const { data, error } = await supabase
-      .from('businesses')
-      .select(`
-        id,
-        business_name,
-        category,
-        average_rating,
-        total_reviews,
-        profile_picture_url,
-        latitude,
-        longitude,
-        owner_id,
-        business_hours,
-        business_type,
-        description
-      `)
-      .eq('id', businessId)
-      .single();
-
-    if (error && error.code === 'PGRST116') {
-      return { data: null, error: null };
-    }
-
-    if (error) {
-      console.error('Error fetching business with ratings:', error);
-      return { data: null, error };
-    }
-
-    // Parse business_hours if it's a string
-    if (data && data.business_hours && typeof data.business_hours === 'string') {
-      data.business_hours = JSON.parse(data.business_hours);
-    }
-
-    return { data, error: null };
-  } catch (error: any) {
-    console.error('Exception fetching business with ratings:', error);
-    return { data: null, error };
-  }
-}
-
-/**
- * Get the average rating for a specific business using the SQL function
- */
-export async function getBusinessAverageRating(businessId: string) {
-  try {
-    const { data, error } = await supabase
-      .rpc('get_business_average_rating', { p_business_id: businessId });
-
-    if (error) {
-      console.error('Error getting business average rating:', error);
-      return { data: null, error };
-    }
-
-    return { data: data?.[0] || null, error: null };
-  } catch (error: any) {
-    console.error('Exception getting business average rating:', error);
-    return { data: null, error };
-  }
-}
-
-/**
- * Get all business average ratings using the SQL function
- */
-export async function getAllBusinessAverageRatings() {
-  try {
-    const { data, error } = await supabase
-      .rpc('get_all_business_ratings');
-
-    if (error) {
-      console.error('Error getting all business average ratings:', error);
-      return { data: [], error };
-    }
-
-    return { data: data || [], error: null };
-  } catch (error: any) {
-    console.error('Exception getting all business average ratings:', error);
-    return { data: [], error };
-  }
-}
-
-/**
- * Manually update all business ratings based on their comments
- * This can be useful if you need to recalculate ratings outside of the trigger
- */
-export async function updateAllBusinessRatings() {
-  try {
-    const { data, error } = await supabase
-      .rpc('update_business_ratings');
-
-    if (error) {
-      console.error('Error updating all business ratings:', error);
-      return { data: null, error };
-    }
-
-    return { data, error: null };
-  } catch (error: any) {
-    console.error('Exception updating business ratings:', error);
-    return { data: null, error };
-  }
-}
 /**
  * Get item purchases where user is the buyer
  */
@@ -1061,5 +993,52 @@ export async function getBusinessItemSales(userId: string) {
     });
     // Return empty array on error to prevent breaking the UI
     return { data: [], error: null };
+  }
+}
+
+// ============================================
+// BUSINESS PAYMENT CONFIGURATION
+// ============================================
+
+export async function getBusinessPaymentConfig(businessId: string) {
+  try {
+    const { data, error } = await supabase
+      .from('businesses')
+      .select('id, upfront_payment_pct')
+      .eq('id', businessId)
+      .single();
+
+    if (error) {
+      console.error('Error fetching payment config:', error);
+      return { data: null, error };
+    }
+
+    return { data, error: null };
+  } catch (error: any) {
+    console.error('Exception fetching payment config:', error);
+    return { data: null, error };
+  }
+}
+
+export async function updateBusinessPaymentConfig(businessId: string, upfrontPct: number) {
+  try {
+    const clamped = Math.max(0, Math.min(100, Math.round(upfrontPct)));
+
+    const { data, error } = await supabase
+      .from('businesses')
+      .update({ upfront_payment_pct: clamped })
+      .eq('id', businessId)
+      .select('id, upfront_payment_pct')
+      .single();
+
+    if (error) {
+      console.error('Error updating payment config:', error);
+      return { data: null, error };
+    }
+
+    return { data, error: null };
+  } catch (error: any) {
+    console.error('Exception updating payment config:', error);
+    return { data: null, error };
   }
 }

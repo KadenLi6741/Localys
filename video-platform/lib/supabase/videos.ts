@@ -1,4 +1,5 @@
 import { supabase } from './client';
+import { cacheGet, cacheSet, cacheInvalidate } from '../cache';
 import type { VideoMetadata } from '../../models/Video';
 
 export type { VideoMetadata };
@@ -115,13 +116,20 @@ export async function getVideosFeed(limit = 20, offset = 0) {
 
     if (pathForSigning) {
       try {
-        const { data: signed, error: signedErr } = await supabase.storage
-          .from(STORAGE_BUCKET)
-          .createSignedUrl(pathForSigning, 60 * 60); // 1 hour
-        if (!signedErr && signed?.signedUrl) {
-          url = signed.signedUrl;
+        const cacheKey = `signed-url:${STORAGE_BUCKET}:${pathForSigning}`;
+        const cached = cacheGet<string>(cacheKey);
+        if (cached) {
+          url = cached;
         } else {
-          console.warn('createSignedUrl failed for', pathForSigning, signedErr);
+          const { data: signed, error: signedErr } = await supabase.storage
+            .from(STORAGE_BUCKET)
+            .createSignedUrl(pathForSigning, 60 * 60); // 1 hour
+          if (!signedErr && signed?.signedUrl) {
+            url = signed.signedUrl;
+            cacheSet(cacheKey, url, 55 * 60 * 1000); // 55 min TTL
+          } else {
+            console.warn('createSignedUrl failed for', pathForSigning, signedErr);
+          }
         }
       } catch (e) {
         console.error('Error creating signed url for', pathForSigning, e);
@@ -143,7 +151,7 @@ export async function getVideoById(videoId: string) {
   const { data: video, error } = await supabase
     .from('videos')
     .select(`
-      *,
+      id, user_id, video_url, caption, created_at, business_id, view_count, boost_value, coins_spent_on_promotion, last_promoted_at,
       profiles:user_id (
         id,
         username,
@@ -156,26 +164,37 @@ export async function getVideoById(videoId: string) {
 
   if (error) return { data: null, error };
 
+  const videoWithBusiness: any = { ...video };
+
   if (video.business_id) {
     const { data: business } = await supabase
       .from('businesses')
-      .select('*')
+      .select('id, owner_id, business_name, business_type, category, profile_picture_url, average_rating, total_reviews, latitude, longitude')
       .eq('id', video.business_id)
       .single();
-    
+
     if (business) {
-      video.businesses = business;
+      videoWithBusiness.businesses = business;
     }
   }
 
-  if (video.video_url && !video.video_url.startsWith('http')) {
-     const { data: signed } = await supabase.storage
+  if (videoWithBusiness.video_url && !videoWithBusiness.video_url.startsWith('http')) {
+    const cacheKey = `signed-url:${STORAGE_BUCKET}:${videoWithBusiness.video_url}`;
+    const cached = cacheGet<string>(cacheKey);
+    if (cached) {
+      videoWithBusiness.video_url = cached;
+    } else {
+      const { data: signed } = await supabase.storage
         .from(STORAGE_BUCKET)
-        .createSignedUrl(video.video_url, 60 * 60);
-     if (signed?.signedUrl) video.video_url = signed.signedUrl;
+        .createSignedUrl(videoWithBusiness.video_url, 60 * 60);
+      if (signed?.signedUrl) {
+        videoWithBusiness.video_url = signed.signedUrl;
+        cacheSet(cacheKey, signed.signedUrl, 55 * 60 * 1000);
+      }
+    }
   }
 
-  return { data: video, error: null };
+  return { data: videoWithBusiness, error: null };
 }
 
 export async function uploadVideoFile(file: File, userId: string) {
@@ -185,7 +204,7 @@ export async function uploadVideoFile(file: File, userId: string) {
   const { data, error } = await supabase.storage
     .from(STORAGE_BUCKET)
     .upload(fileName, file, {
-      cacheControl: '3600',
+      cacheControl: '31536000',
       upsert: false,
     });
 
@@ -462,7 +481,7 @@ export async function getUserBookmarkedVideos(userId: string, limit = 20, offset
     if (userIds.length > 0) {
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
-        .select('*')
+        .select('id, username, full_name, profile_picture_url')
         .in('id', userIds);
 
       if (!profilesError && profiles) {
@@ -473,7 +492,7 @@ export async function getUserBookmarkedVideos(userId: string, limit = 20, offset
     if (businessIds.length > 0) {
       const { data: businesses, error: businessesError } = await supabase
         .from('businesses')
-        .select('*')
+        .select('id, owner_id, business_name, category, profile_picture_url, average_rating, total_reviews, latitude, longitude')
         .in('id', businessIds);
 
       if (!businessesError && businesses) {
@@ -636,22 +655,30 @@ export async function getVideoBoost(videoId: string) {
  */
 export async function getWeightedVideoFeed(limit = 20, offset = 0) {
   try {
-    const { data: allVideos, error: videosError } = await supabase
-      .from('videos')
-      .select(`
-        id,
-        user_id,
-        video_url,
-        caption,
-        created_at,
-        business_id,
-        boost_value
-      `)
-      .order('created_at', { ascending: false });
+    const allVideosCacheKey = 'weighted-feed:all-videos';
+    let allVideos = cacheGet<any[]>(allVideosCacheKey);
 
-    if (videosError) throw videosError;
-    if (!allVideos || allVideos.length === 0) {
-      return { data: [], error: null };
+    if (!allVideos) {
+      const { data, error: videosError } = await supabase
+        .from('videos')
+        .select(`
+          id,
+          user_id,
+          video_url,
+          caption,
+          created_at,
+          business_id,
+          boost_value,
+          view_count
+        `)
+        .order('created_at', { ascending: false });
+
+      if (videosError) throw videosError;
+      if (!data || data.length === 0) {
+        return { data: [], error: null };
+      }
+      allVideos = data;
+      cacheSet(allVideosCacheKey, allVideos, 2 * 60 * 1000); // 2 min TTL
     }
 
     const weightedPool: string[] = [];
@@ -673,21 +700,9 @@ export async function getWeightedVideoFeed(limit = 20, offset = 0) {
       attempts++;
     }
 
-    const selectedIds = Array.from(selectedVideoIds);
-    const { data: selectedVideos } = await supabase
-      .from('videos')
-      .select(`
-        id,
-        user_id,
-        video_url,
-        caption,
-        created_at,
-        business_id,
-        view_count
-      `)
-      .in('id', selectedIds);
+    const selectedVideos = allVideos.filter((v: any) => selectedVideoIds.has(v.id));
 
-    if (!selectedVideos) {
+    if (selectedVideos.length === 0) {
       return { data: [], error: null };
     }
 
@@ -700,7 +715,7 @@ export async function getWeightedVideoFeed(limit = 20, offset = 0) {
     if (userIds.length > 0) {
       const { data: profiles } = await supabase
         .from('profiles')
-        .select('*')
+        .select('id, full_name, username, profile_picture_url')
         .in('id', userIds);
 
       if (profiles) {
@@ -711,7 +726,7 @@ export async function getWeightedVideoFeed(limit = 20, offset = 0) {
     if (businessIds.length > 0) {
       const { data: businesses } = await supabase
         .from('businesses')
-        .select('*')
+        .select('id, owner_id, business_name, business_type, category, profile_picture_url, average_rating, total_reviews, price_range_min, price_range_max, latitude, longitude')
         .in('id', businessIds);
 
       if (businesses) {
@@ -720,10 +735,8 @@ export async function getWeightedVideoFeed(limit = 20, offset = 0) {
     }
 
     const enrichedVideos = selectedVideos.map((v: any) => {
-      const boost = allVideos.find((av: any) => av.id === v.id)?.boost_value || 1;
       return {
         ...v,
-        boost_value: boost,
         profiles: profilesMap[v.user_id] || null,
         businesses: businessesMap[v.business_id] || null,
       };

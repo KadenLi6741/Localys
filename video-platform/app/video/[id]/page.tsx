@@ -1,12 +1,15 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { likeItem, unlikeItem, getLikeCounts } from '@/lib/supabase/videos';
 import { CommentModal } from '@/components/CommentModal';
 import Link from 'next/link';
+import Image from 'next/image';
+import { useTranslation } from '@/hooks/useTranslation';
+import { haversineDistance } from '@/lib/utils/geo';
 
 interface Video {
   id: string;
@@ -26,6 +29,11 @@ interface Video {
     owner_id: string;
     business_name: string;
     profile_picture_url: string;
+    category?: string;
+    latitude?: number;
+    longitude?: number;
+    average_rating?: number;
+    total_reviews?: number;
     custom_messages?: string[];
   };
 }
@@ -34,6 +42,7 @@ export default function VideoDetailPage() {
   const params = useParams();
   const router = useRouter();
   const { user } = useAuth();
+  const { t } = useTranslation();
   const videoId = params?.id as string;
 
   const [video, setVideo] = useState<Video | null>(null);
@@ -42,13 +51,11 @@ export default function VideoDetailPage() {
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
   const [commentModalOpen, setCommentModalOpen] = useState(false);
+  const [priceRange, setPriceRange] = useState<{ min: number; max: number } | null>(null);
+  const [isLocating, setIsLocating] = useState(false);
+  const [userCoords, setUserCoords] = useState<{ lat: number; lng: number } | null>(null);
 
-  useEffect(() => {
-    if (!videoId) return;
-    loadVideo();
-  }, [videoId, user]);
-
-  const loadVideo = async () => {
+  const loadVideo = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -64,7 +71,7 @@ export default function VideoDetailPage() {
         return;
       }
 
-      let enrichedVideo = { ...videoData };
+      const enrichedVideo = { ...videoData };
 
       if (videoData.user_id) {
         const { data: profile } = await supabase
@@ -80,12 +87,33 @@ export default function VideoDetailPage() {
       if (videoData.business_id) {
         const { data: business } = await supabase
           .from('businesses')
-          .select('id, owner_id, business_name, profile_picture_url, custom_messages')
+          .select('id, owner_id, business_name, profile_picture_url, category, latitude, longitude, average_rating, total_reviews, custom_messages')
           .eq('id', videoData.business_id)
           .single();
         if (business) {
           enrichedVideo.businesses = business;
         }
+
+        const { data: menuItems } = await supabase
+          .from('menu_items')
+          .select('price')
+          .eq('user_id', videoData.business_id)
+          .ilike('category', 'main');
+
+        const prices = (menuItems || [])
+          .map((item: { price: number | string }) => (typeof item.price === 'number' ? item.price : Number(item.price)))
+          .filter((price: number) => Number.isFinite(price) && price > 0);
+
+        if (prices.length > 0) {
+          setPriceRange({
+            min: Math.floor(Math.min(...prices)),
+            max: Math.ceil(Math.max(...prices)),
+          });
+        } else {
+          setPriceRange(null);
+        }
+      } else {
+        setPriceRange(null);
       }
 
       setVideo(enrichedVideo);
@@ -93,7 +121,8 @@ export default function VideoDetailPage() {
       if (videoData.business_id) {
         const { data: counts } = await getLikeCounts([videoData.business_id]);
         if (counts && typeof counts === 'object') {
-          setLikeCount((counts as any)[videoData.business_id] || 0);
+          const typedCounts = counts as Record<string, number>;
+          setLikeCount(typedCounts[videoData.business_id] || 0);
         }
       } else {
         const { count } = await supabase
@@ -113,13 +142,18 @@ export default function VideoDetailPage() {
           .single();
         setLiked(!!userLike);
       }
-    } catch (err: any) {
+    } catch (err) {
       console.error('Error loading video:', err);
       setError('Failed to load video');
     } finally {
       setLoading(false);
     }
-  };
+  }, [videoId, user]);
+
+  useEffect(() => {
+    if (!videoId) return;
+    loadVideo();
+  }, [videoId, loadVideo]);
 
   const handleToggleLike = async () => {
     if (!user || !video) return;
@@ -149,6 +183,55 @@ export default function VideoDetailPage() {
     }
     setCommentModalOpen(true);
   };
+
+  const requestLocation = () => {
+    if (!navigator.geolocation) return;
+
+    setIsLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setUserCoords({
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        });
+        setIsLocating(false);
+      },
+      () => {
+        setIsLocating(false);
+      },
+      { enableHighAccuracy: true, timeout: 8000 }
+    );
+  };
+
+  const distanceKm = useMemo(() => {
+    if (!video?.businesses?.latitude || !video.businesses.longitude || !userCoords) return null;
+    return haversineDistance(
+      userCoords.lat,
+      userCoords.lng,
+      video.businesses.latitude,
+      video.businesses.longitude
+    );
+  }, [video?.businesses?.latitude, video?.businesses?.longitude, userCoords]);
+
+  const estimatedMinutes = useMemo(() => {
+    if (distanceKm === null) return null;
+    return Math.max(4, Math.round((distanceKm / 35) * 60));
+  }, [distanceKm]);
+
+  const distanceLabel = useMemo(() => {
+    if (distanceKm === null) return null;
+    if (distanceKm < 1) return `${Math.round(distanceKm * 1000)} m`;
+    return `${distanceKm.toFixed(1)} km`;
+  }, [distanceKm]);
+
+  const priceSignal = useMemo(() => {
+    if (!priceRange) return null;
+    const average = (priceRange.min + priceRange.max) / 2;
+    if (average < 15) return '$';
+    if (average < 30) return '$$';
+    if (average < 60) return '$$$';
+    return '$$$$';
+  }, [priceRange]);
 
   const handleSendQuickMessage = async (messageText: string) => {
     if (!user || !video?.businesses) {
@@ -237,6 +320,10 @@ export default function VideoDetailPage() {
   const creator = video.businesses || video.profiles;
   const creatorName = video.businesses?.business_name || video.profiles?.full_name || 'Unknown';
   const creatorImage = creator?.profile_picture_url || 'https://via.placeholder.com/60';
+  const hasBusinessLocation = Boolean(video.businesses?.latitude && video.businesses?.longitude);
+  const directionsUrl = hasBusinessLocation
+    ? `https://www.google.com/maps/dir/?api=1&destination=${video.businesses!.latitude},${video.businesses!.longitude}`
+    : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(creatorName)}`;
 
   return (
     <div className="min-h-screen bg-black">
@@ -283,9 +370,12 @@ export default function VideoDetailPage() {
 
             {/* Creator Info */}
             <div className="flex items-center gap-3">
-              <img
+              <Image
                 src={creatorImage}
                 alt={creatorName}
+                width={48}
+                height={48}
+                unoptimized
                 className="w-12 h-12 rounded-full object-cover"
               />
               <div>
@@ -295,6 +385,70 @@ export default function VideoDetailPage() {
                 </p>
               </div>
             </div>
+
+            {video.businesses && (
+              <div className="rounded-xl border border-gray-700 bg-gray-800/70 p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <p className="text-white font-semibold">Restaurant Snapshot</p>
+                  {video.businesses.category && (
+                    <span className="text-xs uppercase tracking-wide text-gray-300 bg-gray-700 px-2 py-1 rounded-full">
+                      {video.businesses.category}
+                    </span>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className="rounded-lg bg-gray-900/80 p-3">
+                    <p className="text-xs text-gray-400">{t('video.info.price')}</p>
+                    <p className="text-white font-semibold">
+                      {priceRange ? `${priceSignal} · $${priceRange.min}-$${priceRange.max}` : '—'}
+                    </p>
+                  </div>
+
+                  <div className="rounded-lg bg-gray-900/80 p-3">
+                    <p className="text-xs text-gray-400">{t('video.info.distance')}</p>
+                    <p className="text-white font-semibold">{distanceLabel || 'Tap GPS below'}</p>
+                  </div>
+
+                  <div className="rounded-lg bg-gray-900/80 p-3">
+                    <p className="text-xs text-gray-400">{t('video.info.eta')}</p>
+                    <p className="text-white font-semibold">{estimatedMinutes ? `${estimatedMinutes} min` : '—'}</p>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    onClick={requestLocation}
+                    disabled={isLocating}
+                    className="px-3 py-2 bg-gray-700 hover:bg-gray-600 disabled:opacity-60 disabled:cursor-not-allowed text-white text-sm rounded-lg transition"
+                  >
+                    {isLocating ? 'Locating...' : '📍 Use GPS'}
+                  </button>
+
+                  <a
+                    href={directionsUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-3 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm rounded-lg transition"
+                  >
+                    {t('video.info.get_directions')}
+                  </a>
+
+                  <Link
+                    href={`/profile/${video.businesses.id}`}
+                    className="px-3 py-2 bg-gray-700 hover:bg-gray-600 text-white text-sm rounded-lg transition"
+                  >
+                    {t('video.info.view_menu')}
+                  </Link>
+                </div>
+
+                {(video.businesses.average_rating || video.businesses.total_reviews) && (
+                  <p className="text-sm text-gray-300">
+                    ⭐ {video.businesses.average_rating?.toFixed(1) || '—'} · {video.businesses.total_reviews || 0} reviews
+                  </p>
+                )}
+              </div>
+            )}
 
             {/* Interaction Buttons */}
             <div className="flex gap-4 pt-4 border-t border-gray-700">

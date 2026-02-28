@@ -2,14 +2,25 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import { useParams, usePathname, useRouter } from 'next/navigation';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase/client';
 import { getOrCreateOneToOneChat } from '@/lib/supabase/messaging';
-import { getProfileByUserId, getUserBusiness, Business, BusinessHours } from '@/lib/supabase/profiles';
+import { getUserBusiness, getProfileByUserId, getBusinessLocations, Business, BusinessHours, BusinessLocation } from '@/lib/supabase/profiles';
+
 import { MenuList } from '@/components/MenuList';
 import { PostedVideos } from '@/components/PostedVideos';
+import { BusyTimesDisplay } from '@/components/busytimes/BusyTimesDisplay';
+
+const BusinessLocationMap = dynamic(
+  () => import('@/components/BusinessLocationMap'),
+  {
+    ssr: false,
+    loading: () => <div className="h-[300px] bg-white/5 animate-pulse rounded-t-none" />,
+  }
+);
 
 interface Profile {
   id: string;
@@ -17,6 +28,7 @@ interface Profile {
   full_name: string;
   profile_picture_url?: string;
   bio?: string;
+  type?: string | null;
 }
 
 export default function UserProfilePage() {
@@ -36,6 +48,7 @@ function UserProfileContent() {
   
   const [profile, setProfile] = useState<Profile | null>(null);
   const [business, setBusiness] = useState<Business | null>(null);
+  const [businessLocations, setBusinessLocations] = useState<BusinessLocation[]>([]);
   const [showBusinessHours, setShowBusinessHours] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -44,15 +57,29 @@ function UserProfileContent() {
   useEffect(() => {
     if (userId) {
       loadProfile();
-      loadBusiness();
     }
   }, [userId]);
+
+  useEffect(() => {
+    if (profile?.type) {
+      loadBusiness();
+      loadLocations();
+    } else {
+      setBusiness(null);
+      setBusinessLocations([]);
+    }
+  }, [profile?.type]);
+
+  const loadLocations = async () => {
+    const { data } = await getBusinessLocations(userId);
+    setBusinessLocations(data ?? []);
+  };
 
   const loadProfile = async () => {
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, username, full_name, profile_picture_url, bio')
+        .select('id, username, full_name, profile_picture_url, bio, type')
         .eq('id', userId)
         .single();
 
@@ -83,6 +110,10 @@ function UserProfileContent() {
             console.error('Error parsing business_hours:', parseError);
             data.business_hours = null;
           }
+          console.log('Business after parsing:', biz); // DEBUG
+          setBusiness(biz);
+        } else {
+          setBusiness(null);
         }
         setBusiness(data as Business);
       } else {
@@ -188,16 +219,6 @@ function UserProfileContent() {
             alt={profile.full_name}
             className="w-32 h-32 rounded-full border-4 border-white/20 object-cover mb-4"
           />
-          
-          {/* Average Rating Badge - Prominently displayed below profile pic */}
-          {business && typeof (business as any).average_rating === 'number' && (business as any).average_rating !== null && (
-            <div className="flex items-center justify-center gap-1 bg-gradient-to-r from-yellow-500/20 to-yellow-600/20 border border-yellow-500/50 rounded-full px-4 py-2 mb-3 shadow-lg">
-              <span className="text-2xl">⭐</span>
-              <span className="font-bold text-yellow-300 text-lg">{((business as any).average_rating as number).toFixed(2)}</span>
-              <span className="text-yellow-200/80 text-sm">({(business as any).total_reviews})</span>
-            </div>
-          )}
-          
           <h2 className="text-2xl font-bold mb-1">{profile.full_name}</h2>
           <p className="text-white/60 mb-4">@{profile.username}</p>
           {profile.bio && (
@@ -206,19 +227,16 @@ function UserProfileContent() {
           
           {/* Business Info */}
           {business && (
-            <div className="flex flex-col items-center gap-3 mb-6">
-              <div className="flex items-center gap-2 flex-wrap justify-center">
-                <p className="text-blue-400 text-sm">🏪 {business.business_name}</p>
-                {business.business_type && (
-                  <span className="bg-blue-500/30 text-blue-200 text-xs px-2 py-1 rounded-full capitalize">
-                    {business.business_type === 'hybrid' ? '📦 Pickup & Delivery' : `🏷️ ${business.business_type}`}
-                  </span>
-                )}
-              </div>
-              
+            <div className="flex items-center gap-2 flex-wrap justify-center mb-6">
+              <p className="text-blue-400 text-sm">🏪 {business.business_name}</p>
+              {business.business_type && (
+                <span className="bg-blue-500/30 text-blue-200 text-xs px-2 py-1 rounded-full capitalize">
+                  {business.business_type === 'hybrid' ? '📦 Pickup & Delivery' : `🏷️ ${business.business_type}`}
+                </span>
+              )}
               <button
                 onClick={() => setShowBusinessHours(!showBusinessHours)}
-                className="bg-blue-500/20 text-blue-200 text-xs px-3 py-2 rounded-full hover:bg-blue-500/30 transition-colors font-semibold"
+                className="bg-blue-500/20 text-blue-200 text-xs px-2 py-1 rounded-full hover:bg-blue-500/30 transition-colors"
               >
                 {showBusinessHours ? '⏰ Hide Hours' : '⏰ Show Hours'}
               </button>
@@ -248,48 +266,90 @@ function UserProfileContent() {
         </div>
 
         {/* Business Hours Section */}
-        {business && showBusinessHours && (
+        {showBusinessHours && (
           <div className="mt-8 mb-8">
             <h3 className="text-xl font-semibold mb-4">⏰ Business Hours</h3>
             <div className="bg-white/5 border border-white/10 rounded-lg p-6 space-y-2">
-              {business.business_hours && Object.keys(business.business_hours).length > 0 ? (
-                ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'].map((day) => {
-                  const dayHours = business.business_hours?.[day];
-                  return (
-                    <div key={day} className="flex justify-between items-center text-sm">
-                      <span className="text-white/80 capitalize font-medium w-24">{day}</span>
-                      <span className="text-white/60 text-right">
-                        {dayHours?.closed ? (
-                          <span className="text-red-400">Closed</span>
-                        ) : dayHours?.open && dayHours?.close ? (
-                          `${dayHours.open} - ${dayHours.close}`
-                        ) : (
-                          <span className="text-gray-400">Not set</span>
-                        )}
-                      </span>
-                    </div>
-                  );
-                })
+              {business?.business_hours ? (
+                ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'].map((day) => (
+                  <div key={day} className="flex justify-between items-center text-sm">
+                    <span className="text-white/80 capitalize font-medium">{day}</span>
+                    <span className="text-white/60">
+                      {business.business_hours?.[day]?.closed ? (
+                        'Closed'
+                      ) : (
+                        `${business.business_hours?.[day]?.open || ''} - ${business.business_hours?.[day]?.close || ''}`
+                      )}
+                    </span>
+                  </div>
+                ))
               ) : (
-                <p className="text-white/60 text-center py-4">Business hours not yet set</p>
+                <p className="text-white/60 text-center py-4">Business hours not set</p>
               )}
             </div>
           </div>
         )}
 
-        {/* Services Section */}
-        <div className="mt-8">
-          <h3 className="text-xl font-semibold mb-4">⚙️ Services</h3>
-          <div className="bg-white/5 border border-white/10 rounded-lg p-6">
-            <MenuList userId={userId} isOwnProfile={false} />
+        {/* Business Location Map */}
+        {businessLocations.length > 0 && (
+          <div className="mt-8">
+            <h3 className="text-xl font-semibold mb-4">
+              📍 Location{businessLocations.length > 1 ? 's' : ''}
+            </h3>
+            <div className="bg-white/5 border border-white/10 rounded-lg overflow-hidden">
+              <BusinessLocationMap
+                locations={businessLocations}
+                businessName={business?.business_name ?? ''}
+              />
+            </div>
           </div>
-        </div>
+        )}
+
+        {/* Services Section (business only) */}
+        {profile.type && (
+          <div className="mt-8">
+            <h3 className="text-xl font-semibold mb-4">⚙️ Services</h3>
+            <div className="bg-white/5 border border-white/10 rounded-lg p-6">
+              <MenuList userId={userId} isOwnProfile={false} />
+            </div>
+          </div>
+        )}
+
+        {/* Popular Times Section (business only) */}
+        {business && (
+          <div className="mt-8">
+            <h3 className="text-xl font-semibold mb-4">Popular Times</h3>
+            <div className="bg-white/5 border border-white/10 rounded-lg p-6">
+              <BusyTimesDisplay businessId={business.id} />
+            </div>
+          </div>
+        )}
+
+        {/* Pre-Order CTA (business only) */}
+        {business && (
+          <div className="mt-8">
+            <Link
+              href={`/preorder/${business.id}`}
+              className="block bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 rounded-lg p-6 hover:from-blue-500/30 hover:to-purple-500/30 transition-all duration-200"
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-white font-semibold text-lg mb-1">Pre-Order Now</h3>
+                  <p className="text-white/60 text-sm">Browse the menu, pick a table & time, and have your food ready when you arrive</p>
+                </div>
+                <svg className="w-6 h-6 text-white/60 flex-shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
+            </Link>
+          </div>
+        )}
 
         {/* Videos Section */}
         <div className="mt-8">
           <h3 className="text-xl font-semibold mb-4">📹 Videos</h3>
           <div className="bg-white/5 border border-white/10 rounded-lg p-6">
-            <PostedVideos userId={userId} />
+            <PostedVideos userId={userId} isOwnProfile={false} />
           </div>
         </div>
       </div>

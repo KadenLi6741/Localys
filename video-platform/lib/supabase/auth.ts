@@ -1,7 +1,58 @@
 import { supabase } from './client';
 import type { SignUpData, SignInData } from '../../models/Auth';
+import { createWelcomeCoupon } from './coupons';
 
 export type { SignUpData, SignInData };
+
+type EnsureProfileInput = {
+  id: string;
+  email?: string | null;
+  name?: string | null;
+  username?: string | null;
+};
+
+async function ensureOwnProfile({ id, email, name, username }: EnsureProfileInput) {
+  const fallbackUsername = `user_${id.replace(/-/g, '').slice(0, 8)}`;
+  const sanitizedUsername = username
+    ?.toLowerCase()
+    .replace(/[^a-z0-9_]/g, '')
+    .slice(0, 30);
+
+  const profileEmail = email && email.trim().length > 0 ? email : `${id}@localy.invalid`;
+  const profilePayload = {
+    id,
+    email: profileEmail,
+    full_name: name ?? null,
+    username: sanitizedUsername || (email ? email.split('@')[0].toLowerCase().replace(/[^a-z0-9_]/g, '').slice(0, 30) : fallbackUsername),
+  };
+
+  const firstAttempt = await supabase
+    .from('profiles')
+    .upsert(profilePayload, { onConflict: 'id' });
+
+  if (!firstAttempt.error) {
+    return firstAttempt;
+  }
+
+  const isUsernameConflict =
+    firstAttempt.error.code === '23505' &&
+    (firstAttempt.error.message.includes('profiles_username_key') ||
+      firstAttempt.error.message.toLowerCase().includes('username'));
+
+  if (!isUsernameConflict) {
+    return firstAttempt;
+  }
+
+  return supabase
+    .from('profiles')
+    .upsert(
+      {
+        ...profilePayload,
+        username: `${fallbackUsername}_${id.replace(/-/g, '').slice(0, 4)}`,
+      },
+      { onConflict: 'id' }
+    );
+}
 
 /**
  * Sign up a new user
@@ -13,56 +64,62 @@ export async function signUp({ email, password, name, username, accountType, bus
       throw new Error('Business type is required for business accounts');
     }
 
+    const normalizedEmail = email.trim().toLowerCase();
+
+    const { data: existingProfile, error: existingProfileError } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('email', normalizedEmail)
+      .maybeSingle();
+
+    if (existingProfileError) {
+      throw existingProfileError;
+    }
+
+    if (existingProfile) {
+      throw new Error('An account with this email already exists. Please sign in.');
+    }
+
+    const emailRedirectTo = typeof window !== 'undefined'
+      ? `${window.location.origin}/auth/verified`
+      : undefined;
+
     const { data: authData, error: authError } = await supabase.auth.signUp({
-      email,
+      email: normalizedEmail,
       password,
+      options: {
+        emailRedirectTo,
+        data: {
+          full_name: name,
+          username,
+          account_type: accountType,
+          business_type: businessType ?? null,
+        },
+      },
     });
 
     if (authError) throw authError;
     if (!authData.user) throw new Error('User creation failed');
 
-    // Create profile using server-side API to bypass RLS policy
-    const profileResponse = await fetch('/api/auth/create-profile', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        id: authData.user.id,
-        email,
-        full_name: name,
-        username,
-      }),
-    });
+    const hasNoIdentities =
+      Array.isArray(authData.user.identities) &&
+      authData.user.identities.length === 0;
 
-    if (!profileResponse.ok) {
-      const errorData = await profileResponse.json();
-      console.error('Profile creation failed:', errorData);
-      throw new Error(errorData.error || 'Failed to create profile');
+    if (hasNoIdentities) {
+      throw new Error('An account with this email already exists. Please sign in.');
     }
 
-    // If business account, create business record
-    if (accountType === 'business' && businessType) {
-      const { error: businessError } = await supabase
-        .from('businesses')
-        .insert({
-          owner_id: authData.user.id,
-          business_name: name || username,
-          business_type: businessType,
-          business_hours: {
-            monday: { open: '09:00', close: '17:00' },
-            tuesday: { open: '09:00', close: '17:00' },
-            wednesday: { open: '09:00', close: '17:00' },
-            thursday: { open: '09:00', close: '17:00' },
-            friday: { open: '09:00', close: '17:00' },
-            saturday: { open: '10:00', close: '16:00' },
-            sunday: { closed: true },
-          },
-        });
+    if (authData.session) {
+      const { error: profileError } = await ensureOwnProfile({
+        id: authData.user.id,
+        email: normalizedEmail,
+        name,
+        username,
+      });
 
-      if (businessError) {
-        console.warn('Business creation failed:', businessError);
-        // Don't throw - business creation failure shouldn't block signup
+      if (profileError) {
+        console.error('Profile creation failed:', profileError);
+        throw profileError;
       }
     }
 
@@ -84,11 +141,51 @@ export async function signUp({ email, password, name, username, accountType, bus
 /**
  * Sign in existing user
  */
-export async function signIn({ email, password }: SignInData) {
+export async function signIn({ identifier, password }: SignInData) {
+  const normalizedIdentifier = identifier.trim();
+  if (!normalizedIdentifier) {
+    return { data: null, error: new Error('Email or username is required') };
+  }
+
+  let resolvedEmail = normalizedIdentifier.toLowerCase();
+
+  if (!normalizedIdentifier.includes('@')) {
+    const normalizedUsername = normalizedIdentifier.toLowerCase();
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('email')
+      .eq('username', normalizedUsername)
+      .maybeSingle();
+
+    if (profileError) {
+      return { data: null, error: profileError };
+    }
+
+    if (!profile?.email) {
+      return { data: null, error: new Error('Invalid login credentials') };
+    }
+
+    resolvedEmail = profile.email.trim().toLowerCase();
+  }
+
   const { data, error } = await supabase.auth.signInWithPassword({
-    email,
+    email: resolvedEmail,
     password,
   });
+
+  if (!error && data.user) {
+    const metadata = (data.user.user_metadata ?? {}) as Record<string, unknown>;
+    const { error: profileError } = await ensureOwnProfile({
+      id: data.user.id,
+      email: data.user.email ?? resolvedEmail,
+      name: (metadata.full_name as string | undefined) ?? null,
+      username: (metadata.username as string | undefined) ?? null,
+    });
+
+    if (profileError) {
+      console.warn('Profile sync on sign-in failed:', profileError);
+    }
+  }
 
   return { data, error };
 }
@@ -102,33 +199,11 @@ export async function signOut() {
 }
 
 /**
- * Get current session with improved error handling for refresh token issues
+ * Get current session
  */
 export async function getSession() {
-  try {
-    const { data: { session }, error } = await supabase.auth.getSession();
-    
-    if (error) {
-      // If it's a refresh token error, clear the session
-      if (error.message?.includes('refresh token') || error.message?.includes('Refresh Token')) {
-        console.warn('Refresh token issue detected, clearing session:', error.message);
-        // Clear corrupted session data
-        try {
-          localStorage.removeItem('sb-dbqkpcwnzteljwxjoudj-auth-token');
-        } catch (e) {
-          // Ignore localStorage errors
-        }
-        return { session: null, error: null };
-      }
-      return { session, error };
-    }
-    
-    return { session, error };
-  } catch (error: any) {
-    console.error('Unexpected error in getSession:', error);
-    // Return null session on any error to prevent app from breaking
-    return { session: null, error };
-  }
+  const { data: { session }, error } = await supabase.auth.getSession();
+  return { session, error };
 }
 
 /**
@@ -137,6 +212,23 @@ export async function getSession() {
 export async function getCurrentUser() {
   const { data: { user }, error } = await supabase.auth.getUser();
   return { user, error };
+}
+
+/**
+ * Send password reset email
+ */
+export async function resetPasswordForEmail(email: string) {
+  const redirectTo = `${window.location.origin}/reset-password`;
+  const { data, error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo });
+  return { data, error };
+}
+
+/**
+ * Update user password (used after reset link callback)
+ */
+export async function updatePassword(newPassword: string) {
+  const { data, error } = await supabase.auth.updateUser({ password: newPassword });
+  return { data, error };
 }
 
 /**

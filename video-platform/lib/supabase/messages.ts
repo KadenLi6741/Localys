@@ -38,7 +38,6 @@ export async function getChats(userId: string) {
       dataLength: cmembers?.length, 
       hasError: !!cmError,
       errorKeys: cmError ? Object.keys(cmError) : [],
-      errorStatus: cmError?.status,
       errorCode: cmError?.code,
       errorMessage: cmError?.message,
     });
@@ -116,7 +115,7 @@ async function processChatData(memberChats: any[], userId: string) {
 
   const { data: messages, error: messagesError } = await supabase
     .from('messages')
-    .select('*')
+    .select('id, chat_id, sender_id, content, created_at')
     .in('chat_id', chatIds)
     .order('created_at', { ascending: false });
 
@@ -127,28 +126,32 @@ async function processChatData(memberChats: any[], userId: string) {
   
   console.log('Messages fetched:', messages?.length || 0);
 
-  const chats: ChatWithDetails[] = memberChats.map(mc => {
+  const chats = memberChats.reduce<ChatWithDetails[]>((acc, mc) => {
     const chat = mc.chats as Chat | null;
-    if (!chat) return null;
-    
-    const chatMembers = allMembers?.filter(m => m.chat_id === mc.chat_id) || [];
-    const otherMember = chatMembers.find(m => m.user_id !== userId);
-    const lastMessage = messages?.find(m => m.chat_id === mc.chat_id);
-    
-    const unreadMessages = messages?.filter(m => 
-      m.chat_id === mc.chat_id && 
+    if (!chat) return acc;
+
+    const chatMembers = (allMembers?.filter(m => m.chat_id === mc.chat_id) || []) as ChatMember[];
+    const otherMember = chatMembers.find(m => m.user_id !== userId) as (ChatMember & { profiles?: unknown }) | undefined;
+    const otherProfile = otherMember?.profiles;
+    const otherUser = (Array.isArray(otherProfile) ? otherProfile[0] : otherProfile) as ChatWithDetails['other_user'];
+    const lastMessage = messages?.find(m => m.chat_id === mc.chat_id) as Message | undefined;
+
+    const unreadMessages = messages?.filter(m =>
+      m.chat_id === mc.chat_id &&
       m.sender_id !== userId &&
       (!mc.last_read || new Date(m.created_at || '').getTime() > new Date(mc.last_read).getTime())
     ) || [];
 
-    return {
+    acc.push({
       ...chat,
       members: chatMembers,
-      other_user: otherMember?.profiles as ChatWithDetails['other_user'],
+      other_user: otherUser,
       last_message: lastMessage,
       unread_count: unreadMessages.length,
-    };
-  }).filter((chat): chat is ChatWithDetails => chat !== null);
+    });
+
+    return acc;
+  }, []);
 
   chats.sort((a, b) => {
     const aTime = a.last_message?.created_at || a.created_at || '';
@@ -235,22 +238,29 @@ export async function findOneToOneChat(userId1: string, userId2: string) {
       return { data: null, error: null };
     }
 
+    const potentialChatIds = potentialChats.map(c => c.id);
+    const { data: allMembers, error: membersError } = await supabase
+      .from('chat_members')
+      .select('chat_id, user_id')
+      .in('chat_id', potentialChatIds);
+
+    if (membersError) {
+      console.error('Error fetching members for chats:', membersError);
+      throw membersError;
+    }
+
+    const membersByChatId: Record<string, string[]> = {};
+    (allMembers || []).forEach(m => {
+      if (!membersByChatId[m.chat_id]) membersByChatId[m.chat_id] = [];
+      membersByChatId[m.chat_id].push(m.user_id);
+    });
+
+    const targetIds = [userId1, userId2].sort();
     for (const chat of potentialChats) {
-      const { data: members, error: membersError } = await supabase
-        .from('chat_members')
-        .select('user_id')
-        .eq('chat_id', chat.id);
-
-      if (membersError) {
-        console.error('Error fetching members for chat:', chat.id, membersError);
-        continue;
-      }
-
-      if (members && members.length === 2) {
-        const memberIds = members.map(m => m.user_id).sort();
-        const targetIds = [userId1, userId2].sort();
-        
-        if (memberIds[0] === targetIds[0] && memberIds[1] === targetIds[1]) {
+      const members = membersByChatId[chat.id] || [];
+      if (members.length === 2) {
+        const sorted = [...members].sort();
+        if (sorted[0] === targetIds[0] && sorted[1] === targetIds[1]) {
           console.log('Found matching 1:1 chat:', chat.id);
           return { data: chat, error: null };
         }
@@ -270,9 +280,15 @@ export async function findOneToOneChat(userId1: string, userId2: string) {
  */
 export async function getOrCreateOneToOneChat(userId1: string, userId2: string) {
   try {
-    console.log('Creating/fetching 1:1 chat between', userId1, 'and', userId2);
+    const { data: authData, error: authError } = await supabase.auth.getUser();
+    if (authError || !authData?.user?.id) {
+      throw new Error('You must be signed in to start a chat.');
+    }
+
+    const initiatorUserId = authData.user.id;
+    console.log('Creating/fetching 1:1 chat between', initiatorUserId, 'and', userId2);
     
-    const { data: existing, error: findError } = await findOneToOneChat(userId1, userId2);
+    const { data: existing, error: findError } = await findOneToOneChat(initiatorUserId, userId2);
     
     if (findError) {
       const errorMsg = extractErrorMessage(findError);
@@ -286,36 +302,33 @@ export async function getOrCreateOneToOneChat(userId1: string, userId2: string) 
     }
 
     console.log('Creating new 1:1 chat...');
-    
-    // Step 1: Generate a UUID for the chat on the client side
-    // This avoids the RLS issue with insert().select()
-    const chatId = crypto.randomUUID();
-    console.log('Generated chat ID:', chatId);
-    
-    // Step 2: Insert chat with the generated ID
-    const { error: insertError } = await supabase
+    const { data: newChat, error: chatError } = await supabase
       .from('chats')
       .insert({
-        id: chatId,
         is_group: false,
         metadata: {},
-      });
+      })
+      .select()
+      .single();
 
-    if (insertError) {
-      const errorMsg = extractErrorMessage(insertError);
-      console.error('Error inserting chat:', errorMsg, insertError);
+    if (chatError) {
+      const errorMsg = extractErrorMessage(chatError);
+      console.error('Error creating chat:', errorMsg, chatError);
       throw new Error(errorMsg);
     }
 
-    console.log('Chat inserted successfully');
+    if (!newChat) {
+      throw new Error('Failed to create chat - no data returned');
+    }
 
-    // Step 3: Add both users as chat members
-    console.log('Adding chat members...');
+    console.log('Chat created successfully:', newChat.id);
+
+    console.log('Adding members to chat...');
     const { error: membersError } = await supabase
       .from('chat_members')
       .insert([
-        { chat_id: chatId, user_id: userId1, role: 'member' },
-        { chat_id: chatId, user_id: userId2, role: 'member' },
+        { chat_id: newChat.id, user_id: initiatorUserId, role: 'member' },
+        { chat_id: newChat.id, user_id: userId2, role: 'member' },
       ]);
 
     if (membersError) {
@@ -325,20 +338,6 @@ export async function getOrCreateOneToOneChat(userId1: string, userId2: string) 
     }
 
     console.log('Members added successfully');
-
-    // Step 4: Query and return the chat
-    const { data: newChat, error: selectError } = await supabase
-      .from('chats')
-      .select('*')
-      .eq('id', chatId)
-      .single();
-    
-    if (selectError || !newChat) {
-      console.error('Error fetching created chat:', selectError);
-      throw new Error('Failed to fetch created chat');
-    }
-
-    console.log('Chat created successfully:', newChat.id);
     return { data: newChat, error: null };
   } catch (error) {
     const errorMsg = extractErrorMessage(error);
@@ -431,7 +430,7 @@ export async function getConversation(chatId: string): Promise<{ data: (Conversa
   try {
     const { data: chat, error: chatError } = await supabase
       .from('chats')
-      .select('*')
+      .select('id, is_group, metadata, created_at')
       .eq('id', chatId)
       .single();
 
@@ -440,6 +439,7 @@ export async function getConversation(chatId: string): Promise<{ data: (Conversa
     const { data: members, error: membersError } = await supabase
       .from('chat_members')
       .select(`
+        chat_id,
         user_id,
         profiles:user_id (
           id,
