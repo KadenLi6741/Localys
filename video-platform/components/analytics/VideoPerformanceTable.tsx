@@ -20,7 +20,7 @@ export function VideoPerformanceTable({ videos }: VideoPerformanceTableProps) {
         {sorted.map((video, index) => (
           <div
             key={video.videoId}
-            className="bg-black border border-white/10 rounded-lg overflow-hidden hover:border-white/20 transition-all duration-200"
+            className="bg-transparent border border-white/10 rounded-lg overflow-hidden hover:border-white/20 transition-all duration-200"
           >
             <div className="flex gap-4 p-4">
               <div className="flex-shrink-0 w-14 h-14 bg-white/5 rounded-lg flex items-center justify-center relative">

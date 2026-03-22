@@ -190,7 +190,7 @@ export default function CommentSection({ videoId, className = '' }: CommentSecti
   }
 
   return (
-    <div className={`bg-black text-white ${className}`}>
+    <div className={`bg-transparent text-white ${className}`}>
       {/* Average Rating Display */}
       {(averageRating || totalRatedComments > 0) && (
         <div className="p-4 bg-white/5 border-b border-white/10">

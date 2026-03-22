@@ -199,7 +199,7 @@ export default function CommentForm({
           placeholder={placeholder}
           disabled={loading}
           rows={compact ? 1 : 3}
-          className={`w-full bg-black border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-white/40 disabled:opacity-50 disabled:cursor-not-allowed resize-none ${
+          className={`w-full bg-transparent border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-white/40 disabled:opacity-50 disabled:cursor-not-allowed resize-none ${
             compact ? 'text-sm min-h-[32px]' : 'text-sm'
           }`}
           style={{ maxHeight: compact ? '80px' : '120px' }}

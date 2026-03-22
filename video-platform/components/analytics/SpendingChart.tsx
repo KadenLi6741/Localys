@@ -18,7 +18,7 @@ interface SpendingChartProps {
 function CustomTooltip({ active, payload, label }: { active?: boolean; payload?: { value: number }[]; label?: string }) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="bg-black/90 border border-white/20 rounded-lg p-3 shadow-lg">
+    <div className="bg-[#1A1A18]/90 border border-white/20 rounded-lg p-3 shadow-lg">
       <p className="text-white/60 text-xs mb-1">{label}</p>
       <p className="text-yellow-400 font-semibold">🪙 {payload[0].value} coins</p>
     </div>

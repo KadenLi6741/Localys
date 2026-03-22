@@ -122,7 +122,7 @@ export function EditableProfilePicture({
 
         {/* Loading overlay */}
         {loading && (
-          <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-full">
+          <div className="absolute inset-0 bg-[#1A1A18]/50 flex items-center justify-center rounded-full">
             <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
           </div>
         )}

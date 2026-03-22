@@ -44,9 +44,9 @@ function ChatContent() {
   };
 
   return (
-    <div className="h-screen bg-black text-white flex flex-col pb-16">
+    <div className="h-screen bg-transparent text-white flex flex-col pb-16">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-black/80 backdrop-blur-md border-b border-white/10 px-4 py-4">
+      <div className="sticky top-0 z-10 bg-[#1A1A18]/80 backdrop-blur-md border-b border-white/10 px-4 py-4">
         <div className="flex items-center gap-4">
           <button onClick={() => router.back()} className="text-white">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -66,7 +66,7 @@ function ChatContent() {
       />
 
       {/* Message Input */}
-      <form onSubmit={handleSendMessage} className="sticky bottom-0 bg-black/80 backdrop-blur-md border-t border-white/10 p-4">
+      <form onSubmit={handleSendMessage} className="sticky bottom-0 bg-[#1A1A18]/80 backdrop-blur-md border-t border-white/10 p-4">
         <div className="flex gap-2">
           <input
             type="text"

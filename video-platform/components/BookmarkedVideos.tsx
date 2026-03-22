@@ -97,9 +97,9 @@ export function BookmarkedVideos({ userId }: BookmarkedVideosProps) {
         <Link
           key={video.id}
           href={`/video/${video.id}`}
-          className="group relative overflow-hidden rounded-lg bg-black/20 border border-white/10 hover:border-white/30 transition-all duration-300"
+          className="group relative overflow-hidden rounded-lg bg-[#1A1A18]/20 border border-white/10 hover:border-white/30 transition-all duration-300"
         >
-          <div className="aspect-video relative overflow-hidden bg-black">
+          <div className="aspect-video relative overflow-hidden bg-transparent">
             {video.video_url && (
               <video
                 src={video.video_url}
@@ -107,7 +107,7 @@ export function BookmarkedVideos({ userId }: BookmarkedVideosProps) {
                 muted
               />
             )}
-            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors duration-300" />
+            <div className="absolute inset-0 bg-[#1A1A18]/0 group-hover:bg-[#1A1A18]/30 transition-colors duration-300" />
           </div>
           
           <div className="p-3">

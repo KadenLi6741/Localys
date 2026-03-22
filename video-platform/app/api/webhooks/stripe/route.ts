@@ -134,22 +134,39 @@ export async function POST(request: NextRequest) {
           return NextResponse.json({ received: true });
         }
 
-        const items = JSON.parse(metadata.items) as { id: string; name: string; sid: string; price: number; qty?: number; sr?: string }[];
+        const items = JSON.parse(metadata.items) as { id: string; qty?: number }[];
+        const sellerId = metadata.sellerId || '';
+
+        // Look up full item details from Supabase menu_items table
+        const itemIds = items.map(i => i.id);
+        const { data: menuItems, error: menuError } = await supabase
+          .from('menu_items')
+          .select('id, name, price, user_id')
+          .in('id', itemIds);
+
+        if (menuError) {
+          console.error('Error fetching menu items for webhook:', menuError);
+        }
+
+        const menuMap = new Map<string, { name: string; price: number; user_id: string }>();
+        (menuItems || []).forEach((mi: { id: string; name: string; price: number; user_id: string }) => {
+          menuMap.set(mi.id, mi);
+        });
 
         const purchaseRecords = items.map((item) => {
-          const originalPrice = item.price;
+          const menuItem = menuMap.get(item.id);
+          const originalPrice = menuItem?.price || 0;
           const paidPrice = discountPercentage > 0
             ? Math.max(0, originalPrice - originalPrice * (discountPercentage / 100))
             : originalPrice;
 
           return {
             item_id: item.id,
-            seller_id: item.sid,
+            seller_id: menuItem?.user_id || sellerId,
             buyer_id: buyerId,
-            item_name: item.name || 'Unknown Item',
+            item_name: menuItem?.name || 'Unknown Item',
             price: paidPrice,
             quantity: item.qty || 1,
-            ...(item.sr ? { special_requests: item.sr } : {}),
             ...(couponCode && {
               original_price: originalPrice,
               coupon_code: couponCode,
@@ -185,7 +202,7 @@ export async function POST(request: NextRequest) {
           }
         }
 
-        const itemNames = items.map(i => i.name).join(', ');
+        const itemNames = purchaseRecords.map(r => r.item_name).join(', ');
         console.log(`Item purchases recorded: ${itemNames} bought by ${buyerId}`);
         return NextResponse.json({ success: true });
       } else if (metadata.itemId && metadata.buyerId && metadata.sellerId) {

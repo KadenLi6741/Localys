@@ -7,7 +7,8 @@ import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { useAuth } from '@/contexts/AuthContext';
 import { uploadVideoFile, uploadVideoMetadata, promoteVideo } from '@/lib/supabase/videos';
 import { getUserCoins } from '@/lib/supabase/profiles';
-import { PromotionModal } from '@/components/PromotionModal';
+import dynamic from 'next/dynamic';
+const PromotionModal = dynamic(() => import('@/components/PromotionModal').then(mod => mod.PromotionModal), { ssr: false });
 import { supabase } from '@/lib/supabase/client';
 
 export default function UploadPage() {
@@ -28,6 +29,7 @@ function UploadContent() {
   const [businessName, setBusinessName] = useState('');
   const [category, setCategory] = useState<string>('');
   const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [error, setError] = useState('');
   const [showPromotionModal, setShowPromotionModal] = useState(false);
   const [uploadedVideoId, setUploadedVideoId] = useState<string | null>(null);
@@ -62,10 +64,22 @@ function UploadContent() {
 
     setError('');
     setIsUploading(true);
+    setUploadProgress(10);
 
     try {
+      // Simulated progress animation
+      const progressInterval = setInterval(() => {
+        setUploadProgress((prev) => {
+          if (prev < 90) return prev + Math.random() * 30;
+          return prev;
+        });
+      }, 500);
+
       const { data: uploadData, error: uploadError } = await uploadVideoFile(selectedVideo, user.id);
       
+      clearInterval(progressInterval);
+      setUploadProgress(70);
+
       if (uploadError || !uploadData?.publicUrl) {
         throw new Error(uploadError?.message || 'Failed to upload video');
       }
@@ -100,6 +114,8 @@ function UploadContent() {
         }
       }
 
+      setUploadProgress(85);
+
       const { data: videoData, error: metadataError } = await uploadVideoMetadata({
         user_id: user.id,
         video_url: uploadData.publicUrl,
@@ -108,6 +124,8 @@ function UploadContent() {
       });
 
       if (metadataError) throw metadataError;
+
+      setUploadProgress(100);
 
       const { data: coins } = await getUserCoins(user.id);
       setUserCoins(coins || 100);
@@ -123,9 +141,11 @@ function UploadContent() {
       }
       
       setIsUploading(false);
+      setUploadProgress(0);
     } catch (err: any) {
       setError(err.message || 'Failed to upload video');
       setIsUploading(false);
+      setUploadProgress(0);
     }
   };
 
@@ -134,76 +154,103 @@ function UploadContent() {
       throw new Error('Video or user not found');
     }
 
-    // Upload the video
-    const { data: uploadData, error: uploadError } = await uploadVideoFile(selectedVideo, user.id);
-    
-    if (uploadError || !uploadData?.publicUrl) {
-      throw new Error(uploadError?.message || 'Failed to upload video');
-    }
+    setUploadProgress(10);
 
-    // Create business if provided
-    let businessId: string | undefined;
-    if (businessName && category) {
-      const { data: existingBusiness } = await supabase
-        .from('businesses')
-        .select('id')
-        .eq('owner_id', user.id)
-        .eq('business_name', businessName)
-        .single();
+    // Simulated progress animation
+    const progressInterval = setInterval(() => {
+      setUploadProgress((prev) => {
+        if (prev < 85) return prev + Math.random() * 25;
+        return prev;
+      });
+    }, 600);
 
-      if (existingBusiness) {
-        businessId = existingBusiness.id;
-      } else {
-        const { data: newBusiness, error: businessError } = await supabase
+    try {
+      // Upload the video
+      const { data: uploadData, error: uploadError } = await uploadVideoFile(selectedVideo, user.id);
+      
+      clearInterval(progressInterval);
+      setUploadProgress(70);
+
+      if (uploadError || !uploadData?.publicUrl) {
+        throw new Error(uploadError?.message || 'Failed to upload video');
+      }
+
+      // Create business if provided
+      let businessId: string | undefined;
+      if (businessName && category) {
+        const { data: existingBusiness } = await supabase
           .from('businesses')
-          .insert({
-            owner_id: user.id,
-            business_name: businessName,
-            category: category as 'food' | 'retail' | 'services',
-            video_url: uploadData.publicUrl,
-            latitude: 0,
-            longitude: 0,
-          })
-          .select()
+          .select('id')
+          .eq('owner_id', user.id)
+          .eq('business_name', businessName)
           .single();
 
-        if (businessError) throw businessError;
-        businessId = newBusiness.id;
+        if (existingBusiness) {
+          businessId = existingBusiness.id;
+        } else {
+          const { data: newBusiness, error: businessError } = await supabase
+            .from('businesses')
+            .insert({
+              owner_id: user.id,
+              business_name: businessName,
+              category: category as 'food' | 'retail' | 'services',
+              video_url: uploadData.publicUrl,
+              latitude: 0,
+              longitude: 0,
+            })
+            .select()
+            .single();
+
+          if (businessError) throw businessError;
+          businessId = newBusiness.id;
+        }
       }
-    }
 
-    // Upload video metadata
-    const { data: videoData, error: metadataError } = await uploadVideoMetadata({
-      user_id: user.id,
-      video_url: uploadData.publicUrl,
-      caption: caption || undefined,
-      business_id: businessId,
-    });
+      setUploadProgress(80);
 
-    if (metadataError) throw metadataError;
+      // Upload video metadata
+      const { data: videoData, error: metadataError } = await uploadVideoMetadata({
+        user_id: user.id,
+        video_url: uploadData.publicUrl,
+        caption: caption || undefined,
+        business_id: businessId,
+      });
 
-    // Apply boost immediately
-    if (coinsToSpend > 0) {
-      const { data: boostData, error: boostError } = await promoteVideo(user.id, videoData.id, coinsToSpend);
-      if (boostError) throw boostError;
-    }
+      if (metadataError) throw metadataError;
 
-    // Update coins
-    const { data: coins } = await getUserCoins(user.id);
-    setUserCoins(coins || 100);
-    setUploadedVideoId(videoData.id);
-    setBoostCoinsFromModal(null);
-    setVideoBoosted(true);
-    setBoostCoinsSpent(coinsToSpend);
-    
-    // Reset form
-    setSelectedVideo(null);
-    setVideoPreview(null);
-    setCaption('');
-    setBusinessName('');
-    setCategory('');
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+      setUploadProgress(90);
+
+      // Apply boost immediately
+      if (coinsToSpend > 0) {
+        const { data: boostData, error: boostError } = await promoteVideo(user.id, videoData.id, coinsToSpend);
+        if (boostError) throw boostError;
+      }
+
+      setUploadProgress(100);
+
+      // Update coins
+      const { data: coins } = await getUserCoins(user.id);
+      setUserCoins(coins || 100);
+      setUploadedVideoId(videoData.id);
+      setBoostCoinsFromModal(null);
+      setVideoBoosted(true);
+      setBoostCoinsSpent(coinsToSpend);
+      
+      // Reset form
+      setSelectedVideo(null);
+      setVideoPreview(null);
+      setCaption('');
+      setBusinessName('');
+      setCategory('');
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+      
+      setUploadProgress(0);
+    } catch (error) {
+      clearInterval(progressInterval);
+      console.error('Upload error:', error);
+      throw error;
     }
   };
 
@@ -219,22 +266,22 @@ function UploadContent() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white pb-24">
+    <div className="min-h-screen bg-[#1A1A18] text-[#F5F0E8] pb-24">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-black/80 backdrop-blur-md border-b border-white/10">
-        <div className="max-w-2xl mx-auto px-4 py-4">
-          <h1 className="text-2xl font-bold">Create Post</h1>
+      <div className="sticky top-0 z-10 bg-[#1A1A18]/80 backdrop-blur-md border-b border-[#3A3A34]">
+        <div className="w-full px-4 lg:px-12 py-4">
+          <h1 className="entrance-slide text-2xl font-bold text-[#F5F0E8]" style={{ animation: 'slideInLeft 0.4s ease-out forwards', opacity: 0 }}>Create Post</h1>
         </div>
       </div>
 
       {/* Success Screen */}
       {uploadedVideoId && !showPromotionModal && videoBoosted && (
-        <div className="max-w-2xl mx-auto px-4 py-16 flex items-center justify-center min-h-[calc(100vh-120px)]">
+        <div className="w-full px-4 lg:px-12 py-16 flex items-center justify-center min-h-[calc(100vh-120px)]">
           <div className="text-center space-y-6">
             <div className="flex justify-center">
               <div className="relative w-20 h-20">
-                <div className="absolute inset-0 bg-green-500/20 border border-green-500 rounded-full flex items-center justify-center animate-pulse">
-                  <svg className="w-10 h-10 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="absolute inset-0 bg-[#6BAF7A]/20 border border-[#6BAF7A] rounded-full flex items-center justify-center animate-pulse">
+                  <svg className="w-10 h-10 text-[#6BAF7A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
@@ -245,30 +292,30 @@ function UploadContent() {
             </div>
             
             <div>
-              <h2 className="text-3xl font-bold mb-2">Video Boosted!</h2>
-              <p className="text-white/60">Your video is now live and boosted in the feed</p>
+              <h2 className="text-3xl font-bold mb-2 text-[#F5F0E8]">Video Boosted!</h2>
+              <p className="text-[#9E9A90]">Your video is now live and boosted in the feed</p>
             </div>
 
-            <div className="bg-gradient-to-r from-green-500/10 to-blue-500/10 border border-green-500/30 rounded-lg p-6 my-6">
+            <div className="bg-gradient-to-r from-[#6BAF7A]/10 to-[#F5A623]/10 border border-[#6BAF7A]/30 rounded-2xl p-6 my-6">
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
-                  <span className="text-white/70">Boost Applied</span>
-                  <span className="font-semibold text-green-400">✓ Confirmed</span>
+                  <span className="text-[#9E9A90]">Boost Applied</span>
+                  <span className="font-semibold text-[#6BAF7A]">✓ Confirmed</span>
                 </div>
-                <div className="h-px bg-white/10"></div>
+                <div className="h-px bg-[#3A3A34]"></div>
                 <div className="flex justify-between items-center">
-                  <span className="text-white/70">Coins Spent</span>
-                  <span className="text-2xl font-bold text-yellow-400">🪙 {boostCoinsSpent}</span>
+                  <span className="text-[#9E9A90]">Coins Spent</span>
+                  <span className="text-2xl font-bold text-[#F5A623]">🪙 {boostCoinsSpent}</span>
                 </div>
-                <div className="h-px bg-white/10"></div>
+                <div className="h-px bg-[#3A3A34]"></div>
                 <div className="flex justify-between items-center">
-                  <span className="text-white/70">Remaining Coins</span>
-                  <span className="text-2xl font-bold text-yellow-400">🪙 {userCoins}</span>
+                  <span className="text-[#9E9A90]">Remaining Coins</span>
+                  <span className="text-2xl font-bold text-[#F5A623]">🪙 {userCoins}</span>
                 </div>
               </div>
             </div>
 
-            <p className="text-white/70 text-sm">Your boosted video will get more visibility and reach in the feed!</p>
+            <p className="text-[#9E9A90] text-sm">Your boosted video will get more visibility and reach in the feed!</p>
 
             <div className="flex gap-3 justify-center pt-4">
               <button
@@ -277,7 +324,7 @@ function UploadContent() {
                   setVideoBoosted(false);
                   setBoostCoinsSpent(0);
                 }}
-                className="px-6 py-3 bg-white/10 hover:bg-white/20 rounded-lg font-semibold transition-all"
+                className="px-6 py-3 bg-[#242420] hover:bg-[#2E2E28] border border-[#3A3A34] rounded-xl font-semibold transition-all min-h-[48px]"
               >
                 Create Another
               </button>
@@ -286,7 +333,7 @@ function UploadContent() {
                   router.push('/');
                   router.refresh();
                 }}
-                className="px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-semibold transition-all flex items-center gap-2"
+                className="px-6 py-3 bg-[#F5A623] hover:bg-[#F5A623]/90 text-black rounded-xl font-semibold transition-all flex items-center gap-2 min-h-[48px] active:scale-[0.98]"
               >
                 <span>👀</span>
                 <span>View Feed</span>
@@ -298,45 +345,45 @@ function UploadContent() {
 
       {/* Success Screen */}
       {uploadedVideoId && !showPromotionModal && !videoBoosted && (
-        <div className="max-w-2xl mx-auto px-4 py-16 flex items-center justify-center min-h-[calc(100vh-120px)]">
+        <div className="w-full px-4 lg:px-12 py-16 flex items-center justify-center min-h-[calc(100vh-120px)]">
           <div className="text-center space-y-6">
             <div className="flex justify-center">
-              <div className="w-16 h-16 bg-green-500/20 border border-green-500 rounded-full flex items-center justify-center">
-                <svg className="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-16 h-16 bg-[#6BAF7A]/20 border border-[#6BAF7A] rounded-full flex items-center justify-center">
+                <svg className="w-8 h-8 text-[#6BAF7A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               </div>
             </div>
             
             <div>
-              <h2 className="text-3xl font-bold mb-2">Video Uploaded!</h2>
-              <p className="text-white/60">Your video is now live in the feed</p>
+              <h2 className="text-3xl font-bold mb-2 text-[#F5F0E8]">Video Uploaded!</h2>
+              <p className="text-[#9E9A90]">Your video is now live in the feed</p>
             </div>
 
-            <div className="bg-white/5 border border-white/10 rounded-lg p-6 my-6">
+            <div className="bg-[#242420] border border-[#3A3A34] rounded-2xl p-6 my-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-white/80 text-sm">Your Coins</p>
-                  <p className="text-3xl font-bold text-yellow-400">🪙 {userCoins}</p>
+                  <p className="text-[#9E9A90] text-sm">Your Coins</p>
+                  <p className="text-3xl font-bold text-[#F5A623]">🪙 {userCoins}</p>
                 </div>
-                <svg className="w-12 h-12 text-yellow-400/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-12 h-12 text-[#F5A623]/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 10h-2m0 0h-2m2 0v-2m0 2v2m0-6h4v4m0 0h-2m2 0v-2m0 2v2" />
                 </svg>
               </div>
             </div>
 
-            <p className="text-white/70 text-sm">Boost your video to get more exposure in the feed</p>
+            <p className="text-[#9E9A90] text-sm">Boost your video to get more exposure in the feed</p>
 
             <div className="flex gap-3 justify-center pt-4">
               <button
                 onClick={() => router.push('/')}
-                className="px-6 py-3 bg-white/10 hover:bg-white/20 rounded-lg font-semibold transition-all"
+                className="px-6 py-3 bg-[#242420] hover:bg-[#2E2E28] border border-[#3A3A34] rounded-xl font-semibold transition-all min-h-[48px]"
               >
                 View Feed
               </button>
               <button
                 onClick={() => setShowPromotionModal(true)}
-                className="px-6 py-3 bg-yellow-500 hover:bg-yellow-600 text-black rounded-lg font-semibold transition-all flex items-center gap-2"
+                className="px-6 py-3 bg-[#F5A623] hover:bg-[#F5A623]/90 text-black rounded-xl font-semibold transition-all flex items-center gap-2 min-h-[48px] active:scale-[0.98] shadow-lg shadow-[#F5A623]/20"
               >
                 <span>🚀</span>
                 <span>Boost Video</span>
@@ -348,27 +395,28 @@ function UploadContent() {
 
       {/* Main Content */}
       {!uploadedVideoId && (
-        <div className="max-w-2xl mx-auto px-4 py-8">
+        <div className="entrance-fade w-full px-4 lg:px-12 py-8" style={{ animation: 'fadeInUp 0.4s ease-out 0.1s forwards', opacity: 0 }}>
         <form onSubmit={handleSubmit} className="space-y-6">
           {error && (
-            <div className="bg-red-500/20 border border-red-500 text-red-200 px-4 py-3 rounded-lg">
+            <div className="bg-[#E05C3A]/10 border border-[#E05C3A] text-[#E05C3A] px-4 py-3 rounded-xl">
               {error}
             </div>
           )}
 
           {/* Video Upload Area */}
           <div className="space-y-4">
-            <label className="block text-sm font-medium text-white/80">
+            <label className="block text-sm font-medium text-[#9E9A90]">
               Upload Video
             </label>
             
             {!videoPreview ? (
-              <div
+              <button
+                type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="border-2 border-dashed border-white/20 rounded-lg p-12 text-center cursor-pointer hover:border-white/40 transition-all duration-300 hover:bg-white/5"
+                className="w-full border-2 border-dashed border-[#3A3A34] bg-[#242420] rounded-xl p-12 text-center cursor-pointer transition-all duration-300 hover:border-[#F5A623] hover:bg-[#2E2E28] hover:shadow-lg hover:shadow-[#F5A623]/20 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F5A623]"
               >
                 <svg
-                  className="w-16 h-16 mx-auto mb-4 text-white/40"
+                  className="w-16 h-16 mx-auto mb-4 text-[#6BAF7A] transition-transform duration-300 hover:scale-110"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -380,8 +428,8 @@ function UploadContent() {
                     d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
                   />
                 </svg>
-                <p className="text-white/60 mb-2">Click to upload video</p>
-                <p className="text-sm text-white/40">MP4, MOV, AVI up to 100MB</p>
+                <p className="text-[#F5F0E8] font-semibold mb-2">Drag your video here or click to browse</p>
+                <p className="text-sm text-[#9E9A90]">MP4, MOV, AVI up to 100MB (Max 15 minutes)</p>
                 <input
                   ref={fileInputRef}
                   type="file"
@@ -389,9 +437,9 @@ function UploadContent() {
                   onChange={handleVideoSelect}
                   className="hidden"
                 />
-              </div>
+              </button>
             ) : (
-              <div className="relative rounded-lg overflow-hidden bg-black">
+              <div className="relative rounded-xl overflow-hidden bg-[#242420] border border-[#3A3A34]">
                 <video
                   src={videoPreview}
                   controls
@@ -400,7 +448,7 @@ function UploadContent() {
                 <button
                   type="button"
                   onClick={handleRemoveVideo}
-                  className="absolute top-4 right-4 bg-red-500/80 hover:bg-red-500 text-white px-4 py-2 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95"
+                  className="absolute top-4 right-4 bg-[#E05C3A] hover:bg-[#E05C3A]/90 text-white px-4 py-2 rounded-lg font-semibold transition-all duration-200 hover:shadow-lg hover:shadow-[#E05C3A]/40 active:scale-95"
                 >
                   Remove
                 </button>
@@ -410,7 +458,7 @@ function UploadContent() {
 
           {/* Caption Input */}
           <div className="space-y-2">
-            <label htmlFor="caption" className="block text-sm font-medium text-white/80">
+            <label htmlFor="caption" className="block text-sm font-medium text-[#9E9A90]">
               Caption
             </label>
             <textarea
@@ -424,9 +472,9 @@ function UploadContent() {
               placeholder="Describe your business or service..."
               rows={4}
               maxLength={500}
-              className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-white/40 focus:outline-none focus:border-white/40 focus:ring-2 focus:ring-white/20 transition-all duration-200"
+              className="w-full bg-[#242420] border border-[#3A3A34] rounded-xl px-4 py-3 text-[#F5F0E8] placeholder-[#9E9A90]/50 focus:outline-none focus:border-[#F5A623] focus:ring-1 focus:ring-[#F5A623]/30 transition-all duration-200"
             />
-            <p className={`text-xs ${caption.length >= 450 ? 'text-yellow-400' : 'text-white/40'}`}>
+            <p className={`text-xs ${caption.length >= 450 ? 'text-[#F5A623]' : 'text-[#9E9A90]'}`}>
               {caption.length}/500 characters
             </p>
           </div>
@@ -434,7 +482,7 @@ function UploadContent() {
           {/* Business Info (Optional) */}
           <div className="space-y-4">
             <div className="space-y-2">
-              <label htmlFor="businessName" className="block text-sm font-medium text-white/80">
+              <label htmlFor="businessName" className="block text-sm font-medium text-[#9E9A90]">
                 Business Name (Optional)
               </label>
               <input
@@ -443,13 +491,13 @@ function UploadContent() {
                 value={businessName}
                 onChange={(e) => setBusinessName(e.target.value)}
                 placeholder="Enter business name"
-                className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-white/40 focus:outline-none focus:border-white/40 focus:ring-2 focus:ring-white/20 transition-all duration-200"
+                className="w-full bg-[#242420] border border-[#3A3A34] rounded-xl px-4 py-3 text-[#F5F0E8] placeholder-[#9E9A90]/50 focus:outline-none focus:border-[#F5A623] focus:ring-1 focus:ring-[#F5A623]/30 transition-all duration-200"
               />
             </div>
 
             {businessName && (
               <div className="space-y-2">
-                <label htmlFor="category" className="block text-sm font-medium text-white/80">
+                <label htmlFor="category" className="block text-sm font-medium text-[#9E9A90]">
                   Category
                 </label>
                 <select
@@ -457,7 +505,7 @@ function UploadContent() {
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
                   required={!!businessName}
-                  className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-white/40 focus:ring-2 focus:ring-white/20 transition-all duration-200"
+                  className="w-full bg-[#242420] border border-[#3A3A34] rounded-xl px-4 py-3 text-[#F5F0E8] focus:outline-none focus:border-[#F5A623] focus:ring-1 focus:ring-[#F5A623]/30 transition-all duration-200"
                 >
                   <option value="" style={{ color: '#000', backgroundColor: '#f3f4f6' }}>Select category</option>
                   <option value="food" style={{ color: '#000', backgroundColor: '#f3f4f6' }}>Food</option>
@@ -476,18 +524,34 @@ function UploadContent() {
                 setBoostCoinsSpent(0);
                 setShowPromotionModal(true);
               }}
-              className="w-full mt-4 bg-yellow-500/20 hover:bg-yellow-500/30 border border-yellow-500/50 text-yellow-300 font-semibold py-3 rounded-lg transition-all duration-200 flex items-center justify-center gap-2"
+              className="w-full mt-4 bg-[#F5A623]/20 hover:bg-[#F5A623]/30 border border-[#F5A623]/50 text-[#F5A623] font-semibold py-3 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 min-h-[48px]"
             >
               <span>🚀</span>
               <span>Learn About Boosting</span>
             </button>
           </div>
 
+          {/* Upload Progress Bar */}
+          {isUploading && (
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-[#F5F0E8]">Uploading video...</span>
+                <span className="text-sm text-[#9E9A90]">{uploadProgress}%</span>
+              </div>
+              <div className="relative h-2 bg-[#3A3A34] rounded-full overflow-hidden">
+                <div 
+                  className="absolute inset-y-0 left-0 bg-gradient-to-r from-[#F5A623] via-[#F5A623] to-[#F5A623]/70 rounded-full transition-all duration-300 ease-out shadow-lg shadow-[#F5A623]/40"
+                  style={{ width: `${uploadProgress}%` }}
+                />
+              </div>
+            </div>
+          )}
+
           {/* Submit Button */}
           <button
             type="submit"
             disabled={!selectedVideo || isUploading}
-            className="w-full bg-white text-black font-semibold py-4 rounded-lg disabled:bg-white/20 disabled:text-white/40 disabled:cursor-not-allowed hover:bg-white/90 active:scale-98 transition-all duration-200"
+            className="w-full bg-[#F5A623] text-black font-semibold py-4 rounded-xl disabled:bg-[#242420] disabled:text-[#9E9A90]/40 disabled:cursor-not-allowed hover:bg-[#F5A623]/90 active:scale-[0.98] transition-all duration-200 min-h-[48px] shadow-lg shadow-[#F5A623]/20"
           >
             {isUploading ? (
               <span className="flex items-center justify-center gap-2">
@@ -504,43 +568,6 @@ function UploadContent() {
         </form>
       </div>
       )}
-
-      {/* Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 z-20 bg-black/50 backdrop-blur-md border-t border-white/10">
-        <div className="flex items-center justify-around py-3">
-          <Link href="/" className="flex flex-col items-center gap-1 transition-transform duration-200 hover:scale-110 active:scale-95">
-            <svg className="w-6 h-6 text-white/60" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
-            </svg>
-            <span className="text-white/60 text-xs">Home</span>
-          </Link>
-          <Link href="/search" className="flex flex-col items-center gap-1 transition-transform duration-200 hover:scale-110 active:scale-95">
-            <svg className="w-6 h-6 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-            <span className="text-white/60 text-xs">Search</span>
-          </Link>
-          <Link href="/upload" className="flex flex-col items-center gap-1 transition-transform duration-200 hover:scale-110 active:scale-95">
-            <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-200 ${pathname === '/upload' ? 'bg-white' : 'bg-white/20'}`}>
-              <svg className={`w-6 h-6 ${pathname === '/upload' ? 'text-black' : 'text-white'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-            </div>
-          </Link>
-          <Link href="/chats" className="flex flex-col items-center gap-1 transition-transform duration-200 hover:scale-110 active:scale-95">
-            <svg className="w-6 h-6 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-            </svg>
-            <span className="text-white/60 text-xs">Chats</span>
-          </Link>
-          <Link href="/profile" className="flex flex-col items-center gap-1 transition-transform duration-200 hover:scale-110 active:scale-95">
-            <svg className="w-6 h-6 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-            </svg>
-            <span className="text-white/60 text-xs">Profile</span>
-          </Link>
-        </div>
-      </div>
 
       {/* Promotion Modal */}
       {uploadedVideoId && (

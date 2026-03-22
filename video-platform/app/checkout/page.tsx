@@ -132,7 +132,7 @@ function CheckoutContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+      <div className="min-h-screen bg-transparent text-white flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
       </div>
     );
@@ -140,8 +140,8 @@ function CheckoutContent() {
 
   if (checkoutItems.length === 0) {
     return (
-      <div className="min-h-screen bg-black text-white p-4">
-        <div className="max-w-2xl mx-auto text-center py-16">
+      <div className="min-h-screen bg-transparent text-white p-4">
+        <div className="w-full px-4 lg:px-12 text-center py-16">
           <p className="text-white/60 mb-4">No items to checkout</p>
           <Link href="/" className="inline-block bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg px-6 py-2 transition-colors">
             Browse Services
@@ -152,8 +152,8 @@ function CheckoutContent() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white p-4">
-      <div className="max-w-2xl mx-auto">
+    <div className="min-h-screen bg-transparent text-white p-4">
+      <div className="w-full px-4 lg:px-12">
         {/* Header */}
         <div className="mb-6">
           <button onClick={() => router.back()} className="text-white/60 hover:text-white mb-4 inline-flex items-center gap-2">
@@ -288,7 +288,7 @@ function CheckoutContent() {
 export default function CheckoutPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+      <div className="min-h-screen bg-transparent text-white flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
       </div>
     }>

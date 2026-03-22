@@ -7,7 +7,8 @@ import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { useAuth } from '@/contexts/AuthContext';
 import { useChats } from '@/hooks/useChats';
 import { ChatList } from '@/components/chats/ChatList';
-import { NewChatModal } from '@/components/chats/NewChatModal';
+import dynamic from 'next/dynamic';
+const NewChatModal = dynamic(() => import('@/components/chats/NewChatModal').then(mod => mod.NewChatModal), { ssr: false });
 
 export default function ChatsPage() {
   return (
@@ -24,17 +25,18 @@ function ChatsContent() {
   const [showNewChatModal, setShowNewChatModal] = useState(false);
 
   return (
-    <div className="min-h-screen bg-black text-white pb-20">
+    <div className="min-h-screen bg-[#1A1A18] text-[#F5F0E8] pb-20">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-black/80 backdrop-blur-md border-b border-white/10">
-        <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
-          <h1 className="text-2xl font-bold">Messages</h1>
+      <div className="sticky top-0 z-10 bg-[#1A1A18]/80 backdrop-blur-md border-b border-[#3A3A34]">
+        <div className="w-full px-4 lg:px-12 py-4 flex items-center justify-between">
+          <h1 className="entrance-slide text-2xl font-bold text-[#F5F0E8]" style={{ animation: 'slideInLeft 0.4s ease-out forwards', opacity: 0 }}>Messages</h1>
           <button
             onClick={() => setShowNewChatModal(true)}
-            className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
+            className="entrance-scale w-11 h-11 rounded-full bg-[#242420] hover:bg-[#2E2E28] border border-[#3A3A34] flex items-center justify-center transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F5A623] focus-visible:ring-offset-2 focus-visible:ring-offset-[#1A1A18]"
+            style={{ animation: 'scaleIn 0.3s ease-out 0.15s forwards', opacity: 0 }}
             aria-label="New chat"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-6 h-6 text-[#F5F0E8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
           </button>
@@ -42,14 +44,16 @@ function ChatsContent() {
       </div>
 
       {/* Chats Content */}
-      <div className="max-w-2xl mx-auto px-4 py-8">
+      <div className="w-full px-4 lg:px-12 py-8">
         {error && (
-          <div className="mb-6 p-4 bg-red-500/10 border border-red-500/50 rounded-lg">
-            <p className="text-red-400 font-semibold mb-2">Error loading chats</p>
-            <p className="text-red-400/80 text-sm">{error.message}</p>
+          <div className="entrance-fade mb-6 p-4 bg-[#E05C3A]/10 border border-[#E05C3A]/50 rounded-xl" style={{ animation: 'fadeInUp 0.4s ease-out forwards', opacity: 0 }}>
+            <p className="text-[#E05C3A] font-semibold mb-2">Error loading chats</p>
+            <p className="text-[#E05C3A]/80 text-sm">{error.message}</p>
           </div>
         )}
-        <ChatList chats={chats} currentUserId={user?.id || ''} loading={loading} />
+        <div className="entrance-fade" style={{ animation: 'fadeInUp 0.4s ease-out 0.1s forwards', opacity: 0 }}>
+          <ChatList chats={chats} currentUserId={user?.id || ''} loading={loading} />
+        </div>
       </div>
 
       {/* New Chat Modal */}
@@ -60,43 +64,6 @@ function ChatsContent() {
           currentUserId={user.id}
         />
       )}
-
-      {/* Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 z-20 bg-black/50 backdrop-blur-md border-t border-white/10">
-        <div className="flex items-center justify-around py-3">
-          <Link href="/" className="flex flex-col items-center gap-1 transition-transform duration-200 hover:scale-110 active:scale-95">
-            <svg className="w-6 h-6 text-white/60" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
-            </svg>
-            <span className="text-white/60 text-xs">Home</span>
-          </Link>
-          <Link href="/search" className="flex flex-col items-center gap-1 transition-transform duration-200 hover:scale-110 active:scale-95">
-            <svg className="w-6 h-6 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-            <span className="text-white/60 text-xs">Search</span>
-          </Link>
-          <Link href="/upload" className="flex flex-col items-center gap-1 transition-transform duration-200 hover:scale-110 active:scale-95">
-            <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
-              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-            </div>
-          </Link>
-          <Link href="/chats" className="flex flex-col items-center gap-1 transition-transform duration-200 hover:scale-110 active:scale-95">
-            <svg className={`w-6 h-6 ${pathname === '/chats' ? 'text-white' : 'text-white/60'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-            </svg>
-            <span className={`text-xs ${pathname === '/chats' ? 'text-white' : 'text-white/60'}`}>Chats</span>
-          </Link>
-          <Link href="/profile" className="flex flex-col items-center gap-1 transition-transform duration-200 hover:scale-110 active:scale-95">
-            <svg className="w-6 h-6 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-            </svg>
-            <span className="text-white/60 text-xs">Profile</span>
-          </Link>
-        </div>
-      </div>
     </div>
   );
 }
