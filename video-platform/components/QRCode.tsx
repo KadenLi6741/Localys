@@ -26,7 +26,7 @@ export function OrderQRCode({ orderId, token, size = 200 }: OrderQRCodeProps) {
           fgColor="#000000"
         />
       </div>
-      <p className="text-white/40 text-xs font-mono">
+      <p className="text-[var(--text-muted)] text-xs font-mono">
         #{orderId.substring(0, 8)}
       </p>
     </div>

@@ -51,16 +51,16 @@ export default function CartPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#1A1A18] text-[#F5F0E8] pb-24">
+    <div className="min-h-screen bg-[var(--color-charcoal)] text-[var(--color-cream)] pb-24">
       <div className="w-full px-4 lg:px-12 py-4">
         {/* Header */}
         <div className="mb-6">
-          <Link href="/" className="text-[#9E9A90] hover:text-[#F5F0E8] mb-4 inline-flex items-center gap-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F5A623] rounded-lg">
+          <Link href="/" className="text-[var(--color-body-text)] hover:text-[var(--color-cream)] mb-4 inline-flex items-center gap-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F5A623] rounded-lg">
             ← Back
           </Link>
-          <h1 className="text-2xl font-bold text-[#F5F0E8]">Shopping Cart</h1>
+          <h1 className="text-2xl font-bold text-[var(--color-cream)]">Shopping Cart</h1>
           {items.length > 0 && (
-            <p className="text-[#9E9A90] text-sm mt-1">{items.reduce((s, i) => s + i.quantity, 0)} item{items.reduce((s, i) => s + i.quantity, 0) !== 1 ? 's' : ''}</p>
+            <p className="text-[var(--color-body-text)] text-sm mt-1">{items.reduce((s, i) => s + i.quantity, 0)} item{items.reduce((s, i) => s + i.quantity, 0) !== 1 ? 's' : ''}</p>
           )}
         </div>
 
@@ -69,8 +69,8 @@ export default function CartPage() {
             <svg className="w-16 h-16 text-[#6BAF7A]/40 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z" />
             </svg>
-            <p className="text-[#9E9A90] mb-2 text-lg font-semibold">Your cart is empty</p>
-            <p className="text-[#9E9A90]/70 text-sm mb-6">Browse local businesses and add items</p>
+            <p className="text-[var(--color-body-text)] mb-2 text-lg font-semibold">Your cart is empty</p>
+            <p className="text-[var(--color-body-text)]/70 text-sm mb-6">Browse local businesses and add items</p>
             <Link href="/" className="inline-block bg-[#F5A623] hover:bg-[#F5A623]/90 text-black font-semibold rounded-xl px-6 py-3 transition-colors active:scale-95">
               Browse Services
             </Link>
@@ -82,18 +82,18 @@ export default function CartPage() {
               {items.map((item) => (
                 <div
                   key={item.itemId}
-                  className="list-item-stagger bg-[#242420] border border-[#3A3A34] rounded-2xl p-4 hover:border-[#F5A623]/30 transition-all duration-200"
+                  className="list-item-stagger bg-[var(--color-charcoal-light)] border border-[var(--color-charcoal-lighter-plus)] rounded-2xl p-4 hover:border-[#F5A623]/30 transition-all duration-200"
                 >
                   <div className="flex gap-3">
                     {item.itemImage && (
                       <img
                         src={item.itemImage}
                         alt={item.itemName}
-                        className="w-16 h-16 rounded-xl object-cover border border-[#3A3A34] flex-shrink-0"
+                        className="w-16 h-16 rounded-xl object-cover border border-[var(--color-charcoal-lighter-plus)] flex-shrink-0"
                       />
                     )}
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-[#F5F0E8] font-semibold truncate">{item.itemName}</h3>
+                      <h3 className="text-[var(--color-cream)] font-semibold truncate">{item.itemName}</h3>
                       <p className="text-[#F5A623] font-bold">${(item.itemPrice * item.quantity).toFixed(2)}</p>
                     </div>
                     <button
@@ -109,29 +109,29 @@ export default function CartPage() {
 
                   {/* Quantity controls */}
                   <div className="flex items-center gap-3 mt-3">
-                    <span className="text-[#9E9A90] text-sm">Qty:</span>
-                    <div className="flex items-center gap-0 bg-[#1A1A18] border border-[#3A3A34] rounded-xl overflow-hidden">
+                    <span className="text-[var(--color-body-text)] text-sm">Qty:</span>
+                    <div className="flex items-center gap-0 bg-[var(--color-charcoal)] border border-[var(--color-charcoal-lighter-plus)] rounded-xl overflow-hidden">
                       <button
                         onClick={() => updateQuantity(item.itemId, item.quantity - 1)}
                         disabled={item.quantity <= 1}
-                        className="px-3 py-1.5 text-[#F5F0E8] hover:bg-[#2E2E28] disabled:text-[#9E9A90]/40 disabled:hover:bg-transparent transition-colors min-w-[44px] min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F5A623]"
+                        className="px-3 py-1.5 text-[var(--color-cream)] hover:bg-[var(--color-charcoal-lighter)] disabled:text-[var(--color-body-text)]/40 disabled:hover:bg-transparent transition-colors min-w-[44px] min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F5A623]"
                         aria-label="Decrease quantity"
                       >
                         &minus;
                       </button>
-                      <span className="px-3 py-1.5 text-[#F5F0E8] font-medium min-w-[2rem] text-center border-x border-[#3A3A34]">
+                      <span className="px-3 py-1.5 text-[var(--color-cream)] font-medium min-w-[2rem] text-center border-x border-[var(--color-charcoal-lighter-plus)]">
                         {item.quantity}
                       </span>
                       <button
                         onClick={() => updateQuantity(item.itemId, item.quantity + 1)}
-                        className="px-3 py-1.5 text-[#F5F0E8] hover:bg-[#2E2E28] transition-colors min-w-[44px] min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F5A623]"
+                        className="px-3 py-1.5 text-[var(--color-cream)] hover:bg-[var(--color-charcoal-lighter)] transition-colors min-w-[44px] min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F5A623]"
                         aria-label="Increase quantity"
                       >
                         +
                       </button>
                     </div>
                     {item.quantity > 1 && (
-                      <span className="text-[#9E9A90] text-xs">${item.itemPrice.toFixed(2)} each</span>
+                      <span className="text-[var(--color-body-text)] text-xs">${item.itemPrice.toFixed(2)} each</span>
                     )}
                   </div>
 
@@ -142,7 +142,7 @@ export default function CartPage() {
                       placeholder="Special requests (e.g. no onions, extra sauce...)"
                       value={item.specialRequests || ''}
                       onChange={(e) => updateSpecialRequests(item.itemId, e.target.value)}
-                      className="w-full bg-[#1A1A18] border border-[#3A3A34] rounded-xl px-3 py-2 text-sm text-[#F5F0E8] placeholder-[#9E9A90]/50 focus:outline-none focus:border-[#F5A623] focus:ring-1 focus:ring-[#F5A623]/30 transition-colors"
+                      className="w-full bg-[var(--color-charcoal)] border border-[var(--color-charcoal-lighter-plus)] rounded-xl px-3 py-2 text-sm text-[var(--color-cream)] placeholder-[#9E9A90]/50 focus:outline-none focus:border-[#F5A623] focus:ring-1 focus:ring-[#F5A623]/30 transition-colors"
                       aria-label="Special requests"
                     />
                   </div>
@@ -153,8 +153,8 @@ export default function CartPage() {
             {/* Available Coupons */}
             {!loadingCoupons && coupons.length > 0 && (
               <div className="bg-[#6BAF7A]/10 border border-[#6BAF7A]/30 rounded-2xl p-4 mb-6">
-                <h2 className="text-lg font-semibold mb-3 text-[#F5F0E8]">Available Coupons</h2>
-                <p className="text-[#9E9A90] text-xs mb-3">Coupons can be applied at checkout</p>
+                <h2 className="text-lg font-semibold mb-3 text-[var(--color-cream)]">Available Coupons</h2>
+                <p className="text-[var(--color-body-text)] text-xs mb-3">Coupons can be applied at checkout</p>
                 <div className="space-y-2">
                   {coupons.map((coupon) => (
                     <div
@@ -163,7 +163,7 @@ export default function CartPage() {
                     >
                       <div>
                         <p className="font-semibold text-[#6BAF7A]">{coupon.code}</p>
-                        <p className="text-[#9E9A90] text-sm">{coupon.discount_percentage}% off</p>
+                        <p className="text-[var(--color-body-text)] text-sm">{coupon.discount_percentage}% off</p>
                       </div>
                       <span className="text-[#6BAF7A]/60 text-xs border border-[#6BAF7A]/30 px-2 py-1 rounded-lg">
                         Apply at checkout
@@ -174,15 +174,15 @@ export default function CartPage() {
               </div>
             )}
             {loadingCoupons && (
-              <div className="bg-[#242420] border border-[#3A3A34] rounded-2xl p-4 mb-6 text-center">
+              <div className="bg-[var(--color-charcoal-light)] border border-[var(--color-charcoal-lighter-plus)] rounded-2xl p-4 mb-6 text-center">
                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#F5A623] mx-auto"></div>
               </div>
             )}
 
             {/* Summary */}
-            <div className="bg-[#242420] border border-[#3A3A34] rounded-2xl p-4 mb-4">
+            <div className="bg-[var(--color-charcoal-light)] border border-[var(--color-charcoal-lighter-plus)] rounded-2xl p-4 mb-4">
               <div className="flex justify-between items-center">
-                <span className="text-[#9E9A90]">Total</span>
+                <span className="text-[var(--color-body-text)]">Total</span>
                 <span className="text-xl font-bold text-[#F5A623]">${total.toFixed(2)}</span>
               </div>
             </div>
@@ -191,13 +191,13 @@ export default function CartPage() {
             <div className="space-y-3">
               <button
                 onClick={handleCheckout}
-                className="w-full bg-[#F5A623] hover:bg-[#F5A623]/90 text-black font-semibold py-3 rounded-xl transition-all duration-200 active:scale-[0.98] shadow-lg shadow-[#F5A623]/20 min-h-[48px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F5A623] focus-visible:ring-offset-2 focus-visible:ring-offset-[#1A1A18]"
+                className="w-full bg-[#F5A623] hover:bg-[#F5A623]/90 text-black font-semibold py-3 rounded-xl transition-all duration-200 active:scale-[0.98] shadow-lg shadow-[#F5A623]/20 min-h-[48px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F5A623] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-charcoal)]"
               >
                 Proceed to Checkout
               </button>
               <button
                 onClick={clearCart}
-                className="w-full bg-[#242420] hover:bg-[#2E2E28] text-[#9E9A90] hover:text-[#F5F0E8] font-semibold py-3 rounded-xl transition-all duration-200 border border-[#3A3A34] min-h-[48px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F5A623]"
+                className="w-full bg-[var(--color-charcoal-light)] hover:bg-[var(--color-charcoal-lighter)] text-[var(--color-body-text)] hover:text-[var(--color-cream)] font-semibold py-3 rounded-xl transition-all duration-200 border border-[var(--color-charcoal-lighter-plus)] min-h-[48px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F5A623]"
               >
                 Clear Cart
               </button>

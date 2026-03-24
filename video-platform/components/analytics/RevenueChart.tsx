@@ -31,8 +31,8 @@ function filterByRange(data: RevenueDataPoint[], range: TimeRange): RevenueDataP
 function RevenueTooltip({ active, payload, label }: { active?: boolean; payload?: { value: number }[]; label?: string }) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="bg-[#1A1A18]/90 border border-[#3A3A34] rounded-lg p-3 shadow-lg">
-      <p className="text-[#9E9A90] text-xs mb-1">{label}</p>
+    <div className="bg-[var(--color-charcoal)]/90 border border-[var(--color-charcoal-lighter-plus)] rounded-lg p-3 shadow-lg">
+      <p className="text-[var(--color-body-text)] text-xs mb-1">{label}</p>
       <p className="text-[#F5A623] font-semibold">${payload[0].value.toFixed(2)}</p>
     </div>
   );
@@ -45,7 +45,7 @@ export function RevenueChart({ data }: RevenueChartProps) {
   return (
     <div>
       <div className="flex items-center justify-between mb-3">
-        <h4 className="text-sm font-semibold text-[#F5F0E8]/80">💰 Revenue Over Time</h4>
+        <h4 className="text-sm font-semibold text-[var(--color-cream)]/80">💰 Revenue Over Time</h4>
         <div className="flex gap-1">
           {(['week', 'month', 'all'] as const).map(r => (
             <button
@@ -54,7 +54,7 @@ export function RevenueChart({ data }: RevenueChartProps) {
               className={`px-3 py-1 rounded-lg text-xs font-medium transition-all ${
                 range === r
                   ? 'bg-[#F5A623] text-black'
-                  : 'bg-[#2E2E28] text-[#9E9A90] hover:text-[#F5F0E8]'
+                  : 'bg-[var(--color-charcoal-lighter)] text-[var(--color-body-text)] hover:text-[var(--color-cream)]'
               }`}
             >
               {r === 'week' ? 'Week' : r === 'month' ? 'Month' : 'All Time'}
@@ -64,7 +64,7 @@ export function RevenueChart({ data }: RevenueChartProps) {
       </div>
 
       {filtered.length < 2 ? (
-        <div className="h-[200px] flex items-center justify-center text-[#9E9A90] text-sm">
+        <div className="h-[200px] flex items-center justify-center text-[var(--color-body-text)] text-sm">
           Not enough data to display chart
         </div>
       ) : (
@@ -79,12 +79,12 @@ export function RevenueChart({ data }: RevenueChartProps) {
             <CartesianGrid strokeDasharray="3 3" stroke="#ffffff08" />
             <XAxis
               dataKey="date"
-              tick={{ fill: '#9E9A90', fontSize: 11 }}
+              tick={{ fill: 'var(--color-body-text)', fontSize: 11 }}
               tickFormatter={(val: string) => val.substring(5)}
               axisLine={{ stroke: '#ffffff08' }}
             />
             <YAxis
-              tick={{ fill: '#9E9A90', fontSize: 11 }}
+              tick={{ fill: 'var(--color-body-text)', fontSize: 11 }}
               axisLine={{ stroke: '#ffffff08' }}
               tickFormatter={(val: number) => `$${val}`}
             />

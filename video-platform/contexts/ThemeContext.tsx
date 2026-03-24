@@ -31,6 +31,7 @@ function applyThemeClass(resolvedTheme: ResolvedTheme) {
 
   root.classList.remove('light', 'dark');
   root.classList.add(resolvedTheme);
+  root.setAttribute('data-theme', resolvedTheme);
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {

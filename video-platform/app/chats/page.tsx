@@ -25,18 +25,18 @@ function ChatsContent() {
   const [showNewChatModal, setShowNewChatModal] = useState(false);
 
   return (
-    <div className="min-h-screen bg-[#1A1A18] text-[#F5F0E8] pb-20">
+    <div className="min-h-screen bg-[var(--color-charcoal)] text-[var(--color-cream)] pb-20">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-[#1A1A18]/80 backdrop-blur-md border-b border-[#3A3A34]">
+      <div className="sticky top-0 z-10 bg-[var(--color-charcoal)]/80 backdrop-blur-md border-b border-[var(--color-charcoal-lighter-plus)]">
         <div className="w-full px-4 lg:px-12 py-4 flex items-center justify-between">
-          <h1 className="entrance-slide text-2xl font-bold text-[#F5F0E8]" style={{ animation: 'slideInLeft 0.4s ease-out forwards', opacity: 0 }}>Messages</h1>
+          <h1 className="entrance-slide text-2xl font-bold text-[var(--color-cream)]" style={{ animation: 'slideInLeft 0.4s ease-out forwards', opacity: 0 }}>Messages</h1>
           <button
             onClick={() => setShowNewChatModal(true)}
-            className="entrance-scale w-11 h-11 rounded-full bg-[#242420] hover:bg-[#2E2E28] border border-[#3A3A34] flex items-center justify-center transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F5A623] focus-visible:ring-offset-2 focus-visible:ring-offset-[#1A1A18]"
+            className="entrance-scale w-11 h-11 rounded-full bg-[var(--color-charcoal-light)] hover:bg-[var(--color-charcoal-lighter)] border border-[var(--color-charcoal-lighter-plus)] flex items-center justify-center transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F5A623] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-charcoal)]"
             style={{ animation: 'scaleIn 0.3s ease-out 0.15s forwards', opacity: 0 }}
             aria-label="New chat"
           >
-            <svg className="w-6 h-6 text-[#F5F0E8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-6 h-6 text-[var(--color-cream)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
           </button>

@@ -9,6 +9,13 @@ export type { Message, Chat, ChatMember, ChatWithDetails, Conversation };
 export async function getChats(userId: string) {
   try {
     console.log('Starting getChats for user:', userId);
+
+    // Sanity-check the client config — a missing/placeholder URL causes "Failed to fetch"
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    if (!supabaseUrl || supabaseUrl === 'your-supabase-url' || !supabaseUrl.startsWith('https://')) {
+      console.warn('Supabase URL looks invalid:', supabaseUrl, '— chats will not load');
+      return { data: [], error: null };
+    }
     
     // Check if user is authenticated
     const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
@@ -108,9 +115,9 @@ async function processChatData(memberChats: any[], userId: string) {
 
   if (membersError) {
     console.error('Error fetching all members:', membersError);
-    throw membersError;
+    console.error('Members error full:', JSON.stringify(membersError, null, 2));
   }
-  
+
   console.log('All members fetched:', allMembers?.length || 0);
 
   const { data: messages, error: messagesError } = await supabase
@@ -121,7 +128,7 @@ async function processChatData(memberChats: any[], userId: string) {
 
   if (messagesError) {
     console.error('Error fetching messages:', messagesError);
-    throw messagesError;
+    console.error('Messages error full:', JSON.stringify(messagesError, null, 2));
   }
   
   console.log('Messages fetched:', messages?.length || 0);

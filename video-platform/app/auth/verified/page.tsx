@@ -24,10 +24,10 @@ export default function EmailVerifiedPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-transparent text-white flex items-center justify-center px-4">
+    <div className="min-h-screen bg-transparent text-[var(--text-primary)] flex items-center justify-center px-4">
       <div className="w-full max-w-md space-y-6 text-center">
         <h1 className="text-3xl font-bold">Email verified</h1>
-        <p className="text-white/70">
+        <p className="text-[var(--text-secondary)]">
           Your email is confirmed. For security, please sign in again to continue.
         </p>
 
@@ -39,13 +39,13 @@ export default function EmailVerifiedPage() {
           Go to Sign In
         </button>
 
-        <p className="text-white/60 text-sm">
+        <p className="text-[var(--text-tertiary)] text-sm">
           You can now log in with your email and password.
         </p>
 
-        <p className="text-white/60 text-sm">
+        <p className="text-[var(--text-tertiary)] text-sm">
           Need a new account?{' '}
-          <Link href="/signup" className="text-white hover:underline">
+          <Link href="/signup" className="text-[var(--text-primary)] hover:underline">
             Sign up
           </Link>
         </p>

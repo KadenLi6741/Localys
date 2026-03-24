@@ -181,7 +181,7 @@ export default function CommentForm({
             className={`rounded-full object-cover ${compact ? 'w-6 h-6' : 'w-8 h-8'}`}
           />
         ) : (
-          <div className={`rounded-full bg-white/10 flex items-center justify-center ${compact ? 'w-6 h-6' : 'w-8 h-8'}`}>
+          <div className={`rounded-full bg-[var(--glass-bg)] flex items-center justify-center ${compact ? 'w-6 h-6' : 'w-8 h-8'}`}>
             <span className={`font-semibold ${compact ? 'text-xs' : 'text-sm'}`}>
               {user.email?.[0]?.toUpperCase() || '?'}
             </span>
@@ -199,7 +199,7 @@ export default function CommentForm({
           placeholder={placeholder}
           disabled={loading}
           rows={compact ? 1 : 3}
-          className={`w-full bg-transparent border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-white/40 disabled:opacity-50 disabled:cursor-not-allowed resize-none ${
+          className={`w-full bg-transparent border border-[var(--glass-border)] rounded-lg px-3 py-2 text-[var(--text-primary)] placeholder-gray-500 focus:outline-none focus:border-[var(--glass-border-focus)] disabled:opacity-50 disabled:cursor-not-allowed resize-none ${
             compact ? 'text-sm min-h-[32px]' : 'text-sm'
           }`}
           style={{ maxHeight: compact ? '80px' : '120px' }}
@@ -256,7 +256,7 @@ export default function CommentForm({
               disabled={uploading}
               className="absolute top-4 right-4 bg-red-500/80 hover:bg-red-600 disabled:opacity-50 p-1 rounded-full"
             >
-              <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <svg className="w-4 h-4 text-[var(--text-primary)]" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" />
               </svg>
             </button>
@@ -278,7 +278,7 @@ export default function CommentForm({
               type="button"
               onClick={() => fileInputRef.current?.click()}
               disabled={uploading || loading}
-              className="px-3 py-1.5 rounded-lg font-semibold text-sm bg-white/10 text-white hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              className="px-3 py-1.5 rounded-lg font-semibold text-sm bg-[var(--glass-bg)] text-[var(--text-primary)] hover:bg-[var(--glass-bg-strong)] disabled:opacity-50 disabled:cursor-not-allowed transition-all"
               title="Add image"
             >
               📷
@@ -287,10 +287,10 @@ export default function CommentForm({
           <button
             type="submit"
             disabled={!content.trim() || loading || uploading}
-            className={`px-4 py-1.5 rounded-lg font-semibold text-sm disabled:bg-white/10 disabled:text-gray-400 disabled:cursor-not-allowed transition-all duration-200 ${
+            className={`px-4 py-1.5 rounded-lg font-semibold text-sm disabled:bg-[var(--glass-bg)] disabled:text-gray-400 disabled:cursor-not-allowed transition-all duration-200 ${
               compact
-                ? 'bg-white/20 text-white hover:bg-white/30 active:scale-95'
-                : 'bg-white/20 text-white hover:bg-white/30'
+                ? 'bg-[var(--glass-bg-strong)] text-[var(--text-primary)] hover:bg-[var(--glass-bg-strong)] active:scale-95'
+                : 'bg-[var(--glass-bg-strong)] text-[var(--text-primary)] hover:bg-[var(--glass-bg-strong)]'
             }`}
           >
             {loading || uploading ? (

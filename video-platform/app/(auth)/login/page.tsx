@@ -48,8 +48,8 @@ export default function LoginPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-transparent text-white flex items-center justify-center px-4">
-          <p className="text-white/70">Loading login...</p>
+        <div className="min-h-screen bg-transparent text-[var(--text-primary)] flex items-center justify-center px-4">
+          <p className="text-[var(--text-secondary)]">Loading login...</p>
         </div>
       }
     >
@@ -168,11 +168,11 @@ function LoginPageContent() {
 
   if (resetMode) {
     return (
-      <div className="min-h-screen bg-transparent text-white flex items-center justify-center px-4">
-        <div className="w-full max-w-md space-y-8 bg-[rgba(36,36,32,0.85)] backdrop-blur-md border border-[#3A3A34] rounded-2xl p-8 shadow-xl" style={{ animation: 'fadeInUp 0.5s ease-out forwards', opacity: 0 }}>
+      <div className="min-h-screen bg-transparent text-[var(--text-primary)] flex items-center justify-center px-4">
+        <div className="w-full max-w-md space-y-8 bg-[rgba(36,36,32,0.85)] backdrop-blur-md border border-[var(--color-charcoal-lighter-plus)] rounded-2xl p-8 shadow-xl" style={{ animation: 'fadeInUp 0.5s ease-out forwards', opacity: 0 }}>
           <div className="text-center">
             <h1 className="entrance-slide text-4xl font-bold mb-2" style={{ animation: 'slideInLeft 0.4s ease-out 0.1s forwards', opacity: 0 }}>Localy</h1>
-            <p className="text-white/60">Reset your password</p>
+            <p className="text-[var(--text-tertiary)]">Reset your password</p>
           </div>
 
           {resetSent ? (
@@ -211,7 +211,7 @@ function LoginPageContent() {
                   value={identifier}
                   onChange={(e) => setIdentifier(e.target.value)}
                   required
-                  className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-white/40 focus:outline-none focus:border-white/40 focus:ring-2 focus:ring-white/20 transition-all duration-200"
+                  className="w-full bg-[var(--glass-bg)] border border-[var(--glass-border)] rounded-lg px-4 py-3 text-[var(--text-primary)] placeholder-[var(--placeholder)] focus:outline-none focus:border-[var(--glass-border-focus)] focus:ring-2 focus:ring-white/20 transition-all duration-200"
                   placeholder="you@example.com"
                 />
               </div>
@@ -229,7 +229,7 @@ function LoginPageContent() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-white text-black font-semibold py-3 rounded-lg disabled:bg-white/20 disabled:text-white/40 disabled:cursor-not-allowed hover:bg-white/90 active:scale-98 transition-all duration-200"
+                className="w-full bg-white text-black font-semibold py-3 rounded-lg disabled:bg-[var(--glass-bg-strong)] disabled:text-[var(--text-muted)] disabled:cursor-not-allowed hover:bg-white/90 active:scale-98 transition-all duration-200"
               >
                 {loading ? 'Sending...' : 'Send Reset Link'}
               </button>
@@ -237,10 +237,10 @@ function LoginPageContent() {
           )}
 
           {!resetSent && (
-            <p className="text-center text-white/60">
+            <p className="text-center text-[var(--text-tertiary)]">
               <button
                 onClick={switchToLogin}
-                className="text-white hover:underline"
+                className="text-[var(--text-primary)] hover:underline"
               >
                 Back to Sign In
               </button>
@@ -252,11 +252,11 @@ function LoginPageContent() {
   }
 
   return (
-    <div className="min-h-screen bg-transparent text-white flex items-center justify-center px-4">
-      <div className="w-full max-w-md space-y-8 bg-[rgba(36,36,32,0.85)] backdrop-blur-md border border-[#3A3A34] rounded-2xl p-8 shadow-xl" style={{ animation: 'fadeInUp 0.5s ease-out forwards', opacity: 0 }}>
+    <div className="min-h-screen bg-transparent text-[var(--text-primary)] flex items-center justify-center px-4">
+      <div className="w-full max-w-md space-y-8 bg-[rgba(36,36,32,0.85)] backdrop-blur-md border border-[var(--color-charcoal-lighter-plus)] rounded-2xl p-8 shadow-xl" style={{ animation: 'fadeInUp 0.5s ease-out forwards', opacity: 0 }}>
         <div className="text-center">
           <h1 className="entrance-slide text-4xl font-bold mb-2" style={{ animation: 'slideInLeft 0.4s ease-out 0.1s forwards', opacity: 0 }}>Localy</h1>
-          <p className="text-white/60">Sign in to your account</p>
+          <p className="text-[var(--text-tertiary)]">Sign in to your account</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -282,7 +282,7 @@ function LoginPageContent() {
               value={identifier}
               onChange={(e) => setIdentifier(e.target.value)}
               required
-              className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-white/40 focus:outline-none focus:border-white/40 focus:ring-2 focus:ring-white/20 transition-all duration-200"
+              className="w-full bg-[var(--glass-bg)] border border-[var(--glass-border)] rounded-lg px-4 py-3 text-[var(--text-primary)] placeholder-[var(--placeholder)] focus:outline-none focus:border-[var(--glass-border-focus)] focus:ring-2 focus:ring-white/20 transition-all duration-200"
               placeholder="you@example.com"
             />
           </div>
@@ -295,7 +295,7 @@ function LoginPageContent() {
               <button
                 type="button"
                 onClick={switchToReset}
-                className="text-sm text-white/60 hover:text-white hover:underline transition-colors duration-200"
+                className="text-sm text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:underline transition-colors duration-200"
               >
                 Forgot Password?
               </button>
@@ -306,7 +306,7 @@ function LoginPageContent() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-white/40 focus:outline-none focus:border-white/40 focus:ring-2 focus:ring-white/20 transition-all duration-200"
+              className="w-full bg-[var(--glass-bg)] border border-[var(--glass-border)] rounded-lg px-4 py-3 text-[var(--text-primary)] placeholder-[var(--placeholder)] focus:outline-none focus:border-[var(--glass-border-focus)] focus:ring-2 focus:ring-white/20 transition-all duration-200"
               placeholder="••••••••"
             />
           </div>
@@ -324,15 +324,15 @@ function LoginPageContent() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-white text-black font-semibold py-3 rounded-lg disabled:bg-white/20 disabled:text-white/40 disabled:cursor-not-allowed hover:bg-white/90 active:scale-98 transition-all duration-200"
+            className="w-full bg-white text-black font-semibold py-3 rounded-lg disabled:bg-[var(--glass-bg-strong)] disabled:text-[var(--text-muted)] disabled:cursor-not-allowed hover:bg-white/90 active:scale-98 transition-all duration-200"
           >
             {loading ? 'Signing in...' : 'Sign In'}
           </button>
         </form>
 
-        <p className="text-center text-white/60">
+        <p className="text-center text-[var(--text-tertiary)]">
           Don't have an account?{' '}
-          <Link href="/signup" className="text-white hover:underline">
+          <Link href="/signup" className="text-[var(--text-primary)] hover:underline">
             Sign up
           </Link>
         </p>

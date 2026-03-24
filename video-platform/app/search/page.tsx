@@ -7,6 +7,14 @@ import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { searchVideos, searchBusinesses, SearchFilters, SearchMode } from '@/lib/supabase/search';
 import { haversineDistance } from '@/lib/utils/geo';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { Toast } from '@/components/Toast';
+
+const DISTANCE_OPTIONS = [
+  { label: 'Nearby', km: 5 },
+  { label: 'Within 10km', km: 10 },
+  { label: 'Within 25km', km: 25 },
+  { label: 'Any Distance', km: Infinity },
+] as const;
 
 const CUISINE_TYPES = ['Italian', 'Mexican', 'Chinese', 'Japanese', 'Korean', 'Indian', 'Thai', 'Vietnamese', 'Mediterranean', 'American', 'French', 'Middle Eastern'];
 const FORMALITY_TYPES = ['Restaurant', 'Cafe', 'Bar'];
@@ -52,6 +60,8 @@ function SearchContent() {
   const [userLng, setUserLng] = useState<number | undefined>();
 
   const [hoveredBusiness, setHoveredBusiness] = useState<any>(null);
+  const [distanceFilter, setDistanceFilter] = useState<number>(Infinity);
+  const [toastMessage, setToastMessage] = useState('');
 
   const toggleArrayFilter = (arr: string[], setArr: (v: string[]) => void, value: string) => {
     setArr(arr.includes(value) ? arr.filter((v) => v !== value) : [...arr, value]);
@@ -161,14 +171,45 @@ function SearchContent() {
     setTags([]);
     setNearMe(false);
     setRadius(10);
+    setDistanceFilter(Infinity);
   };
 
   const hasActiveFilters = category || minRating || priceRange[0] > 0 || priceRange[1] < 1000
     || cuisineType || formality || specialType || dietary.length > 0 || features.length > 0
-    || amenities.length > 0 || payment.length > 0 || tags.length > 0 || nearMe;
+    || amenities.length > 0 || payment.length > 0 || tags.length > 0 || nearMe || distanceFilter !== Infinity;
+
+  const handleDistanceFilter = (km: number) => {
+    if (km !== Infinity && !userLat && !userLng) {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            setUserLat(pos.coords.latitude);
+            setUserLng(pos.coords.longitude);
+            setDistanceFilter(km);
+          },
+          () => {
+            setToastMessage('Enable location for distance filtering');
+          }
+        );
+      } else {
+        setToastMessage('Enable location for distance filtering');
+      }
+      return;
+    }
+    setDistanceFilter(km);
+  };
+
+  const filteredResults = distanceFilter !== Infinity && userLat && userLng
+    ? results.filter((r) => {
+        const lat = r.latitude ?? r.businesses?.latitude;
+        const lng = r.longitude ?? r.businesses?.longitude;
+        if (lat == null || lng == null) return false;
+        return haversineDistance(userLat, userLng, lat, lng) <= distanceFilter;
+      })
+    : results;
 
   return (
-    <div className="min-h-screen bg-[#1A1A18] text-foreground pb-20">
+    <div className="min-h-screen bg-[var(--color-charcoal)] text-foreground pb-20">
       <StarSymbolDefs />
 
       {/* Header */}
@@ -300,7 +341,7 @@ function SearchContent() {
                       Any
                     </button>
                   </div>
-                  <p className="text-xs text-white/60">
+                  <p className="text-xs text-[var(--text-tertiary)]">
                     {minRating ? `${minRating}+ stars` : 'Any rating'}
                   </p>
                 </div>
@@ -312,7 +353,7 @@ function SearchContent() {
                   </label>
                   <div className="relative h-6 flex items-center">
                     {/* Track background */}
-                    <div className="absolute left-0 right-0 h-1.5 rounded-full bg-white/10" />
+                    <div className="absolute left-0 right-0 h-1.5 rounded-full bg-[var(--glass-bg)]" />
                     {/* Active range highlight */}
                     <div
                       className="absolute h-1.5 rounded-full bg-[#F5A623]"
@@ -351,6 +392,26 @@ function SearchContent() {
                   <div className="flex justify-between text-xs text-[var(--muted-foreground)] mt-1">
                     <span>$0</span>
                     <span>$1000</span>
+                  </div>
+                </div>
+
+                {/* Distance Filter */}
+                <div>
+                  <label className="block text-sm font-medium mb-2">Distance</label>
+                  <div className="flex flex-wrap gap-2">
+                    {DISTANCE_OPTIONS.map((opt) => (
+                      <button
+                        key={opt.label}
+                        onClick={() => handleDistanceFilter(opt.km)}
+                        className={`px-4 py-2 rounded-full text-xs font-semibold transition-all duration-200 transform hover:scale-105 active:scale-95 ${
+                          distanceFilter === opt.km
+                            ? 'bg-[#F5A623] text-black shadow-md shadow-[#F5A623]/40'
+                            : 'bg-[var(--color-charcoal-light)] border border-[var(--color-charcoal-lighter-plus)] text-[var(--color-cream)] hover:border-[#F5A623] hover:shadow-md hover:shadow-[#F5A623]/20'
+                        }`}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
                   </div>
                 </div>
               </div>
@@ -469,7 +530,7 @@ function SearchContent() {
           <section className="min-w-0">
             <div className="mb-4">
               <h2 className="mb-2 text-lg font-semibold">
-                {loading ? 'Searching...' : hasSearched ? `Results (${results.length})` : 'Search Results'}
+                {loading ? 'Searching...' : hasSearched ? `Results (${filteredResults.length})` : 'Search Results'}
               </h2>
               {category && (
                 <p className="text-sm text-[#F5A623]">
@@ -482,10 +543,10 @@ function SearchContent() {
               <div className="text-center py-8">
                 <div className="mx-auto h-8 w-8 animate-spin rounded-full border-b-2 border-current"></div>
               </div>
-            ) : results.length > 0 ? (
+            ) : filteredResults.length > 0 ? (
               <div className="space-y-4">
                 {searchMode === 'businesses'
-                  ? results.map((biz) => (
+                  ? filteredResults.map((biz) => (
                       <div key={biz.id} className="search-result-card">
                         <BusinessResultCard
                           business={biz}
@@ -496,7 +557,7 @@ function SearchContent() {
                         />
                       </div>
                     ))
-                  : results.map((result) => (
+                  : filteredResults.map((result) => (
                       <div key={result.id} className="search-result-card">
                         <VideoResultCard result={result} query={query} />
                       </div>
@@ -568,6 +629,10 @@ function SearchContent() {
           </section>
         </div>
       </div>
+
+      {toastMessage && (
+        <Toast message={toastMessage} onClose={() => setToastMessage('')} />
+      )}
     </div>
   );
 }
@@ -590,7 +655,7 @@ function ChipButton({ label, active, onClick }: { label: string; active: boolean
       className={`px-4 py-2 rounded-full text-xs font-semibold transition-all duration-200 transform hover:scale-105 active:scale-95 ${
         active
           ? 'bg-[#F5A623] text-black shadow-md shadow-[#F5A623]/40 hover:shadow-lg hover:shadow-[#F5A623]/50'
-          : 'bg-[#242420] border border-[#3A3A34] text-[#F5F0E8] hover:border-[#F5A623] hover:shadow-md hover:shadow-[#F5A623]/20 active:scale-95'
+          : 'bg-[var(--color-charcoal-light)] border border-[var(--color-charcoal-lighter-plus)] text-[var(--color-cream)] hover:border-[#F5A623] hover:shadow-md hover:shadow-[#F5A623]/20 active:scale-95'
       }`}
     >
       {label}
@@ -603,7 +668,7 @@ function RatingStar({ fill }: { fill: number }) {
 
   return (
     <div className="relative w-6 h-6" aria-hidden="true">
-      <svg className="absolute inset-0 w-full h-full text-white/25" viewBox="0 0 24 24">
+      <svg className="absolute inset-0 w-full h-full text-[var(--text-faint)]" viewBox="0 0 24 24">
         <use href="#search-rating-star" />
       </svg>
       <div className="absolute inset-0 overflow-hidden" style={{ width: `${clampedFill * 100}%` }}>
@@ -671,7 +736,7 @@ function BusinessResultCard({
 
   return (
     <div
-      className="search-result-card group relative block cursor-pointer rounded-xl border border-[#3A3A34] bg-[#242420] p-4 transition-all duration-200 hover:bg-[#2E2E28] hover:border-[#F5A623] hover:shadow-lg hover:shadow-[#F5A623]/20"
+      className="search-result-card group relative block cursor-pointer rounded-xl border border-[var(--color-charcoal-lighter-plus)] bg-[var(--color-charcoal-light)] p-4 transition-all duration-200 hover:bg-[var(--color-charcoal-lighter)] hover:border-[#F5A623] hover:shadow-lg hover:shadow-[#F5A623]/20"
       onMouseEnter={() => onHover(business)}
       onMouseLeave={() => onHover(null)}
       onClick={handleClick}
@@ -759,13 +824,13 @@ function VideoResultCard({ result, query }: { result: any; query: string }) {
   return (
     <Link
       href={`/video/${result.id}`}
-      className="search-result-card group block rounded-xl border border-[#3A3A34] bg-[#242420] p-4 transition-all duration-200 hover:bg-[#2E2E28] hover:border-[#F5A623] hover:shadow-lg hover:shadow-[#F5A623]/20"
+      className="search-result-card group block rounded-xl border border-[var(--color-charcoal-lighter-plus)] bg-[var(--color-charcoal-light)] p-4 transition-all duration-200 hover:bg-[var(--color-charcoal-lighter)] hover:border-[#F5A623] hover:shadow-lg hover:shadow-[#F5A623]/20"
     >
       <div className="flex gap-4">
         <div className="relative w-32 h-24 rounded-lg overflow-hidden flex-shrink-0">
           <video src={result.video_url} className="w-full h-full object-cover" muted />
-          <div className="absolute inset-0 bg-[#1A1A18]/0 group-hover:bg-[#1A1A18]/20 transition-all duration-200 flex items-center justify-center">
-            <svg className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200" fill="currentColor" viewBox="0 0 24 24">
+          <div className="absolute inset-0 bg-[var(--color-charcoal)]/0 group-hover:bg-[var(--color-charcoal)]/20 transition-all duration-200 flex items-center justify-center">
+            <svg className="w-8 h-8 text-[var(--text-primary)] opacity-0 group-hover:opacity-100 transition-opacity duration-200" fill="currentColor" viewBox="0 0 24 24">
               <path d="M8 5v14l11-7z" />
             </svg>
           </div>

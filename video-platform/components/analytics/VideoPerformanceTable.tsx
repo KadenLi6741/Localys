@@ -15,15 +15,15 @@ export function VideoPerformanceTable({ videos }: VideoPerformanceTableProps) {
 
   return (
     <div>
-      <h4 className="text-sm font-semibold text-white/80 mb-3">🎬 Video Performance</h4>
+      <h4 className="text-sm font-semibold text-[var(--text-secondary)] mb-3">🎬 Video Performance</h4>
       <div className="space-y-3">
         {sorted.map((video, index) => (
           <div
             key={video.videoId}
-            className="bg-transparent border border-white/10 rounded-lg overflow-hidden hover:border-white/20 transition-all duration-200"
+            className="bg-transparent border border-[var(--glass-border)] rounded-lg overflow-hidden hover:border-[var(--glass-border)] transition-all duration-200"
           >
             <div className="flex gap-4 p-4">
-              <div className="flex-shrink-0 w-14 h-14 bg-white/5 rounded-lg flex items-center justify-center relative">
+              <div className="flex-shrink-0 w-14 h-14 bg-[var(--glass-bg-subtle)] rounded-lg flex items-center justify-center relative">
                 {video.thumbnailUrl ? (
                   <img
                     src={video.thumbnailUrl}
@@ -38,7 +38,7 @@ export function VideoPerformanceTable({ videos }: VideoPerformanceTableProps) {
                 )}
               </div>
               <div className="flex-1 min-w-0">
-                <h4 className="text-sm font-semibold text-white truncate">{video.title}</h4>
+                <h4 className="text-sm font-semibold text-[var(--text-primary)] truncate">{video.title}</h4>
                 <div className="flex gap-3 mt-2 text-xs flex-wrap">
                   <span className="text-yellow-400">🪙 {video.totalCoinsSpent} spent</span>
                   <span className="text-blue-400">👁️ {video.totalViews.toLocaleString()} views</span>

@@ -22,7 +22,7 @@ export function Toast({ message, onClose, duration = 3000 }: ToastProps) {
 
   return (
     <div 
-      className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 bg-[#1A1A18]/90 backdrop-blur-md text-white px-6 py-3 rounded-full shadow-lg page-transition"
+      className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 bg-[var(--color-charcoal)]/90 backdrop-blur-md text-[var(--text-primary)] px-6 py-3 rounded-full shadow-lg page-transition"
       role="status"
       aria-live="polite"
     >

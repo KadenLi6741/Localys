@@ -39,7 +39,7 @@ export function PromotionActivityFeed({ history }: PromotionActivityFeedProps) {
 
   return (
     <div>
-      <h4 className="text-sm font-semibold text-white/80 mb-3">🚀 Recent Promotions</h4>
+      <h4 className="text-sm font-semibold text-[var(--text-secondary)] mb-3">🚀 Recent Promotions</h4>
       <div className="space-y-0">
         {displayed.map((entry) => (
           <div
@@ -50,14 +50,14 @@ export function PromotionActivityFeed({ history }: PromotionActivityFeedProps) {
               <span className="text-sm">🚀</span>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm text-white">
+              <p className="text-sm text-[var(--text-primary)]">
                 Spent <span className="text-yellow-400 font-semibold">{entry.coinsSpent} coins</span> on{' '}
                 <span className="text-blue-400">&quot;{entry.videoTitle}&quot;</span>
               </p>
-              <p className="text-xs text-white/40 mt-1">
+              <p className="text-xs text-[var(--text-muted)] mt-1">
                 Boost: {entry.previousBoost.toFixed(1)} → {entry.newBoost.toFixed(1)}
               </p>
-              <p className="text-xs text-white/30 mt-0.5">{relativeTime(entry.createdAt)}</p>
+              <p className="text-xs text-[var(--text-muted)] mt-0.5">{relativeTime(entry.createdAt)}</p>
             </div>
           </div>
         ))}

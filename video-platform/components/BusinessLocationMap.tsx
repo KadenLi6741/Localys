@@ -197,13 +197,13 @@ export default function BusinessLocationMap({ locations, businessName }: Busines
 
       {/* Badge: nearest drive time (or straight-line while loading) */}
       {badgeLabel && (
-        <div className="absolute top-3 right-3 z-[1000] bg-[#1A1A18]/80 text-white text-sm font-medium px-3 py-1.5 rounded-full backdrop-blur-sm border border-white/20 pointer-events-none">
+        <div className="absolute top-3 right-3 z-[1000] bg-[var(--color-charcoal)]/80 text-[var(--text-primary)] text-sm font-medium px-3 py-1.5 rounded-full backdrop-blur-sm border border-[var(--glass-border)] pointer-events-none">
           {badgeLabel}
         </div>
       )}
 
       {/* Controls bar */}
-      <div className="flex items-center justify-between px-4 py-3 bg-white/5 border-t border-white/10">
+      <div className="flex items-center justify-between px-4 py-3 bg-[var(--glass-bg-subtle)] border-t border-[var(--glass-border)]">
         <div>
           {gpsState === 'idle' && (
             <button
@@ -218,7 +218,7 @@ export default function BusinessLocationMap({ locations, businessName }: Busines
             </button>
           )}
           {gpsState === 'loading' && (
-            <div className="flex items-center gap-2 text-sm text-white/60">
+            <div className="flex items-center gap-2 text-sm text-[var(--text-tertiary)]">
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white/60"></div>
               Getting your location...
             </div>
@@ -229,14 +229,14 @@ export default function BusinessLocationMap({ locations, businessName }: Busines
             </p>
           )}
           {gpsState === 'denied' && (
-            <p className="text-sm text-white/40">Location access denied — showing business location only</p>
+            <p className="text-sm text-[var(--text-muted)]">Location access denied — showing business location only</p>
           )}
         </div>
         <a
           href={`https://www.openstreetmap.org/?mlat=${center[0]}&mlon=${center[1]}#map=15/${center[0]}/${center[1]}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-xs text-white/40 hover:text-white/60 transition-colors"
+          className="text-xs text-[var(--text-muted)] hover:text-[var(--text-tertiary)] transition-colors"
         >
           Open in maps ↗
         </a>

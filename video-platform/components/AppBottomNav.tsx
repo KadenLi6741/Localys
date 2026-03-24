@@ -6,6 +6,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useActivity } from '@/contexts/ActivityContext';
+import { useUnreadMessages } from '@/contexts/UnreadMessagesContext';
 import { supabase } from '@/lib/supabase/client';
 
 export function AppBottomNav() {
@@ -13,11 +14,11 @@ export function AppBottomNav() {
   const { getCartCount } = useCart();
   const { user } = useAuth();
   const { togglePanel, unreadCount } = useActivity();
+  const { unreadMessages } = useUnreadMessages();
   const cartCount = getCartCount();
   const [isBusiness, setIsBusiness] = useState(false);
   const [indicatorStyle, setIndicatorStyle] = useState<{ left: string; width: string }>({ left: '0%', width: '0%' });
   const navRef = useRef<HTMLDivElement>(null);
-  const [unreadMessages, setUnreadMessages] = useState(0);
   const [pendingOrders, setPendingOrders] = useState(0);
 
   useEffect(() => {
@@ -36,34 +37,6 @@ export function AppBottomNav() {
     };
 
     checkBusiness();
-  }, [user]);
-
-  // Fetch unread messages count
-  useEffect(() => {
-    if (!user) { setUnreadMessages(0); return; }
-    const fetchUnread = async () => {
-      const { data: memberships } = await supabase
-        .from('chat_members')
-        .select('chat_id, last_read')
-        .eq('user_id', user.id);
-      if (!memberships || memberships.length === 0) { setUnreadMessages(0); return; }
-      let total = 0;
-      for (const m of memberships) {
-        let query = supabase
-          .from('messages')
-          .select('id', { count: 'exact', head: true })
-          .eq('chat_id', m.chat_id)
-          .neq('sender_id', user.id);
-        if (m.last_read) query = query.gt('created_at', m.last_read);
-        const { count } = await query;
-        total += count || 0;
-      }
-      setUnreadMessages(total);
-    };
-    fetchUnread();
-    const msgChannel = supabase.channel('bottomnav-messages').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, () => fetchUnread()).subscribe();
-    const readChannel = supabase.channel('bottomnav-chat-read').on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'chat_members' }, () => fetchUnread()).subscribe();
-    return () => { supabase.removeChannel(msgChannel); supabase.removeChannel(readChannel); };
   }, [user]);
 
   // Fetch pending orders count (business only)
@@ -108,6 +81,7 @@ export function AppBottomNav() {
   const getActiveHref = () => {
     if (pathname === '/') return '/';
     if (pathname?.startsWith('/search')) return '/search';
+    if (pathname?.startsWith('/explore')) return '/explore';
     if (pathname?.startsWith('/upload')) return '/upload';
     if (pathname?.startsWith('/chats')) return '/chats';
     if (pathname?.startsWith('/cart')) return '/cart';
@@ -140,6 +114,11 @@ export function AppBottomNav() {
       href: '/search',
       label: 'Search',
       icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />,
+    },
+    {
+      href: '/explore',
+      label: 'Explore',
+      icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />,
     },
     {
       href: '/upload',
@@ -179,8 +158,8 @@ export function AppBottomNav() {
   ];
 
   return (
-    <nav className={`fixed bottom-0 left-0 right-0 z-30 border-t border-[#3A3A34] lg:hidden ${
-      pathname === '/' ? 'bg-[#1A1A18]/80 backdrop-blur-md' : 'bg-charcoal'
+    <nav className={`fixed bottom-0 left-0 right-0 z-30 border-t border-[var(--color-charcoal-lighter-plus)] lg:hidden ${
+      pathname === '/' ? 'bg-[var(--color-charcoal)]/80 backdrop-blur-md' : 'bg-charcoal'
     }`}>
       {/* Animated Indicator Bar */}
       <div
@@ -212,7 +191,7 @@ export function AppBottomNav() {
             return (
               <div key={item.href} data-nav-item>
                 <Link href={item.href} className="relative flex flex-col items-center gap-1 transition-colors duration-200 hover:scale-105 active:scale-95">
-                  <svg className={`h-6 w-6 ${isActive(item.href) ? 'text-[#F5F0E8]' : 'text-[#9E9A90]'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className={`h-6 w-6 ${isActive(item.href) ? 'text-[var(--color-cream)]' : 'text-[var(--color-body-text)]'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     {item.icon}
                   </svg>
                   {cartCount > 0 && (
@@ -220,7 +199,7 @@ export function AppBottomNav() {
                       {cartCount}
                     </span>
                   )}
-                  <span className={`text-xs ${isActive(item.href) ? 'text-[#F5F0E8]' : 'text-[#9E9A90]'}`}>{item.label}</span>
+                  <span className={`text-xs ${isActive(item.href) ? 'text-[var(--color-cream)]' : 'text-[var(--color-body-text)]'}`}>{item.label}</span>
                 </Link>
               </div>
             );
@@ -239,7 +218,7 @@ export function AppBottomNav() {
 }
 
 function NavItem({ href, label, active, icon, fillIcon = false, onClick, badge }: { href: string; label: string; active: boolean; icon: React.ReactNode; fillIcon?: boolean; onClick?: (e: React.MouseEvent) => void; badge?: number }) {
-  const colorClass = active ? 'text-[#F5F0E8]' : 'text-[#9E9A90]';
+  const colorClass = active ? 'text-[var(--color-cream)]' : 'text-[var(--color-body-text)]';
 
   return (
     <Link href={href} onClick={onClick} className="relative flex flex-col items-center gap-1 transition-colors duration-200 hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F5A623] rounded-lg p-1" aria-label={label}>

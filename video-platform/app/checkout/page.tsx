@@ -132,7 +132,7 @@ function CheckoutContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-transparent text-white flex items-center justify-center">
+      <div className="min-h-screen bg-transparent text-[var(--text-primary)] flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
       </div>
     );
@@ -140,9 +140,9 @@ function CheckoutContent() {
 
   if (checkoutItems.length === 0) {
     return (
-      <div className="min-h-screen bg-transparent text-white p-4">
+      <div className="min-h-screen bg-transparent text-[var(--text-primary)] p-4">
         <div className="w-full px-4 lg:px-12 text-center py-16">
-          <p className="text-white/60 mb-4">No items to checkout</p>
+          <p className="text-[var(--text-tertiary)] mb-4">No items to checkout</p>
           <Link href="/" className="inline-block bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg px-6 py-2 transition-colors">
             Browse Services
           </Link>
@@ -152,18 +152,18 @@ function CheckoutContent() {
   }
 
   return (
-    <div className="min-h-screen bg-transparent text-white p-4">
+    <div className="min-h-screen bg-transparent text-[var(--text-primary)] p-4">
       <div className="w-full px-4 lg:px-12">
         {/* Header */}
         <div className="mb-6">
-          <button onClick={() => router.back()} className="text-white/60 hover:text-white mb-4 inline-flex items-center gap-2">
+          <button onClick={() => router.back()} className="text-[var(--text-tertiary)] hover:text-[var(--text-primary)] mb-4 inline-flex items-center gap-2">
             ← Back
           </button>
           <h1 className="text-2xl font-bold">Checkout</h1>
         </div>
 
         {/* Order Summary */}
-        <div className="bg-white/5 border border-white/10 rounded-lg p-4 mb-6">
+        <div className="bg-[var(--glass-bg-subtle)] border border-[var(--glass-border)] rounded-lg p-4 mb-6">
           <h2 className="text-lg font-semibold mb-3">Order Summary</h2>
           <div className="space-y-3">
             {checkoutItems.map((item) => (
@@ -172,13 +172,13 @@ function CheckoutContent() {
                   <img
                     src={item.itemImage}
                     alt={item.itemName}
-                    className="w-12 h-12 rounded-lg object-cover border border-white/20"
+                    className="w-12 h-12 rounded-lg object-cover border border-[var(--glass-border)]"
                   />
                 )}
                 <div className="flex-1 min-w-0">
-                  <p className="text-white font-medium truncate">{item.itemName}</p>
+                  <p className="text-[var(--text-primary)] font-medium truncate">{item.itemName}</p>
                   {item.quantity > 1 && (
-                    <p className="text-white/40 text-xs">x{item.quantity} @ ${item.itemPrice.toFixed(2)}</p>
+                    <p className="text-[var(--text-muted)] text-xs">x{item.quantity} @ ${item.itemPrice.toFixed(2)}</p>
                   )}
                   {item.specialRequests && (
                     <p className="text-yellow-400/70 text-xs mt-0.5">Note: {item.specialRequests}</p>
@@ -210,7 +210,7 @@ function CheckoutContent() {
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="font-semibold text-green-400">{coupon.code}</p>
-                        <p className="text-white/60 text-sm">{coupon.discount_percentage}% off</p>
+                        <p className="text-[var(--text-tertiary)] text-sm">{coupon.discount_percentage}% off</p>
                       </div>
                       <div className="flex items-center gap-2">
                         {isSelected && (
@@ -220,7 +220,7 @@ function CheckoutContent() {
                           isSelected ? 'border-green-500 bg-green-500' : 'border-white/30'
                         }`}>
                           {isSelected && (
-                            <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="w-3 h-3 text-[var(--text-primary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                             </svg>
                           )}
@@ -235,9 +235,9 @@ function CheckoutContent() {
         )}
 
         {/* Price Breakdown */}
-        <div className="bg-white/5 border border-white/10 rounded-lg p-4 mb-6">
+        <div className="bg-[var(--glass-bg-subtle)] border border-[var(--glass-border)] rounded-lg p-4 mb-6">
           <div className="space-y-2">
-            <div className="flex justify-between text-white/60">
+            <div className="flex justify-between text-[var(--text-tertiary)]">
               <span>Subtotal</span>
               <span>${subtotal.toFixed(2)}</span>
             </div>
@@ -247,7 +247,7 @@ function CheckoutContent() {
                 <span>-${discountAmount.toFixed(2)}</span>
               </div>
             )}
-            <div className="border-t border-white/10 pt-2 flex justify-between">
+            <div className="border-t border-[var(--glass-border)] pt-2 flex justify-between">
               <span className="font-semibold">Total</span>
               <span className="text-xl font-bold text-yellow-400">${total.toFixed(2)}</span>
             </div>
@@ -277,7 +277,7 @@ function CheckoutContent() {
           )}
         </button>
 
-        <p className="text-white/40 text-xs text-center mt-3">
+        <p className="text-[var(--text-muted)] text-xs text-center mt-3">
           You will be redirected to Stripe for secure payment
         </p>
       </div>
@@ -288,7 +288,7 @@ function CheckoutContent() {
 export default function CheckoutPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-transparent text-white flex items-center justify-center">
+      <div className="min-h-screen bg-transparent text-[var(--text-primary)] flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
       </div>
     }>

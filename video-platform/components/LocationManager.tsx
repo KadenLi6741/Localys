@@ -105,19 +105,19 @@ export default function LocationManager({ profileId }: LocationManagerProps) {
     <div className="space-y-4">
       {/* Saved locations list */}
       {loading ? (
-        <p className="text-white/40 text-sm">Loading locations...</p>
+        <p className="text-[var(--text-muted)] text-sm">Loading locations...</p>
       ) : locations.length === 0 ? (
-        <p className="text-white/40 text-sm">No locations added yet.</p>
+        <p className="text-[var(--text-muted)] text-sm">No locations added yet.</p>
       ) : (
         <ul className="space-y-2">
           {locations.map((loc) => (
             <li
               key={loc.id}
-              className="flex items-center justify-between bg-white/5 border border-white/10 rounded-lg px-4 py-3"
+              className="flex items-center justify-between bg-[var(--glass-bg-subtle)] border border-[var(--glass-border)] rounded-lg px-4 py-3"
             >
               <div>
-                <p className="text-white text-sm font-medium">{loc.label}</p>
-                <p className="text-white/40 text-xs">
+                <p className="text-[var(--text-primary)] text-sm font-medium">{loc.label}</p>
+                <p className="text-[var(--text-muted)] text-xs">
                   {loc.latitude.toFixed(5)}, {loc.longitude.toFixed(5)}
                 </p>
               </div>
@@ -135,8 +135,8 @@ export default function LocationManager({ profileId }: LocationManagerProps) {
 
       {/* Add location map picker */}
       {adding ? (
-        <div className="rounded-lg overflow-hidden border border-white/20">
-          <p className="text-white/60 text-xs px-3 py-2 bg-white/5 border-b border-white/10">
+        <div className="rounded-lg overflow-hidden border border-[var(--glass-border)]">
+          <p className="text-[var(--text-tertiary)] text-xs px-3 py-2 bg-[var(--glass-bg-subtle)] border-b border-[var(--glass-border)]">
             Tap anywhere on the map to place a pin
           </p>
           <MapContainer
@@ -162,9 +162,9 @@ export default function LocationManager({ profileId }: LocationManagerProps) {
             )}
           </MapContainer>
 
-          <div className="p-3 bg-white/5 space-y-2 border-t border-white/10">
+          <div className="p-3 bg-[var(--glass-bg-subtle)] space-y-2 border-t border-[var(--glass-border)]">
             {pending && (
-              <p className="text-white/50 text-xs">
+              <p className="text-[var(--text-tertiary)] text-xs">
                 Pin at {pending.lat.toFixed(5)}, {pending.lng.toFixed(5)}
               </p>
             )}
@@ -174,13 +174,13 @@ export default function LocationManager({ profileId }: LocationManagerProps) {
               onChange={(e) => setLabel(e.target.value)}
               placeholder='Location label, e.g. "Downtown Branch"'
               maxLength={60}
-              className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-white/30 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full bg-[var(--glass-bg)] border border-[var(--glass-border)] rounded-lg px-3 py-2 text-[var(--text-primary)] placeholder-[var(--placeholder)] text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             {error && <p className="text-red-400 text-xs">{error}</p>}
             <div className="flex gap-2">
               <button
                 onClick={cancelAdding}
-                className="flex-1 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg py-2 text-sm transition-colors"
+                className="flex-1 bg-[var(--glass-bg)] hover:bg-[var(--glass-bg-strong)] border border-[var(--glass-border)] rounded-lg py-2 text-sm transition-colors"
               >
                 Cancel
               </button>

@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  /* ========== COLOR PALETTE ========== */
+  /* ========== COLOR PALETTE (Dark Mode — default) ========== */
   /* Charcoal - Primary Background */
   --color-charcoal: #1A1A18;
   --color-charcoal-light: #242420;
@@ -29,14 +29,65 @@
   --font-outfit: "Outfit", sans-serif;
   --font-mono: "JetBrains Mono", monospace;
   
-  /* ========== LEGACY VARS (for backward compatibility) ========== */
+  /* ========== THEME VARS ========== */
   --background: #0a0a0a;
   --foreground: #ededed;
+  --surface-1: rgba(255, 255, 255, 0.05);
+  --surface-2: rgba(255, 255, 255, 0.1);
+  --surface-overlay: rgba(26, 26, 24, 0.88);
+  --border-color: rgba(255, 255, 255, 0.14);
+  --card-shadow: none;
+
+  /* ========== TEXT OPACITY LEVELS ========== */
+  --text-primary: #F5F0E8;
+  --text-secondary: rgba(245, 240, 232, 0.8);
+  --text-tertiary: rgba(245, 240, 232, 0.6);
+  --text-muted: rgba(245, 240, 232, 0.4);
+  --text-faint: rgba(245, 240, 232, 0.2);
+
+  /* ========== GLASS / SURFACE ========== */
+  --glass-bg: rgba(255, 255, 255, 0.1);
+  --glass-bg-strong: rgba(255, 255, 255, 0.2);
+  --glass-bg-subtle: rgba(255, 255, 255, 0.05);
+  --glass-border: rgba(255, 255, 255, 0.2);
+  --glass-border-focus: rgba(255, 255, 255, 0.4);
+  --placeholder: rgba(255, 255, 255, 0.4);
 }
 
 html.light {
-  --background: #ffffff;
-  --foreground: #000000;
+  --color-charcoal: #FFFFFF;
+  --color-charcoal-light: #F5F5F0;
+  --color-charcoal-lighter: #EBEBE6;
+  --color-charcoal-lighter-plus: #D4D0C8;
+  --color-cream: #0A0A0A;
+  --color-body-text: #3A3A3A;
+  --color-amber-light: rgba(245, 166, 35, 0.12);
+  --color-amber-lighter: rgba(245, 166, 35, 0.06);
+  --color-sage-light: rgba(107, 175, 122, 0.12);
+  --color-warm-red-light: rgba(224, 92, 58, 0.12);
+  --background: #FFFFFF;
+  --foreground: #0A0A0A;
+  --surface-1: rgba(0, 0, 0, 0.04);
+  --surface-2: rgba(0, 0, 0, 0.08);
+  --surface-overlay: rgba(255, 255, 255, 0.88);
+  --border-color: rgba(0, 0, 0, 0.12);
+  --card-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  color-scheme: light;
+
+  /* Text opacity levels */
+  --text-primary: #0A0A0A;
+  --text-secondary: #3A3A3A;
+  --text-tertiary: #555555;
+  --text-muted: #6B6B65;
+  --text-faint: #9E9A90;
+
+  /* Glass / surface */
+  --glass-bg: rgba(0, 0, 0, 0.06);
+  --glass-bg-strong: rgba(0, 0, 0, 0.1);
+  --glass-bg-subtle: rgba(0, 0, 0, 0.03);
+  --glass-border: rgba(0, 0, 0, 0.12);
+  --glass-border-focus: rgba(0, 0, 0, 0.25);
+  --placeholder: rgba(0, 0, 0, 0.4);
 }
 
 @theme inline {
@@ -65,7 +116,7 @@ div::-webkit-scrollbar {
 }
 
 body {
-  background-color: #1A1A18;
+  background-color: var(--color-charcoal);
   color: var(--foreground);
   font-family: var(--font-outfit);
   font-weight: 400;
@@ -104,17 +155,6 @@ body {
   .responsive-container {
     padding-inline: 3rem; /* 48px desktop */
   }
-}
-
-html.light {
-  color-scheme: light;
-  --background: #fafafa;
-  --foreground: #111111;
-  --muted-foreground: #575757;
-  --surface-1: rgba(0, 0, 0, 0.05);
-  --surface-2: rgba(0, 0, 0, 0.1);
-  --surface-overlay: rgba(250, 250, 250, 0.88);
-  --border-color: rgba(0, 0, 0, 0.14);
 }
 
 html.dark {
@@ -343,6 +383,18 @@ button:active, a:active {
   to {
     opacity: 1;
     transform: translateX(0);
+  }
+}
+
+/* Slide down from above for list items */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
@@ -3077,4 +3129,191 @@ html {
 /* Video exit animation */
 .animate-video-exit {
   animation: fadeIn 0.2s ease-in reverse;
+}
+
+/* ===================== */
+/* LIGHT MODE OVERRIDES  */
+/* ===================== */
+/* Remap hardcoded Tailwind hex classes when html.light is active */
+
+/* Background: #1A1A18 → #FFFFFF */
+html.light .bg-\[\#1A1A18\],
+html.light .bg-\[\#1A1A18\]\/80,
+html.light .bg-\[\#1A1A18\]\/90,
+html.light .bg-\[\#1A1A18\]\/95 {
+  background-color: #FFFFFF !important;
+}
+
+/* Background: #242420 → #F5F5F0 */
+html.light .bg-\[\#242420\] {
+  background-color: #F5F5F0 !important;
+}
+
+/* Background: #2E2E28 → #EBEBE6 */
+html.light .bg-\[\#2E2E28\] {
+  background-color: #EBEBE6 !important;
+}
+
+/* Background: #3A3A34 → #D4D0C8 */
+html.light .bg-\[\#3A3A34\] {
+  background-color: #D4D0C8 !important;
+}
+
+/* Border: #3A3A34 → #D4D0C8 */
+html.light .border-\[\#3A3A34\] {
+  border-color: #D4D0C8 !important;
+}
+
+/* Text: #F5F0E8 → #1A1A18 */
+html.light .text-\[\#F5F0E8\] {
+  color: #1A1A18 !important;
+}
+
+/* Text: #F5F0E8/60 → #1A1A18/60 */
+html.light .text-\[\#F5F0E8\]\/60 {
+  color: rgba(26, 26, 24, 0.6) !important;
+}
+
+/* Text: #F5F0E8/80 → #1A1A18/80 */
+html.light .text-\[\#F5F0E8\]\/80 {
+  color: rgba(26, 26, 24, 0.8) !important;
+}
+
+/* Text: #9E9A90 → #6B6B65 */
+html.light .text-\[\#9E9A90\] {
+  color: #6B6B65 !important;
+}
+
+/* Hover text overrides */
+html.light .hover\:text-\[\#F5F0E8\]:hover {
+  color: #1A1A18 !important;
+}
+
+html.light .hover\:text-\[\#F5A623\]:hover {
+  color: #F5A623 !important;
+}
+
+/* Hover background overrides */
+html.light .hover\:bg-\[\#242420\]:hover {
+  background-color: #EBEBE6 !important;
+}
+
+html.light .hover\:bg-\[\#2E2E28\]:hover {
+  background-color: #E0E0DB !important;
+}
+
+/* Sidebar, cards & nav — surface backgrounds */
+html.light .bg-\[\#1A1A18\]\/95 {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+}
+
+html.light .bg-charcoal {
+  background-color: #FFFFFF !important;
+}
+
+/* Body element itself */
+html.light body {
+  background-color: #FFFFFF;
+  color: #1A1A18;
+}
+
+/* Card shadow in light mode */
+html.light .card,
+html.light .card-glass,
+html.light .chat-list-item,
+html.light .search-result-card,
+html.light .menu-item-card,
+html.light .order-card,
+html.light .video-card {
+  box-shadow: var(--card-shadow);
+  background-color: var(--color-charcoal-light);
+  border-color: var(--color-charcoal-lighter-plus);
+}
+
+/* Video overlay glass in light mode */
+html.light .video-overlay-glass {
+  background: rgba(255, 255, 255, 0.9);
+  background-image: linear-gradient(135deg, rgba(245, 245, 240, 0.4) 0%, rgba(255, 255, 255, 0.9) 100%);
+}
+
+/* Skeleton loaders in light mode */
+html.light .skeleton-card,
+html.light .skeleton-text,
+html.light .skeleton-text-lg,
+html.light .skeleton-image,
+html.light .animate-skeleton-pulse,
+html.light .animate-shimmer {
+  background-color: #EBEBE6;
+}
+
+html.light .animate-skeleton-shimmer,
+html.light .animate-shimmer {
+  background: linear-gradient(90deg, #EBEBE6 0%, #D4D0C8 50%, #EBEBE6 100%);
+  background-size: 1000px 100%;
+}
+
+/* Spinner in light mode */
+html.light .spinner,
+html.light .spinner-small {
+  border-color: #D4D0C8;
+  border-top-color: #F5A623;
+}
+
+/* Filter chips in light mode */
+html.light .filter-chip {
+  background-color: var(--color-charcoal-light);
+  border-color: var(--color-charcoal-lighter-plus);
+  color: var(--color-cream);
+}
+
+/* Input fields in light mode */
+html.light .input-field,
+html.light .form-input,
+html.light .form-textarea {
+  background-color: var(--color-charcoal-light);
+  border-color: var(--color-charcoal-lighter-plus);
+  color: var(--color-cream);
+}
+
+/* Glassmorphism overlays in light mode */
+html.light .backdrop-blur-xl,
+html.light .backdrop-blur-md {
+  --tw-backdrop-blur: blur(12px);
+}
+
+/* Button ghost in light mode */
+html.light .btn-ghost {
+  color: var(--color-cream);
+}
+
+html.light .btn-ghost:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Drag-drop zone in light mode */
+html.light .drag-drop-zone {
+  background-color: var(--color-charcoal-light);
+}
+
+html.light .drag-drop-zone:hover {
+  background-color: var(--color-charcoal-lighter);
+}
+
+/* Progress bar container in light mode */
+html.light .progress-bar-container {
+  background-color: var(--color-charcoal-lighter-plus);
+}
+
+/* Premium blobs — hide or soften in light mode */
+html.light .premium-blob {
+  opacity: 0.03;
+}
+
+/* Scrollbar for light mode if visible */
+html.light ::-webkit-scrollbar-track {
+  background: #F5F5F0;
+}
+
+html.light ::-webkit-scrollbar-thumb {
+  background: #D4D0C8;
 }

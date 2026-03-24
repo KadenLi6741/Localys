@@ -14,8 +14,9 @@
  * - Optimistic updates for better UX
  */
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/lib/supabase/client';
 import {
   getVideoComments,
   createComment,
@@ -45,6 +46,8 @@ export default function CommentSection({ videoId, className = '' }: CommentSecti
   const [posting, setPosting] = useState(false);
   const [averageRating, setAverageRating] = useState<number | null>(null);
   const [totalRatedComments, setTotalRatedComments] = useState(0);
+  const [verifiedPurchasers, setVerifiedPurchasers] = useState<Set<string>>(new Set());
+  const verifiedCacheRef = useRef<Map<string, Set<string>>>(new Map());
 
   const COMMENTS_PER_PAGE = 20;
 
@@ -160,6 +163,52 @@ export default function CommentSection({ videoId, className = '' }: CommentSecti
     );
   }, []);
 
+  // Check verified purchases for all commenters
+  useEffect(() => {
+    if (!videoId || comments.length === 0) return;
+
+    const checkVerifiedPurchases = async () => {
+      const { data: videoData } = await supabase
+        .from('videos')
+        .select('user_id')
+        .eq('id', videoId)
+        .single();
+
+      if (!videoData?.user_id) return;
+      const sellerId = videoData.user_id;
+
+      const cacheKey = sellerId;
+      const cached = verifiedCacheRef.current.get(cacheKey);
+      const commenterIds = [...new Set(comments.map(c => c.user_id).filter(Boolean))];
+      const uncheckedIds = cached
+        ? commenterIds.filter(id => !cached.has(id))
+        : commenterIds;
+
+      if (uncheckedIds.length === 0 && cached) {
+        setVerifiedPurchasers(cached);
+        return;
+      }
+
+      const idsToQuery = cached ? uncheckedIds : commenterIds;
+      if (idsToQuery.length === 0) return;
+
+      const { data: purchases } = await supabase
+        .from('item_purchases')
+        .select('buyer_id')
+        .eq('seller_id', sellerId)
+        .in('buyer_id', idsToQuery)
+        .in('status', ['completed', 'paid']);
+
+      const verifiedSet = new Set(cached || verifiedPurchasers);
+      (purchases || []).forEach((p: { buyer_id: string }) => verifiedSet.add(p.buyer_id));
+
+      verifiedCacheRef.current.set(cacheKey, verifiedSet);
+      setVerifiedPurchasers(verifiedSet);
+    };
+
+    checkVerifiedPurchases();
+  }, [videoId, comments]);
+
   useEffect(() => {
     if (!videoId) return;
 
@@ -190,10 +239,10 @@ export default function CommentSection({ videoId, className = '' }: CommentSecti
   }
 
   return (
-    <div className={`bg-transparent text-white ${className}`}>
+    <div className={`bg-transparent text-[var(--text-primary)] ${className}`}>
       {/* Average Rating Display */}
       {(averageRating || totalRatedComments > 0) && (
-        <div className="p-4 bg-white/5 border-b border-white/10">
+        <div className="p-4 bg-[var(--glass-bg-subtle)] border-b border-[var(--glass-border)]">
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-1">
               {[1, 2, 3, 4, 5].map((star) => (
@@ -220,7 +269,7 @@ export default function CommentSection({ videoId, className = '' }: CommentSecti
       
       {/* Comment Form */}
       {user && (
-        <div className="p-4 border-b border-white/10">
+        <div className="p-4 border-b border-[var(--glass-border)]">
           <CommentForm
             onSubmit={handleCreateComment}
             loading={posting}
@@ -245,6 +294,7 @@ export default function CommentSection({ videoId, className = '' }: CommentSecti
                 videoId={videoId}
                 onLikeUpdate={handleLikeUpdate}
                 onCommentDeleted={handleCommentDeleted}
+                isVerifiedPurchaser={verifiedPurchasers.has(comment.user_id)}
               />
             ))}
 
@@ -254,7 +304,7 @@ export default function CommentSection({ videoId, className = '' }: CommentSecti
                 <button
                   onClick={() => loadComments(true)}
                   disabled={loadingMore}
-                  className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-4 py-2 bg-[var(--glass-bg)] hover:bg-[var(--glass-bg-strong)] rounded-lg text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {loadingMore ? (
                     <div className="flex items-center gap-2">

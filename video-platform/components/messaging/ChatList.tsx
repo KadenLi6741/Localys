@@ -143,7 +143,7 @@ export default function ChatList({ onSelectConversation }: ChatListProps) {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="p-4 border-b border-white/10">
+      <div className="p-4 border-b border-[var(--glass-border)]">
         <h2 className="text-xl font-bold">Messages</h2>
       </div>
       <div className="flex-1 overflow-y-auto">
@@ -151,7 +151,7 @@ export default function ChatList({ onSelectConversation }: ChatListProps) {
           <button
             key={conversation.id}
             onClick={() => conversation.id && handleConversationClick(conversation.id)}
-            className="w-full px-4 py-3 hover:bg-white/5 transition-colors border-b border-white/5 flex items-center gap-3"
+            className="w-full px-4 py-3 hover:bg-[var(--glass-bg-subtle)] transition-colors border-b border-white/5 flex items-center gap-3"
           >
             {/* Avatar */}
             <div className="flex-shrink-0">
@@ -162,7 +162,7 @@ export default function ChatList({ onSelectConversation }: ChatListProps) {
                   className="w-12 h-12 rounded-full object-cover"
                 />
               ) : (
-                <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center">
+                <div className="w-12 h-12 rounded-full bg-[var(--glass-bg)] flex items-center justify-center">
                   <span className="text-lg font-semibold">
                     {conversation.other_user?.username?.[0]?.toUpperCase() || '?'}
                   </span>

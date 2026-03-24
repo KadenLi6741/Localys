@@ -16,11 +16,11 @@
 
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUnreadMessages } from '@/contexts/UnreadMessagesContext';
 import {
   getMessages,
   sendMessage,
   subscribeToMessages,
-  markConversationAsRead,
   getConversation,
   editMessage,
   deleteMessage,
@@ -37,6 +37,7 @@ interface ChatWindowProps {
 
 export default function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
   const { user } = useAuth();
+  const { markChatAsRead } = useUnreadMessages();
   const [messages, setMessages] = useState<Message[]>([]);
   const [conversation, setConversation] = useState<Conversation | null>(null);
   const [newMessage, setNewMessage] = useState('');
@@ -153,7 +154,7 @@ export default function ChatWindow({ conversationId, onBack }: ChatWindowProps) 
 
   const markAsRead = async () => {
     if (!conversationId || !user) return;
-    await markConversationAsRead(conversationId);
+    await markChatAsRead(conversationId);
   };
 
   const handleEditStart = (message: Message) => {
@@ -300,14 +301,14 @@ export default function ChatWindow({ conversationId, onBack }: ChatWindowProps) 
   }
 
   return (
-    <div className="flex flex-col h-full bg-transparent text-white">
+    <div className="flex flex-col h-full bg-transparent text-[var(--text-primary)]">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-[#1A1A18]/80 backdrop-blur-md border-b border-white/10 px-4 py-4">
+      <div className="sticky top-0 z-10 bg-[var(--color-charcoal)]/80 backdrop-blur-md border-b border-[var(--glass-border)] px-4 py-4">
         <div className="flex items-center gap-4">
           {onBack && (
             <button
               onClick={onBack}
-              className="text-white hover:text-white/80 transition-colors"
+              className="text-[var(--text-primary)] hover:text-[var(--text-secondary)] transition-colors"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -322,7 +323,7 @@ export default function ChatWindow({ conversationId, onBack }: ChatWindowProps) 
                 className="w-10 h-10 rounded-full object-cover"
               />
             ) : (
-              <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-full bg-[var(--glass-bg)] flex items-center justify-center">
                 <span className="font-semibold">
                   {conversation?.other_user?.username?.[0]?.toUpperCase() || '?'}
                 </span>
@@ -379,7 +380,7 @@ export default function ChatWindow({ conversationId, onBack }: ChatWindowProps) 
                         <textarea
                           value={editingContent}
                           onChange={(e) => setEditingContent(e.target.value)}
-                          className="w-full px-3 py-2 rounded-lg bg-white/20 text-white placeholder-white/40 focus:outline-none focus:bg-white/30"
+                          className="w-full px-3 py-2 rounded-lg bg-[var(--glass-bg-strong)] text-[var(--text-primary)] placeholder-[var(--placeholder)] focus:outline-none focus:bg-[var(--glass-bg-strong)]"
                           rows={2}
                         />
                         <div className="flex gap-2 mt-2">
@@ -402,23 +403,23 @@ export default function ChatWindow({ conversationId, onBack }: ChatWindowProps) 
                         className={`px-4 py-2 rounded-lg ${
                           isOwn
                             ? 'bg-white text-black rounded-br-none'
-                            : 'bg-white/10 text-white rounded-bl-none'
+                            : 'bg-[var(--glass-bg)] text-[var(--text-primary)] rounded-bl-none'
                         }`}
                       >
                         <p className={`text-sm whitespace-pre-wrap break-words ${message.deleted ? 'italic text-gray-400' : ''}`}>
                           {message.content}
                         </p>
                         <div className={`flex items-center gap-1 mt-1 ${isOwn ? 'justify-end' : 'justify-start'}`}>
-                          <span className={`text-xs ${isOwn ? 'text-black/60' : 'text-white/60'}`}>
+                          <span className={`text-xs ${isOwn ? 'text-black/60' : 'text-[var(--text-tertiary)]'}`}>
                             {formatTimestamp(message.created_at || '')}
                           </span>
                           {message.edited_at && (
-                            <span className={`text-xs ${isOwn ? 'text-black/60' : 'text-white/60'}`}>
+                            <span className={`text-xs ${isOwn ? 'text-black/60' : 'text-[var(--text-tertiary)]'}`}>
                               (edited)
                             </span>
                           )}
                           {isOwn && (
-                            <span className={`text-xs ${isOwn ? 'text-black/60' : 'text-white/60'}`}>
+                            <span className={`text-xs ${isOwn ? 'text-black/60' : 'text-[var(--text-tertiary)]'}`}>
                               {message.is_read ? '✓✓' : '✓'}
                             </span>
                           )}
@@ -429,19 +430,19 @@ export default function ChatWindow({ conversationId, onBack }: ChatWindowProps) 
                       <div className="relative">
                         <button
                           onClick={() => setMenuOpenId(menuOpenId === message.id ? null : message.id || null)}
-                          className="text-xs px-2 py-1 text-white/60 hover:text-white hover:bg-white/10 rounded transition-colors"
+                          className="text-xs px-2 py-1 text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:bg-[var(--glass-bg)] rounded transition-colors"
                           title="Message options"
                         >
                           ⋯
                         </button>
                         {menuOpenId === message.id && (
-                          <div className="absolute top-full mt-1 right-0 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg shadow-lg z-50">
+                          <div className="absolute top-full mt-1 right-0 bg-[var(--glass-bg)] backdrop-blur-sm border border-[var(--glass-border)] rounded-lg shadow-lg z-50">
                             <button
                               onClick={() => {
                                 handleEditStart(message);
                                 setMenuOpenId(null);
                               }}
-                              className="w-full text-left px-4 py-2 text-sm text-white hover:bg-white/20 flex items-center gap-2 hover:text-blue-400 transition-colors"
+                              className="w-full text-left px-4 py-2 text-sm text-[var(--text-primary)] hover:bg-[var(--glass-bg-strong)] flex items-center gap-2 hover:text-blue-400 transition-colors"
                             >
                               ✏️ Edit
                             </button>
@@ -450,7 +451,7 @@ export default function ChatWindow({ conversationId, onBack }: ChatWindowProps) 
                                 handleDelete(message.id);
                                 setMenuOpenId(null);
                               }}
-                              className="w-full text-left px-4 py-2 text-sm text-white hover:bg-white/20 flex items-center gap-2 hover:text-red-400 transition-colors border-t border-white/10"
+                              className="w-full text-left px-4 py-2 text-sm text-[var(--text-primary)] hover:bg-[var(--glass-bg-strong)] flex items-center gap-2 hover:text-red-400 transition-colors border-t border-[var(--glass-border)]"
                             >
                               🗑️ Delete
                             </button>
@@ -470,7 +471,7 @@ export default function ChatWindow({ conversationId, onBack }: ChatWindowProps) 
       {/* Message Input */}
       <form
         onSubmit={handleSendMessage}
-        className="sticky bottom-0 bg-[#1A1A18]/80 backdrop-blur-md border-t border-white/10 p-4"
+        className="sticky bottom-0 bg-[var(--color-charcoal)]/80 backdrop-blur-md border-t border-[var(--glass-border)] p-4"
       >
         <div className="flex gap-2">
           <input
@@ -479,7 +480,7 @@ export default function ChatWindow({ conversationId, onBack }: ChatWindowProps) 
             onChange={(e) => setNewMessage(e.target.value)}
             placeholder="Type a message..."
             disabled={sending}
-            className="flex-1 bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-white/40 focus:outline-none focus:border-white/40 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 bg-[var(--glass-bg)] border border-[var(--glass-border)] rounded-lg px-4 py-3 text-[var(--text-primary)] placeholder-[var(--placeholder)] focus:outline-none focus:border-[var(--glass-border-focus)] disabled:opacity-50 disabled:cursor-not-allowed"
             onKeyDown={(e) => {
               if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
@@ -490,7 +491,7 @@ export default function ChatWindow({ conversationId, onBack }: ChatWindowProps) 
           <button
             type="submit"
             disabled={!newMessage.trim() || sending}
-            className="bg-white text-black px-6 py-3 rounded-lg font-semibold disabled:bg-white/20 disabled:text-white/40 disabled:cursor-not-allowed hover:bg-white/90 transition-all duration-200 active:scale-95"
+            className="bg-white text-black px-6 py-3 rounded-lg font-semibold disabled:bg-[var(--glass-bg-strong)] disabled:text-[var(--text-muted)] disabled:cursor-not-allowed hover:bg-white/90 transition-all duration-200 active:scale-95"
           >
             {sending ? (
               <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-black"></div>

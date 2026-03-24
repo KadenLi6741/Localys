@@ -25,9 +25,9 @@ function DiscountBadge({ item }: { item: ItemPurchase }) {
         i
       </span>
       {showTooltip && (
-        <span className="absolute bottom-full right-0 mb-2 px-3 py-2 rounded-lg bg-[#242420] border border-[#3A3A34] text-[#F5F0E8] text-xs whitespace-nowrap z-10 shadow-lg">
+        <span className="absolute bottom-full right-0 mb-2 px-3 py-2 rounded-lg bg-[var(--color-charcoal-light)] border border-[var(--color-charcoal-lighter-plus)] text-[var(--color-cream)] text-xs whitespace-nowrap z-10 shadow-lg">
           <span className="block text-[#F5A623] font-semibold mb-1">Coupon: {item.coupon_code}</span>
-          <span className="text-[#9E9A90]">{item.discount_percentage}% off</span>
+          <span className="text-[var(--color-body-text)]">{item.discount_percentage}% off</span>
         </span>
       )}
     </span>
@@ -142,7 +142,7 @@ export function OrderHistory({ userId, businessId, isBusiness = false }: OrderHi
 
   if (!tablesExist) {
     return (
-      <div className="text-center py-8 text-[#9E9A90]">
+      <div className="text-center py-8 text-[var(--color-body-text)]">
         <p className="text-sm">Order history feature coming soon!</p>
       </div>
     );
@@ -154,7 +154,7 @@ export function OrderHistory({ userId, businessId, isBusiness = false }: OrderHi
 
     if (!hasPurchases && !hasSales) {
       return (
-        <div className="text-center py-8 text-[#9E9A90]">
+        <div className="text-center py-8 text-[var(--color-body-text)]">
           <p>No orders yet</p>
         </div>
       );
@@ -162,13 +162,13 @@ export function OrderHistory({ userId, businessId, isBusiness = false }: OrderHi
 
     return (
       <div className="space-y-4">
-        <div className="flex gap-4 border-b border-[#3A3A34]">
+        <div className="flex gap-4 border-b border-[var(--color-charcoal-lighter-plus)]">
           <button
             onClick={() => setActiveTab('purchases')}
             className={`px-4 py-2 font-medium transition-colors min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F5A623] rounded-t-lg ${
               activeTab === 'purchases'
                 ? 'text-[#F5A623] border-b-2 border-[#F5A623]'
-                : 'text-[#9E9A90] hover:text-[#F5F0E8]'
+                : 'text-[var(--color-body-text)] hover:text-[var(--color-cream)]'
             }`}
           >
             Purchases {hasPurchases ? `(${coinPurchases.length + itemPurchases.length})` : ''}
@@ -178,7 +178,7 @@ export function OrderHistory({ userId, businessId, isBusiness = false }: OrderHi
             className={`px-4 py-2 font-medium transition-colors min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F5A623] rounded-t-lg ${
               activeTab === 'sales'
                 ? 'text-[#F5A623] border-b-2 border-[#F5A623]'
-                : 'text-[#9E9A90] hover:text-[#F5F0E8]'
+                : 'text-[var(--color-body-text)] hover:text-[var(--color-cream)]'
             }`}
           >
             Sales {hasSales ? `(${itemSales.length})` : ''}
@@ -188,7 +188,7 @@ export function OrderHistory({ userId, businessId, isBusiness = false }: OrderHi
         {activeTab === 'purchases' && (
           <div className="space-y-3">
             {allPurchases.length === 0 ? (
-              <p className="text-center py-4 text-[#9E9A90]/60 text-sm">No purchases</p>
+              <p className="text-center py-4 text-[var(--color-body-text)]/60 text-sm">No purchases</p>
             ) : (
               allPurchases.map((order, idx) => (
                 <div key={idx} className="order-card">
@@ -202,7 +202,7 @@ export function OrderHistory({ userId, businessId, isBusiness = false }: OrderHi
         {activeTab === 'sales' && (
           <div className="space-y-3">
             {itemSales.length === 0 ? (
-              <p className="text-center py-4 text-[#9E9A90]/60 text-sm">No sales yet</p>
+              <p className="text-center py-4 text-[var(--color-body-text)]/60 text-sm">No sales yet</p>
             ) : (
               itemSales.map((sale, idx) => (
                 <div key={idx} className="order-card">
@@ -218,7 +218,7 @@ export function OrderHistory({ userId, businessId, isBusiness = false }: OrderHi
 
   if (allPurchases.length === 0) {
     return (
-      <div className="text-center py-8 text-[#9E9A90]">
+      <div className="text-center py-8 text-[var(--color-body-text)]">
         <p>No orders yet</p>
       </div>
     );
@@ -248,18 +248,18 @@ function OrderItem({ order }: { order: CoinPurchase | ItemPurchase }) {
   if (isCoinPurchase) {
     const coins = order as CoinPurchase;
     return (
-      <div className="bg-[#242420] border border-[#F5A623]/30 rounded-2xl p-4 hover:bg-[#2E2E28] hover:border-[#F5A623]/40 hover:shadow-lg hover:shadow-[#F5A623]/20 transition-all duration-200">
+      <div className="bg-[var(--color-charcoal-light)] border border-[#F5A623]/30 rounded-2xl p-4 hover:bg-[var(--color-charcoal-lighter)] hover:border-[#F5A623]/40 hover:shadow-lg hover:shadow-[#F5A623]/20 transition-all duration-200">
         <div className="flex justify-between items-start">
           <div className="flex items-center gap-3 flex-1">
             <div className="text-2xl">🪙</div>
             <div>
-              <p className="font-medium text-[#F5F0E8]">Coin Purchase</p>
-              <p className="text-[#9E9A90] text-sm">{coins.coins} coins</p>
+              <p className="font-medium text-[var(--color-cream)]">Coin Purchase</p>
+              <p className="text-[var(--color-body-text)] text-sm">{coins.coins} coins</p>
             </div>
           </div>
           <div className="text-right">
             <p className="font-medium text-[#F5A623]">{coins.coins}x 🪙</p>
-            <p className="text-[#9E9A90] text-xs">{formattedDate}</p>
+            <p className="text-[var(--color-body-text)] text-xs">{formattedDate}</p>
           </div>
         </div>
       </div>
@@ -270,13 +270,13 @@ function OrderItem({ order }: { order: CoinPurchase | ItemPurchase }) {
   const isPaid = item.status === 'paid';
 
   return (
-    <div className="bg-[#242420] border border-[#3A3A34] rounded-lg p-4 hover:bg-[#2E2E28] hover:border-[#F5A623]/40 hover:shadow-lg hover:shadow-[#F5A623]/20 transition-all duration-200 active:scale-95">
+    <div className="bg-[var(--color-charcoal-light)] border border-[var(--color-charcoal-lighter-plus)] rounded-lg p-4 hover:bg-[var(--color-charcoal-lighter)] hover:border-[#F5A623]/40 hover:shadow-lg hover:shadow-[#F5A623]/20 transition-all duration-200 active:scale-95">
       <div className="flex justify-between items-start">
         <div className="flex items-center gap-3 flex-1">
           <div className="text-2xl">🛍️</div>
           <div>
-            <p className="font-semibold text-[#F5F0E8]">{item.item_name}</p>
-            <p className="text-[#9E9A90] text-sm">Order #{item.id.substring(0, 8)}</p>
+            <p className="font-semibold text-[var(--color-cream)]">{item.item_name}</p>
+            <p className="text-[var(--color-body-text)] text-sm">Order #{item.id.substring(0, 8)}</p>
           </div>
         </div>
         <div className="text-right">
@@ -284,10 +284,10 @@ function OrderItem({ order }: { order: CoinPurchase | ItemPurchase }) {
             {item.original_price ? `$${item.original_price.toFixed(2)}` : `$${item.price.toFixed(2)}`}
           </p>
           <DiscountBadge item={item} />
-          <p className="text-[#9E9A90] text-xs mt-1">{formattedDate}</p>
+          <p className="text-[var(--color-body-text)] text-xs mt-1">{formattedDate}</p>
         </div>
       </div>
-      <div className="mt-3 flex items-center gap-2 pt-3 border-t border-[#3A3A34]">
+      <div className="mt-3 flex items-center gap-2 pt-3 border-t border-[var(--color-charcoal-lighter-plus)]">
         <StatusBadge status={item.status} />
         {isPaid && item.verification_token && (
           <button
@@ -299,8 +299,8 @@ function OrderItem({ order }: { order: CoinPurchase | ItemPurchase }) {
         )}
       </div>
       {showQR && isPaid && item.verification_token && (
-        <div className="mt-3 flex flex-col items-center py-3 border-t border-[#3A3A34]">
-          <p className="text-[#9E9A90] text-xs mb-2">Show at pickup</p>
+        <div className="mt-3 flex flex-col items-center py-3 border-t border-[var(--color-charcoal-lighter-plus)]">
+          <p className="text-[var(--color-body-text)] text-xs mb-2">Show at pickup</p>
           <OrderQRCode orderId={item.id} token={item.verification_token} size={160} />
         </div>
       )}
@@ -317,21 +317,21 @@ function SaleItem({ sale }: { sale: ItemPurchase }) {
   });
 
   return (
-    <div className="bg-[#242420] border border-[#3A3A34] rounded-lg p-4 hover:bg-[#2E2E28] hover:border-[#6BAF7A]/40 hover:shadow-lg hover:shadow-[#6BAF7A]/20 transition-all duration-200 active:scale-95">
+    <div className="bg-[var(--color-charcoal-light)] border border-[var(--color-charcoal-lighter-plus)] rounded-lg p-4 hover:bg-[var(--color-charcoal-lighter)] hover:border-[#6BAF7A]/40 hover:shadow-lg hover:shadow-[#6BAF7A]/20 transition-all duration-200 active:scale-95">
       <div className="flex justify-between items-start">
         <div className="flex items-center gap-3 flex-1">
           <div className="text-2xl">📦</div>
           <div>
-            <p className="font-semibold text-[#F5F0E8]">{sale.item_name}</p>
-            <p className="text-[#9E9A90] text-sm">Order #{sale.id.substring(0, 8)}</p>
+            <p className="font-semibold text-[var(--color-cream)]">{sale.item_name}</p>
+            <p className="text-[var(--color-body-text)] text-sm">Order #{sale.id.substring(0, 8)}</p>
           </div>
         </div>
         <div className="text-right">
           <p className="font-semibold text-[#6BAF7A]">${sale.price.toFixed(2)}</p>
-          <p className="text-[#9E9A90] text-xs mt-1">{formattedDate}</p>
+          <p className="text-[var(--color-body-text)] text-xs mt-1">{formattedDate}</p>
         </div>
       </div>
-      <div className="mt-3 flex items-center gap-2 pt-3 border-t border-[#3A3A34]">
+      <div className="mt-3 flex items-center gap-2 pt-3 border-t border-[var(--color-charcoal-lighter-plus)]">
         <StatusBadge status={sale.status} />
       </div>
     </div>

@@ -85,8 +85,8 @@ export function BookmarkedVideos({ userId }: BookmarkedVideosProps) {
   if (videos.length === 0) {
     return (
       <div className="text-center py-8">
-        <p className="text-white/60">No bookmarked videos yet</p>
-        <p className="text-white/40 text-sm mt-2">Bookmark videos from the feed to see them here</p>
+        <p className="text-[var(--text-tertiary)]">No bookmarked videos yet</p>
+        <p className="text-[var(--text-muted)] text-sm mt-2">Bookmark videos from the feed to see them here</p>
       </div>
     );
   }
@@ -97,7 +97,7 @@ export function BookmarkedVideos({ userId }: BookmarkedVideosProps) {
         <Link
           key={video.id}
           href={`/video/${video.id}`}
-          className="group relative overflow-hidden rounded-lg bg-[#1A1A18]/20 border border-white/10 hover:border-white/30 transition-all duration-300"
+          className="group relative overflow-hidden rounded-lg bg-[var(--color-charcoal)]/20 border border-[var(--glass-border)] hover:border-white/30 transition-all duration-300"
         >
           <div className="aspect-video relative overflow-hidden bg-transparent">
             {video.video_url && (
@@ -107,20 +107,20 @@ export function BookmarkedVideos({ userId }: BookmarkedVideosProps) {
                 muted
               />
             )}
-            <div className="absolute inset-0 bg-[#1A1A18]/0 group-hover:bg-[#1A1A18]/30 transition-colors duration-300" />
+            <div className="absolute inset-0 bg-[var(--color-charcoal)]/0 group-hover:bg-[var(--color-charcoal)]/30 transition-colors duration-300" />
           </div>
           
           <div className="p-3">
-            <h3 className="font-semibold text-white text-sm truncate">
+            <h3 className="font-semibold text-[var(--text-primary)] text-sm truncate">
               {video.businesses?.business_name || video.profiles?.full_name || 'Video'}
             </h3>
             {video.caption && (
-              <p className="text-white/70 text-xs line-clamp-2 mt-1">
+              <p className="text-[var(--text-secondary)] text-xs line-clamp-2 mt-1">
                 {video.caption}
               </p>
             )}
             {video.businesses && (
-              <div className="flex items-center gap-2 mt-2 text-xs text-white/60">
+              <div className="flex items-center gap-2 mt-2 text-xs text-[var(--text-tertiary)]">
                 {video.businesses.average_rating && (
                   <>
                     <span>⭐ {video.businesses.average_rating.toFixed(1)}</span>

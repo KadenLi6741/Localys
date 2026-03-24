@@ -100,8 +100,8 @@ export default function NewConversationButton({
       </button>
 
       {isOpen && (
-        <div className="fixed inset-0 bg-[#1A1A18]/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-transparent border border-white/20 rounded-lg w-full max-w-md p-6">
+        <div className="fixed inset-0 bg-[var(--color-charcoal)]/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-transparent border border-[var(--glass-border)] rounded-lg w-full max-w-md p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold">New Conversation</h2>
               <button
@@ -110,7 +110,7 @@ export default function NewConversationButton({
                   setSearchQuery('');
                   setSearchResults([]);
                 }}
-                className="text-gray-400 hover:text-white transition-colors"
+                className="text-gray-400 hover:text-[var(--text-primary)] transition-colors"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -124,7 +124,7 @@ export default function NewConversationButton({
                 value={searchQuery}
                 onChange={(e) => handleSearch(e.target.value)}
                 placeholder="Search for a user..."
-                className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-2 text-white placeholder-white/40 focus:outline-none focus:border-white/40"
+                className="w-full bg-[var(--glass-bg)] border border-[var(--glass-border)] rounded-lg px-4 py-2 text-[var(--text-primary)] placeholder-[var(--placeholder)] focus:outline-none focus:border-[var(--glass-border-focus)]"
                 autoFocus
               />
             </div>
@@ -148,7 +148,7 @@ export default function NewConversationButton({
                     key={profile.id}
                     onClick={() => handleStartConversation(profile.id)}
                     disabled={creating}
-                    className="w-full flex items-center gap-3 p-3 hover:bg-white/5 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full flex items-center gap-3 p-3 hover:bg-[var(--glass-bg-subtle)] rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {profile.avatar_url ? (
                       <img
@@ -157,7 +157,7 @@ export default function NewConversationButton({
                         className="w-10 h-10 rounded-full object-cover"
                       />
                     ) : (
-                      <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
+                      <div className="w-10 h-10 rounded-full bg-[var(--glass-bg)] flex items-center justify-center">
                         <span className="font-semibold">
                           {profile.username?.[0]?.toUpperCase() || '?'}
                         </span>

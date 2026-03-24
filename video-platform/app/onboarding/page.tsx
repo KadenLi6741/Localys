@@ -54,7 +54,7 @@ export default function OnboardingPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-transparent text-white flex items-center justify-center">
+      <div className="min-h-screen bg-transparent text-[var(--text-primary)] flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
           <p>Loading...</p>
@@ -68,11 +68,11 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-transparent text-white flex items-center justify-center px-4">
+    <div className="min-h-screen bg-transparent text-[var(--text-primary)] flex items-center justify-center px-4">
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
           <h1 className="text-4xl font-bold mb-2">Localy</h1>
-          <p className="text-white/60">Set up your profile</p>
+          <p className="text-[var(--text-tertiary)]">Set up your profile</p>
         </div>
 
         <div className="flex flex-col items-center gap-3">
@@ -84,7 +84,7 @@ export default function OnboardingPage() {
             isOwnProfile={true}
             className="w-32 h-32"
           />
-          <p className="text-white/40 text-sm">Tap to add a profile photo</p>
+          <p className="text-[var(--text-muted)] text-sm">Tap to add a profile photo</p>
         </div>
 
         <div>
@@ -95,12 +95,12 @@ export default function OnboardingPage() {
             id="bio"
             value={bio}
             onChange={(e) => setBio(e.target.value)}
-            className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-white/40 focus:outline-none focus:border-white/40 focus:ring-2 focus:ring-white/20 transition-all duration-200 resize-none"
+            className="w-full bg-[var(--glass-bg)] border border-[var(--glass-border)] rounded-lg px-4 py-3 text-[var(--text-primary)] placeholder-[var(--placeholder)] focus:outline-none focus:border-[var(--glass-border-focus)] focus:ring-2 focus:ring-white/20 transition-all duration-200 resize-none"
             placeholder="Tell us about yourself..."
             rows={4}
             maxLength={300}
           />
-          <p className="text-white/40 text-xs mt-1 text-right">{bio.length}/300</p>
+          <p className="text-[var(--text-muted)] text-xs mt-1 text-right">{bio.length}/300</p>
         </div>
 
         {error && (
@@ -113,7 +113,7 @@ export default function OnboardingPage() {
           type="button"
           onClick={handleComplete}
           disabled={saving}
-          className="w-full bg-white text-black font-semibold py-3 rounded-lg disabled:bg-white/20 disabled:text-white/40 disabled:cursor-not-allowed hover:bg-white/90 active:scale-98 transition-all duration-200"
+          className="w-full bg-white text-black font-semibold py-3 rounded-lg disabled:bg-[var(--glass-bg-strong)] disabled:text-[var(--text-muted)] disabled:cursor-not-allowed hover:bg-white/90 active:scale-98 transition-all duration-200"
         >
           {saving ? 'Saving...' : 'Complete'}
         </button>
@@ -123,7 +123,7 @@ export default function OnboardingPage() {
             type="button"
             onClick={handleSkip}
             disabled={saving}
-            className="text-white/60 hover:text-white hover:underline transition-colors duration-200"
+            className="text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:underline transition-colors duration-200"
           >
             Skip for now
           </button>

@@ -9,7 +9,7 @@ const ParticleBackground = dynamic(
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="relative min-h-screen bg-[#1A1A18]">
+    <div className="relative min-h-screen bg-[var(--color-charcoal)]">
       <ParticleBackground />
       <div className="relative z-10">
         {children}

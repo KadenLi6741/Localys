@@ -27,9 +27,10 @@ interface CommentItemProps {
   onLikeUpdate: (likeData: { comment_id: string; like_count: number; user_liked: boolean }) => void;
   onCommentDeleted?: (commentId: string) => void;
   isReply?: boolean;
+  isVerifiedPurchaser?: boolean;
 }
 
-export default function CommentItem({ comment, videoId, onLikeUpdate, onCommentDeleted, isReply = false }: CommentItemProps) {
+export default function CommentItem({ comment, videoId, onLikeUpdate, onCommentDeleted, isReply = false, isVerifiedPurchaser = false }: CommentItemProps) {
   const { user } = useAuth();
   const [replies, setReplies] = useState<Comment[]>([]);
   const [showReplies, setShowReplies] = useState(false);
@@ -175,7 +176,7 @@ export default function CommentItem({ comment, videoId, onLikeUpdate, onCommentD
   };
 
   return (
-    <div className={`${isReply ? 'ml-8 border-l border-white/20 pl-4' : 'p-4'}`}>
+    <div className={`${isReply ? 'ml-8 border-l border-[var(--glass-border)] pl-4' : 'p-4'}`}>
       {/* Comment Header */}
       <div className="flex items-start gap-3 mb-2">
         {/* Avatar */}
@@ -187,7 +188,7 @@ export default function CommentItem({ comment, videoId, onLikeUpdate, onCommentD
               className="w-8 h-8 rounded-full object-cover"
             />
           ) : (
-            <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-full bg-[var(--glass-bg)] flex items-center justify-center">
               <span className="text-sm font-semibold">
                 {comment.username?.[0]?.toUpperCase() || '?'}
               </span>
@@ -201,6 +202,11 @@ export default function CommentItem({ comment, videoId, onLikeUpdate, onCommentD
             <span className="font-semibold text-sm">
               {comment.full_name || comment.username}
             </span>
+            {isVerifiedPurchaser && (
+              <span className="text-[11px] font-semibold" style={{ color: '#6BAF7A' }}>
+                Verified Purchase ✓
+              </span>
+            )}
             <span className="text-xs text-gray-400">
               {formatTimestamp(comment.created_at)}
             </span>
@@ -247,7 +253,7 @@ export default function CommentItem({ comment, videoId, onLikeUpdate, onCommentD
             <button
               onClick={handleLikeToggle}
               disabled={!user || liking}
-              className={`flex items-center gap-1 hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+              className={`flex items-center gap-1 hover:text-[var(--text-primary)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
                 comment.is_liked ? 'text-red-400' : ''
               }`}
             >
@@ -265,7 +271,7 @@ export default function CommentItem({ comment, videoId, onLikeUpdate, onCommentD
             {!isReply && user && (
               <button
                 onClick={() => setShowReplyForm(!showReplyForm)}
-                className="hover:text-white transition-colors"
+                className="hover:text-[var(--text-primary)] transition-colors"
               >
                 Reply
               </button>
@@ -275,7 +281,7 @@ export default function CommentItem({ comment, videoId, onLikeUpdate, onCommentD
             {!isReply && comment.reply_count && comment.reply_count > 0 && (
               <button
                 onClick={handleShowReplies}
-                className="hover:text-white transition-colors"
+                className="hover:text-[var(--text-primary)] transition-colors"
               >
                 {showReplies ? 'Hide' : 'View'} {comment.reply_count} {comment.reply_count === 1 ? 'reply' : 'replies'}
               </button>
@@ -313,7 +319,7 @@ export default function CommentItem({ comment, videoId, onLikeUpdate, onCommentD
           />
           <button
             onClick={() => setShowReplyForm(false)}
-            className="mt-2 text-xs text-gray-400 hover:text-white transition-colors"
+            className="mt-2 text-xs text-gray-400 hover:text-[var(--text-primary)] transition-colors"
           >
             Cancel
           </button>

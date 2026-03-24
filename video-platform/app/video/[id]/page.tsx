@@ -306,7 +306,7 @@ export default function VideoDetailPage() {
     return (
       <div className="min-h-screen bg-transparent flex items-center justify-center">
         <div className="text-center">
-          <p className="text-white text-xl mb-4">{error || 'Video not found'}</p>
+          <p className="text-[var(--text-primary)] text-xl mb-4">{error || 'Video not found'}</p>
           <button
             onClick={() => router.back()}
             className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
@@ -332,7 +332,7 @@ export default function VideoDetailPage() {
         {/* Back Button */}
         <button
           onClick={() => router.back()}
-          className="mb-4 text-gray-400 hover:text-white flex items-center gap-2"
+          className="mb-4 text-gray-400 hover:text-[var(--text-primary)] flex items-center gap-2"
         >
           ← Back
         </button>
@@ -367,7 +367,7 @@ export default function VideoDetailPage() {
           {/* Video Info */}
           <div className="p-6 space-y-4">
             {/* Caption */}
-            <p className="text-white text-lg">{video.caption}</p>
+            <p className="text-[var(--text-primary)] text-lg">{video.caption}</p>
 
             {/* Creator Info */}
             <div className="flex items-center gap-3">
@@ -380,7 +380,7 @@ export default function VideoDetailPage() {
                 className="w-12 h-12 rounded-full object-cover"
               />
               <div>
-                <p className="text-white font-semibold">{creatorName}</p>
+                <p className="text-[var(--text-primary)] font-semibold">{creatorName}</p>
                 <p className="text-gray-400 text-sm">
                   {new Date(video.created_at).toLocaleDateString()}
                 </p>
@@ -390,7 +390,7 @@ export default function VideoDetailPage() {
             {video.businesses && (
               <div className="rounded-xl border border-gray-700 bg-gray-800/70 p-4 space-y-3">
                 <div className="flex items-center justify-between">
-                  <p className="text-white font-semibold">Restaurant Snapshot</p>
+                  <p className="text-[var(--text-primary)] font-semibold">Restaurant Snapshot</p>
                   {video.businesses.category && (
                     <span className="text-xs uppercase tracking-wide text-gray-300 bg-gray-700 px-2 py-1 rounded-full">
                       {video.businesses.category}
@@ -401,19 +401,19 @@ export default function VideoDetailPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div className="rounded-lg bg-gray-900/80 p-3">
                     <p className="text-xs text-gray-400">{t('video.info.price')}</p>
-                    <p className="text-white font-semibold">
+                    <p className="text-[var(--text-primary)] font-semibold">
                       {priceRange ? `${priceSignal} · $${priceRange.min}-$${priceRange.max}` : '—'}
                     </p>
                   </div>
 
                   <div className="rounded-lg bg-gray-900/80 p-3">
                     <p className="text-xs text-gray-400">{t('video.info.distance')}</p>
-                    <p className="text-white font-semibold">{distanceLabel || 'Tap GPS below'}</p>
+                    <p className="text-[var(--text-primary)] font-semibold">{distanceLabel || 'Tap GPS below'}</p>
                   </div>
 
                   <div className="rounded-lg bg-gray-900/80 p-3">
                     <p className="text-xs text-gray-400">{t('video.info.eta')}</p>
-                    <p className="text-white font-semibold">{estimatedMinutes ? `${estimatedMinutes} min` : '—'}</p>
+                    <p className="text-[var(--text-primary)] font-semibold">{estimatedMinutes ? `${estimatedMinutes} min` : '—'}</p>
                   </div>
                 </div>
 

@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useActivity } from '@/contexts/ActivityContext';
+import { useUnreadMessages } from '@/contexts/UnreadMessagesContext';
 import { supabase } from '@/lib/supabase/client';
 
 interface FollowingAccount {
@@ -22,10 +23,10 @@ export function DesktopSidebar() {
   const { getCartCount } = useCart();
   const { user } = useAuth();
   const { togglePanel, unreadCount } = useActivity();
+  const { unreadMessages } = useUnreadMessages();
   const cartCount = getCartCount();
   const [isBusiness, setIsBusiness] = useState(false);
   const [following, setFollowing] = useState<FollowingAccount[]>([]);
-  const [unreadMessages, setUnreadMessages] = useState(0);
   const [pendingOrders, setPendingOrders] = useState(0);
 
   useEffect(() => {
@@ -35,34 +36,6 @@ export function DesktopSidebar() {
       setIsBusiness(!!data?.type);
     };
     check();
-  }, [user]);
-
-  // Fetch unread messages count
-  useEffect(() => {
-    if (!user) { setUnreadMessages(0); return; }
-    const fetchUnread = async () => {
-      const { data: memberships } = await supabase
-        .from('chat_members')
-        .select('chat_id, last_read')
-        .eq('user_id', user.id);
-      if (!memberships || memberships.length === 0) { setUnreadMessages(0); return; }
-      let total = 0;
-      for (const m of memberships) {
-        let query = supabase
-          .from('messages')
-          .select('id', { count: 'exact', head: true })
-          .eq('chat_id', m.chat_id)
-          .neq('sender_id', user.id);
-        if (m.last_read) query = query.gt('created_at', m.last_read);
-        const { count } = await query;
-        total += count || 0;
-      }
-      setUnreadMessages(total);
-    };
-    fetchUnread();
-    const msgChannel = supabase.channel('sidebar-messages').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, () => fetchUnread()).subscribe();
-    const readChannel = supabase.channel('sidebar-chat-read').on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'chat_members' }, () => fetchUnread()).subscribe();
-    return () => { supabase.removeChannel(msgChannel); supabase.removeChannel(readChannel); };
   }, [user]);
 
   // Fetch pending orders count (business only)
@@ -109,6 +82,7 @@ export function DesktopSidebar() {
   const navItems = [
     { href: '/', label: 'Home', icon: 'M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z', fill: true },
     { href: '/search', label: 'Search', icon: 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z' },
+    { href: '/explore', label: 'Explore', icon: 'M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7' },
     { href: '/upload', label: 'Upload', icon: 'M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12' },
     { href: '/chats', label: 'Messages', icon: 'M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z', badge: unreadMessages },
     { href: '/cart', label: 'Cart', icon: 'M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z', cart: true },
@@ -118,9 +92,12 @@ export function DesktopSidebar() {
   ];
 
   return (
-    <aside className="hidden lg:flex sticky top-0 h-screen z-20 w-60 shrink-0 flex-col border-r border-[#3A3A34] bg-[#1A1A18]/95 backdrop-blur-xl">
-      <div className="px-5 py-6">
-        <Link href="/" className="text-2xl font-bold text-[#F5F0E8]">Localy</Link>
+    <aside className="hidden lg:flex sticky top-0 h-screen z-20 w-60 shrink-0 flex-col border-r border-[var(--color-charcoal-lighter-plus)] bg-[var(--color-charcoal)]/95 backdrop-blur-xl">
+      <div className="px-5 py-6 flex justify-center">
+        <Link href="/" className="flex items-center gap-3.5 text-[2rem] font-bold text-[var(--color-cream)]">
+          Localy
+          <Image src="/logo.png" alt="Localy logo" width={62} height={62} className="rounded-md" />
+        </Link>
       </div>
       <nav className="px-3 space-y-1">
         {navItems.map((item) => {
@@ -134,7 +111,7 @@ export function DesktopSidebar() {
                 href="#"
                 role="button"
                 onClick={(e) => { e.preventDefault(); togglePanel(); }}
-                className={`flex items-center gap-3 rounded-xl px-3 py-3 text-[15px] font-medium transition-all duration-200 hover-lift text-[#9E9A90] hover:text-[#F5F0E8] hover:bg-[#242420]`}
+                className={`flex items-center gap-3 rounded-xl px-3 py-3 text-[15px] font-medium transition-all duration-200 hover-lift text-[var(--color-body-text)] hover:text-[var(--color-cream)] hover:bg-[var(--color-charcoal-light)]`}
               >
                 <svg className="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={item.icon} />
@@ -156,7 +133,7 @@ export function DesktopSidebar() {
               className={`flex items-center gap-3 rounded-xl px-3 py-3 text-[15px] font-medium transition-all duration-200 hover-lift ${
                 active
                   ? 'bg-[#F5A623]/10 text-[#F5A623] border-l-4 border-[#F5A623]'
-                  : 'text-[#9E9A90] hover:text-[#F5F0E8] hover:bg-[#242420]'
+                  : 'text-[var(--color-body-text)] hover:text-[var(--color-cream)] hover:bg-[var(--color-charcoal-light)]'
               }`}
             >
               <svg className="h-5 w-5 shrink-0" fill={item.fill ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
@@ -181,39 +158,39 @@ export function DesktopSidebar() {
       {/* Following Accounts */}
       {user && following.length > 0 && (
         <div className="px-3">
-          <div className="border-t border-[#3A3A34] my-2" />
-          <p className="px-3 pt-2 pb-1 text-xs font-semibold text-[#9E9A90]">Following Accounts</p>
+          <div className="border-t border-[var(--color-charcoal-lighter-plus)] my-2" />
+          <p className="px-3 pt-1 pb-1 text-[13px] font-semibold text-[var(--color-body-text)]">Following Accounts</p>
           <div className="flex flex-col gap-1">
             {following.map((account) => (
               <a
                 key={account.id}
                 href="#"
                 onClick={(e) => { e.preventDefault(); router.push(`/profile/${account.id}`); }}
-                className="flex items-center gap-2 rounded-lg px-3 py-1.5 transition-all duration-150 hover:bg-[#242420] hover:border-l-2 hover:border-[#F5A623] border-l-2 border-transparent"
+                className="flex items-center gap-3 rounded-lg px-3 py-1 transition-all duration-150 hover:bg-[var(--color-charcoal-light)] hover:border-l-2 hover:border-[#F5A623] border-l-2 border-transparent"
               >
                 {account.profile_picture_url ? (
                   <Image
                     src={account.profile_picture_url}
-                    alt={account.full_name}
+                    alt={account.full_name || account.username || 'User avatar'}
                     width={28}
                     height={28}
                     className="h-7 w-7 rounded-full object-cover shrink-0"
                   />
                 ) : (
-                  <div className="h-7 w-7 rounded-full bg-[#3A3A34] flex items-center justify-center shrink-0">
-                    <span className="text-[10px] text-[#9E9A90]">{account.full_name?.charAt(0)?.toUpperCase() || '?'}</span>
+                  <div className="h-7 w-7 rounded-full bg-[var(--color-charcoal-lighter-plus)] flex items-center justify-center shrink-0">
+                    <span className="text-[10px] text-[var(--color-body-text)]">{account.full_name?.charAt(0)?.toUpperCase() || '?'}</span>
                   </div>
                 )}
                 <p className="min-w-0 flex-1 truncate">
-                  <span className="text-[12px] font-bold text-[#F5F0E8]">{account.full_name}</span>
-                  <span className="text-[11px] text-[#9E9A90]"> · @{account.username}</span>
+                  <span className="text-[13px] font-bold text-[var(--color-cream)]">{account.full_name}</span>
+                  <span className="text-[12px] text-[#9E9A90]"> · @{account.username}</span>
                 </p>
               </a>
             ))}
           </div>
           <Link
             href="/profile#following"
-            className="flex items-center gap-2.5 rounded-lg px-3 py-2 mt-0.5 text-[13px] text-[#9E9A90] transition-all duration-150 hover:text-[#F5F0E8] hover:bg-[#242420]"
+            className="flex items-center gap-2.5 rounded-lg px-3 py-2 mt-0.5 text-[13px] text-[var(--color-body-text)] transition-all duration-150 hover:text-[var(--color-cream)] hover:bg-[var(--color-charcoal-light)]"
           >
             <svg className="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
@@ -225,12 +202,12 @@ export function DesktopSidebar() {
 
       {/* Footer */}
       <div className="px-3">
-        <div className="border-t border-[#3A3A34] my-2" />
+        <div className="border-t border-[var(--color-charcoal-lighter-plus)] my-2" />
         <div className="px-3 py-4 space-y-1.5">
-          <a href="#" className="block text-[11px] text-[#9E9A90] hover:text-[#F5A623] transition-colors">Company</a>
-          <a href="#" className="block text-[11px] text-[#9E9A90] hover:text-[#F5A623] transition-colors">Program</a>
-          <a href="#" className="block text-[11px] text-[#9E9A90] hover:text-[#F5A623] transition-colors">Terms &amp; Policies</a>
-          <p className="text-[11px] text-[#9E9A90] pt-2">&copy; 2026 Localys</p>
+          <a href="#" className="block text-[11px] text-[var(--color-body-text)] hover:text-[#F5A623] transition-colors">Company</a>
+          <a href="#" className="block text-[11px] text-[var(--color-body-text)] hover:text-[#F5A623] transition-colors">Program</a>
+          <a href="#" className="block text-[11px] text-[var(--color-body-text)] hover:text-[#F5A623] transition-colors">Terms &amp; Policies</a>
+          <p className="text-[11px] text-[var(--color-body-text)] pt-2">&copy; 2026 Localys</p>
         </div>
       </div>
     </aside>

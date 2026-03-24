@@ -5,6 +5,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { CartProvider } from "@/contexts/CartContext";
+import { UnreadMessagesProvider } from "@/contexts/UnreadMessagesContext";
 import { AppBottomNav } from "@/components/AppBottomNav";
 import { ActivityPanel } from "@/components/ActivityPanel";
 import { ActivityProvider } from "@/contexts/ActivityContext";
@@ -37,13 +38,14 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full">
       <body
-        className={`${outfit.variable} ${jetbrainsMono.variable} antialiased h-full dark bg-[#1A1A18] text-[#F5F0E8]`}
+        className={`${outfit.variable} ${jetbrainsMono.variable} antialiased h-full`}
       >
         <ThemeProvider>
           <AuthProvider>
             <LanguageProvider>
               <CartProvider>
                 <ActivityProvider>
+                <UnreadMessagesProvider>
                 <a href="#main-content" className="skip-to-main">Skip to main content</a>
                 {/* Premium background elements */}
                 <div className="premium-blob premium-blob--amber" aria-hidden="true" />
@@ -59,6 +61,7 @@ export default function RootLayout({
                 </div>
                 <AppBottomNav />
                 <ActivityPanel />
+                </UnreadMessagesProvider>
                 </ActivityProvider>
               </CartProvider>
             </LanguageProvider>

@@ -457,20 +457,20 @@ export function ActivityPanel() {
 
       {/* Panel */}
       <div
-        className={`fixed top-0 right-0 bottom-0 z-50 w-full md:w-[35%] md:min-w-[360px] bg-[#1A1A18] border-l border-[#3A3A34] flex flex-col transition-transform duration-300 ease-out ${
+        className={`fixed top-0 right-0 bottom-0 z-50 w-full md:w-[35%] md:min-w-[360px] bg-[var(--color-charcoal)] border-l border-[var(--color-charcoal-lighter-plus)] flex flex-col transition-transform duration-300 ease-out ${
           isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
         {/* Header */}
-        <div className="p-5 pb-3 border-b border-[#3A3A34]">
+        <div className="p-5 pb-3 border-b border-[var(--color-charcoal-lighter-plus)]">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-[#F5F0E8] text-2xl font-bold">Activity</h2>
+            <h2 className="text-[var(--color-cream)] text-2xl font-bold">Activity</h2>
             <button
               onClick={closePanel}
-              className="p-2 hover:bg-[#242420] rounded-full transition-colors"
+              className="p-2 hover:bg-[var(--color-charcoal-light)] rounded-full transition-colors"
               aria-label="Close activity panel"
             >
-              <svg className="w-6 h-6 text-[#F5F0E8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-6 h-6 text-[var(--color-cream)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
@@ -509,8 +509,8 @@ export function ActivityPanel() {
               <svg className="w-12 h-12 text-[#6BAF7A] mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
               </svg>
-              <p className="text-[#F5F0E8] font-medium mb-1">No activity yet</p>
-              <p className="text-[#9E9A90] text-sm text-center">Your likes, comments and followers will appear here</p>
+              <p className="text-[var(--color-cream)] font-medium mb-1">No activity yet</p>
+              <p className="text-[var(--color-body-text)] text-sm text-center">Your likes, comments and followers will appear here</p>
             </div>
           ) : (
             <div className="py-2">
@@ -518,10 +518,10 @@ export function ActivityPanel() {
                 <div key={group.label}>
                   {/* Group Header */}
                   <div className="flex items-center gap-3 px-5 py-3">
-                    <span className="text-[#F5F0E8]/60 text-xs font-semibold uppercase tracking-wider whitespace-nowrap">
+                    <span className="text-[var(--color-cream)]/60 text-xs font-semibold uppercase tracking-wider whitespace-nowrap">
                       {group.label}
                     </span>
-                    <div className="flex-1 h-px bg-[#3A3A34]" />
+                    <div className="flex-1 h-px bg-[var(--color-charcoal-lighter-plus)]" />
                   </div>
 
                   {/* Items */}
@@ -529,16 +529,16 @@ export function ActivityPanel() {
                     <button
                       key={item.id}
                       onClick={() => handleItemClick(item)}
-                      className="w-full flex items-center gap-3 px-5 py-3 hover:bg-[#242420] transition-colors text-left"
+                      className="w-full flex items-center gap-3 px-5 py-3 hover:bg-[var(--color-charcoal-light)] transition-colors text-left"
                     >
                       {/* Avatar */}
                       <div className={`w-12 h-12 rounded-full overflow-hidden shrink-0 ${
-                        item.isBusinessUser ? 'ring-2 ring-[#F5A623]' : 'ring-1 ring-[#3A3A34]'
+                        item.isBusinessUser ? 'ring-2 ring-[#F5A623]' : 'ring-1 ring-[var(--color-charcoal-lighter-plus)]'
                       }`}>
                         {item.avatarUrl ? (
                           <img src={item.avatarUrl} alt={item.fullName} className="w-full h-full object-cover" />
                         ) : (
-                          <div className="w-full h-full bg-[#242420] flex items-center justify-center text-[#9E9A90] text-sm font-medium">
+                          <div className="w-full h-full bg-[var(--color-charcoal-light)] flex items-center justify-center text-[var(--color-body-text)] text-sm font-medium">
                             {item.fullName?.[0] || '?'}
                           </div>
                         )}
@@ -547,10 +547,10 @@ export function ActivityPanel() {
                       {/* Content */}
                       <div className="flex-1 min-w-0">
                         <p className="text-sm">
-                          <span className="text-[#F5F0E8] font-bold">{item.username}</span>{' '}
-                          <span className="text-[#9E9A90]">{item.actionText}</span>
+                          <span className="text-[var(--color-cream)] font-bold">{item.username}</span>{' '}
+                          <span className="text-[var(--color-body-text)]">{item.actionText}</span>
                         </p>
-                        <p className="text-[#9E9A90] text-xs mt-0.5">{formatTimestamp(item.timestamp)}</p>
+                        <p className="text-[var(--color-body-text)] text-xs mt-0.5">{formatTimestamp(item.timestamp)}</p>
                       </div>
 
                       {/* Right side */}
@@ -562,8 +562,8 @@ export function ActivityPanel() {
                           Follow Back
                         </button>
                       ) : item.videoId ? (
-                        <div className="w-10 h-10 rounded-lg bg-[#242420] border border-[#3A3A34] flex items-center justify-center shrink-0">
-                          <svg className="w-4 h-4 text-[#9E9A90]" fill="currentColor" viewBox="0 0 24 24">
+                        <div className="w-10 h-10 rounded-lg bg-[var(--color-charcoal-light)] border border-[var(--color-charcoal-lighter-plus)] flex items-center justify-center shrink-0">
+                          <svg className="w-4 h-4 text-[var(--color-body-text)]" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M8 5v14l11-7z" />
                           </svg>
                         </div>

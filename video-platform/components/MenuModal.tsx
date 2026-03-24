@@ -318,24 +318,24 @@ export function MenuModal({ userId, businessId, menu, editItem, isOpen, onClose,
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-[#1A1A18]/70 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-[var(--color-charcoal)]/70 backdrop-blur-sm"
       onClick={handleBackdropClick}
       role="dialog"
       aria-modal="true"
       aria-labelledby="menu-modal-title"
     >
-      <div className="relative w-full sm:max-w-lg bg-[#1A1A18] border border-[#3A3A34] rounded-t-2xl sm:rounded-2xl shadow-2xl max-h-[80vh] sm:max-h-[600px] flex flex-col animate-[scaleIn_200ms_ease-out]">
+      <div className="relative w-full sm:max-w-lg bg-[var(--color-charcoal)] border border-[var(--color-charcoal-lighter-plus)] rounded-t-2xl sm:rounded-2xl shadow-2xl max-h-[80vh] sm:max-h-[600px] flex flex-col animate-[scaleIn_200ms_ease-out]">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-[#3A3A34]">
-          <h2 id="menu-modal-title" className="text-lg font-semibold text-[#F5F0E8]">
+        <div className="flex items-center justify-between p-4 border-b border-[var(--color-charcoal-lighter-plus)]">
+          <h2 id="menu-modal-title" className="text-lg font-semibold text-[var(--color-cream)]">
             {editItem ? 'Edit Item' : menu ? t('menu.edit_menu') || 'Edit Menu' : t('menu.create_menu') || 'Create Menu'}
           </h2>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-[#2E2E28] rounded-full transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F5A623]"
+            className="p-2 hover:bg-[var(--color-charcoal-lighter)] rounded-full transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F5A623]"
             aria-label="Close modal"
           >
-            <svg className="w-6 h-6 text-[#9E9A90]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-6 h-6 text-[var(--color-body-text)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
@@ -343,7 +343,7 @@ export function MenuModal({ userId, businessId, menu, editItem, isOpen, onClose,
 
         {/* Content */}
         <div className="flex flex-col flex-1 overflow-hidden">
-          <div className="flex-1 p-4 overflow-y-auto bg-[#1A1A18] space-y-4">
+          <div className="flex-1 p-4 overflow-y-auto bg-[var(--color-charcoal)] space-y-4">
             {/* Error Message */}
             {error && (
               <div className="bg-[#E05C3A]/10 border border-[#E05C3A]/50 text-[#E05C3A] rounded-xl p-3 text-sm">
@@ -356,7 +356,7 @@ export function MenuModal({ userId, businessId, menu, editItem, isOpen, onClose,
               <>
                 {/* Menu Name */}
                 <div>
-                  <label className="block text-[#F5F0E8] text-sm font-medium mb-2">
+                  <label className="block text-[var(--color-cream)] text-sm font-medium mb-2">
                     {t('menu.menu_name') || 'Menu Name'}
                   </label>
                   <input
@@ -364,13 +364,13 @@ export function MenuModal({ userId, businessId, menu, editItem, isOpen, onClose,
                     value={menuName}
                     onChange={(e) => setMenuName(e.target.value)}
                     placeholder={t('menu.menu_name_placeholder') || 'e.g., Appetizers, Main Courses'}
-                    className="w-full bg-[#242420] border border-[#3A3A34] rounded-xl px-4 py-2 text-[#F5F0E8] placeholder:text-[#9E9A90]/50 focus:outline-none focus:ring-2 focus:ring-[#F5A623] focus:border-transparent transition-all"
+                    className="w-full bg-[var(--color-charcoal-light)] border border-[var(--color-charcoal-lighter-plus)] rounded-xl px-4 py-2 text-[var(--color-cream)] placeholder:text-[var(--color-body-text)]/50 focus:outline-none focus:ring-2 focus:ring-[#F5A623] focus:border-transparent transition-all"
                   />
                 </div>
 
                 {/* Description */}
                 <div>
-                  <label className="block text-[#F5F0E8] text-sm font-medium mb-2">
+                  <label className="block text-[var(--color-cream)] text-sm font-medium mb-2">
                     {t('menu.description') || 'Description'}
                   </label>
                   <textarea
@@ -378,19 +378,19 @@ export function MenuModal({ userId, businessId, menu, editItem, isOpen, onClose,
                     onChange={(e) => setDescription(e.target.value)}
                     placeholder={t('menu.description_placeholder') || 'Add a description for this menu section...'}
                     rows={3}
-                    className="w-full bg-[#242420] border border-[#3A3A34] rounded-xl px-4 py-2 text-[#F5F0E8] placeholder:text-[#9E9A90]/50 focus:outline-none focus:ring-2 focus:ring-[#F5A623] focus:border-transparent transition-all resize-none"
+                    className="w-full bg-[var(--color-charcoal-light)] border border-[var(--color-charcoal-lighter-plus)] rounded-xl px-4 py-2 text-[var(--color-cream)] placeholder:text-[var(--color-body-text)]/50 focus:outline-none focus:ring-2 focus:ring-[#F5A623] focus:border-transparent transition-all resize-none"
                   />
                 </div>
 
                 {/* Category */}
                 <div>
-                  <label className="block text-[#F5F0E8] text-sm font-medium mb-2">
+                  <label className="block text-[var(--color-cream)] text-sm font-medium mb-2">
                     {t('menu.category') || 'Category'}
                   </label>
                   <select
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
-                    className="w-full bg-[#242420] border border-[#3A3A34] rounded-xl px-4 py-2 text-[#F5F0E8] focus:outline-none focus:ring-2 focus:ring-[#F5A623] focus:border-transparent transition-all"
+                    className="w-full bg-[var(--color-charcoal-light)] border border-[var(--color-charcoal-lighter-plus)] rounded-xl px-4 py-2 text-[var(--color-cream)] focus:outline-none focus:ring-2 focus:ring-[#F5A623] focus:border-transparent transition-all"
                   >
                     <option value="General">General</option>
                     <option value="Appetizers">Appetizers</option>
@@ -407,54 +407,54 @@ export function MenuModal({ userId, businessId, menu, editItem, isOpen, onClose,
 
             {/* Add/Edit Item Section - Only when editing existing menu or editing an item */}
             {(menu || editItem) && (
-              <div className="border-t border-[#3A3A34] pt-4">
-                <h3 className="text-[#F5F0E8] text-sm font-semibold mb-4">
+              <div className="border-t border-[var(--color-charcoal-lighter-plus)] pt-4">
+                <h3 className="text-[var(--color-cream)] text-sm font-semibold mb-4">
                   {editItem ? 'Edit Item' : 'Add Item to Menu'}
                 </h3>
                 <form onSubmit={handleAddItem} className="space-y-3">
                   <div>
-                    <label className="block text-[#F5F0E8] text-xs font-medium mb-2">Item Name *</label>
+                    <label className="block text-[var(--color-cream)] text-xs font-medium mb-2">Item Name *</label>
                     <input
                       type="text"
                       value={itemName}
                       onChange={(e) => setItemName(e.target.value)}
                       placeholder="e.g., Caesar Salad"
-                      className="w-full bg-[#242420] border border-[#3A3A34] rounded-xl px-4 py-2 text-[#F5F0E8] placeholder:text-[#9E9A90]/50 focus:outline-none focus:ring-2 focus:ring-[#F5A623] focus:border-transparent transition-all"
+                      className="w-full bg-[var(--color-charcoal-light)] border border-[var(--color-charcoal-lighter-plus)] rounded-xl px-4 py-2 text-[var(--color-cream)] placeholder:text-[var(--color-body-text)]/50 focus:outline-none focus:ring-2 focus:ring-[#F5A623] focus:border-transparent transition-all"
                     />
                   </div>
 
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-[#F5F0E8] text-xs font-medium mb-2">Price *</label>
+                      <label className="block text-[var(--color-cream)] text-xs font-medium mb-2">Price *</label>
                       <input
                         type="number"
                         step="0.01"
                         value={itemPrice}
                         onChange={(e) => setItemPrice(e.target.value)}
                         placeholder="0.00"
-                        className="w-full bg-[#242420] border border-[#3A3A34] rounded-xl px-4 py-2 text-[#F5F0E8] placeholder:text-[#9E9A90]/50 focus:outline-none focus:ring-2 focus:ring-[#F5A623] focus:border-transparent transition-all"
+                        className="w-full bg-[var(--color-charcoal-light)] border border-[var(--color-charcoal-lighter-plus)] rounded-xl px-4 py-2 text-[var(--color-cream)] placeholder:text-[var(--color-body-text)]/50 focus:outline-none focus:ring-2 focus:ring-[#F5A623] focus:border-transparent transition-all"
                       />
                     </div>
                     <div>
-                      <label className="block text-[#F5F0E8] text-xs font-medium mb-2">Category</label>
+                      <label className="block text-[var(--color-cream)] text-xs font-medium mb-2">Category</label>
                       <input
                         type="text"
                         value={itemCategory}
                         onChange={(e) => setItemCategory(e.target.value)}
                         placeholder="e.g., Vegetarian"
-                        className="w-full bg-[#242420] border border-[#3A3A34] rounded-xl px-4 py-2 text-[#F5F0E8] placeholder:text-[#9E9A90]/50 focus:outline-none focus:ring-2 focus:ring-[#F5A623] focus:border-transparent transition-all"
+                        className="w-full bg-[var(--color-charcoal-light)] border border-[var(--color-charcoal-lighter-plus)] rounded-xl px-4 py-2 text-[var(--color-cream)] placeholder:text-[var(--color-body-text)]/50 focus:outline-none focus:ring-2 focus:ring-[#F5A623] focus:border-transparent transition-all"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-[#F5F0E8] text-xs font-medium mb-2">Description</label>
+                    <label className="block text-[var(--color-cream)] text-xs font-medium mb-2">Description</label>
                     <textarea
                       value={itemDescription}
                       onChange={(e) => setItemDescription(e.target.value)}
                       placeholder="Describe the item..."
                       rows={2}
-                      className="w-full bg-[#242420] border border-[#3A3A34] rounded-xl px-4 py-2 text-[#F5F0E8] placeholder:text-[#9E9A90]/50 focus:outline-none focus:ring-2 focus:ring-[#F5A623] focus:border-transparent transition-all resize-none"
+                      className="w-full bg-[var(--color-charcoal-light)] border border-[var(--color-charcoal-lighter-plus)] rounded-xl px-4 py-2 text-[var(--color-cream)] placeholder:text-[var(--color-body-text)]/50 focus:outline-none focus:ring-2 focus:ring-[#F5A623] focus:border-transparent transition-all resize-none"
                     />
                   </div>
 
@@ -467,7 +467,7 @@ export function MenuModal({ userId, businessId, menu, editItem, isOpen, onClose,
 
                   {/* Image Preview */}
                   {imagePreview && (
-                    <div className="relative bg-[#242420] rounded-xl p-2">
+                    <div className="relative bg-[var(--color-charcoal-light)] rounded-xl p-2">
                       <img
                         src={imagePreview}
                         alt="Preview"
@@ -480,7 +480,7 @@ export function MenuModal({ userId, businessId, menu, editItem, isOpen, onClose,
                         className="absolute top-2 right-2 bg-[#E05C3A]/80 hover:bg-[#E05C3A] disabled:opacity-50 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F5A623]"
                         aria-label="Remove image"
                       >
-                        <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <svg className="w-4 h-4 text-[var(--text-primary)]" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" />
                         </svg>
                       </button>
@@ -501,7 +501,7 @@ export function MenuModal({ userId, businessId, menu, editItem, isOpen, onClose,
                       type="button"
                       onClick={() => fileInputRef.current?.click()}
                       disabled={uploading || addingItem}
-                      className="px-4 py-2 rounded-xl font-medium text-sm bg-[#242420] border border-[#3A3A34] text-[#F5F0E8] hover:bg-[#2E2E28] disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+                      className="px-4 py-2 rounded-xl font-medium text-sm bg-[var(--color-charcoal-light)] border border-[var(--color-charcoal-lighter-plus)] text-[var(--color-cream)] hover:bg-[var(--color-charcoal-lighter)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
                       title="Add item photo"
                     >
                       📷 Add Photo
@@ -521,12 +521,12 @@ export function MenuModal({ userId, businessId, menu, editItem, isOpen, onClose,
           </div>
 
           {/* Footer */}
-          <div className="flex items-center justify-end gap-3 p-4 border-t border-[#3A3A34] bg-[#1A1A18]">
+          <div className="flex items-center justify-end gap-3 p-4 border-t border-[var(--color-charcoal-lighter-plus)] bg-[var(--color-charcoal)]">
             <button
               type="button"
               onClick={onClose}
               disabled={loading}
-              className="px-4 py-2 text-[#9E9A90] hover:bg-[#2E2E28] disabled:opacity-50 disabled:cursor-not-allowed rounded-xl transition-colors font-medium min-h-[44px]"
+              className="px-4 py-2 text-[var(--color-body-text)] hover:bg-[var(--color-charcoal-lighter)] disabled:opacity-50 disabled:cursor-not-allowed rounded-xl transition-colors font-medium min-h-[44px]"
             >
               {t('common.cancel') || 'Cancel'}
             </button>

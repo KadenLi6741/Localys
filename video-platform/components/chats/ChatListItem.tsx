@@ -35,15 +35,15 @@ export function ChatListItem({ chat, onClick }: ChatListItemProps) {
       onClick={onClick}
       className={`w-full text-left flex items-center gap-4 px-4 py-5 border-b transition-colors duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F5A623] ${
         unreadCount > 0
-          ? 'border-b-[#3A3A34] bg-[#242420]/50 hover:bg-[#242420]'
-          : 'border-b-[#3A3A34] hover:bg-[#242420]/50'
+          ? 'border-b-[#3A3A34] bg-[var(--color-charcoal-light)]/50 hover:bg-[var(--color-charcoal-light)]'
+          : 'border-b-[#3A3A34] hover:bg-[var(--color-charcoal-light)]/50'
       }`}
     >
       {/* Avatar with Unread Indicator */}
       <div className={`relative w-14 h-14 rounded-full flex-shrink-0 overflow-hidden ring-2 transition-all duration-200 ${
         unreadCount > 0 
           ? 'ring-[#F5A623] bg-[#F5A623]/10' 
-          : 'ring-[#3A3A34] bg-[#2E2E28]'
+          : 'ring-[var(--color-charcoal-lighter-plus)] bg-[var(--color-charcoal-lighter)]'
       }`}>
         {avatarUrl ? (
           <img
@@ -52,13 +52,13 @@ export function ChatListItem({ chat, onClick }: ChatListItemProps) {
             className="w-full h-full object-cover"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-[#9E9A90] text-xl font-semibold">
+          <div className="w-full h-full flex items-center justify-center text-[var(--color-body-text)] text-xl font-semibold">
             {displayName[0]?.toUpperCase() || '?'}
           </div>
         )}
         {/* Unread dot indicator */}
         {unreadCount > 0 && (
-          <div className="absolute top-0 right-0 w-3 h-3 bg-[#F5A623] rounded-full border border-[#1A1A18] animate-pulse"></div>
+          <div className="absolute top-0 right-0 w-3 h-3 bg-[#F5A623] rounded-full border border-[var(--color-charcoal)] animate-pulse"></div>
         )}
       </div>
 
@@ -67,8 +67,8 @@ export function ChatListItem({ chat, onClick }: ChatListItemProps) {
         <div className="flex items-center gap-2 mb-1">
           <h3 className={`font-semibold truncate transition-colors duration-200 ${
             unreadCount > 0 
-              ? 'text-[#F5F0E8] font-bold' 
-              : 'text-[#F5F0E8]'
+              ? 'text-[var(--color-cream)] font-bold' 
+              : 'text-[var(--color-cream)]'
           }`}>
             {displayName}
           </h3>
@@ -83,8 +83,8 @@ export function ChatListItem({ chat, onClick }: ChatListItemProps) {
         </div>
         <p className={`text-sm truncate transition-colors duration-200 ${
           unreadCount > 0 
-            ? 'text-[#F5F0E8]' 
-            : 'text-[#9E9A90]'
+            ? 'text-[var(--color-cream)]' 
+            : 'text-[var(--color-body-text)]'
         }`}>
           {lastMessageText}
         </p>
@@ -96,7 +96,7 @@ export function ChatListItem({ chat, onClick }: ChatListItemProps) {
           <p className={`text-xs mb-1 transition-colors duration-200 ${
             unreadCount > 0 
               ? 'text-[#F5A623] font-semibold' 
-              : 'text-[#9E9A90]'
+              : 'text-[var(--color-body-text)]'
           }`}>
             {formatTimestamp(chat.last_message.created_at)}
           </p>

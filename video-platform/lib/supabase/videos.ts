@@ -669,7 +669,8 @@ export async function getWeightedVideoFeed(limit = 20, offset = 0) {
           created_at,
           business_id,
           boost_value,
-          view_count
+          view_count,
+          admin_like_boost
         `)
         .order('created_at', { ascending: false });
 
@@ -745,6 +746,7 @@ export async function getWeightedVideoFeed(limit = 20, offset = 0) {
     return { data: enrichedVideos, error: null };
   } catch (error: any) {
     console.error('Exception generating weighted feed:', error);
+    console.error('Full error:', JSON.stringify(error, null, 2));
     return { data: null, error };
   }
 }

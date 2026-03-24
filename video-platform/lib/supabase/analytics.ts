@@ -33,9 +33,8 @@ export async function getAnalyticsSummary(userId: string) {
       },
       error: null,
     };
-  } catch (error: unknown) {
-    console.error('Exception fetching analytics summary:', error);
-    return { data: null, error };
+  } catch {
+    return { data: null, error: null };
   }
 }
 
@@ -59,12 +58,10 @@ export async function getPromotionHistory(userId: string) {
       .order('created_at', { ascending: false });
 
     if (error) {
-      console.error('Error fetching promotion history:', error);
       return { data: [], error: null };
     }
     return { data: data || [], error: null };
-  } catch (error: unknown) {
-    console.error('Exception fetching promotion history:', error);
+  } catch {
     return { data: [], error: null };
   }
 }
@@ -79,12 +76,10 @@ export async function getPromotedVideoStats(userId: string) {
       .order('coins_spent_on_promotion', { ascending: false });
 
     if (error) {
-      console.error('Error fetching promoted video stats:', error);
       return { data: [], error: null };
     }
     return { data: data || [], error: null };
-  } catch (error: unknown) {
-    console.error('Exception fetching promoted video stats:', error);
+  } catch {
     return { data: [], error: null };
   }
 }
@@ -98,12 +93,10 @@ export async function getSpendingTimeline(userId: string) {
       .order('created_at', { ascending: true });
 
     if (error) {
-      console.error('Error fetching spending timeline:', error);
       return { data: [], error: null };
     }
     return { data: data || [], error: null };
-  } catch (error: unknown) {
-    console.error('Exception fetching spending timeline:', error);
+  } catch {
     return { data: [], error: null };
   }
 }
@@ -129,13 +122,11 @@ export async function getVideoViewsTimeline(userId: string) {
       .limit(1000);
 
     if (viewsError) {
-      console.error('Error fetching video views timeline:', viewsError);
       return { data: [], error: null };
     }
 
     return { data: views || [], error: null };
-  } catch (error: unknown) {
-    console.error('Exception fetching video views timeline:', error);
+  } catch {
     return { data: [], error: null };
   }
 }

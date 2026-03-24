@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { useAuth } from '@/contexts/AuthContext';
 import { useMessages } from '@/hooks/useMessages';
+import { useUnreadMessages } from '@/contexts/UnreadMessagesContext';
 import { ChatWindow } from '@/components/chats/ChatWindow';
 
 export default function ChatPage() {
@@ -22,8 +23,16 @@ function ChatContent() {
   const chatId = params.id as string;
   const [newMessage, setNewMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const { markChatAsRead } = useUnreadMessages();
   
   const { messages, loading, sending, send } = useMessages(chatId, user?.id);
+
+  // Mark chat as read immediately on mount
+  useEffect(() => {
+    if (chatId) {
+      markChatAsRead(chatId);
+    }
+  }, [chatId, markChatAsRead]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -44,11 +53,11 @@ function ChatContent() {
   };
 
   return (
-    <div className="h-screen bg-transparent text-white flex flex-col pb-16">
+    <div className="h-screen bg-transparent text-[var(--text-primary)] flex flex-col pb-16">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-[#1A1A18]/80 backdrop-blur-md border-b border-white/10 px-4 py-4">
+      <div className="sticky top-0 z-10 bg-[var(--color-charcoal)]/80 backdrop-blur-md border-b border-[var(--glass-border)] px-4 py-4">
         <div className="flex items-center gap-4">
-          <button onClick={() => router.back()} className="text-white">
+          <button onClick={() => router.back()} className="text-[var(--text-primary)]">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
@@ -66,7 +75,7 @@ function ChatContent() {
       />
 
       {/* Message Input */}
-      <form onSubmit={handleSendMessage} className="sticky bottom-0 bg-[#1A1A18]/80 backdrop-blur-md border-t border-white/10 p-4">
+      <form onSubmit={handleSendMessage} className="sticky bottom-0 bg-[var(--color-charcoal)]/80 backdrop-blur-md border-t border-[var(--glass-border)] p-4">
         <div className="flex gap-2">
           <input
             type="text"
@@ -74,12 +83,12 @@ function ChatContent() {
             onChange={(e) => setNewMessage(e.target.value)}
             placeholder="Type a message..."
             disabled={sending}
-            className="flex-1 bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-white/40 focus:outline-none focus:border-white/40 disabled:opacity-50"
+            className="flex-1 bg-[var(--glass-bg)] border border-[var(--glass-border)] rounded-lg px-4 py-3 text-[var(--text-primary)] placeholder-[var(--placeholder)] focus:outline-none focus:border-[var(--glass-border-focus)] disabled:opacity-50"
           />
           <button
             type="submit"
             disabled={!newMessage.trim() || sending}
-            className="bg-white text-black px-6 py-3 rounded-lg font-semibold disabled:bg-white/20 disabled:text-white/40 disabled:cursor-not-allowed hover:bg-white/90 transition-all duration-200 active:scale-95"
+            className="bg-white text-black px-6 py-3 rounded-lg font-semibold disabled:bg-[var(--glass-bg-strong)] disabled:text-[var(--text-muted)] disabled:cursor-not-allowed hover:bg-white/90 transition-all duration-200 active:scale-95"
           >
             {sending ? 'Sending...' : 'Send'}
           </button>

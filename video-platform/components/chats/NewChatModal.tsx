@@ -103,18 +103,18 @@ export function NewChatModal({ isOpen, onClose, currentUserId }: NewChatModalPro
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-[#1A1A18]/80 backdrop-blur-sm"
+        className="absolute inset-0 bg-[var(--color-charcoal)]/80 backdrop-blur-sm"
         onClick={onClose}
       />
 
       {/* Modal */}
-      <div className="relative w-full max-w-lg mx-4 mb-4 sm:mb-0 bg-[#1A1A18] border border-[#3A3A34] rounded-2xl shadow-2xl max-h-[80vh] flex flex-col animate-[scaleIn_200ms_ease-out]">
+      <div className="relative w-full max-w-lg mx-4 mb-4 sm:mb-0 bg-[var(--color-charcoal)] border border-[var(--color-charcoal-lighter-plus)] rounded-2xl shadow-2xl max-h-[80vh] flex flex-col animate-[scaleIn_200ms_ease-out]">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-[#3A3A34]">
-          <h2 className="text-xl font-bold text-[#F5F0E8]">New Chat</h2>
+        <div className="flex items-center justify-between p-6 border-b border-[var(--color-charcoal-lighter-plus)]">
+          <h2 className="text-xl font-bold text-[var(--color-cream)]">New Chat</h2>
           <button
             onClick={onClose}
-            className="w-11 h-11 flex items-center justify-center rounded-full text-[#9E9A90] hover:text-[#F5F0E8] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F5A623]"
+            className="w-11 h-11 flex items-center justify-center rounded-full text-[var(--color-body-text)] hover:text-[var(--color-cream)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F5A623]"
             aria-label="Close"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -124,13 +124,13 @@ export function NewChatModal({ isOpen, onClose, currentUserId }: NewChatModalPro
         </div>
 
         {/* Search Input */}
-        <div className="p-6 border-b border-[#3A3A34]">
+        <div className="p-6 border-b border-[var(--color-charcoal-lighter-plus)]">
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search by name or username..."
-            className="w-full bg-[#242420] border border-[#3A3A34] rounded-xl px-4 py-3 text-[#F5F0E8] placeholder-[#9E9A90]/50 focus:outline-none focus:ring-2 focus:ring-[#F5A623] focus:border-transparent"
+            className="w-full bg-[var(--color-charcoal-light)] border border-[var(--color-charcoal-lighter-plus)] rounded-xl px-4 py-3 text-[var(--color-cream)] placeholder-[#9E9A90]/50 focus:outline-none focus:ring-2 focus:ring-[#F5A623] focus:border-transparent"
             aria-label="Search users"
             autoFocus
           />
@@ -150,11 +150,11 @@ export function NewChatModal({ isOpen, onClose, currentUserId }: NewChatModalPro
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#F5A623] mx-auto"></div>
             </div>
           ) : searchResults.length === 0 && searchQuery.trim() ? (
-            <div className="text-center py-8 text-[#9E9A90]">
+            <div className="text-center py-8 text-[var(--color-body-text)]">
               No users found
             </div>
           ) : searchResults.length === 0 ? (
-            <div className="text-center py-8 text-[#9E9A90]">
+            <div className="text-center py-8 text-[var(--color-body-text)]">
               Search for users to start a chat
             </div>
           ) : (
@@ -164,10 +164,10 @@ export function NewChatModal({ isOpen, onClose, currentUserId }: NewChatModalPro
                   key={user.id}
                   onClick={() => handleSelectUser(user.id)}
                   disabled={creating}
-                  className="w-full flex items-center gap-4 p-4 bg-[#242420] hover:bg-[#2E2E28] rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F5A623]"
+                  className="w-full flex items-center gap-4 p-4 bg-[var(--color-charcoal-light)] hover:bg-[var(--color-charcoal-lighter)] rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F5A623]"
                 >
                   {/* Avatar */}
-                  <div className="w-12 h-12 rounded-full bg-[#2E2E28] flex-shrink-0 overflow-hidden">
+                  <div className="w-12 h-12 rounded-full bg-[var(--color-charcoal-lighter)] flex-shrink-0 overflow-hidden">
                     {user.profile_picture_url ? (
                       <img
                         src={user.profile_picture_url}
@@ -175,7 +175,7 @@ export function NewChatModal({ isOpen, onClose, currentUserId }: NewChatModalPro
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center text-[#9E9A90] text-lg font-semibold">
+                      <div className="w-full h-full flex items-center justify-center text-[var(--color-body-text)] text-lg font-semibold">
                         {(user.full_name || user.username || '?')[0]?.toUpperCase() || '?'}
                       </div>
                     )}
@@ -183,9 +183,9 @@ export function NewChatModal({ isOpen, onClose, currentUserId }: NewChatModalPro
 
                   {/* User Info */}
                   <div className="flex-1 text-left">
-                    <p className="font-semibold text-[#F5F0E8]">{user.full_name || user.username}</p>
+                    <p className="font-semibold text-[var(--color-cream)]">{user.full_name || user.username}</p>
                     {user.username && user.full_name && (
-                      <p className="text-sm text-[#9E9A90]">@{user.username}</p>
+                      <p className="text-sm text-[var(--color-body-text)]">@{user.username}</p>
                     )}
                   </div>
                 </button>

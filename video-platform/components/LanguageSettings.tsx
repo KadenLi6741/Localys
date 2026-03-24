@@ -19,7 +19,7 @@ export function LanguageSettings() {
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg transition-colors text-white"
+        className="flex items-center gap-2 px-4 py-2 bg-[var(--glass-bg)] hover:bg-[var(--glass-bg-strong)] border border-[var(--glass-border)] rounded-lg transition-colors text-[var(--text-primary)]"
       >
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21H9m4-18H9m2 2v8m4 0l4-4m0 0l4 4m-4-4v4m-10 0h10" />
@@ -36,9 +36,9 @@ export function LanguageSettings() {
       </button>
 
       {isOpen && (
-        <div className="absolute top-full right-0 mt-2 w-48 bg-transparent border border-white/20 rounded-lg shadow-lg z-50">
+        <div className="absolute top-full right-0 mt-2 w-48 bg-transparent border border-[var(--glass-border)] rounded-lg shadow-lg z-50">
           <div className="p-2">
-            <p className="text-white/60 text-xs uppercase tracking-wide mb-2 px-2">{t('common.language')}</p>
+            <p className="text-[var(--text-tertiary)] text-xs uppercase tracking-wide mb-2 px-2">{t('common.language')}</p>
             {(Object.entries(LANGUAGES) as [Language, typeof LANGUAGES[Language]][]).map(([code, { name, nativeName }]) => (
               <button
                 key={code}
@@ -46,11 +46,11 @@ export function LanguageSettings() {
                 className={`w-full text-left px-3 py-2 rounded-lg transition-colors ${
                   language === code
                     ? 'bg-blue-500 text-white'
-                    : 'text-white/80 hover:bg-white/10'
+                    : 'text-[var(--text-secondary)] hover:bg-[var(--glass-bg)]'
                 }`}
               >
                 <div className="font-medium">{nativeName}</div>
-                <div className="text-xs text-white/60">{name}</div>
+                <div className="text-xs text-[var(--text-tertiary)]">{name}</div>
               </button>
             ))}
           </div>

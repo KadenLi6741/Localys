@@ -19,8 +19,8 @@ function CustomTooltip({ active, payload, label }: { active?: boolean; payload?:
   if (!active || !payload?.length) return null;
   const point = payload[0].payload as ViewsDataPoint;
   return (
-    <div className="bg-[#1A1A18]/90 border border-white/20 rounded-lg p-3 shadow-lg">
-      <p className="text-white/60 text-xs mb-1">{label}</p>
+    <div className="bg-[var(--color-charcoal)]/90 border border-[var(--glass-border)] rounded-lg p-3 shadow-lg">
+      <p className="text-[var(--text-tertiary)] text-xs mb-1">{label}</p>
       <p className="text-blue-400 font-semibold">👁️ {payload[0].value} views</p>
       {point.promoted && (
         <p className="text-yellow-400 text-xs mt-1">⭐ Promotion day</p>
@@ -43,8 +43,8 @@ export function ViewsChart({ data }: ViewsChartProps) {
   if (data.length < 2) {
     return (
       <div>
-        <h4 className="text-sm font-semibold text-white/80 mb-3">👁️ Views Over Time</h4>
-        <div className="h-[200px] flex items-center justify-center text-white/40 text-sm">
+        <h4 className="text-sm font-semibold text-[var(--text-secondary)] mb-3">👁️ Views Over Time</h4>
+        <div className="h-[200px] flex items-center justify-center text-[var(--text-muted)] text-sm">
           Not enough data to display chart
         </div>
       </div>
@@ -53,8 +53,8 @@ export function ViewsChart({ data }: ViewsChartProps) {
 
   return (
     <div>
-      <h4 className="text-sm font-semibold text-white/80 mb-3">👁️ Views Over Time</h4>
-      <div className="flex items-center gap-4 mb-2 text-xs text-white/40">
+      <h4 className="text-sm font-semibold text-[var(--text-secondary)] mb-3">👁️ Views Over Time</h4>
+      <div className="flex items-center gap-4 mb-2 text-xs text-[var(--text-muted)]">
         <span className="flex items-center gap-1">
           <span className="w-3 h-0.5 bg-blue-400 inline-block rounded" /> Views
         </span>

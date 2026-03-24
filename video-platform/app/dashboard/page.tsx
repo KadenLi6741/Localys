@@ -161,14 +161,14 @@ function DashboardContent() {
 
   if (isBusiness === null || (loading && isBusiness)) {
     return (
-      <div className="min-h-screen bg-transparent text-white flex items-center justify-center">
+      <div className="min-h-screen bg-transparent text-[var(--text-primary)] flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-400"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-transparent text-white pb-24">
+    <div className="min-h-screen bg-transparent text-[var(--text-primary)] pb-24">
       <div className="w-full px-4 lg:px-12 py-6">
         <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
 
@@ -185,14 +185,14 @@ function DashboardContent() {
                   {scanResult.message}
                 </p>
                 {scanResult.order && (
-                  <p className="text-white/60 text-sm mt-1">
+                  <p className="text-[var(--text-tertiary)] text-sm mt-1">
                     {scanResult.order.item_name} - ${scanResult.order.price.toFixed(2)}
                   </p>
                 )}
               </div>
               <button
                 onClick={() => setScanResult(null)}
-                className="text-white/40 hover:text-white/60"
+                className="text-[var(--text-muted)] hover:text-[var(--text-tertiary)]"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -216,13 +216,15 @@ function DashboardContent() {
           </div>
 
           {pendingOrders.length === 0 ? (
-            <div className="bg-white/5 border border-white/10 rounded-lg p-8 text-center">
-              <p className="text-white/40">No pending orders</p>
+            <div className="bg-[var(--glass-bg-subtle)] border border-[var(--glass-border)] rounded-lg p-8 text-center">
+              <p className="text-[var(--text-muted)]">No pending orders</p>
             </div>
           ) : (
             <div className="space-y-3">
-              {pendingOrders.map((order) => (
-                <OrderCard key={order.id} order={order} variant="pending" />
+              {pendingOrders.map((order, index) => (
+                <div key={order.id} style={{ animation: `slideDown 0.4s ease-out ${index * 0.05}s forwards`, opacity: 0 }}>
+                  <OrderCard order={order} variant="pending" />
+                </div>
               ))}
             </div>
           )}
@@ -232,13 +234,15 @@ function DashboardContent() {
         <section>
           <h2 className="text-lg font-semibold mb-3">Recent Completed</h2>
           {completedOrders.length === 0 ? (
-            <div className="bg-white/5 border border-white/10 rounded-lg p-8 text-center">
-              <p className="text-white/40">No completed orders yet</p>
+            <div className="bg-[var(--glass-bg-subtle)] border border-[var(--glass-border)] rounded-lg p-8 text-center">
+              <p className="text-[var(--text-muted)]">No completed orders yet</p>
             </div>
           ) : (
             <div className="space-y-3">
-              {completedOrders.map((order) => (
-                <OrderCard key={order.id} order={order} variant="completed" />
+              {completedOrders.map((order, index) => (
+                <div key={order.id} style={{ animation: `slideDown 0.4s ease-out ${index * 0.05}s forwards`, opacity: 0 }}>
+                  <OrderCard order={order} variant="completed" />
+                </div>
               ))}
             </div>
           )}
@@ -282,21 +286,21 @@ function OrderCard({ order, variant }: { order: ItemPurchase; variant: 'pending'
   const statusColor = variant === 'pending' ? 'bg-yellow-500/20 text-yellow-300' : 'bg-green-500/20 text-green-300';
 
   return (
-    <div className={`bg-white/5 border ${borderColor} rounded-lg p-4`}>
+    <div className={`bg-[var(--glass-bg-subtle)] border ${borderColor} rounded-lg p-4`}>
       <div className="flex justify-between items-start">
         <div>
-          <p className="font-medium text-white">
+          <p className="font-medium text-[var(--text-primary)]">
             {order.item_name}
             {order.quantity && order.quantity > 1 && (
-              <span className="text-white/50 font-normal"> x{order.quantity}</span>
+              <span className="text-[var(--text-tertiary)] font-normal"> x{order.quantity}</span>
             )}
           </p>
-          <p className="text-white/40 text-xs mt-0.5">
+          <p className="text-[var(--text-muted)] text-xs mt-0.5">
             Order #{order.id.substring(0, 8)} &middot; {formattedDate} {formattedTime}
           </p>
         </div>
         <div className="text-right">
-          <p className="font-medium text-white">${order.price.toFixed(2)}</p>
+          <p className="font-medium text-[var(--text-primary)]">${order.price.toFixed(2)}</p>
           <span className={`inline-block text-xs px-2 py-0.5 rounded-full font-medium capitalize mt-1 ${statusColor}`}>
             {order.status}
           </span>
@@ -305,7 +309,7 @@ function OrderCard({ order, variant }: { order: ItemPurchase; variant: 'pending'
       {order.special_requests && (
         <div className="mt-2 bg-yellow-500/10 border border-yellow-500/20 rounded-md px-3 py-2">
           <p className="text-yellow-300 text-xs font-medium">Special Request</p>
-          <p className="text-white/80 text-sm">{order.special_requests}</p>
+          <p className="text-[var(--text-secondary)] text-sm">{order.special_requests}</p>
         </div>
       )}
     </div>

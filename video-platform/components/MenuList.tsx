@@ -176,13 +176,13 @@ export function MenuList({ userId, businessId, isOwnProfile, onMenusLoaded }: Me
         {Array.from({ length: 6 }).map((_, index) => (
           <div
             key={index}
-            className="bg-[#2E2E28] rounded-2xl overflow-hidden animate-pulse"
+            className="bg-[var(--color-charcoal-lighter)] rounded-2xl overflow-hidden animate-pulse"
           >
-            <div className="aspect-square bg-[#3A3A34]"></div>
+            <div className="aspect-square bg-[var(--color-charcoal-lighter-plus)]"></div>
             <div className="p-3 space-y-2">
-              <div className="h-4 bg-[#3A3A34] rounded w-3/4"></div>
-              <div className="h-4 bg-[#3A3A34] rounded w-1/2"></div>
-              <div className="h-8 bg-[#3A3A34] rounded"></div>
+              <div className="h-4 bg-[var(--color-charcoal-lighter-plus)] rounded w-3/4"></div>
+              <div className="h-4 bg-[var(--color-charcoal-lighter-plus)] rounded w-1/2"></div>
+              <div className="h-8 bg-[var(--color-charcoal-lighter-plus)] rounded"></div>
             </div>
           </div>
         ))}
@@ -205,7 +205,7 @@ export function MenuList({ userId, businessId, isOwnProfile, onMenusLoaded }: Me
             }
             setIsModalOpen(true);
           }}
-          className="w-full mb-6 bg-[#F5A623] hover:bg-[#F5A623]/90 text-black font-semibold rounded-lg py-3 transition-colors flex items-center justify-center gap-2 min-h-[48px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F5A623] focus-visible:ring-offset-2 focus-visible:ring-offset-[#1A1A18]"
+          className="w-full mb-6 bg-[#F5A623] hover:bg-[#F5A623]/90 text-black font-semibold rounded-lg py-3 transition-colors flex items-center justify-center gap-2 min-h-[48px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F5A623] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-charcoal)]"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -220,7 +220,7 @@ export function MenuList({ userId, businessId, isOwnProfile, onMenusLoaded }: Me
           {menus[0].menu_items.map((item, index) => (
             <div
               key={item.id}
-              className={`menu-item-card bg-[#242420] border border-[#3A3A34] rounded-2xl overflow-hidden hover:scale-[0.97] transition-all duration-200 group relative ${
+              className={`menu-item-card bg-[var(--color-charcoal-light)] border border-[var(--color-charcoal-lighter-plus)] rounded-2xl overflow-hidden hover:scale-[0.97] transition-all duration-200 group relative ${
                 fadingOutItemId === item.id ? 'opacity-0 scale-95 pointer-events-none' : ''
               }`}
             >
@@ -229,7 +229,7 @@ export function MenuList({ userId, businessId, isOwnProfile, onMenusLoaded }: Me
                 <div className="absolute top-2 right-2 z-10 flex gap-1">
                   <button
                     onClick={(e) => { e.stopPropagation(); handleEditItem(item); }}
-                    className="w-8 h-8 flex items-center justify-center rounded-lg bg-[#1A1A18]/70 backdrop-blur-sm text-[#F5F0E8] hover:text-[#F5A623] transition-colors"
+                    className="w-8 h-8 flex items-center justify-center rounded-lg bg-[var(--color-charcoal)]/70 backdrop-blur-sm text-[var(--color-cream)] hover:text-[#F5A623] transition-colors"
                     aria-label={`Edit ${item.item_name}`}
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -238,7 +238,7 @@ export function MenuList({ userId, businessId, isOwnProfile, onMenusLoaded }: Me
                   </button>
                   <button
                     onClick={(e) => { e.stopPropagation(); setDeletingItemId(item.id); }}
-                    className="w-8 h-8 flex items-center justify-center rounded-lg bg-[#1A1A18]/70 backdrop-blur-sm text-[#E05C3A] hover:text-[#E05C3A]/80 transition-colors"
+                    className="w-8 h-8 flex items-center justify-center rounded-lg bg-[var(--color-charcoal)]/70 backdrop-blur-sm text-[#E05C3A] hover:text-[#E05C3A]/80 transition-colors"
                     aria-label={`Delete ${item.item_name}`}
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -250,8 +250,8 @@ export function MenuList({ userId, businessId, isOwnProfile, onMenusLoaded }: Me
 
               {/* Inline Delete Confirmation */}
               {deletingItemId === item.id && (
-                <div className="absolute inset-0 z-20 bg-[#1A1A18]/90 backdrop-blur-sm flex flex-col items-center justify-center gap-3 p-4 rounded-2xl">
-                  <p className="text-[#F5F0E8] text-sm font-medium text-center">Delete this item?</p>
+                <div className="absolute inset-0 z-20 bg-[var(--color-charcoal)]/90 backdrop-blur-sm flex flex-col items-center justify-center gap-3 p-4 rounded-2xl">
+                  <p className="text-[var(--color-cream)] text-sm font-medium text-center">Delete this item?</p>
                   <div className="flex gap-2">
                     <button
                       onClick={() => handleDeleteItemConfirm(item.id)}
@@ -261,7 +261,7 @@ export function MenuList({ userId, businessId, isOwnProfile, onMenusLoaded }: Me
                     </button>
                     <button
                       onClick={() => setDeletingItemId(null)}
-                      className="px-4 py-1.5 text-[#9E9A90] hover:bg-[#2E2E28] text-xs font-medium rounded-lg transition-colors"
+                      className="px-4 py-1.5 text-[var(--color-body-text)] hover:bg-[var(--color-charcoal-lighter)] text-xs font-medium rounded-lg transition-colors"
                     >
                       Cancel
                     </button>
@@ -271,7 +271,7 @@ export function MenuList({ userId, businessId, isOwnProfile, onMenusLoaded }: Me
 
               {/* Item Image */}
               {item.image_url ? (
-                <div className="relative aspect-square overflow-hidden bg-[#1A1A18]">
+                <div className="relative aspect-square overflow-hidden bg-[var(--color-charcoal)]">
                   <img
                     src={item.image_url}
                     alt={item.item_name}
@@ -279,7 +279,7 @@ export function MenuList({ userId, businessId, isOwnProfile, onMenusLoaded }: Me
                   />
                 </div>
               ) : (
-                <div className="aspect-square bg-[#3A3A34] flex items-center justify-center">
+                <div className="aspect-square bg-[var(--color-charcoal-lighter-plus)] flex items-center justify-center">
                   <svg className="w-8 h-8 text-[#6BAF7A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
@@ -288,7 +288,7 @@ export function MenuList({ userId, businessId, isOwnProfile, onMenusLoaded }: Me
 
               {/* Item Details */}
               <div className="p-3 flex flex-col flex-1">
-                <h4 className="text-[#F5F0E8] font-bold text-sm truncate mb-1">
+                <h4 className="text-[var(--color-cream)] font-bold text-sm truncate mb-1">
                   {item.item_name}
                 </h4>
 
@@ -304,7 +304,7 @@ export function MenuList({ userId, businessId, isOwnProfile, onMenusLoaded }: Me
                       onChange={(e) => setEditingPriceValue(e.target.value)}
                       onKeyDown={(e) => handlePriceKeyDown(e, item.id)}
                       onBlur={() => handlePriceSave(item.id)}
-                      className="w-16 bg-[#242420] border border-[#F5A623] rounded px-1 py-0.5 text-[#F5A623] font-bold text-sm focus:outline-none"
+                      className="w-16 bg-[var(--color-charcoal-light)] border border-[#F5A623] rounded px-1 py-0.5 text-[#F5A623] font-bold text-sm focus:outline-none"
                       autoFocus
                     />
                     <button
@@ -366,7 +366,7 @@ export function MenuList({ userId, businessId, isOwnProfile, onMenusLoaded }: Me
               d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
             />
           </svg>
-          <p className="text-[#F5F0E8]/60 mb-4">
+          <p className="text-[var(--color-cream)]/60 mb-4">
             {isOwnProfile ? t('menu.no_menus') : 'No items available'}
           </p>
           {isOwnProfile && (

@@ -8,8 +8,8 @@ import { useAuth } from '@/contexts/AuthContext';
 export default function CheckoutSuccessPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-transparent text-white flex items-center justify-center p-4">
-        <p className="text-white/70">Loading confirmation...</p>
+      <div className="min-h-screen bg-transparent text-[var(--text-primary)] flex items-center justify-center p-4">
+        <p className="text-[var(--text-secondary)]">Loading confirmation...</p>
       </div>
     }>
       <CheckoutSuccessContent />
@@ -44,31 +44,31 @@ function CheckoutSuccessContent() {
   }, [sessionId, user]);
 
   return (
-    <div className="min-h-screen bg-transparent text-white flex items-center justify-center p-4">
+    <div className="min-h-screen bg-transparent text-[var(--text-primary)] flex items-center justify-center p-4">
       <div className="max-w-md w-full">
-        <div className="bg-white/5 border border-green-500/30 rounded-lg p-8 text-center">
+        <div className="bg-[var(--glass-bg-subtle)] border border-green-500/30 rounded-lg p-8 text-center">
           {/* Success Icon */}
           <div className="text-6xl mb-4">✅</div>
 
           <h1 className="text-3xl font-bold mb-2 text-green-400">Order Confirmed!</h1>
-          <p className="text-white/60 mb-8">
+          <p className="text-[var(--text-tertiary)] mb-8">
             Payment received and order confirmed.
           </p>
 
           {/* Confirmation Number */}
           {confirmationNumber && (
             <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-6 mb-6">
-              <p className="text-white/60 text-sm mb-2">Order Confirmation Number</p>
+              <p className="text-[var(--text-tertiary)] text-sm mb-2">Order Confirmation Number</p>
               <p className="text-2xl font-mono font-bold text-green-400 tracking-wider">{confirmationNumber}</p>
-              <p className="text-white/40 text-xs mt-2">Save this for your records</p>
+              <p className="text-[var(--text-muted)] text-xs mt-2">Save this for your records</p>
             </div>
           )}
 
           {/* Session ID */}
           {sessionId && (
-            <div className="bg-[#1A1A18]/40 rounded-lg p-4 mb-6 text-left">
-              <p className="text-white/60 text-xs mb-1">Session ID:</p>
-              <p className="text-white/40 font-mono text-xs break-all">{sessionId}</p>
+            <div className="bg-[var(--color-charcoal)]/40 rounded-lg p-4 mb-6 text-left">
+              <p className="text-[var(--text-tertiary)] text-xs mb-1">Session ID:</p>
+              <p className="text-[var(--text-muted)] font-mono text-xs break-all">{sessionId}</p>
             </div>
           )}
 
@@ -89,7 +89,7 @@ function CheckoutSuccessContent() {
             </Link>
             <Link
               href="/"
-              className="block bg-white/10 hover:bg-white/20 text-white py-3 rounded-lg transition-all"
+              className="block bg-[var(--glass-bg)] hover:bg-[var(--glass-bg-strong)] text-[var(--text-primary)] py-3 rounded-lg transition-all"
             >
               Back to Home
             </Link>

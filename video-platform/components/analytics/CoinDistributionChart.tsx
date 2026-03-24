@@ -24,8 +24,8 @@ function CustomTooltip({ active, payload }: { active?: boolean; payload?: { payl
   if (!active || !payload?.length) return null;
   const entry = payload[0].payload;
   return (
-    <div className="bg-[#1A1A18]/90 border border-white/20 rounded-lg p-3 shadow-lg">
-      <p className="text-white text-sm font-semibold mb-1">{entry.title}</p>
+    <div className="bg-[var(--color-charcoal)]/90 border border-[var(--glass-border)] rounded-lg p-3 shadow-lg">
+      <p className="text-[var(--text-primary)] text-sm font-semibold mb-1">{entry.title}</p>
       <p className="text-yellow-400 text-xs">🪙 {entry.coinsSpent} coins ({entry.percentage}%)</p>
     </div>
   );
@@ -58,7 +58,7 @@ export function CoinDistributionChart({ data }: CoinDistributionChartProps) {
 
   return (
     <div>
-      <h4 className="text-sm font-semibold text-white/80 mb-3">📊 Coin Distribution by Video</h4>
+      <h4 className="text-sm font-semibold text-[var(--text-secondary)] mb-3">📊 Coin Distribution by Video</h4>
       <ResponsiveContainer width="100%" height={280}>
         <PieChart>
           <Pie
@@ -79,7 +79,7 @@ export function CoinDistributionChart({ data }: CoinDistributionChartProps) {
           </Pie>
           <Tooltip content={<CustomTooltip />} />
           <Legend
-            formatter={(value: string) => <span className="text-white/60 text-xs">{value}</span>}
+            formatter={(value: string) => <span className="text-[var(--text-tertiary)] text-xs">{value}</span>}
             wrapperStyle={{ fontSize: '12px' }}
           />
         </PieChart>
