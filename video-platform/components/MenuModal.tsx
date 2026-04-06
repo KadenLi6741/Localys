@@ -2,19 +2,21 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { useTranslation } from '@/hooks/useTranslation';
-import { Menu, createMenu, updateMenu, addMenuItemToMenu } from '@/lib/supabase/profiles';
+import { Menu, MenuItem, createMenu, updateMenu, addMenuItemToMenu, updateMenuItem } from '@/lib/supabase/profiles';
 import { supabase } from '@/lib/supabase/client';
 
 interface MenuModalProps {
   userId: string;
   businessId?: string;
   menu: Menu | null;
+  editItem?: MenuItem | null;
   isOpen: boolean;
   onClose: () => void;
   onSave: () => void;
+  onItemSaved?: (message: string) => void;
 }
 
-export function MenuModal({ userId, businessId, menu, isOpen, onClose, onSave }: MenuModalProps) {
+export function MenuModal({ userId, businessId, menu, editItem, isOpen, onClose, onSave, onItemSaved }: MenuModalProps) {
   const { t } = useTranslation();
   const [menuName, setMenuName] = useState('');
   const [description, setDescription] = useState('');
@@ -49,9 +51,20 @@ export function MenuModal({ userId, businessId, menu, isOpen, onClose, onSave }:
         setCategory('General');
       }
       setError(null);
-      resetItemForm();
+
+      // Pre-fill item form if editing an existing item
+      if (editItem) {
+        setItemName(editItem.item_name);
+        setItemPrice(editItem.price.toString());
+        setItemDescription(editItem.description || '');
+        setItemCategory(editItem.category || '');
+        setImagePreview(editItem.image_url || null);
+        setSelectedImage(null);
+      } else {
+        resetItemForm();
+      }
     }
-  }, [isOpen, menu]);
+  }, [isOpen, menu, editItem]);
 
   const resetItemForm = () => {
     setItemName('');
@@ -249,22 +262,46 @@ export function MenuModal({ userId, businessId, menu, isOpen, onClose, onSave }:
         }
       }
 
-      const { error: addError } = await addMenuItemToMenu(menu.id, userId, {
-        item_name: itemName,
-        price: parseFloat(itemPrice),
-        description: itemDescription,
-        category: itemCategory,
-        image_url: imageUrl,
-      });
+      if (editItem) {
+        // Update existing item
+        const updateData: { item_name: string; price: number; description: string; category: string; image_url?: string } = {
+          item_name: itemName,
+          price: parseFloat(itemPrice),
+          description: itemDescription,
+          category: itemCategory,
+        };
+        if (imageUrl) {
+          updateData.image_url = imageUrl;
+        }
 
-      if (addError) {
-        setError(addError.message || 'Failed to add item');
+        const { error: updateError } = await updateMenuItem(editItem.id, updateData);
+
+        if (updateError) {
+          setError(updateError.message || 'Failed to update item');
+        } else {
+          resetItemForm();
+          onItemSaved?.('Item updated successfully');
+          onSave();
+        }
       } else {
-        resetItemForm();
-        onSave();
+        // Add new item
+        const { error: addError } = await addMenuItemToMenu(menu.id, userId, {
+          item_name: itemName,
+          price: parseFloat(itemPrice),
+          description: itemDescription,
+          category: itemCategory,
+          image_url: imageUrl,
+        });
+
+        if (addError) {
+          setError(addError.message || 'Failed to add item');
+        } else {
+          resetItemForm();
+          onSave();
+        }
       }
     } catch (err: any) {
-      setError(err.message || 'An error occurred while adding item');
+      setError(err.message || 'An error occurred');
     } finally {
       setAddingItem(false);
       setUploading(false);
@@ -281,24 +318,24 @@ export function MenuModal({ userId, businessId, menu, isOpen, onClose, onSave }:
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-[#1A1A18]/70 backdrop-blur-sm"
       onClick={handleBackdropClick}
       role="dialog"
       aria-modal="true"
       aria-labelledby="menu-modal-title"
     >
-      <div className="relative w-full sm:max-w-lg bg-black rounded-t-2xl sm:rounded-2xl shadow-2xl max-h-[80vh] sm:max-h-[600px] flex flex-col">
+      <div className="relative w-full sm:max-w-lg bg-[#1A1A18] border border-[#3A3A34] rounded-t-2xl sm:rounded-2xl shadow-2xl max-h-[80vh] sm:max-h-[600px] flex flex-col animate-[scaleIn_200ms_ease-out]">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-700">
-          <h2 id="menu-modal-title" className="text-lg font-semibold text-white">
-            {menu ? t('menu.edit_menu') || 'Edit Menu' : t('menu.create_menu') || 'Create Menu'}
+        <div className="flex items-center justify-between p-4 border-b border-[#3A3A34]">
+          <h2 id="menu-modal-title" className="text-lg font-semibold text-[#F5F0E8]">
+            {editItem ? 'Edit Item' : menu ? t('menu.edit_menu') || 'Edit Menu' : t('menu.create_menu') || 'Create Menu'}
           </h2>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-800 rounded-full transition-colors"
+            className="p-2 hover:bg-[#2E2E28] rounded-full transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F5A623]"
             aria-label="Close modal"
           >
-            <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-6 h-6 text-[#9E9A90]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
@@ -306,10 +343,10 @@ export function MenuModal({ userId, businessId, menu, isOpen, onClose, onSave }:
 
         {/* Content */}
         <div className="flex flex-col flex-1 overflow-hidden">
-          <div className="flex-1 p-4 overflow-y-auto bg-gray-900 space-y-4">
+          <div className="flex-1 p-4 overflow-y-auto bg-[#1A1A18] space-y-4">
             {/* Error Message */}
             {error && (
-              <div className="bg-red-500/20 border border-red-500/50 text-red-200 rounded-lg p-3 text-sm">
+              <div className="bg-[#E05C3A]/10 border border-[#E05C3A]/50 text-[#E05C3A] rounded-xl p-3 text-sm">
                 {error}
               </div>
             )}
@@ -319,7 +356,7 @@ export function MenuModal({ userId, businessId, menu, isOpen, onClose, onSave }:
               <>
                 {/* Menu Name */}
                 <div>
-                  <label className="block text-white text-sm font-medium mb-2">
+                  <label className="block text-[#F5F0E8] text-sm font-medium mb-2">
                     {t('menu.menu_name') || 'Menu Name'}
                   </label>
                   <input
@@ -327,13 +364,13 @@ export function MenuModal({ userId, businessId, menu, isOpen, onClose, onSave }:
                     value={menuName}
                     onChange={(e) => setMenuName(e.target.value)}
                     placeholder={t('menu.menu_name_placeholder') || 'e.g., Appetizers, Main Courses'}
-                    className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                    className="w-full bg-[#242420] border border-[#3A3A34] rounded-xl px-4 py-2 text-[#F5F0E8] placeholder:text-[#9E9A90]/50 focus:outline-none focus:ring-2 focus:ring-[#F5A623] focus:border-transparent transition-all"
                   />
                 </div>
 
                 {/* Description */}
                 <div>
-                  <label className="block text-white text-sm font-medium mb-2">
+                  <label className="block text-[#F5F0E8] text-sm font-medium mb-2">
                     {t('menu.description') || 'Description'}
                   </label>
                   <textarea
@@ -341,19 +378,19 @@ export function MenuModal({ userId, businessId, menu, isOpen, onClose, onSave }:
                     onChange={(e) => setDescription(e.target.value)}
                     placeholder={t('menu.description_placeholder') || 'Add a description for this menu section...'}
                     rows={3}
-                    className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
+                    className="w-full bg-[#242420] border border-[#3A3A34] rounded-xl px-4 py-2 text-[#F5F0E8] placeholder:text-[#9E9A90]/50 focus:outline-none focus:ring-2 focus:ring-[#F5A623] focus:border-transparent transition-all resize-none"
                   />
                 </div>
 
                 {/* Category */}
                 <div>
-                  <label className="block text-white text-sm font-medium mb-2">
+                  <label className="block text-[#F5F0E8] text-sm font-medium mb-2">
                     {t('menu.category') || 'Category'}
                   </label>
                   <select
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
-                    className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                    className="w-full bg-[#242420] border border-[#3A3A34] rounded-xl px-4 py-2 text-[#F5F0E8] focus:outline-none focus:ring-2 focus:ring-[#F5A623] focus:border-transparent transition-all"
                   >
                     <option value="General">General</option>
                     <option value="Appetizers">Appetizers</option>
@@ -368,77 +405,80 @@ export function MenuModal({ userId, businessId, menu, isOpen, onClose, onSave }:
               </>
             )}
 
-            {/* Add Item Section - Only when editing existing menu */}
-            {menu && (
-              <div className="border-t border-gray-700 pt-4">
-                <h3 className="text-white text-sm font-semibold mb-4">Add Item to Menu</h3>
+            {/* Add/Edit Item Section - Only when editing existing menu or editing an item */}
+            {(menu || editItem) && (
+              <div className="border-t border-[#3A3A34] pt-4">
+                <h3 className="text-[#F5F0E8] text-sm font-semibold mb-4">
+                  {editItem ? 'Edit Item' : 'Add Item to Menu'}
+                </h3>
                 <form onSubmit={handleAddItem} className="space-y-3">
                   <div>
-                    <label className="block text-white text-xs font-medium mb-2">Item Name *</label>
+                    <label className="block text-[#F5F0E8] text-xs font-medium mb-2">Item Name *</label>
                     <input
                       type="text"
                       value={itemName}
                       onChange={(e) => setItemName(e.target.value)}
                       placeholder="e.g., Caesar Salad"
-                      className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                      className="w-full bg-[#242420] border border-[#3A3A34] rounded-xl px-4 py-2 text-[#F5F0E8] placeholder:text-[#9E9A90]/50 focus:outline-none focus:ring-2 focus:ring-[#F5A623] focus:border-transparent transition-all"
                     />
                   </div>
 
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-white text-xs font-medium mb-2">Price *</label>
+                      <label className="block text-[#F5F0E8] text-xs font-medium mb-2">Price *</label>
                       <input
                         type="number"
                         step="0.01"
                         value={itemPrice}
                         onChange={(e) => setItemPrice(e.target.value)}
                         placeholder="0.00"
-                        className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                        className="w-full bg-[#242420] border border-[#3A3A34] rounded-xl px-4 py-2 text-[#F5F0E8] placeholder:text-[#9E9A90]/50 focus:outline-none focus:ring-2 focus:ring-[#F5A623] focus:border-transparent transition-all"
                       />
                     </div>
                     <div>
-                      <label className="block text-white text-xs font-medium mb-2">Category</label>
+                      <label className="block text-[#F5F0E8] text-xs font-medium mb-2">Category</label>
                       <input
                         type="text"
                         value={itemCategory}
                         onChange={(e) => setItemCategory(e.target.value)}
                         placeholder="e.g., Vegetarian"
-                        className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                        className="w-full bg-[#242420] border border-[#3A3A34] rounded-xl px-4 py-2 text-[#F5F0E8] placeholder:text-[#9E9A90]/50 focus:outline-none focus:ring-2 focus:ring-[#F5A623] focus:border-transparent transition-all"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-white text-xs font-medium mb-2">Description</label>
+                    <label className="block text-[#F5F0E8] text-xs font-medium mb-2">Description</label>
                     <textarea
                       value={itemDescription}
                       onChange={(e) => setItemDescription(e.target.value)}
                       placeholder="Describe the item..."
                       rows={2}
-                      className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
+                      className="w-full bg-[#242420] border border-[#3A3A34] rounded-xl px-4 py-2 text-[#F5F0E8] placeholder:text-[#9E9A90]/50 focus:outline-none focus:ring-2 focus:ring-[#F5A623] focus:border-transparent transition-all resize-none"
                     />
                   </div>
 
                   {/* Image Upload Error */}
                   {uploadError && (
-                    <div className="bg-red-500/20 border border-red-500/50 text-red-200 text-xs rounded p-2">
+                    <div className="bg-[#E05C3A]/10 border border-[#E05C3A]/50 text-[#E05C3A] text-xs rounded-xl p-2">
                       {uploadError}
                     </div>
                   )}
 
                   {/* Image Preview */}
                   {imagePreview && (
-                    <div className="relative bg-gray-800 rounded-lg p-2">
+                    <div className="relative bg-[#242420] rounded-xl p-2">
                       <img
                         src={imagePreview}
                         alt="Preview"
-                        className="w-full h-32 object-cover rounded"
+                        className="w-full h-32 object-cover rounded-xl"
                       />
                       <button
                         type="button"
                         onClick={removeImage}
                         disabled={uploading}
-                        className="absolute top-2 right-2 bg-red-500/80 hover:bg-red-600 disabled:opacity-50 p-1 rounded-full"
+                        className="absolute top-2 right-2 bg-[#E05C3A]/80 hover:bg-[#E05C3A] disabled:opacity-50 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F5A623]"
+                        aria-label="Remove image"
                       >
                         <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" />
@@ -461,7 +501,7 @@ export function MenuModal({ userId, businessId, menu, isOpen, onClose, onSave }:
                       type="button"
                       onClick={() => fileInputRef.current?.click()}
                       disabled={uploading || addingItem}
-                      className="px-4 py-2 rounded-lg font-medium text-sm bg-gray-700 text-white hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+                      className="px-4 py-2 rounded-xl font-medium text-sm bg-[#242420] border border-[#3A3A34] text-[#F5F0E8] hover:bg-[#2E2E28] disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
                       title="Add item photo"
                     >
                       📷 Add Photo
@@ -471,9 +511,9 @@ export function MenuModal({ userId, businessId, menu, isOpen, onClose, onSave }:
                   <button
                     type="submit"
                     disabled={addingItem || uploading || !itemName.trim() || !itemPrice}
-                    className="w-full px-4 py-2 bg-green-500 hover:bg-green-600 disabled:bg-green-400 disabled:cursor-not-allowed text-white rounded-lg transition-colors font-medium text-sm"
+                    className="w-full px-4 py-2 bg-[#6BAF7A] hover:bg-[#6BAF7A]/90 disabled:bg-[#6BAF7A]/40 disabled:cursor-not-allowed text-black rounded-xl transition-colors font-medium text-sm min-h-[44px]"
                   >
-                    {addingItem || uploading ? (uploading ? 'Uploading...' : 'Adding...') : 'Add Item'}
+                    {addingItem || uploading ? (uploading ? 'Uploading...' : (editItem ? 'Saving...' : 'Adding...')) : (editItem ? 'Save Changes' : 'Add Item')}
                   </button>
                 </form>
               </div>
@@ -481,12 +521,12 @@ export function MenuModal({ userId, businessId, menu, isOpen, onClose, onSave }:
           </div>
 
           {/* Footer */}
-          <div className="flex items-center justify-end gap-3 p-4 border-t border-gray-700 bg-gray-900">
+          <div className="flex items-center justify-end gap-3 p-4 border-t border-[#3A3A34] bg-[#1A1A18]">
             <button
               type="button"
               onClick={onClose}
               disabled={loading}
-              className="px-4 py-2 text-gray-300 hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors font-medium"
+              className="px-4 py-2 text-[#9E9A90] hover:bg-[#2E2E28] disabled:opacity-50 disabled:cursor-not-allowed rounded-xl transition-colors font-medium min-h-[44px]"
             >
               {t('common.cancel') || 'Cancel'}
             </button>
@@ -494,7 +534,7 @@ export function MenuModal({ userId, businessId, menu, isOpen, onClose, onSave }:
               <button
                 onClick={handleSubmit}
                 disabled={loading || !menuName.trim()}
-                className="px-6 py-2 bg-blue-500 hover:bg-blue-600 disabled:bg-blue-400 disabled:cursor-not-allowed text-white rounded-lg transition-colors font-medium"
+                className="px-6 py-2 bg-[#F5A623] hover:bg-[#F5A623]/90 disabled:bg-[#F5A623]/40 disabled:cursor-not-allowed text-black rounded-xl transition-colors font-medium min-h-[44px]"
               >
                 {loading ? (
                   <span className="flex items-center gap-2">

@@ -43,6 +43,7 @@ export interface ChatWithDetails extends Chat {
     username?: string;
     full_name?: string;
     profile_picture_url?: string;
+    type?: string | null; // 'business' or 'seller' indicates verified seller
   };
 }
 

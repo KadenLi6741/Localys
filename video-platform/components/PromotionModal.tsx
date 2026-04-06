@@ -80,8 +80,8 @@ export function PromotionModal({ isOpen, onClose, videoId, userCoins, onSuccess,
   const sliderValue = ((coinsToSpend - MIN_COINS) / (maxCoinsAllowed - MIN_COINS)) * 100;
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-black border border-white/20 rounded-lg p-6 max-w-md w-full">
+    <div className="fixed inset-0 bg-[#1A1A18]/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div className="bg-transparent border border-white/20 rounded-lg p-6 max-w-md w-full">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-bold text-white">Promote Video</h2>
           <button

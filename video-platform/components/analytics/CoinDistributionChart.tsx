@@ -24,7 +24,7 @@ function CustomTooltip({ active, payload }: { active?: boolean; payload?: { payl
   if (!active || !payload?.length) return null;
   const entry = payload[0].payload;
   return (
-    <div className="bg-black/90 border border-white/20 rounded-lg p-3 shadow-lg">
+    <div className="bg-[#1A1A18]/90 border border-white/20 rounded-lg p-3 shadow-lg">
       <p className="text-white text-sm font-semibold mb-1">{entry.title}</p>
       <p className="text-yellow-400 text-xs">🪙 {entry.coinsSpent} coins ({entry.percentage}%)</p>
     </div>

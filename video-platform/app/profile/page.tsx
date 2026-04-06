@@ -9,6 +9,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useTranslation } from '@/hooks/useTranslation';
 import { signOut } from '@/lib/supabase/auth';
 import { supabase } from '@/lib/supabase/client';
+import { useRouter as useNavRouter } from 'next/navigation';
 import { EditableProfilePicture } from '@/components/EditableProfilePicture';
 import { LanguageSettings } from '@/components/LanguageSettings';
 import { BookmarkedVideos } from '@/components/BookmarkedVideos';
@@ -31,6 +32,7 @@ import {
 } from '@/lib/supabase/profiles';
 import { OrderHistory } from '@/components/OrderHistory';
 import { AnalyticsDashboard } from '@/components/analytics';
+import { FinancialOverview } from '@/components/analytics/FinancialOverview';
 
 const LocationManager = dynamic(
   () => import('@/components/LocationManager'),
@@ -112,7 +114,7 @@ function ProfileContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-black text-white pb-20 flex items-center justify-center">
+      <div className="min-h-screen bg-transparent text-white pb-20 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
           <p>{t('common.loading')}</p>
@@ -122,18 +124,19 @@ function ProfileContent() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white pb-20">
+    <div className="min-h-screen bg-transparent text-white pb-20">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-black/80 backdrop-blur-md border-b border-white/10">
-        <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
-          <h1 className="text-2xl font-bold">{t('profile.title')}</h1>
+      <div className="sticky top-0 z-10 bg-[#1A1A18]/80 backdrop-blur-md border-b border-white/10">
+        <div className="w-full px-4 lg:px-12 py-4 flex items-center justify-between">
+          <h1 className="entrance-slide text-2xl font-bold" style={{ animation: 'slideInLeft 0.4s ease-out forwards', opacity: 0 }}>{t('profile.title')}</h1>
           <LanguageSettings />
         </div>
       </div>
 
       {/* Profile Content */}
       {isEditMode ? (
-        <ProfileEditForm 
+        <div className="entrance-fade" style={{ animation: 'fadeInUp 0.4s ease-out 0.1s forwards', opacity: 0 }}>
+          <ProfileEditForm 
           profile={profile}
           business={business}
           user={user}
@@ -144,16 +147,19 @@ function ProfileContent() {
           }}
           onCancel={() => setIsEditMode(false)}
         />
+        </div>
       ) : (
-        <ProfileView 
-          profile={profile}
-          business={business}
-          user={user}
-          onEditClick={() => setIsEditMode(true)}
-          onSignOut={handleSignOut}
-          onProfileUpdated={loadProfile}
-          pathname={pathname}
-        />
+        <div className="entrance-fade" style={{ animation: 'fadeInUp 0.4s ease-out 0.1s forwards', opacity: 0 }}>
+          <ProfileView 
+            profile={profile}
+            business={business}
+            user={user}
+            onEditClick={() => setIsEditMode(true)}
+            onSignOut={handleSignOut}
+            onProfileUpdated={loadProfile}
+            pathname={pathname}
+          />
+        </div>
       )}
     </div>
   );
@@ -169,15 +175,55 @@ interface ProfileViewProps {
   pathname: string;
 }
 
+interface FollowingUser {
+  id: string;
+  username: string;
+  full_name: string;
+  profile_picture_url?: string;
+  type?: string | null;
+}
+
 function ProfileView({ profile, business, user, onEditClick, onSignOut, onProfileUpdated, pathname }: ProfileViewProps) {
   const { t } = useTranslation();
+  const navRouter = useNavRouter();
   const [showBusinessHours, setShowBusinessHours] = useState(false);
-  
+  const [following, setFollowing] = useState<FollowingUser[]>([]);
+  const [followingLoading, setFollowingLoading] = useState(true);
+
+  useEffect(() => {
+    if (user?.id) {
+      loadFollowing();
+    }
+  }, [user?.id]);
+
+  const loadFollowing = async () => {
+    try {
+      const { data } = await supabase
+        .from('follows')
+        .select('following_id')
+        .eq('follower_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(5);
+      if (data && data.length > 0) {
+        const ids = data.map(f => f.following_id);
+        const { data: profiles } = await supabase
+          .from('profiles')
+          .select('id, username, full_name, profile_picture_url, type')
+          .in('id', ids);
+        setFollowing(profiles ?? []);
+      }
+    } catch {
+      // silently fail
+    } finally {
+      setFollowingLoading(false);
+    }
+  };
+
   return (
     <>
-      <div className="max-w-2xl mx-auto px-4 py-8">
+      <div className="w-full px-4 lg:px-12 py-8">
         {/* Profile Header */}
-        <div className="flex items-center gap-6 mb-8">
+        <div className="flex items-center gap-6 mb-8" style={{ animation: 'fadeInUp 0.4s ease-out forwards', opacity: 0 }}>
           <EditableProfilePicture
             userId={user.id}
             currentImageUrl={profile?.profile_picture_url}
@@ -238,7 +284,8 @@ function ProfileView({ profile, business, user, onEditClick, onSignOut, onProfil
         {/* Edit Profile Button */}
         <button 
           onClick={onEditClick}
-          className="w-full bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg py-3 mb-6 transition-all duration-200 hover:scale-[1.02] active:scale-98"
+          className="entrance-scale w-full bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg py-3 mb-6 transition-all duration-200 hover:scale-[1.02] active:scale-98"
+          style={{ animation: 'scaleIn 0.3s ease-out 0.15s forwards', opacity: 0 }}
         >
           {t('profile.edit_profile')}
         </button>
@@ -262,12 +309,21 @@ function ProfileView({ profile, business, user, onEditClick, onSignOut, onProfil
         )}
 
         {/* Analytics Dashboard Section */}
-        <AnalyticsDashboard userId={user.id} />
+        <div style={{ animation: 'fadeInUp 0.4s ease-out 0.2s forwards', opacity: 0 }}>
+          <AnalyticsDashboard userId={user.id} />
+        </div>
+
+        {/* Financial Overview Section (business only) */}
+        {business && (
+          <div style={{ animation: 'fadeInUp 0.4s ease-out 0.22s forwards', opacity: 0 }}>
+            <FinancialOverview userId={user.id} />
+          </div>
+        )}
 
         {/* Services Section (business only) */}
         {business && (
-          <div className="mb-8">
-            <h3 className="text-xl font-semibold mb-4">⚙️ Services</h3>
+          <div className="mb-8" style={{ animation: 'fadeInUp 0.4s ease-out 0.25s forwards', opacity: 0 }}>
+            <h3 className="entrance-slide text-xl font-semibold mb-4" style={{ animation: 'slideInLeft 0.4s ease-out 0.25s forwards', opacity: 0 }}>⚙️ Services</h3>
             <div className="bg-white/5 border border-white/10 rounded-lg p-6">
               <MenuList userId={user.id} businessId={business?.id} isOwnProfile={true} />
             </div>
@@ -275,24 +331,24 @@ function ProfileView({ profile, business, user, onEditClick, onSignOut, onProfil
         )}
 
         {/* Posted Videos Section */}
-        <div className="mb-8">
-          <h3 className="text-xl font-semibold mb-4">{t('profile.videos')}</h3>
+        <div className="mb-8" style={{ animation: 'fadeInUp 0.4s ease-out 0.3s forwards', opacity: 0 }}>
+          <h3 className="entrance-slide text-xl font-semibold mb-4" style={{ animation: 'slideInLeft 0.4s ease-out 0.3s forwards', opacity: 0 }}>{t('profile.videos')}</h3>
           <div className="bg-white/5 border border-white/10 rounded-lg p-6">
             <PostedVideos userId={user.id} isOwnProfile={true} />
           </div>
         </div>
 
         {/* Bookmarked Videos Section */}
-        <div className="mb-8">
-          <h3 className="text-xl font-semibold mb-4">{t('profile.bookmarked')}</h3>
+        <div className="mb-8" style={{ animation: 'fadeInUp 0.4s ease-out 0.35s forwards', opacity: 0 }}>
+          <h3 className="entrance-slide text-xl font-semibold mb-4" style={{ animation: 'slideInLeft 0.4s ease-out 0.35s forwards', opacity: 0 }}>{t('profile.bookmarked')}</h3>
           <div className="bg-white/5 border border-white/10 rounded-lg p-6">
             <BookmarkedVideos userId={user.id} />
           </div>
         </div>
 
         {/* Orders History Section */}
-        <div className="mb-8">
-          <h3 className="text-xl font-semibold mb-4">📋 Order History</h3>
+        <div className="mb-8" style={{ animation: 'fadeInUp 0.4s ease-out 0.4s forwards', opacity: 0 }}>
+          <h3 className="entrance-slide text-xl font-semibold mb-4" style={{ animation: 'slideInLeft 0.4s ease-out 0.4s forwards', opacity: 0 }}>📋 Order History</h3>
           <div className="bg-white/5 border border-white/10 rounded-lg p-6">
             <OrderHistory userId={user.id} isBusiness={!!business} />
           </div>
@@ -321,17 +377,70 @@ function ProfileView({ profile, business, user, onEditClick, onSignOut, onProfil
           </Link>
         </div>
 
+        {/* Following Preview Section */}
+        <div className="mb-8" style={{ animation: 'fadeInUp 0.4s ease-out 0.42s forwards', opacity: 0 }}>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-xl font-semibold">Following</h3>
+            {following.length > 0 && (
+              <Link href="/search" className="text-[#F5A623] text-sm hover:underline">View All</Link>
+            )}
+          </div>
+          {followingLoading ? (
+            <div className="flex gap-4">
+              {[...Array(4)].map((_, i) => (
+                <div key={i} className="flex flex-col items-center gap-2">
+                  <div className="w-12 h-12 rounded-full bg-white/10 animate-pulse" />
+                  <div className="w-10 h-2 bg-white/10 rounded animate-pulse" />
+                </div>
+              ))}
+            </div>
+          ) : following.length > 0 ? (
+            <div className="flex gap-4 overflow-x-auto pb-2">
+              {following.map(f => (
+                <button
+                  key={f.id}
+                  onClick={() => navRouter.push(`/profile/${f.username}`)}
+                  className="flex flex-col items-center gap-1.5 min-w-[64px] hover:opacity-80 transition-opacity"
+                >
+                  <div className={`w-12 h-12 rounded-full overflow-hidden ${f.type ? 'ring-2 ring-[#F5A623]' : 'ring-1 ring-white/20'}`}>
+                    {f.profile_picture_url ? (
+                      <img src={f.profile_picture_url} alt={f.full_name} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full bg-white/20 flex items-center justify-center text-sm text-white/60">
+                        {f.full_name?.[0] || '?'}
+                      </div>
+                    )}
+                  </div>
+                  <span className="text-[10px] text-white/60 truncate max-w-[64px]">{f.username}</span>
+                </button>
+              ))}
+            </div>
+          ) : (
+            <div className="bg-white/5 border border-white/10 rounded-lg p-6 text-center">
+              <p className="text-white/40 text-sm mb-3">You are not following anyone yet</p>
+              <Link href="/search" className="text-[#F5A623] text-sm font-medium hover:underline">Discover People</Link>
+            </div>
+          )}
+        </div>
+
         {/* Sign Out Button */}
         <button
           onClick={onSignOut}
-          className="w-full bg-red-500/20 hover:bg-red-500/30 border border-red-500/50 text-red-200 rounded-lg py-3 transition-all duration-200 hover:scale-[1.02] active:scale-98"
+          className="w-full bg-red-500/20 hover:bg-red-500/30 border border-red-500/50 text-red-200 rounded-lg py-3 transition-all duration-200 hover:scale-[1.02] active:scale-98 mb-8"
         >
           {t('profile.sign_out')}
         </button>
-      </div>
 
-      {/* Bottom Navigation */}
-      <BottomNavigation pathname={pathname} />
+        {/* Footer */}
+        <div className="border-t border-[#3A3A34] pt-6 pb-8">
+          <div className="flex items-center justify-center gap-6 mb-3">
+            <a href="#" className="text-[#9E9A90] text-xs hover:text-[#F5A623] transition-colors">Company</a>
+            <a href="#" className="text-[#9E9A90] text-xs hover:text-[#F5A623] transition-colors">Program</a>
+            <a href="#" className="text-[#9E9A90] text-xs hover:text-[#F5A623] transition-colors">Terms & Policies</a>
+          </div>
+          <p className="text-[#9E9A90] text-xs text-center">© 2026 Localys</p>
+        </div>
+      </div>
     </>
   );
 }
@@ -498,7 +607,7 @@ function ProfileEditForm({ profile, business, user, onSave, onCancel }: ProfileE
   };
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-8">
+    <div className="w-full px-4 lg:px-12 py-8">
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Profile Picture */}
         <div className="flex flex-col items-center gap-4">
@@ -765,50 +874,6 @@ function ProfileEditForm({ profile, business, user, onSave, onCancel }: ProfileE
           </button>
         </div>
       </form>
-    </div>
-  );
-}
-
-interface BottomNavigationProps {
-  pathname: string;
-}
-
-function BottomNavigation({ pathname }: BottomNavigationProps) {
-  return (
-    <div className="fixed bottom-0 left-0 right-0 z-20 bg-black/50 backdrop-blur-md border-t border-white/10">
-      <div className="flex items-center justify-around py-3">
-        <Link href="/" className="flex flex-col items-center gap-1 transition-transform duration-200 hover:scale-110 active:scale-95">
-          <svg className="w-6 h-6 text-white/60" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
-          </svg>
-          <span className="text-white/60 text-xs">Home</span>
-        </Link>
-        <Link href="/search" className="flex flex-col items-center gap-1 transition-transform duration-200 hover:scale-110 active:scale-95">
-          <svg className="w-6 h-6 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-          <span className="text-white/60 text-xs">Search</span>
-        </Link>
-        <Link href="/upload" className="flex flex-col items-center gap-1 transition-transform duration-200 hover:scale-110 active:scale-95">
-          <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
-            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-          </div>
-        </Link>
-        <Link href="/chats" className="flex flex-col items-center gap-1 transition-transform duration-200 hover:scale-110 active:scale-95">
-          <svg className="w-6 h-6 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-          </svg>
-          <span className="text-white/60 text-xs">Chats</span>
-        </Link>
-        <Link href="/profile" className="flex flex-col items-center gap-1 transition-transform duration-200 hover:scale-110 active:scale-95">
-          <svg className={`w-6 h-6 ${pathname === '/profile' ? 'text-white' : 'text-white/60'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-          </svg>
-          <span className={`text-xs ${pathname === '/profile' ? 'text-white' : 'text-white/60'}`}>Profile</span>
-        </Link>
-      </div>
     </div>
   );
 }

@@ -55,3 +55,51 @@ export interface AnalyticsData {
   coinDistribution: CoinDistribution[];
   promotionHistory: PromotionEntry[];
 }
+
+// Financial Analytics types
+
+export interface FinancialSummary {
+  totalRevenue: number;
+  totalOrders: number;
+  completedOrders: number;
+  cancelledOrders: number;
+}
+
+export interface RevenueDataPoint {
+  date: string;
+  revenue: number;
+}
+
+export interface OrdersBreakdown {
+  status: string;
+  count: number;
+  color: string;
+}
+
+export interface TopSellingItem {
+  itemName: string;
+  unitsSold: number;
+}
+
+export interface VideoConversion {
+  videoId: string;
+  caption: string;
+  views: number;
+  orders: number;
+}
+
+export interface QuickStats {
+  averageOrderValue: number;
+  bestSellingDay: string;
+  returnRate: number;
+  revenueChangePercent: number;
+}
+
+export interface FinancialData {
+  summary: FinancialSummary;
+  revenueOverTime: RevenueDataPoint[];
+  ordersBreakdown: OrdersBreakdown[];
+  topSellingItems: TopSellingItem[];
+  videoConversions: VideoConversion[];
+  quickStats: QuickStats;
+}
