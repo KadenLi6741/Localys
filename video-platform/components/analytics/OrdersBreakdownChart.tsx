@@ -19,9 +19,9 @@ function BreakdownTooltip({ active, payload }: { active?: boolean; payload?: { p
   if (!active || !payload?.length) return null;
   const entry = payload[0].payload;
   return (
-    <div className="bg-[var(--color-charcoal)]/90 border border-[var(--color-charcoal-lighter-plus)] rounded-lg p-3 shadow-lg">
-      <p className="text-[var(--color-cream)] text-sm font-semibold mb-1">{entry.status}</p>
-      <p className="text-[#F5A623] text-xs">{entry.count} orders</p>
+    <div className="bg-[#1A1A1A]/90 border border-[#3A3A34] rounded-lg p-3 shadow-lg">
+      <p className="text-white text-sm font-semibold mb-1">{entry.status}</p>
+      <p className="text-[#1B5EA8] text-xs">{entry.count} orders</p>
     </div>
   );
 }
@@ -40,7 +40,7 @@ function CustomLabel(props: PieLabelRenderProps) {
   const x = cx + radius * Math.cos(-midAngle * RADIAN);
   const y = cy + radius * Math.sin(-midAngle * RADIAN);
   return (
-    <text x={x} y={y} fill="var(--color-cream)" textAnchor="middle" dominantBaseline="central" fontSize={12} fontWeight={600}>
+    <text x={x} y={y} fill="#ffffff" textAnchor="middle" dominantBaseline="central" fontSize={12} fontWeight={600}>
       {pct}%
     </text>
   );
@@ -51,7 +51,7 @@ export function OrdersBreakdownChart({ data }: OrdersBreakdownChartProps) {
 
   return (
     <div>
-      <h4 className="text-sm font-semibold text-[var(--color-cream)]/80 mb-3">📦 Orders Breakdown</h4>
+      <h4 className="text-sm font-semibold text-[#1A1A1A] mb-3">Orders Breakdown</h4>
       <ResponsiveContainer width="100%" height={260}>
         <PieChart>
           <Pie
@@ -72,7 +72,7 @@ export function OrdersBreakdownChart({ data }: OrdersBreakdownChartProps) {
           </Pie>
           <Tooltip content={<BreakdownTooltip />} />
           <Legend
-            formatter={(value: string) => <span className="text-[var(--color-body-text)] text-xs">{value}</span>}
+            formatter={(value: string) => <span className="text-[#6B6B65] text-xs">{value}</span>}
             wrapperStyle={{ fontSize: '12px' }}
           />
         </PieChart>

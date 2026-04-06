@@ -26,7 +26,7 @@ function DiscountBadge({ item }: { item: ItemPurchase }) {
       </span>
       {showTooltip && (
         <span className="absolute bottom-full right-0 mb-2 px-3 py-2 rounded-lg bg-[var(--color-charcoal-light)] border border-[var(--color-charcoal-lighter-plus)] text-[var(--color-cream)] text-xs whitespace-nowrap z-10 shadow-lg">
-          <span className="block text-[#F5A623] font-semibold mb-1">Coupon: {item.coupon_code}</span>
+          <span className="block text-[#1B5EA8] font-semibold mb-1">Coupon: {item.coupon_code}</span>
           <span className="text-[var(--color-body-text)]">{item.discount_percentage}% off</span>
         </span>
       )}
@@ -36,11 +36,11 @@ function DiscountBadge({ item }: { item: ItemPurchase }) {
 
 function StatusBadge({ status }: { status: string }) {
   const styles: Record<string, { bg: string; text: string; icon: string }> = {
-    paid: { bg: 'bg-[#F5A623]/15 border border-[#F5A623]/40', text: 'text-[#F5A623]', icon: '💳' },
+    paid: { bg: 'bg-[#1B5EA8]/15 border border-[#1B5EA8]/40', text: 'text-[#1B5EA8]', icon: '$' },
     completed: { bg: 'bg-[#6BAF7A]/15 border border-[#6BAF7A]/40', text: 'text-[#6BAF7A]', icon: '✓' },
-    delivered: { bg: 'bg-[#6BAF7A]/15 border border-[#6BAF7A]/40', text: 'text-[#6BAF7A]', icon: '📦' },
-    pending: { bg: 'bg-[#F5A623]/15 border border-[#F5A623]/40', text: 'text-[#F5A623]', icon: '⏳' },
-    shipped: { bg: 'bg-[#F5A623]/15 border border-[#F5A623]/40', text: 'text-[#F5A623]', icon: '🚚' },
+    delivered: { bg: 'bg-[#6BAF7A]/15 border border-[#6BAF7A]/40', text: 'text-[#6BAF7A]', icon: '✓' },
+    pending: { bg: 'bg-[#1B5EA8]/15 border border-[#1B5EA8]/40', text: 'text-[#1B5EA8]', icon: '•••' },
+    shipped: { bg: 'bg-[#1B5EA8]/15 border border-[#1B5EA8]/40', text: 'text-[#1B5EA8]', icon: '→' },
     failed: { bg: 'bg-[#E05C3A]/15 border border-[#E05C3A]/40', text: 'text-[#E05C3A]', icon: '✕' },
     cancelled: { bg: 'bg-[#E05C3A]/15 border border-[#E05C3A]/40', text: 'text-[#E05C3A]', icon: '✕' },
   };
@@ -135,7 +135,7 @@ export function OrderHistory({ userId, businessId, isBusiness = false }: OrderHi
   if (loading) {
     return (
       <div className="flex items-center justify-center py-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#F5A623]"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1B5EA8]"></div>
       </div>
     );
   }
@@ -165,9 +165,9 @@ export function OrderHistory({ userId, businessId, isBusiness = false }: OrderHi
         <div className="flex gap-4 border-b border-[var(--color-charcoal-lighter-plus)]">
           <button
             onClick={() => setActiveTab('purchases')}
-            className={`px-4 py-2 font-medium transition-colors min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F5A623] rounded-t-lg ${
+            className={`px-4 py-2 font-medium transition-colors min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1B5EA8] rounded-t-lg ${
               activeTab === 'purchases'
-                ? 'text-[#F5A623] border-b-2 border-[#F5A623]'
+                ? 'text-[#1B5EA8] border-b-2 border-[#1B5EA8]'
                 : 'text-[var(--color-body-text)] hover:text-[var(--color-cream)]'
             }`}
           >
@@ -175,9 +175,9 @@ export function OrderHistory({ userId, businessId, isBusiness = false }: OrderHi
           </button>
           <button
             onClick={() => setActiveTab('sales')}
-            className={`px-4 py-2 font-medium transition-colors min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F5A623] rounded-t-lg ${
+            className={`px-4 py-2 font-medium transition-colors min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1B5EA8] rounded-t-lg ${
               activeTab === 'sales'
-                ? 'text-[#F5A623] border-b-2 border-[#F5A623]'
+                ? 'text-[#1B5EA8] border-b-2 border-[#1B5EA8]'
                 : 'text-[var(--color-body-text)] hover:text-[var(--color-cream)]'
             }`}
           >
@@ -248,17 +248,17 @@ function OrderItem({ order }: { order: CoinPurchase | ItemPurchase }) {
   if (isCoinPurchase) {
     const coins = order as CoinPurchase;
     return (
-      <div className="bg-[var(--color-charcoal-light)] border border-[#F5A623]/30 rounded-2xl p-4 hover:bg-[var(--color-charcoal-lighter)] hover:border-[#F5A623]/40 hover:shadow-lg hover:shadow-[#F5A623]/20 transition-all duration-200">
+      <div className="bg-[var(--color-charcoal-light)] border border-[#1B5EA8]/30 rounded-2xl p-4 hover:bg-[var(--color-charcoal-lighter)] hover:border-[#1B5EA8]/40 hover:shadow-lg hover:shadow-[#1B5EA8]/20 transition-all duration-200">
         <div className="flex justify-between items-start">
           <div className="flex items-center gap-3 flex-1">
-            <div className="text-2xl">🪙</div>
+            <div className="w-8 h-8 bg-yellow-500/10 rounded-full flex items-center justify-center text-yellow-500 font-bold text-sm">C</div>
             <div>
               <p className="font-medium text-[var(--color-cream)]">Coin Purchase</p>
               <p className="text-[var(--color-body-text)] text-sm">{coins.coins} coins</p>
             </div>
           </div>
           <div className="text-right">
-            <p className="font-medium text-[#F5A623]">{coins.coins}x 🪙</p>
+            <p className="font-medium text-[#1B5EA8]">{coins.coins}x coins</p>
             <p className="text-[var(--color-body-text)] text-xs">{formattedDate}</p>
           </div>
         </div>
@@ -270,17 +270,19 @@ function OrderItem({ order }: { order: CoinPurchase | ItemPurchase }) {
   const isPaid = item.status === 'paid';
 
   return (
-    <div className="bg-[var(--color-charcoal-light)] border border-[var(--color-charcoal-lighter-plus)] rounded-lg p-4 hover:bg-[var(--color-charcoal-lighter)] hover:border-[#F5A623]/40 hover:shadow-lg hover:shadow-[#F5A623]/20 transition-all duration-200 active:scale-95">
+    <div className="bg-[var(--color-charcoal-light)] border border-[var(--color-charcoal-lighter-plus)] rounded-lg p-4 hover:bg-[var(--color-charcoal-lighter)] hover:border-[#1B5EA8]/40 hover:shadow-lg hover:shadow-[#1B5EA8]/20 transition-all duration-200 active:scale-95">
       <div className="flex justify-between items-start">
         <div className="flex items-center gap-3 flex-1">
-          <div className="text-2xl">🛍️</div>
+          <div className="w-8 h-8 bg-blue-500/10 rounded-full flex items-center justify-center">
+            <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
+          </div>
           <div>
             <p className="font-semibold text-[var(--color-cream)]">{item.item_name}</p>
             <p className="text-[var(--color-body-text)] text-sm">Order #{item.id.substring(0, 8)}</p>
           </div>
         </div>
         <div className="text-right">
-          <p className="font-semibold text-[#F5A623]">
+          <p className="font-semibold text-[#1B5EA8]">
             {item.original_price ? `$${item.original_price.toFixed(2)}` : `$${item.price.toFixed(2)}`}
           </p>
           <DiscountBadge item={item} />
@@ -292,7 +294,7 @@ function OrderItem({ order }: { order: CoinPurchase | ItemPurchase }) {
         {isPaid && item.verification_token && (
           <button
             onClick={() => setShowQR(!showQR)}
-            className="text-xs px-3 py-1.5 min-h-[44px] rounded-full bg-[#6BAF7A]/20 border border-[#6BAF7A]/40 text-[#6BAF7A] hover:bg-[#6BAF7A]/30 transition-all duration-200 font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F5A623]"
+            className="text-xs px-3 py-1.5 min-h-[44px] rounded-full bg-[#6BAF7A]/20 border border-[#6BAF7A]/40 text-[#6BAF7A] hover:bg-[#6BAF7A]/30 transition-all duration-200 font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1B5EA8]"
           >
             {showQR ? 'Hide QR' : 'Show QR'}
           </button>
@@ -320,7 +322,9 @@ function SaleItem({ sale }: { sale: ItemPurchase }) {
     <div className="bg-[var(--color-charcoal-light)] border border-[var(--color-charcoal-lighter-plus)] rounded-lg p-4 hover:bg-[var(--color-charcoal-lighter)] hover:border-[#6BAF7A]/40 hover:shadow-lg hover:shadow-[#6BAF7A]/20 transition-all duration-200 active:scale-95">
       <div className="flex justify-between items-start">
         <div className="flex items-center gap-3 flex-1">
-          <div className="text-2xl">📦</div>
+          <div className="w-8 h-8 bg-green-500/10 rounded-full flex items-center justify-center">
+            <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
+          </div>
           <div>
             <p className="font-semibold text-[var(--color-cream)]">{sale.item_name}</p>
             <p className="text-[var(--color-body-text)] text-sm">Order #{sale.id.substring(0, 8)}</p>

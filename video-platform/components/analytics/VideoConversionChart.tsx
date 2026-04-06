@@ -18,11 +18,11 @@ interface VideoConversionChartProps {
 function ConversionTooltip({ active, payload, label }: { active?: boolean; payload?: { value: number; name: string }[]; label?: string }) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="bg-[var(--color-charcoal)]/90 border border-[var(--color-charcoal-lighter-plus)] rounded-lg p-3 shadow-lg">
-      <p className="text-[var(--color-cream)] text-sm font-semibold mb-1">{label}</p>
+    <div className="bg-[#1A1A1A]/90 border border-[#3A3A34] rounded-lg p-3 shadow-lg">
+      <p className="text-white text-sm font-semibold mb-1">{label}</p>
       {payload.map((p, idx) => (
-        <p key={idx} className="text-xs" style={{ color: p.name === 'views' ? '#F5A623' : '#6BAF7A' }}>
-          {p.name === 'views' ? '👁️' : '🛒'} {p.name}: {p.value}
+        <p key={idx} className="text-xs" style={{ color: p.name === 'views' ? '#1B5EA8' : '#6BAF7A' }}>
+          {p.name}: {p.value}
         </p>
       ))}
     </div>
@@ -40,21 +40,21 @@ export function VideoConversionChart({ data }: VideoConversionChartProps) {
 
   return (
     <div>
-      <h4 className="text-sm font-semibold text-[var(--color-cream)]/80 mb-3">🎯 Video Performance</h4>
+      <h4 className="text-sm font-semibold text-[#1A1A1A] mb-3">Video Performance</h4>
       <ResponsiveContainer width="100%" height={250}>
         <BarChart data={chartData} margin={{ top: 5, right: 10, left: -10, bottom: 5 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#ffffff08" />
+          <CartesianGrid strokeDasharray="3 3" stroke="#E8E8E4" />
           <XAxis
             dataKey="name"
-            tick={{ fill: 'var(--color-body-text)', fontSize: 10 }}
-            axisLine={{ stroke: '#ffffff08' }}
+            tick={{ fill: '#6B6B65', fontSize: 10 }}
+            axisLine={{ stroke: '#E8E8E4' }}
           />
           <YAxis
-            tick={{ fill: 'var(--color-body-text)', fontSize: 11 }}
-            axisLine={{ stroke: '#ffffff08' }}
+            tick={{ fill: '#6B6B65', fontSize: 11 }}
+            axisLine={{ stroke: '#E8E8E4' }}
           />
           <Tooltip content={<ConversionTooltip />} />
-          <Bar dataKey="views" fill="#F5A623" radius={[4, 4, 0, 0]} barSize={20} name="views" />
+          <Bar dataKey="views" fill="#1B5EA8" radius={[4, 4, 0, 0]} barSize={20} name="views" />
           <Bar dataKey="orders" fill="#6BAF7A" radius={[4, 4, 0, 0]} barSize={20} name="orders" />
         </BarChart>
       </ResponsiveContainer>

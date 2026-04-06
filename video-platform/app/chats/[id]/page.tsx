@@ -53,11 +53,11 @@ function ChatContent() {
   };
 
   return (
-    <div className="h-screen bg-transparent text-[var(--text-primary)] flex flex-col pb-16">
+    <div className="fixed inset-0 z-40 bg-white text-[#1A1A1A] flex flex-col">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-[var(--color-charcoal)]/80 backdrop-blur-md border-b border-[var(--glass-border)] px-4 py-4">
+      <div className="shrink-0 z-10 bg-white/80 backdrop-blur-md border-b border-[#E8E8E4] px-4 py-4">
         <div className="flex items-center gap-4">
-          <button onClick={() => router.back()} className="text-[var(--text-primary)]">
+          <button onClick={() => router.back()} className="text-[#1A1A1A]">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
@@ -67,15 +67,17 @@ function ChatContent() {
       </div>
 
       {/* Messages */}
-      <ChatWindow 
-        messages={messages} 
-        currentUserId={user?.id || ''} 
-        loading={loading}
-        messagesEndRef={messagesEndRef}
-      />
+      <div className="flex-1 min-h-0 overflow-y-auto">
+        <ChatWindow 
+          messages={messages} 
+          currentUserId={user?.id || ''} 
+          loading={loading}
+          messagesEndRef={messagesEndRef}
+        />
+      </div>
 
       {/* Message Input */}
-      <form onSubmit={handleSendMessage} className="sticky bottom-0 bg-[var(--color-charcoal)]/80 backdrop-blur-md border-t border-[var(--glass-border)] p-4">
+      <form onSubmit={handleSendMessage} className="shrink-0 bg-white/80 backdrop-blur-md border-t border-[#E8E8E4] p-4">
         <div className="flex gap-2">
           <input
             type="text"
@@ -83,12 +85,12 @@ function ChatContent() {
             onChange={(e) => setNewMessage(e.target.value)}
             placeholder="Type a message..."
             disabled={sending}
-            className="flex-1 bg-[var(--glass-bg)] border border-[var(--glass-border)] rounded-lg px-4 py-3 text-[var(--text-primary)] placeholder-[var(--placeholder)] focus:outline-none focus:border-[var(--glass-border-focus)] disabled:opacity-50"
+            className="flex-1 bg-[#F8F8F6] border border-[#E8E8E4] rounded-lg px-4 py-3 text-[#1A1A1A] placeholder-[#9E9A90] focus:outline-none focus:border-[#1A1A1A]/30 disabled:opacity-50"
           />
           <button
             type="submit"
             disabled={!newMessage.trim() || sending}
-            className="bg-white text-black px-6 py-3 rounded-lg font-semibold disabled:bg-[var(--glass-bg-strong)] disabled:text-[var(--text-muted)] disabled:cursor-not-allowed hover:bg-white/90 transition-all duration-200 active:scale-95"
+            className="bg-[#1A1A1A] text-white px-6 py-3 rounded-lg font-semibold disabled:bg-[#E8E8E4] disabled:text-[#9E9A90] disabled:cursor-not-allowed hover:bg-[#1A1A1A]/90 transition-all duration-200 active:scale-95"
           >
             {sending ? 'Sending...' : 'Send'}
           </button>

@@ -210,15 +210,12 @@ export function PostedVideos({ userId, isOwnProfile = true }: PostedVideosProps)
               {/* Stats */}
               <div className="flex gap-4 text-xs">
                 <div className="flex items-center gap-1 text-[var(--text-secondary)]">
-                  <span>👁️</span>
                   <span>{video.views} views</span>
                 </div>
                 <div className="flex items-center gap-1 text-[var(--text-secondary)]">
-                  <span>❤️</span>
                   <span>{video.likes} likes</span>
                 </div>
                 <div className="flex items-center gap-1 text-[var(--text-secondary)]">
-                  <span>💬</span>
                   <span>{video.comments} comments</span>
                 </div>
               </div>
@@ -226,7 +223,7 @@ export function PostedVideos({ userId, isOwnProfile = true }: PostedVideosProps)
             {/* Boost Info */}
             {video.boost_value && video.boost_value > 1 && (
               <div className="mt-2 inline-flex items-center gap-1 bg-yellow-500/20 border border-yellow-500/50 rounded px-2 py-1">
-                <span className="text-xs text-yellow-300">🚀 Boosted</span>
+                <span className="text-xs text-yellow-300">Boosted</span>
                 <span className="text-xs text-yellow-300/70">
                   (Boost: {video.boost_value.toFixed(1)})
                 </span>
@@ -242,7 +239,7 @@ export function PostedVideos({ userId, isOwnProfile = true }: PostedVideosProps)
                   className="text-yellow-400 hover:text-yellow-300 transition-colors text-sm font-medium px-3 py-1.5 rounded hover:bg-yellow-500/10"
                   title="Boost this video"
                 >
-                  🚀 Boost
+                  Boost
                 </button>
                 <button
                   onClick={() => deleteVideo(video.id)}
@@ -250,7 +247,7 @@ export function PostedVideos({ userId, isOwnProfile = true }: PostedVideosProps)
                   className="text-red-400 hover:text-red-300 transition-colors text-sm font-medium px-3 py-1.5 rounded hover:bg-red-500/10 disabled:opacity-50 disabled:cursor-not-allowed"
                   title="Delete this video"
                 >
-                  {deletingVideoId === video.id ? '...' : '🗑️ Delete'}
+                  {deletingVideoId === video.id ? '...' : 'Delete'}
                 </button>
               </div>
             )}

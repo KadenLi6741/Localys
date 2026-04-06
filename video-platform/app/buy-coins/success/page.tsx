@@ -48,7 +48,9 @@ function CheckoutSuccessContent() {
       <div className="max-w-md w-full">
         <div className="bg-[var(--glass-bg-subtle)] border border-green-500/30 rounded-lg p-8 text-center">
           {/* Success Icon */}
-          <div className="text-6xl mb-4">✅</div>
+          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-green-500/20 flex items-center justify-center">
+            <svg className="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+          </div>
 
           <h1 className="text-3xl font-bold mb-2 text-green-400">Order Confirmed!</h1>
           <p className="text-[var(--text-tertiary)] mb-8">

@@ -158,12 +158,10 @@ export function AppBottomNav() {
   ];
 
   return (
-    <nav className={`fixed bottom-0 left-0 right-0 z-30 border-t border-[var(--color-charcoal-lighter-plus)] lg:hidden ${
-      pathname === '/' ? 'bg-[var(--color-charcoal)]/80 backdrop-blur-md' : 'bg-charcoal'
-    }`}>
+    <nav className="fixed bottom-0 left-0 right-0 z-30 border-t border-[#E8E8E4] lg:hidden bg-white/95 backdrop-blur-md">
       {/* Animated Indicator Bar */}
       <div
-        className="absolute bottom-0 h-1 bg-[#F5A623] transition-all duration-200 ease-out"
+        className="absolute top-0 h-[2px] bg-[#1A1A1A] transition-all duration-200 ease-out"
         style={{
           left: indicatorStyle.left,
           width: indicatorStyle.width,
@@ -191,15 +189,15 @@ export function AppBottomNav() {
             return (
               <div key={item.href} data-nav-item>
                 <Link href={item.href} className="relative flex flex-col items-center gap-1 transition-colors duration-200 hover:scale-105 active:scale-95">
-                  <svg className={`h-6 w-6 ${isActive(item.href) ? 'text-[var(--color-cream)]' : 'text-[var(--color-body-text)]'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className={`h-6 w-6 ${isActive(item.href) ? 'text-[#1A1A1A]' : 'text-[#6B6B65]'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     {item.icon}
                   </svg>
                   {cartCount > 0 && (
-                    <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#F5A623] text-[10px] font-bold text-charcoal">
+                    <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#1A1A1A] text-[10px] font-bold text-white">
                       {cartCount}
                     </span>
                   )}
-                  <span className={`text-xs ${isActive(item.href) ? 'text-[var(--color-cream)]' : 'text-[var(--color-body-text)]'}`}>{item.label}</span>
+                  <span className={`text-xs ${isActive(item.href) ? 'text-[#1A1A1A] font-medium' : 'text-[#6B6B65]'}`} style={{ fontFamily: 'var(--font-serif)' }}>{item.label}</span>
                 </Link>
               </div>
             );
@@ -218,19 +216,19 @@ export function AppBottomNav() {
 }
 
 function NavItem({ href, label, active, icon, fillIcon = false, onClick, badge }: { href: string; label: string; active: boolean; icon: React.ReactNode; fillIcon?: boolean; onClick?: (e: React.MouseEvent) => void; badge?: number }) {
-  const colorClass = active ? 'text-[var(--color-cream)]' : 'text-[var(--color-body-text)]';
+  const colorClass = active ? 'text-[#1A1A1A]' : 'text-[#6B6B65]';
 
   return (
-    <Link href={href} onClick={onClick} className="relative flex flex-col items-center gap-1 transition-colors duration-200 hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F5A623] rounded-lg p-1" aria-label={label}>
+    <Link href={href} onClick={onClick} className="relative flex flex-col items-center gap-1 transition-colors duration-200 hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] rounded-lg p-1" aria-label={label}>
       <svg className={`h-6 w-6 ${colorClass}`} fill={fillIcon ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
         {icon}
       </svg>
       {badge !== undefined && badge > 0 && (
-        <span className="absolute -top-1 -right-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-[#F5A623] text-[10px] font-bold text-[#1A1A18] px-0.5">
+        <span className="absolute -top-1 -right-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-[#1A1A1A] text-[10px] font-bold text-white px-0.5">
           {badge > 9 ? '9+' : badge}
         </span>
       )}
-      <span className={`text-xs ${colorClass}`}>{label}</span>
+      <span className={`text-xs ${active ? 'font-medium' : ''} ${colorClass}`} style={{ fontFamily: 'var(--font-serif)' }}>{label}</span>
     </Link>
   );
 }

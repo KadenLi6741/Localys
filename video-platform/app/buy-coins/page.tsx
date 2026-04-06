@@ -164,7 +164,7 @@ export default function BuyCoinsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-transparent text-[var(--text-primary)] p-4">
+    <div className="min-h-screen bg-white text-[#1A1A1A] pb-24 lg:pb-8 p-4">
       <div className="w-full px-4 lg:px-12">
         {/* Header */}
         <div className="mb-12">
@@ -181,7 +181,7 @@ export default function BuyCoinsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-[var(--text-tertiary)] text-sm">Current Balance</p>
-                <p className="text-3xl font-bold">🪙 {coinBalance.toLocaleString()}</p>
+                <p className="text-3xl font-bold">{coinBalance.toLocaleString()}</p>
               </div>
               <div className="text-right">
                 <p className="text-[var(--text-tertiary)] text-sm mb-2">Need coins?</p>
@@ -193,9 +193,9 @@ export default function BuyCoinsPage() {
 
         {/* Stripe Configuration Warning */}
         {!stripeConfigured && (
-          <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4 mb-8">
-            <p className="text-yellow-400 text-sm">
-              ⚠️ <strong>Payment system not configured.</strong> The administrator needs to set up Stripe API keys.
+          <div className="bg-[#1B5EA8]/10 border border-[#1B5EA8]/30 rounded-lg p-4 mb-8">
+            <p className="text-[#1B5EA8] text-sm">
+              <strong>Payment system not configured.</strong> The administrator needs to set up Stripe API keys.
             </p>
           </div>
         )}
@@ -203,7 +203,7 @@ export default function BuyCoinsPage() {
         {/* Available Coupons */}
         {availableCoupons.length > 0 && (
           <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-6 mb-8">
-            <h3 className="text-lg font-semibold mb-4">🎉 Available Coupons</h3>
+            <h3 className="text-lg font-semibold mb-4">Available Coupons</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {availableCoupons.map((coupon) => {
                 const couponData = (coupon.coupon as any);
@@ -247,7 +247,7 @@ export default function BuyCoinsPage() {
         {error && (
           <div className="fixed inset-0 bg-[var(--color-charcoal)]/60 flex items-center justify-center p-4 z-50">
             <div className="bg-[var(--glass-bg)] backdrop-blur-sm border border-red-500/50 rounded-lg p-8 max-w-sm w-full text-center">
-              <div className="text-4xl mb-4">⚠️</div>
+              <div className="text-4xl mb-4">!</div>
               <h2 className="text-xl font-bold mb-2">Currently This Option Is Not Available</h2>
               <p className="text-[var(--text-tertiary)] mb-6 text-sm">{error}</p>
               <button
@@ -267,13 +267,13 @@ export default function BuyCoinsPage() {
               key={pkg.id}
               className={`relative rounded-lg border transition-all ${
                 pkg.popular
-                  ? 'border-yellow-500 bg-yellow-500/5 ring-2 ring-yellow-500/30'
+                  ? 'border-[#1B5EA8] bg-[#1B5EA8]/5 ring-2 ring-[#1B5EA8]/30'
                   : 'border-[var(--glass-border)] bg-[var(--glass-bg-subtle)] hover:border-[var(--glass-border)]'
               }`}
             >
               {pkg.popular && (
                 <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                  <span className="bg-yellow-500 text-black px-3 py-1 rounded-full text-xs font-bold">
+                  <span className="bg-[#1B5EA8] text-white px-3 py-1 rounded-full text-xs font-bold">
                     MOST POPULAR
                   </span>
                 </div>
@@ -282,8 +282,8 @@ export default function BuyCoinsPage() {
               <div className="p-8 pt-10">
                 {/* Coins */}
                 <div className="text-center mb-4">
-                  <div className="text-5xl font-bold mb-2">🪙</div>
-                  <p className="text-3xl font-bold text-yellow-400">{pkg.coins.toLocaleString()}</p>
+                  <div className="text-5xl font-bold mb-2 text-[#1B5EA8]">C</div>
+                  <p className="text-3xl font-bold text-[#1B5EA8]">{pkg.coins.toLocaleString()}</p>
                   <p className="text-[var(--text-tertiary)] text-sm mt-2">{pkg.description}</p>
                 </div>
 
@@ -308,7 +308,7 @@ export default function BuyCoinsPage() {
                   disabled={processing || selectedPackage === pkg.id || !stripeConfigured}
                   className={`w-full py-3 rounded-lg font-semibold transition-all ${
                     pkg.popular
-                      ? 'bg-yellow-500 text-black hover:bg-yellow-400 disabled:bg-yellow-500/50'
+                      ? 'bg-[#1B5EA8] text-white hover:bg-[#1B5EA8]/90 disabled:bg-[#1B5EA8]/50'
                       : 'bg-[var(--glass-bg)] text-[var(--text-primary)] hover:bg-[var(--glass-bg-strong)] disabled:bg-[var(--glass-bg-subtle)]'
                   } disabled:cursor-not-allowed`}
                 >

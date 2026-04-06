@@ -11,7 +11,7 @@ function CheckoutContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { user } = useAuth();
-  const { items: cartItems, clearCart } = useCart();
+  const { items: cartItems, clearCart, loaded: cartLoaded } = useCart();
 
   const [checkoutItems, setCheckoutItems] = useState<CartItem[]>([]);
   const [coupons, setCoupons] = useState<Coupon[]>([]);
@@ -27,6 +27,9 @@ function CheckoutContent() {
       router.push('/login');
       return;
     }
+
+    // Wait for cart to finish loading from localStorage
+    if (!cartLoaded) return;
 
     if (source === 'cart') {
       // Coming from cart page
@@ -53,7 +56,7 @@ function CheckoutContent() {
       }
     }
     setLoading(false);
-  }, [user, source, searchParams, cartItems, router]);
+  }, [user, source, searchParams, cartItems, cartLoaded, router]);
 
   // Get unique seller IDs and fetch their coupons
   useEffect(() => {

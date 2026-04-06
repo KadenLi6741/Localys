@@ -22,14 +22,7 @@ export function useChats(userId: string | undefined) {
       if (fetchError) {
         const msg = fetchError instanceof Error ? fetchError.message : String(fetchError);
         console.error('useChats: fetchError returned:', fetchError);
-        // Network-level failure — show empty state, not error UI
-        if (msg.includes('Failed to fetch') || msg.includes('NetworkError') || msg.includes('fetch')) {
-          console.warn('useChats: Network error loading chats — showing empty state');
-          setChats([]);
-          setLoading(false);
-          return;
-        }
-        throw fetchError;
+        throw fetchError instanceof Error ? fetchError : new Error(msg || 'Failed to load chats');
       }
       
       if (!data) {
@@ -44,12 +37,8 @@ export function useChats(userId: string | undefined) {
       const errorMsg = err instanceof Error ? err.message : JSON.stringify(err);
       console.error('Error loading chats:', errorMsg, err);
       setChats([]);
-      // Only set error state for non-network failures (network failures show empty state silently)
-      const isNetworkError = errorMsg.includes('Failed to fetch') || errorMsg.includes('NetworkError') || errorMsg.includes('fetch');
-      if (!isNetworkError) {
-        const finalError = err instanceof Error ? err : new Error(errorMsg || 'Unknown error loading chats');
-        setError(finalError);
-      }
+      const finalError = err instanceof Error ? err : new Error(errorMsg || 'Unknown error loading chats');
+      setError(finalError);
     } finally {
       setLoading(false);
     }

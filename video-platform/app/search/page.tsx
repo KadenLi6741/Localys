@@ -209,48 +209,48 @@ function SearchContent() {
     : results;
 
   return (
-    <div className="min-h-screen bg-[var(--color-charcoal)] text-foreground pb-20">
+    <div className="min-h-screen bg-white text-[#1A1A1A] pb-24 lg:pb-8">
       <StarSymbolDefs />
 
       {/* Header */}
-      <div className="sticky top-0 z-10 border-b border-[var(--border-color)] bg-[var(--surface-overlay)] backdrop-blur-md">
+      <div className="sticky top-0 z-10 border-b border-[#E8E8E4] bg-white/95 backdrop-blur-md">
         <div className="w-full px-4 lg:px-12 py-4 flex items-center justify-between gap-4">
-          <h1 className="entrance-slide text-2xl font-bold" style={{ animation: 'slideInLeft 0.4s ease-out forwards', opacity: 0 }}>Search</h1>
+          <h1 className="text-2xl font-bold text-[#1A1A1A]">Search</h1>
           <ThemeToggle />
         </div>
       </div>
 
       {/* Search Content */}
-      <div className="entrance-fade w-full px-4 lg:px-12 py-8" style={{ animation: 'fadeInUp 0.4s ease-out 0.1s forwards', opacity: 0 }}>
+      <div className="w-full px-4 lg:px-12 py-8" style={{ animation: 'fadeInUp 0.4s ease-out 0.1s forwards', opacity: 0 }}>
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-[420px_minmax(0,1fr)] lg:gap-8">
           <aside className="space-y-6 pr-1 lg:sticky lg:top-24 lg:self-start lg:h-[calc(100dvh-8.5rem)] lg:overflow-hidden lg:pr-2">
             {/* Search Mode Toggle */}
-            <div className="flex rounded-xl border border-[var(--border-color)] bg-[var(--surface-1)] p-1">
+            <div className="flex rounded-xl border border-[#E8E8E4] bg-[#F8F8F6] p-1">
               <button
                 onClick={() => setSearchMode('businesses')}
                 className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all ${
                   searchMode === 'businesses'
-                    ? 'bg-[#F5A623] text-black shadow-sm'
-                    : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)]'
+                    ? 'bg-[#1B5EA8] text-white shadow-sm'
+                    : 'text-[#6B6B65] hover:text-[#1A1A1A]'
                 }`}
               >
-                🏪 Businesses
+                Businesses
               </button>
               <button
                 onClick={() => setSearchMode('videos')}
                 className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all ${
                   searchMode === 'videos'
-                    ? 'bg-[#F5A623] text-black shadow-sm'
-                    : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)]'
+                    ? 'bg-[#1B5EA8] text-white shadow-sm'
+                    : 'text-[#6B6B65] hover:text-[#1A1A1A]'
                 }`}
               >
-                🎬 Videos
+                Videos
               </button>
             </div>
 
             {/* Search Bar */}
-            <div className="mx-1 flex gap-2 rounded-xl border border-[var(--border-color)] bg-[var(--surface-1)] px-4 py-3 transition-all duration-200 hover:bg-[var(--surface-2)]">
-              <svg className="mt-0.5 h-5 w-5 flex-shrink-0 text-[var(--muted-foreground)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="mx-1 flex gap-2 rounded-xl border border-[#E8E8E4] bg-white px-4 py-4 transition-all duration-200 hover:border-[#1B5EA8] focus-within:border-[#1B5EA8] focus-within:ring-2 focus-within:ring-[#1B5EA8]/20">
+              <svg className="mt-0.5 h-5 w-5 flex-shrink-0 text-[#6B6B65]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
               <input
@@ -259,14 +259,14 @@ function SearchContent() {
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 placeholder={searchMode === 'businesses' ? 'Search businesses, cuisine, keywords...' : 'Search videos by keywords, business name...'}
-                className="min-w-0 flex-1 bg-transparent text-[var(--foreground)] placeholder-[var(--muted-foreground)] outline-none"
+                className="min-w-0 flex-1 bg-transparent text-[#1A1A1A] text-lg placeholder-[#9E9A90] outline-none"
                 aria-label="Search"
                 autoFocus
               />
               <button
                 onClick={handleSearch}
                 disabled={loading}
-                className="flex-shrink-0 rounded-lg bg-[var(--foreground)] px-4 py-2 font-semibold text-[var(--background)] transition-all duration-200 hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F5A623]"
+                className="flex-shrink-0 rounded-lg bg-[#1B5EA8] px-5 py-2 font-semibold text-white transition-all duration-200 hover:bg-[#1B5EA8]/90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1B5EA8]"
               >
                 {loading ? '...' : 'Search'}
               </button>
@@ -278,7 +278,7 @@ function SearchContent() {
                 <h2 className="text-lg font-semibold">Filters</h2>
                 <div className="flex gap-3 items-center">
                   {hasActiveFilters && (
-                    <button onClick={clearAllFilters} className="text-sm text-[#F5A623] hover:text-[#F5A623]/80">
+                    <button onClick={clearAllFilters} className="text-sm text-[#1B5EA8] hover:text-[#1B5EA8]/80">
                       Clear All
                     </button>
                   )}
@@ -294,7 +294,7 @@ function SearchContent() {
                 </div>
               </div>
 
-              <div className="space-y-4 rounded-xl border border-[var(--border-color)] bg-[var(--surface-1)] p-4">
+              <div className={`space-y-4 rounded-xl border border-[#E8E8E4] bg-[#F8F8F6] p-4 transition-all duration-300 ease-out ${showAdvancedFilters ? 'opacity-100' : ''}`}>
                 {/* Category Filter */}
                 <div>
                   <label className="block text-sm font-medium mb-2">Category</label>
@@ -305,8 +305,8 @@ function SearchContent() {
                         onClick={() => handleCategoryChange(cat)}
                         className={`py-2 px-3 rounded-lg text-sm font-medium transition-all ${
                           category === cat
-                            ? 'bg-[#F5A623] text-black'
-                            : 'bg-[var(--surface-2)] text-[var(--muted-foreground)] hover:text-[var(--foreground)]'
+                            ? 'bg-[#1B5EA8] text-white'
+                            : 'bg-white text-[#6B6B65] hover:text-[#1A1A1A] border border-[#E8E8E4]'
                         }`}
                       >
                         {cat === '' ? 'All' : cat === 'service' ? 'Services' : cat.charAt(0).toUpperCase() + cat.slice(1)}
@@ -336,7 +336,7 @@ function SearchContent() {
                     <button
                       type="button"
                       onClick={() => setMinRating(undefined)}
-                      className="ml-2 text-xs text-[#F5A623] hover:text-[#F5A623]/80"
+                      className="ml-2 text-xs text-[#1B5EA8] hover:text-[#1B5EA8]/80"
                     >
                       Any
                     </button>
@@ -356,7 +356,7 @@ function SearchContent() {
                     <div className="absolute left-0 right-0 h-1.5 rounded-full bg-[var(--glass-bg)]" />
                     {/* Active range highlight */}
                     <div
-                      className="absolute h-1.5 rounded-full bg-[#F5A623]"
+                      className="absolute h-1.5 rounded-full bg-[#1B5EA8]"
                       style={{
                         left: `${(priceRange[0] / 1000) * 100}%`,
                         right: `${100 - (priceRange[1] / 1000) * 100}%`,
@@ -405,8 +405,8 @@ function SearchContent() {
                         onClick={() => handleDistanceFilter(opt.km)}
                         className={`px-4 py-2 rounded-full text-xs font-semibold transition-all duration-200 transform hover:scale-105 active:scale-95 ${
                           distanceFilter === opt.km
-                            ? 'bg-[#F5A623] text-black shadow-md shadow-[#F5A623]/40'
-                            : 'bg-[var(--color-charcoal-light)] border border-[var(--color-charcoal-lighter-plus)] text-[var(--color-cream)] hover:border-[#F5A623] hover:shadow-md hover:shadow-[#F5A623]/20'
+                            ? 'bg-[#1B5EA8] text-white shadow-md shadow-[#1B5EA8]/40'
+                            : 'bg-white border border-[#E8E8E4] text-[#6B6B65] hover:border-[#1B5EA8] hover:shadow-md hover:shadow-[#1B5EA8]/20'
                         }`}
                       >
                         {opt.label}
@@ -417,10 +417,9 @@ function SearchContent() {
               </div>
 
               {/* Advanced Filters */}
-              {showAdvancedFilters && (
-                <div className="space-y-4">
+              <div className={`space-y-4 overflow-hidden transition-all duration-300 ease-out ${showAdvancedFilters ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'}`}>
                   {/* Cuisine Type */}
-                  <FilterSection title="🍽️ Cuisine Type">
+                  <FilterSection title="Cuisine Type">
                     <div className="flex flex-wrap gap-2">
                       {CUISINE_TYPES.map((c) => (
                         <ChipButton key={c} label={c} active={cuisineType === c} onClick={() => setCuisineType(cuisineType === c ? '' : c)} />
@@ -429,7 +428,7 @@ function SearchContent() {
                   </FilterSection>
 
                   {/* Formality */}
-                  <FilterSection title="🏠 Formality">
+                  <FilterSection title="Formality">
                     <div className="flex flex-wrap gap-2">
                       {FORMALITY_TYPES.map((f) => (
                         <ChipButton key={f} label={f} active={formality === f} onClick={() => setFormality(formality === f ? '' : f)} />
@@ -438,7 +437,7 @@ function SearchContent() {
                   </FilterSection>
 
                   {/* Special Types */}
-                  <FilterSection title="🧁 Special Types">
+                  <FilterSection title="Special Types">
                     <div className="flex flex-wrap gap-2">
                       {SPECIAL_TYPES.map((s) => (
                         <ChipButton key={s} label={s} active={specialType === s} onClick={() => setSpecialType(specialType === s ? '' : s)} />
@@ -447,7 +446,7 @@ function SearchContent() {
                   </FilterSection>
 
                   {/* Dietary */}
-                  <FilterSection title="🥗 Dietary & Health">
+                  <FilterSection title="Dietary & Health">
                     <div className="flex flex-wrap gap-2">
                       {DIETARY_OPTIONS.map((d) => (
                         <ChipButton key={d} label={d} active={dietary.includes(d)} onClick={() => toggleArrayFilter(dietary, setDietary, d)} />
@@ -456,29 +455,29 @@ function SearchContent() {
                   </FilterSection>
 
                   {/* Location */}
-                  <FilterSection title="📍 Location">
+                  <FilterSection title="Location">
                     <div className="space-y-3">
                       <button
                         onClick={handleNearMe}
                         className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                          nearMe ? 'bg-[#F5A623] text-black' : 'bg-[var(--surface-2)] text-[var(--muted-foreground)] hover:text-[var(--foreground)]'
+                          nearMe ? 'bg-[#1B5EA8] text-white' : 'bg-white text-[#6B6B65] border border-[#E8E8E4] hover:text-[#1A1A1A]'
                         }`}
                       >
-                        📍 Near Me
+                        Near Me
                       </button>
                       {nearMe && (
                         <div>
                           <label className="mb-1 block text-sm text-[var(--muted-foreground)]">Radius: {radius} km</label>
                           <input type="range" min="1" max="50" value={radius}
                             onChange={(e) => setRadius(Number(e.target.value))}
-                            className="w-full accent-[#F5A623]" />
+                            className="w-full accent-[#1B5EA8]" />
                         </div>
                       )}
                     </div>
                   </FilterSection>
 
                   {/* Restaurant Features */}
-                  <FilterSection title="🪑 Restaurant Features">
+                  <FilterSection title="Restaurant Features">
                     <div className="flex flex-wrap gap-2">
                       {FEATURE_OPTIONS.map((f) => (
                         <ChipButton key={f} label={f} active={features.includes(f)} onClick={() => toggleArrayFilter(features, setFeatures, f)} />
@@ -487,7 +486,7 @@ function SearchContent() {
                   </FilterSection>
 
                   {/* Food & Drink */}
-                  <FilterSection title="🍺 Food & Drink Options">
+                  <FilterSection title="Food & Drink Options">
                     <div className="flex flex-wrap gap-2">
                       {DRINK_OPTIONS.map((d) => (
                         <ChipButton key={d} label={d} active={features.includes(d)} onClick={() => toggleArrayFilter(features, setFeatures, d)} />
@@ -496,7 +495,7 @@ function SearchContent() {
                   </FilterSection>
 
                   {/* Amenities */}
-                  <FilterSection title="📶 Amenities">
+                  <FilterSection title="Amenities">
                     <div className="flex flex-wrap gap-2">
                       {AMENITY_OPTIONS.map((a) => (
                         <ChipButton key={a} label={a} active={amenities.includes(a)} onClick={() => toggleArrayFilter(amenities, setAmenities, a)} />
@@ -505,7 +504,7 @@ function SearchContent() {
                   </FilterSection>
 
                   {/* Payment */}
-                  <FilterSection title="💳 Payment & Policies">
+                  <FilterSection title="Payment & Policies">
                     <div className="flex flex-wrap gap-2">
                       {PAYMENT_OPTIONS.map((p) => (
                         <ChipButton key={p} label={p} active={payment.includes(p)} onClick={() => toggleArrayFilter(payment, setPayment, p)} />
@@ -514,7 +513,7 @@ function SearchContent() {
                   </FilterSection>
 
                   {/* Modern Tags */}
-                  <FilterSection title="✨ More">
+                  <FilterSection title="More">
                     <div className="flex flex-wrap gap-2">
                       {MODERN_TAGS.map((t) => (
                         <ChipButton key={t} label={t} active={tags.includes(t)} onClick={() => toggleArrayFilter(tags, setTags, t)} />
@@ -522,7 +521,6 @@ function SearchContent() {
                     </div>
                   </FilterSection>
                 </div>
-              )}
             </div>
           </aside>
 
@@ -533,7 +531,7 @@ function SearchContent() {
                 {loading ? 'Searching...' : hasSearched ? `Results (${filteredResults.length})` : 'Search Results'}
               </h2>
               {category && (
-                <p className="text-sm text-[#F5A623]">
+                <p className="text-sm text-[#1B5EA8]">
                   Filtering by: <span className="font-semibold capitalize">{category}</span>
                 </p>
               )}
@@ -587,38 +585,33 @@ function SearchContent() {
             {(!hasSearched || results.length === 0) && (
               <div className="mt-12 pt-8 border-t border-[var(--border-color)]">
                 <h3 className="mb-6 text-lg font-semibold">
-                  {searchMode === 'businesses' ? '🌟 Popular Categories' : '🎬 Popular Videos'}
+                  {searchMode === 'businesses' ? 'Popular Categories' : 'Popular Videos'}
                 </h3>
                 <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
                   {searchMode === 'businesses' ? (
                     <>
-                      {['🍔 Food', '🛍️ Retail', '💇 Services', '☕ Cafes', '🍕 Pizza', '🥘 Mexican', '🍜 Asian', '🍰 Bakery'].map((cat) => (
+                      {['Food', 'Retail', 'Services', 'Cafes', 'Pizza', 'Mexican', 'Asian', 'Bakery'].map((cat) => (
                         <button
                           key={cat}
                           onClick={() => {
-                            const category = cat.split(' ')[1];
-                            if (category.length > 0) {
-                              setQuery(category);
-                              setCuisineType(category);
-                            }
+                            setQuery(cat);
+                            setCuisineType(cat);
                           }}
-                          className="rounded-lg border border-[var(--border-color)] bg-gradient-to-br from-[var(--surface-1)] to-[var(--surface-2)] p-4 text-center transition-all duration-200 hover:border-[#F5A623] hover:shadow-md hover:shadow-[#F5A623]/20 active:scale-95"
+                          className="rounded-lg border border-[var(--border-color)] bg-gradient-to-br from-[var(--surface-1)] to-[var(--surface-2)] p-4 text-center transition-all duration-200 hover:border-[#1B5EA8] hover:shadow-md hover:shadow-[#1B5EA8]/20 active:scale-95"
                         >
-                          <span className="text-lg">{cat.split(' ')[0]}</span>
-                          <p className="mt-2 text-sm font-medium text-[#F5A623]">{cat.split(' ')[1]}</p>
+                          <p className="text-sm font-medium text-[#1B5EA8]">{cat}</p>
                         </button>
                       ))}
                     </>
                   ) : (
                     <>
-                      {['🎥 Trending', '👨‍🍳 Cooking', '🍽️ Food Reviews', '💼 Business', '🌍 Travel', '🎨 Creative', '🎵 Music', '🏪 Shopping'].map((cat) => (
+                      {['Trending', 'Cooking', 'Food Reviews', 'Business', 'Travel', 'Creative', 'Music', 'Shopping'].map((cat) => (
                         <button
                           key={cat}
-                          onClick={() => setQuery(cat.split(' ').slice(1).join(' '))}
-                          className="rounded-lg border border-[var(--border-color)] bg-gradient-to-br from-[var(--surface-1)] to-[var(--surface-2)] p-4 text-center transition-all duration-200 hover:border-[#F5A623] hover:shadow-md hover:shadow-[#F5A623]/20 active:scale-95"
+                          onClick={() => setQuery(cat)}
+                          className="rounded-lg border border-[var(--border-color)] bg-gradient-to-br from-[var(--surface-1)] to-[var(--surface-2)] p-4 text-center transition-all duration-200 hover:border-[#1B5EA8] hover:shadow-md hover:shadow-[#1B5EA8]/20 active:scale-95"
                         >
-                          <span className="text-lg">{cat.split(' ')[0]}</span>
-                          <p className="mt-2 text-sm font-medium text-[#F5A623]">{cat.split(' ').slice(1).join(' ')}</p>
+                          <p className="text-sm font-medium text-[#1B5EA8]">{cat}</p>
                         </button>
                       ))}
                     </>
@@ -641,8 +634,8 @@ function SearchContent() {
 
 function FilterSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="rounded-xl border border-[var(--border-color)] bg-[var(--surface-1)] p-4">
-      <label className="block text-sm font-medium mb-3">{title}</label>
+    <div className="rounded-xl border border-[#E8E8E4] bg-[#F8F8F6] p-4">
+      <label className="block text-sm font-medium mb-3 text-[#1A1A1A]">{title}</label>
       {children}
     </div>
   );
@@ -654,8 +647,8 @@ function ChipButton({ label, active, onClick }: { label: string; active: boolean
       onClick={onClick}
       className={`px-4 py-2 rounded-full text-xs font-semibold transition-all duration-200 transform hover:scale-105 active:scale-95 ${
         active
-          ? 'bg-[#F5A623] text-black shadow-md shadow-[#F5A623]/40 hover:shadow-lg hover:shadow-[#F5A623]/50'
-          : 'bg-[var(--color-charcoal-light)] border border-[var(--color-charcoal-lighter-plus)] text-[var(--color-cream)] hover:border-[#F5A623] hover:shadow-md hover:shadow-[#F5A623]/20 active:scale-95'
+          ? 'bg-[#1B5EA8] text-white shadow-md shadow-[#1B5EA8]/40 hover:shadow-lg hover:shadow-[#1B5EA8]/50'
+          : 'bg-white border border-[#E8E8E4] text-[#6B6B65] hover:border-[#1B5EA8] hover:shadow-md hover:shadow-[#1B5EA8]/20 active:scale-95'
       }`}
     >
       {label}
@@ -736,7 +729,7 @@ function BusinessResultCard({
 
   return (
     <div
-      className="search-result-card group relative block cursor-pointer rounded-xl border border-[var(--color-charcoal-lighter-plus)] bg-[var(--color-charcoal-light)] p-4 transition-all duration-200 hover:bg-[var(--color-charcoal-lighter)] hover:border-[#F5A623] hover:shadow-lg hover:shadow-[#F5A623]/20"
+      className="search-result-card group relative block cursor-pointer rounded-xl border border-[#E8E8E4] bg-white p-4 transition-all duration-200 hover:bg-[#F8F8F6] hover:border-[#1B5EA8] hover:shadow-lg hover:shadow-[#1B5EA8]/20"
       onMouseEnter={() => onHover(business)}
       onMouseLeave={() => onHover(null)}
       onClick={handleClick}
@@ -747,7 +740,7 @@ function BusinessResultCard({
           {business.profile_picture_url ? (
             <img src={business.profile_picture_url} alt={business.business_name} className="w-full h-full object-cover" />
           ) : (
-            <span className="text-2xl">🏪</span>
+            <span className="text-sm font-semibold text-[#6B6B65]">B</span>
           )}
         </div>
 
@@ -756,7 +749,7 @@ function BusinessResultCard({
 
           <div className="mt-1 flex flex-wrap items-center gap-2 text-sm text-[var(--muted-foreground)]">
             {business.average_rating != null && (
-              <span>⭐ {Number(business.average_rating).toFixed(1)}</span>
+              <span>{Number(business.average_rating).toFixed(1)}</span>
             )}
             {business.total_reviews != null && (
               <span>({business.total_reviews} reviews)</span>
@@ -767,12 +760,12 @@ function BusinessResultCard({
               </span>
             )}
             {distance != null && (
-              <span>📍 {distance.toFixed(1)} km</span>
+              <span>{distance.toFixed(1)} km</span>
             )}
           </div>
 
           {avgPrice && (
-            <p className="text-xs text-[#F5A623] mt-1">💰 {avgPrice}</p>
+            <p className="text-xs text-[#1B5EA8] mt-1">{avgPrice}</p>
           )}
         </div>
       </div>
@@ -784,7 +777,7 @@ function BusinessResultCard({
             <div>
               <p className="text-xs text-[var(--muted-foreground)]">Rating</p>
               <p className="font-medium text-[var(--foreground)]">
-                {business.average_rating ? `⭐ ${Number(business.average_rating).toFixed(1)} / 5` : 'No ratings yet'}
+                {business.average_rating ? `${Number(business.average_rating).toFixed(1)} / 5` : 'No ratings yet'}
               </p>
             </div>
             <div>
@@ -824,7 +817,7 @@ function VideoResultCard({ result, query }: { result: any; query: string }) {
   return (
     <Link
       href={`/video/${result.id}`}
-      className="search-result-card group block rounded-xl border border-[var(--color-charcoal-lighter-plus)] bg-[var(--color-charcoal-light)] p-4 transition-all duration-200 hover:bg-[var(--color-charcoal-lighter)] hover:border-[#F5A623] hover:shadow-lg hover:shadow-[#F5A623]/20"
+      className="search-result-card group block rounded-xl border border-[#E8E8E4] bg-white p-4 transition-all duration-200 hover:bg-[#F8F8F6] hover:border-[#1B5EA8] hover:shadow-lg hover:shadow-[#1B5EA8]/20"
     >
       <div className="flex gap-4">
         <div className="relative w-32 h-24 rounded-lg overflow-hidden flex-shrink-0">
@@ -853,7 +846,7 @@ function VideoResultCard({ result, query }: { result: any; query: string }) {
           <div className="mb-2 flex items-center gap-3 text-sm text-[var(--foreground)]">
             {result.businesses?.average_rating && (
               <>
-                <span>⭐ {result.businesses.average_rating.toFixed(1)}</span>
+                <span>{result.businesses.average_rating.toFixed(1)}</span>
                 <span className="text-[var(--muted-foreground)]">•</span>
               </>
             )}
@@ -870,7 +863,7 @@ function VideoResultCard({ result, query }: { result: any; query: string }) {
             )}
           </div>
           {query && (
-            <p className="text-xs text-[#F5A623]">
+            <p className="text-xs text-[#1B5EA8]">
               ✓ Matched: {result.caption?.toLowerCase().includes(query.toLowerCase()) ? 'Caption' : ''}{' '}
               {result.businesses?.business_name?.toLowerCase().includes(query.toLowerCase()) ? 'Business Name' : ''}
             </p>

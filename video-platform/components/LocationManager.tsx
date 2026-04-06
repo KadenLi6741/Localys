@@ -13,7 +13,7 @@ import {
 
 const pendingIcon = L.divIcon({
   className: '',
-  html: `<div style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:22px;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.6))">📍</div>`,
+  html: `<div style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.6))"><svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='%231B4FD8'><path d='M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z'/></svg></div>`,
   iconSize: [32, 32],
   iconAnchor: [16, 32],
 });
@@ -22,7 +22,7 @@ const savedIcon = (label: string) =>
   L.divIcon({
     className: '',
     html: `<div style="display:flex;flex-direction:column;align-items:center;gap:2px">
-      <div style="font-size:20px;filter:drop-shadow(0 1px 3px rgba(0,0,0,0.5))">📍</div>
+      <div style="font-size:20px;filter:drop-shadow(0 1px 3px rgba(0,0,0,0.5))"><svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='%231B4FD8'><path d='M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z'/></svg></div>
       <div style="background:rgba(59,130,246,0.85);color:white;font-size:9px;padding:1px 5px;border-radius:4px;white-space:nowrap;max-width:80px;overflow:hidden;text-overflow:ellipsis">${label}</div>
     </div>`,
     iconSize: [32, 44],

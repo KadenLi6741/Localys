@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Outfit, JetBrains_Mono } from "next/font/google";
+import { Inter, JetBrains_Mono, Cormorant_Garamond } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
@@ -10,11 +10,10 @@ import { AppBottomNav } from "@/components/AppBottomNav";
 import { ActivityPanel } from "@/components/ActivityPanel";
 import { ActivityProvider } from "@/contexts/ActivityContext";
 import { PersistentVideoFeed } from "@/components/PersistentVideoFeed";
-import { CursorOrb } from "@/components/CursorOrb";
-import { DesktopSidebar } from "@/components/DesktopSidebar";
+import { LayoutShell } from "@/components/LayoutShell";
 
-const outfit = Outfit({
-  variable: "--font-outfit",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
 });
@@ -23,6 +22,12 @@ const jetbrainsMono = JetBrains_Mono({
   variable: "--font-jetbrains-mono",
   subsets: ["latin"],
   weight: ["400", "500", "600"],
+});
+
+const cormorant = Cormorant_Garamond({
+  variable: "--font-cormorant",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -38,7 +43,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full">
       <body
-        className={`${outfit.variable} ${jetbrainsMono.variable} antialiased h-full`}
+        className={`${inter.variable} ${jetbrainsMono.variable} ${cormorant.variable} antialiased h-full`}
       >
         <ThemeProvider>
           <AuthProvider>
@@ -47,18 +52,12 @@ export default function RootLayout({
                 <ActivityProvider>
                 <UnreadMessagesProvider>
                 <a href="#main-content" className="skip-to-main">Skip to main content</a>
-                {/* Premium background elements */}
-                <div className="premium-blob premium-blob--amber" aria-hidden="true" />
-                <div className="premium-blob premium-blob--sage" aria-hidden="true" />
-                <div className="premium-blob premium-blob--warm" aria-hidden="true" />
-                <CursorOrb />
                 <PersistentVideoFeed />
-                <div className="app-layout">
-                  <DesktopSidebar />
+                <LayoutShell>
                   <main id="main-content" className="responsive-container">
                     {children}
                   </main>
-                </div>
+                </LayoutShell>
                 <AppBottomNav />
                 <ActivityPanel />
                 </UnreadMessagesProvider>

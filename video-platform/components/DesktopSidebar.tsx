@@ -112,13 +112,14 @@ export function DesktopSidebar() {
                 role="button"
                 onClick={(e) => { e.preventDefault(); togglePanel(); }}
                 className={`flex items-center gap-3 rounded-xl px-3 py-3 text-[15px] font-medium transition-all duration-200 hover-lift text-[var(--color-body-text)] hover:text-[var(--color-cream)] hover:bg-[var(--color-charcoal-light)]`}
+                style={{ fontFamily: 'var(--font-serif)' }}
               >
                 <svg className="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={item.icon} />
                 </svg>
                 <span>{item.label}</span>
                 {unreadCount > 0 && (
-                  <span className="ml-auto flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[#F5A623] text-xs font-bold text-[#1A1A18] px-1">
+                  <span className="ml-auto flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[#1B5EA8] text-xs font-bold text-[#1A1A18] px-1">
                     {unreadCount > 9 ? '9+' : unreadCount}
                   </span>
                 )}
@@ -132,21 +133,22 @@ export function DesktopSidebar() {
               href={item.href}
               className={`flex items-center gap-3 rounded-xl px-3 py-3 text-[15px] font-medium transition-all duration-200 hover-lift ${
                 active
-                  ? 'bg-[#F5A623]/10 text-[#F5A623] border-l-4 border-[#F5A623]'
+                  ? 'bg-[#1B5EA8]/10 text-[#1B5EA8] border-l-4 border-[#1B5EA8]'
                   : 'text-[var(--color-body-text)] hover:text-[var(--color-cream)] hover:bg-[var(--color-charcoal-light)]'
               }`}
+              style={{ fontFamily: 'var(--font-serif)' }}
             >
               <svg className="h-5 w-5 shrink-0" fill={item.fill ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={item.icon} />
               </svg>
               <span>{item.label}</span>
               {'cart' in item && cartCount > 0 && (
-                <span className="ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-[#F5A623] text-[10px] font-bold text-[#1A1A18]">
+                <span className="ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-[#1B5EA8] text-[10px] font-bold text-[#1A1A18]">
                   {cartCount > 9 ? '9+' : cartCount}
                 </span>
               )}
               {'badge' in item && typeof item.badge === 'number' && item.badge > 0 && (
-                <span className="ml-auto flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[#F5A623] text-[10px] font-bold text-[#1A1A18] px-1">
+                <span className="ml-auto flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[#1B5EA8] text-[10px] font-bold text-[#1A1A18] px-1">
                   {item.badge > 9 ? '9+' : item.badge}
                 </span>
               )}
@@ -166,7 +168,7 @@ export function DesktopSidebar() {
                 key={account.id}
                 href="#"
                 onClick={(e) => { e.preventDefault(); router.push(`/profile/${account.id}`); }}
-                className="flex items-center gap-3 rounded-lg px-3 py-1 transition-all duration-150 hover:bg-[var(--color-charcoal-light)] hover:border-l-2 hover:border-[#F5A623] border-l-2 border-transparent"
+                className="flex items-center gap-3 rounded-lg px-3 py-1 transition-all duration-150 hover:bg-[var(--color-charcoal-light)] hover:border-l-2 hover:border-[#1B5EA8] border-l-2 border-transparent"
               >
                 {account.profile_picture_url ? (
                   <Image
@@ -204,9 +206,9 @@ export function DesktopSidebar() {
       <div className="px-3">
         <div className="border-t border-[var(--color-charcoal-lighter-plus)] my-2" />
         <div className="px-3 py-4 space-y-1.5">
-          <a href="#" className="block text-[11px] text-[var(--color-body-text)] hover:text-[#F5A623] transition-colors">Company</a>
-          <a href="#" className="block text-[11px] text-[var(--color-body-text)] hover:text-[#F5A623] transition-colors">Program</a>
-          <a href="#" className="block text-[11px] text-[var(--color-body-text)] hover:text-[#F5A623] transition-colors">Terms &amp; Policies</a>
+          <a href="#" className="block text-[11px] text-[var(--color-body-text)] hover:text-[#1B5EA8] transition-colors">Company</a>
+          <a href="#" className="block text-[11px] text-[var(--color-body-text)] hover:text-[#1B5EA8] transition-colors">Program</a>
+          <a href="#" className="block text-[11px] text-[var(--color-body-text)] hover:text-[#1B5EA8] transition-colors">Terms &amp; Policies</a>
           <p className="text-[11px] text-[var(--color-body-text)] pt-2">&copy; 2026 Localys</p>
         </div>
       </div>

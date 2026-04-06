@@ -18,9 +18,9 @@ interface SpendingChartProps {
 function CustomTooltip({ active, payload, label }: { active?: boolean; payload?: { value: number }[]; label?: string }) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="bg-[var(--color-charcoal)]/90 border border-[var(--glass-border)] rounded-lg p-3 shadow-lg">
-      <p className="text-[var(--text-tertiary)] text-xs mb-1">{label}</p>
-      <p className="text-yellow-400 font-semibold">🪙 {payload[0].value} coins</p>
+    <div className="bg-[#1A1A1A]/90 border border-[#3A3A34] rounded-lg p-3 shadow-lg">
+      <p className="text-white/70 text-xs mb-1">{label}</p>
+      <p className="text-yellow-400 font-semibold">{payload[0].value} coins</p>
     </div>
   );
 }
@@ -29,7 +29,7 @@ export function SpendingChart({ data }: SpendingChartProps) {
   if (data.length < 2) {
     return (
       <div>
-        <h4 className="text-sm font-semibold text-[var(--text-secondary)] mb-3">🪙 Spending Over Time</h4>
+        <h4 className="text-sm font-semibold text-[var(--text-secondary)] mb-3">Spending Over Time</h4>
         <div className="h-[200px] flex items-center justify-center text-[var(--text-muted)] text-sm">
           Not enough data to display chart
         </div>
@@ -39,7 +39,7 @@ export function SpendingChart({ data }: SpendingChartProps) {
 
   return (
     <div>
-      <h4 className="text-sm font-semibold text-[var(--text-secondary)] mb-3">🪙 Spending Over Time</h4>
+      <h4 className="text-sm font-semibold text-[var(--text-secondary)] mb-3">Spending Over Time</h4>
       <ResponsiveContainer width="100%" height={250}>
         <AreaChart data={data} margin={{ top: 5, right: 10, left: -10, bottom: 5 }}>
           <defs>
@@ -48,16 +48,16 @@ export function SpendingChart({ data }: SpendingChartProps) {
               <stop offset="95%" stopColor="#eab308" stopOpacity={0} />
             </linearGradient>
           </defs>
-          <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" />
+          <CartesianGrid strokeDasharray="3 3" stroke="#E8E8E4" />
           <XAxis
             dataKey="date"
-            tick={{ fill: '#ffffff60', fontSize: 11 }}
+            tick={{ fill: '#6B6B65', fontSize: 11 }}
             tickFormatter={(val: string) => val.substring(5)}
-            axisLine={{ stroke: '#ffffff10' }}
+            axisLine={{ stroke: '#E8E8E4' }}
           />
           <YAxis
-            tick={{ fill: '#ffffff60', fontSize: 11 }}
-            axisLine={{ stroke: '#ffffff10' }}
+            tick={{ fill: '#6B6B65', fontSize: 11 }}
+            axisLine={{ stroke: '#E8E8E4' }}
           />
           <Tooltip content={<CustomTooltip />} />
           <Area

@@ -15,7 +15,7 @@ export function VideoPerformanceTable({ videos }: VideoPerformanceTableProps) {
 
   return (
     <div>
-      <h4 className="text-sm font-semibold text-[var(--text-secondary)] mb-3">🎬 Video Performance</h4>
+      <h4 className="text-sm font-semibold text-[var(--text-secondary)] mb-3">Video Performance</h4>
       <div className="space-y-3">
         {sorted.map((video, index) => (
           <div
@@ -31,21 +31,21 @@ export function VideoPerformanceTable({ videos }: VideoPerformanceTableProps) {
                     className="w-full h-full object-cover rounded-lg"
                   />
                 ) : (
-                  <span className="text-2xl">🎬</span>
+                  <span className="text-lg text-[#6B6B65]">&#9654;</span>
                 )}
                 {index === 0 && videos.length > 1 && (
-                  <span className="absolute -top-1 -right-1 text-xs">🏆</span>
+                  <span className="absolute -top-1 -right-1 text-xs bg-yellow-500 text-white rounded-full w-4 h-4 flex items-center justify-center font-bold">1</span>
                 )}
               </div>
               <div className="flex-1 min-w-0">
                 <h4 className="text-sm font-semibold text-[var(--text-primary)] truncate">{video.title}</h4>
                 <div className="flex gap-3 mt-2 text-xs flex-wrap">
-                  <span className="text-yellow-400">🪙 {video.totalCoinsSpent} spent</span>
-                  <span className="text-blue-400">👁️ {video.totalViews.toLocaleString()} views</span>
-                  <span className="text-green-400">📈 {video.viewsPerCoin} views/coin</span>
+                  <span className="text-yellow-400">{video.totalCoinsSpent} spent</span>
+                  <span className="text-blue-400">{video.totalViews.toLocaleString()} views</span>
+                  <span className="text-green-400">{video.viewsPerCoin} views/coin</span>
                 </div>
                 <div className="mt-2 inline-flex items-center gap-1 bg-yellow-500/20 border border-yellow-500/50 rounded px-2 py-0.5">
-                  <span className="text-xs text-yellow-300">🚀 Boost: {video.boostValue.toFixed(1)}</span>
+                  <span className="text-xs text-yellow-300">Boost: {video.boostValue.toFixed(1)}</span>
                 </div>
               </div>
             </div>

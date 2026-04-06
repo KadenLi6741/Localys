@@ -51,11 +51,11 @@ export default function CartPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--color-charcoal)] text-[var(--color-cream)] pb-24">
+    <div className="min-h-screen bg-white text-[#1A1A1A] pb-24 lg:pb-8">
       <div className="w-full px-4 lg:px-12 py-4">
         {/* Header */}
         <div className="mb-6">
-          <Link href="/" className="text-[var(--color-body-text)] hover:text-[var(--color-cream)] mb-4 inline-flex items-center gap-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F5A623] rounded-lg">
+          <Link href="/" className="text-[var(--color-body-text)] hover:text-[var(--color-cream)] mb-4 inline-flex items-center gap-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1B5EA8] rounded-lg">
             ← Back
           </Link>
           <h1 className="text-2xl font-bold text-[var(--color-cream)]">Shopping Cart</h1>
@@ -71,7 +71,7 @@ export default function CartPage() {
             </svg>
             <p className="text-[var(--color-body-text)] mb-2 text-lg font-semibold">Your cart is empty</p>
             <p className="text-[var(--color-body-text)]/70 text-sm mb-6">Browse local businesses and add items</p>
-            <Link href="/" className="inline-block bg-[#F5A623] hover:bg-[#F5A623]/90 text-black font-semibold rounded-xl px-6 py-3 transition-colors active:scale-95">
+            <Link href="/" className="inline-block bg-[#1B5EA8] hover:bg-[#1B5EA8]/90 text-black font-semibold rounded-xl px-6 py-3 transition-colors active:scale-95">
               Browse Services
             </Link>
           </div>
@@ -82,7 +82,7 @@ export default function CartPage() {
               {items.map((item) => (
                 <div
                   key={item.itemId}
-                  className="list-item-stagger bg-[var(--color-charcoal-light)] border border-[var(--color-charcoal-lighter-plus)] rounded-2xl p-4 hover:border-[#F5A623]/30 transition-all duration-200"
+                  className="list-item-stagger bg-[var(--color-charcoal-light)] border border-[var(--color-charcoal-lighter-plus)] rounded-2xl p-4 hover:border-[#1B5EA8]/30 transition-all duration-200"
                 >
                   <div className="flex gap-3">
                     {item.itemImage && (
@@ -94,11 +94,11 @@ export default function CartPage() {
                     )}
                     <div className="flex-1 min-w-0">
                       <h3 className="text-[var(--color-cream)] font-semibold truncate">{item.itemName}</h3>
-                      <p className="text-[#F5A623] font-bold">${(item.itemPrice * item.quantity).toFixed(2)}</p>
+                      <p className="text-[#1B5EA8] font-bold">${(item.itemPrice * item.quantity).toFixed(2)}</p>
                     </div>
                     <button
                       onClick={() => removeFromCart(item.itemId)}
-                      className="text-[#E05C3A] hover:text-[#E05C3A]/80 p-2 self-start rounded-lg hover:bg-[#E05C3A]/10 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F5A623]"
+                      className="text-[#E05C3A] hover:text-[#E05C3A]/80 p-2 self-start rounded-lg hover:bg-[#E05C3A]/10 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1B5EA8]"
                       aria-label="Remove item"
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -114,7 +114,7 @@ export default function CartPage() {
                       <button
                         onClick={() => updateQuantity(item.itemId, item.quantity - 1)}
                         disabled={item.quantity <= 1}
-                        className="px-3 py-1.5 text-[var(--color-cream)] hover:bg-[var(--color-charcoal-lighter)] disabled:text-[var(--color-body-text)]/40 disabled:hover:bg-transparent transition-colors min-w-[44px] min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F5A623]"
+                        className="px-3 py-1.5 text-[var(--color-cream)] hover:bg-[var(--color-charcoal-lighter)] disabled:text-[var(--color-body-text)]/40 disabled:hover:bg-transparent transition-colors min-w-[44px] min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1B5EA8]"
                         aria-label="Decrease quantity"
                       >
                         &minus;
@@ -124,7 +124,7 @@ export default function CartPage() {
                       </span>
                       <button
                         onClick={() => updateQuantity(item.itemId, item.quantity + 1)}
-                        className="px-3 py-1.5 text-[var(--color-cream)] hover:bg-[var(--color-charcoal-lighter)] transition-colors min-w-[44px] min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F5A623]"
+                        className="px-3 py-1.5 text-[var(--color-cream)] hover:bg-[var(--color-charcoal-lighter)] transition-colors min-w-[44px] min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1B5EA8]"
                         aria-label="Increase quantity"
                       >
                         +
@@ -142,7 +142,7 @@ export default function CartPage() {
                       placeholder="Special requests (e.g. no onions, extra sauce...)"
                       value={item.specialRequests || ''}
                       onChange={(e) => updateSpecialRequests(item.itemId, e.target.value)}
-                      className="w-full bg-[var(--color-charcoal)] border border-[var(--color-charcoal-lighter-plus)] rounded-xl px-3 py-2 text-sm text-[var(--color-cream)] placeholder-[#9E9A90]/50 focus:outline-none focus:border-[#F5A623] focus:ring-1 focus:ring-[#F5A623]/30 transition-colors"
+                      className="w-full bg-[var(--color-charcoal)] border border-[var(--color-charcoal-lighter-plus)] rounded-xl px-3 py-2 text-sm text-[var(--color-cream)] placeholder-[#9E9A90]/50 focus:outline-none focus:border-[#1B5EA8] focus:ring-1 focus:ring-[#1B5EA8]/30 transition-colors"
                       aria-label="Special requests"
                     />
                   </div>
@@ -175,7 +175,7 @@ export default function CartPage() {
             )}
             {loadingCoupons && (
               <div className="bg-[var(--color-charcoal-light)] border border-[var(--color-charcoal-lighter-plus)] rounded-2xl p-4 mb-6 text-center">
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#F5A623] mx-auto"></div>
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#1B5EA8] mx-auto"></div>
               </div>
             )}
 
@@ -183,7 +183,7 @@ export default function CartPage() {
             <div className="bg-[var(--color-charcoal-light)] border border-[var(--color-charcoal-lighter-plus)] rounded-2xl p-4 mb-4">
               <div className="flex justify-between items-center">
                 <span className="text-[var(--color-body-text)]">Total</span>
-                <span className="text-xl font-bold text-[#F5A623]">${total.toFixed(2)}</span>
+                <span className="text-xl font-bold text-[#1B5EA8]">${total.toFixed(2)}</span>
               </div>
             </div>
 
@@ -191,13 +191,13 @@ export default function CartPage() {
             <div className="space-y-3">
               <button
                 onClick={handleCheckout}
-                className="w-full bg-[#F5A623] hover:bg-[#F5A623]/90 text-black font-semibold py-3 rounded-xl transition-all duration-200 active:scale-[0.98] shadow-lg shadow-[#F5A623]/20 min-h-[48px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F5A623] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-charcoal)]"
+                className="w-full bg-[#1B5EA8] hover:bg-[#1B5EA8]/90 text-black font-semibold py-3 rounded-xl transition-all duration-200 active:scale-[0.98] shadow-lg shadow-[#1B5EA8]/20 min-h-[48px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1B5EA8] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-charcoal)]"
               >
                 Proceed to Checkout
               </button>
               <button
                 onClick={clearCart}
-                className="w-full bg-[var(--color-charcoal-light)] hover:bg-[var(--color-charcoal-lighter)] text-[var(--color-body-text)] hover:text-[var(--color-cream)] font-semibold py-3 rounded-xl transition-all duration-200 border border-[var(--color-charcoal-lighter-plus)] min-h-[48px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F5A623]"
+                className="w-full bg-[var(--color-charcoal-light)] hover:bg-[var(--color-charcoal-lighter)] text-[var(--color-body-text)] hover:text-[var(--color-cream)] font-semibold py-3 rounded-xl transition-all duration-200 border border-[var(--color-charcoal-lighter-plus)] min-h-[48px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1B5EA8]"
               >
                 Clear Cart
               </button>

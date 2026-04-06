@@ -31,9 +31,9 @@ function filterByRange(data: RevenueDataPoint[], range: TimeRange): RevenueDataP
 function RevenueTooltip({ active, payload, label }: { active?: boolean; payload?: { value: number }[]; label?: string }) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="bg-[var(--color-charcoal)]/90 border border-[var(--color-charcoal-lighter-plus)] rounded-lg p-3 shadow-lg">
-      <p className="text-[var(--color-body-text)] text-xs mb-1">{label}</p>
-      <p className="text-[#F5A623] font-semibold">${payload[0].value.toFixed(2)}</p>
+    <div className="bg-[#1A1A1A]/90 border border-[#3A3A34] rounded-lg p-3 shadow-lg">
+      <p className="text-white/70 text-xs mb-1">{label}</p>
+      <p className="text-[#1B5EA8] font-semibold">${payload[0].value.toFixed(2)}</p>
     </div>
   );
 }
@@ -45,7 +45,7 @@ export function RevenueChart({ data }: RevenueChartProps) {
   return (
     <div>
       <div className="flex items-center justify-between mb-3">
-        <h4 className="text-sm font-semibold text-[var(--color-cream)]/80">💰 Revenue Over Time</h4>
+        <h4 className="text-sm font-semibold text-[#1A1A1A]">Revenue Over Time</h4>
         <div className="flex gap-1">
           {(['week', 'month', 'all'] as const).map(r => (
             <button
@@ -53,8 +53,8 @@ export function RevenueChart({ data }: RevenueChartProps) {
               onClick={() => setRange(r)}
               className={`px-3 py-1 rounded-lg text-xs font-medium transition-all ${
                 range === r
-                  ? 'bg-[#F5A623] text-black'
-                  : 'bg-[var(--color-charcoal-lighter)] text-[var(--color-body-text)] hover:text-[var(--color-cream)]'
+                  ? 'bg-[#1B5EA8] text-white'
+                  : 'bg-[#F8F8F6] text-[#6B6B65] hover:text-[#1A1A1A]'
               }`}
             >
               {r === 'week' ? 'Week' : r === 'month' ? 'Month' : 'All Time'}
@@ -64,7 +64,7 @@ export function RevenueChart({ data }: RevenueChartProps) {
       </div>
 
       {filtered.length < 2 ? (
-        <div className="h-[200px] flex items-center justify-center text-[var(--color-body-text)] text-sm">
+        <div className="h-[200px] flex items-center justify-center text-[#6B6B65] text-sm">
           Not enough data to display chart
         </div>
       ) : (
@@ -72,27 +72,27 @@ export function RevenueChart({ data }: RevenueChartProps) {
           <AreaChart data={filtered} margin={{ top: 5, right: 10, left: -10, bottom: 5 }}>
             <defs>
               <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#F5A623" stopOpacity={0.3} />
-                <stop offset="95%" stopColor="#F5A623" stopOpacity={0} />
+                <stop offset="5%" stopColor="#1B5EA8" stopOpacity={0.3} />
+                <stop offset="95%" stopColor="#1B5EA8" stopOpacity={0} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="#ffffff08" />
+            <CartesianGrid strokeDasharray="3 3" stroke="#E8E8E4" />
             <XAxis
               dataKey="date"
-              tick={{ fill: 'var(--color-body-text)', fontSize: 11 }}
+              tick={{ fill: '#6B6B65', fontSize: 11 }}
               tickFormatter={(val: string) => val.substring(5)}
-              axisLine={{ stroke: '#ffffff08' }}
+              axisLine={{ stroke: '#E8E8E4' }}
             />
             <YAxis
-              tick={{ fill: 'var(--color-body-text)', fontSize: 11 }}
-              axisLine={{ stroke: '#ffffff08' }}
+              tick={{ fill: '#6B6B65', fontSize: 11 }}
+              axisLine={{ stroke: '#E8E8E4' }}
               tickFormatter={(val: number) => `$${val}`}
             />
             <Tooltip content={<RevenueTooltip />} />
             <Area
               type="monotone"
               dataKey="revenue"
-              stroke="#F5A623"
+              stroke="#1B5EA8"
               strokeWidth={2}
               fill="url(#revenueGradient)"
             />

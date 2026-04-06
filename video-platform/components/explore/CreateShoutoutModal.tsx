@@ -269,7 +269,7 @@ export function CreateShoutoutModal({ isOpen, onClose, onSubmit, submitting, edi
             onChange={(e) => handleBusinessInputChange(e.target.value)}
             onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
             placeholder="@business name or type any name"
-            className="w-full bg-[var(--color-charcoal-light)] border border-[var(--color-charcoal-lighter-plus)] rounded-xl px-4 py-2.5 text-sm text-[var(--color-cream)] placeholder-[var(--color-body-text)] focus:outline-none focus:border-[#F5A623] transition-colors"
+            className="w-full bg-[var(--color-charcoal-light)] border border-[var(--color-charcoal-lighter-plus)] rounded-xl px-4 py-2.5 text-sm text-[var(--color-cream)] placeholder-[var(--color-body-text)] focus:outline-none focus:border-[#1B5EA8] transition-colors"
           />
           {showSuggestions && suggestions.length > 0 && (
             <div className="absolute z-10 top-full mt-1 w-full bg-[var(--color-charcoal)] border border-[var(--color-charcoal-lighter-plus)] rounded-xl overflow-hidden shadow-lg">
@@ -297,7 +297,7 @@ export function CreateShoutoutModal({ isOpen, onClose, onSubmit, submitting, edi
                 onClick={() => toggleTag(tag.id)}
                 className={`px-3 py-1.5 text-xs font-semibold rounded-full transition-all duration-200 ${
                   tags.includes(tag.id)
-                    ? 'bg-[#F5A623] text-black'
+                    ? 'bg-[#1B5EA8] text-black'
                     : 'bg-[var(--color-charcoal-light)] text-[var(--color-body-text)] hover:text-[var(--color-cream)] border border-[var(--color-charcoal-lighter-plus)]'
                 }`}
               >
@@ -315,7 +315,7 @@ export function CreateShoutoutModal({ isOpen, onClose, onSubmit, submitting, edi
             onChange={(e) => setText(e.target.value)}
             placeholder="Share your experience..."
             rows={5}
-            className="w-full bg-[var(--color-charcoal-light)] border border-[var(--color-charcoal-lighter-plus)] rounded-xl px-4 py-3 text-sm text-[var(--color-cream)] placeholder-[var(--color-body-text)] focus:outline-none focus:border-[#F5A623] transition-colors resize-none"
+            className="w-full bg-[var(--color-charcoal-light)] border border-[var(--color-charcoal-lighter-plus)] rounded-xl px-4 py-3 text-sm text-[var(--color-cream)] placeholder-[var(--color-body-text)] focus:outline-none focus:border-[#1B5EA8] transition-colors resize-none"
           />
         </div>
 
@@ -327,14 +327,14 @@ export function CreateShoutoutModal({ isOpen, onClose, onSubmit, submitting, edi
             <button
               type="button"
               onClick={() => { setMediaType('photos'); removeVideo(); }}
-              className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${mediaType === 'photos' ? 'bg-[#F5A623] text-black' : 'text-[var(--color-body-text)] hover:text-[var(--color-cream)]'}`}
+              className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${mediaType === 'photos' ? 'bg-[#1B5EA8] text-black' : 'text-[var(--color-body-text)] hover:text-[var(--color-cream)]'}`}
             >
               Photos
             </button>
             <button
               type="button"
               onClick={() => { setMediaType('video'); setPhotos([]); setPhotoPreviews([]); }}
-              className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${mediaType === 'video' ? 'bg-[#F5A623] text-black' : 'text-[var(--color-body-text)] hover:text-[var(--color-cream)]'}`}
+              className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${mediaType === 'video' ? 'bg-[#1B5EA8] text-black' : 'text-[var(--color-body-text)] hover:text-[var(--color-cream)]'}`}
             >
               Video
             </button>
@@ -364,10 +364,10 @@ export function CreateShoutoutModal({ isOpen, onClose, onSubmit, submitting, edi
                   onDragEnter={handleDrag}
                   onDrop={handleDrop}
                   onClick={() => fileInputRef.current?.click()}
-                  className="border-2 border-dashed border-[#F5A623]/40 rounded-xl p-4 text-center cursor-pointer hover:border-[#F5A623]/70 transition-colors"
+                  className="border-2 border-dashed border-[#1B5EA8]/40 rounded-xl p-4 text-center cursor-pointer hover:border-[#1B5EA8]/70 transition-colors"
                 >
                   <p className="text-sm text-[var(--color-body-text)]">
-                    Drag & drop or <span className="text-[#F5A623] font-semibold">click to upload</span> (up to 3)
+                    Drag & drop or <span className="text-[#1B5EA8] font-semibold">click to upload</span> (up to 3)
                   </p>
                   <input
                     ref={fileInputRef}
@@ -399,10 +399,10 @@ export function CreateShoutoutModal({ isOpen, onClose, onSubmit, submitting, edi
                   onDragEnter={handleDrag}
                   onDrop={handleDrop}
                   onClick={() => videoInputRef.current?.click()}
-                  className="border-2 border-dashed border-[#F5A623]/40 rounded-xl p-4 text-center cursor-pointer hover:border-[#F5A623]/70 transition-colors"
+                  className="border-2 border-dashed border-[#1B5EA8]/40 rounded-xl p-4 text-center cursor-pointer hover:border-[#1B5EA8]/70 transition-colors"
                 >
                   <p className="text-sm text-[var(--color-body-text)]">
-                    Drag & drop or <span className="text-[#F5A623] font-semibold">click to upload</span> (max 100MB)
+                    Drag & drop or <span className="text-[#1B5EA8] font-semibold">click to upload</span> (max 100MB)
                   </p>
                   <input
                     ref={videoInputRef}
@@ -434,7 +434,7 @@ export function CreateShoutoutModal({ isOpen, onClose, onSubmit, submitting, edi
               >
                 <svg
                   className={`w-7 h-7 transition-colors ${
-                    star <= (hoverStar || starRating) ? 'text-[#F5A623]' : 'text-[var(--color-charcoal-lighter-plus)]'
+                    star <= (hoverStar || starRating) ? 'text-[#1B5EA8]' : 'text-[var(--color-charcoal-lighter-plus)]'
                   }`}
                   fill="currentColor"
                   viewBox="0 0 20 20"
@@ -456,7 +456,7 @@ export function CreateShoutoutModal({ isOpen, onClose, onSubmit, submitting, edi
               type="checkbox"
               checked={inviteToLocaly}
               onChange={(e) => setInviteToLocaly(e.target.checked)}
-              className="w-4 h-4 rounded accent-[#F5A623]"
+              className="w-4 h-4 rounded accent-[#1B5EA8]"
             />
             <span className="text-sm text-[var(--color-body-text)]">Invite this business to join Localy</span>
           </label>
@@ -473,7 +473,7 @@ export function CreateShoutoutModal({ isOpen, onClose, onSubmit, submitting, edi
           <button
             onClick={handleSubmit}
             disabled={submitting || !businessInput.trim() || !text.trim()}
-            className="flex-1 py-3 rounded-xl font-semibold text-sm bg-[#F5A623] text-black hover:bg-[#F5A623]/90 disabled:opacity-40 transition-all active:scale-[0.98]"
+            className="flex-1 py-3 rounded-xl font-semibold text-sm bg-[#1B5EA8] text-black hover:bg-[#1B5EA8]/90 disabled:opacity-40 transition-all active:scale-[0.98]"
           >
             {submitting ? (editData ? 'Saving...' : 'Posting...') : (editData ? 'Save Changes' : 'Post Shoutout')}
           </button>

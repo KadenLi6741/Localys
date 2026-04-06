@@ -62,7 +62,7 @@ export function CommentModal({ isOpen, onClose, postId, businessName }: CommentM
           </h2>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-[var(--color-charcoal-lighter)] rounded-full transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F5A623]"
+            className="p-2 hover:bg-[var(--color-charcoal-lighter)] rounded-full transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1B5EA8]"
             aria-label="Close modal"
           >
             <svg className="w-6 h-6 text-[var(--color-body-text)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">

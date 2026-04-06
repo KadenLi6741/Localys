@@ -80,7 +80,7 @@ export function useFinancialAnalytics(userId: string | undefined) {
       const STATUS_COLORS: Record<string, string> = {
         completed: '#6BAF7A',
         paid: '#6BAF7A',
-        pending: '#F5A623',
+        pending: '#1B5EA8',
         cancelled: '#E05C3A',
         failed: '#E05C3A',
       };

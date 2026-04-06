@@ -368,6 +368,7 @@ export interface MenuItem {
   price: number;
   category?: string;
   image_url?: string;
+  key_info?: string;
   is_available: boolean;
   created_at: string;
   updated_at: string;
@@ -406,6 +407,8 @@ export interface MenuItemCreateData {
   price: number;
   category?: string;
   image_url?: string;
+  key_info?: string;
+  is_available?: boolean;
 }
 
 export interface MenuItemUpdateData {
@@ -414,6 +417,7 @@ export interface MenuItemUpdateData {
   price?: number;
   category?: string;
   image_url?: string;
+  key_info?: string;
   is_available?: boolean;
 }
 
@@ -652,7 +656,8 @@ export async function addMenuItemToMenu(menuId: string, userId: string, itemData
         price: itemData.price,
         category: itemData.category || null,
         image_url: itemData.image_url || null,
-        is_available: true,
+        key_info: itemData.key_info || null,
+        is_available: itemData.is_available !== undefined ? itemData.is_available : true,
       })
       .select()
       .single();
@@ -696,6 +701,7 @@ export async function updateMenuItem(itemId: string, itemData: MenuItemUpdateDat
     if (itemData.price !== undefined) updateData.price = itemData.price;
     if (itemData.category !== undefined) updateData.category = itemData.category;
     if (itemData.image_url !== undefined) updateData.image_url = itemData.image_url;
+    if (itemData.key_info !== undefined) updateData.key_info = itemData.key_info;
     if (itemData.is_available !== undefined) updateData.is_available = itemData.is_available;
 
     const { data, error } = await supabase

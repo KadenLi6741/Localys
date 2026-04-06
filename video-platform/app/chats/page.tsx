@@ -21,18 +21,18 @@ export default function ChatsPage() {
 function ChatsContent() {
   const { user } = useAuth();
   const pathname = usePathname();
-  const { chats, loading, error } = useChats(user?.id);
+  const { chats, loading, error, refresh } = useChats(user?.id);
   const [showNewChatModal, setShowNewChatModal] = useState(false);
 
   return (
-    <div className="min-h-screen bg-[var(--color-charcoal)] text-[var(--color-cream)] pb-20">
+    <div className="min-h-screen bg-white text-[#1A1A1A] pb-24 lg:pb-8">
       {/* Header */}
       <div className="sticky top-0 z-10 bg-[var(--color-charcoal)]/80 backdrop-blur-md border-b border-[var(--color-charcoal-lighter-plus)]">
         <div className="w-full px-4 lg:px-12 py-4 flex items-center justify-between">
           <h1 className="entrance-slide text-2xl font-bold text-[var(--color-cream)]" style={{ animation: 'slideInLeft 0.4s ease-out forwards', opacity: 0 }}>Messages</h1>
           <button
             onClick={() => setShowNewChatModal(true)}
-            className="entrance-scale w-11 h-11 rounded-full bg-[var(--color-charcoal-light)] hover:bg-[var(--color-charcoal-lighter)] border border-[var(--color-charcoal-lighter-plus)] flex items-center justify-center transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F5A623] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-charcoal)]"
+            className="entrance-scale w-11 h-11 rounded-full bg-[var(--color-charcoal-light)] hover:bg-[var(--color-charcoal-lighter)] border border-[var(--color-charcoal-lighter-plus)] flex items-center justify-center transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1B5EA8] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-charcoal)]"
             style={{ animation: 'scaleIn 0.3s ease-out 0.15s forwards', opacity: 0 }}
             aria-label="New chat"
           >
@@ -48,12 +48,20 @@ function ChatsContent() {
         {error && (
           <div className="entrance-fade mb-6 p-4 bg-[#E05C3A]/10 border border-[#E05C3A]/50 rounded-xl" style={{ animation: 'fadeInUp 0.4s ease-out forwards', opacity: 0 }}>
             <p className="text-[#E05C3A] font-semibold mb-2">Error loading chats</p>
-            <p className="text-[#E05C3A]/80 text-sm">{error.message}</p>
+            <p className="text-[#E05C3A]/80 text-sm mb-3">{error.message}</p>
+            <button
+              onClick={refresh}
+              className="px-4 py-2 text-sm font-medium rounded-lg bg-[#E05C3A]/20 hover:bg-[#E05C3A]/30 text-[#E05C3A] border border-[#E05C3A]/40 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E05C3A]"
+            >
+              Retry
+            </button>
           </div>
         )}
+        {!error && (
         <div className="entrance-fade" style={{ animation: 'fadeInUp 0.4s ease-out 0.1s forwards', opacity: 0 }}>
           <ChatList chats={chats} currentUserId={user?.id || ''} loading={loading} />
         </div>
+        )}
       </div>
 
       {/* New Chat Modal */}

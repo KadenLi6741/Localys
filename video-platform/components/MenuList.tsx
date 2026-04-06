@@ -7,15 +7,17 @@ import { Menu, MenuItem, getUserMenus, getUserMenu, deleteMenu, updateMenuItem, 
 import dynamic from 'next/dynamic';
 const MenuModal = dynamic(() => import('./MenuModal').then(mod => mod.MenuModal), { ssr: false });
 import { MenuItemPurchaseButton } from './MenuItemPurchaseButton';
+import { ProductQuickView } from './ProductQuickView';
 
 interface MenuListProps {
   userId: string;
   businessId?: string;
+  businessName?: string;
   isOwnProfile: boolean;
   onMenusLoaded?: (menus: Menu[]) => void;
 }
 
-export function MenuList({ userId, businessId, isOwnProfile, onMenusLoaded }: MenuListProps) {
+export function MenuList({ userId, businessId, businessName, isOwnProfile, onMenusLoaded }: MenuListProps) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const [menus, setMenus] = useState<Menu[]>([]);
@@ -33,6 +35,8 @@ export function MenuList({ userId, businessId, isOwnProfile, onMenusLoaded }: Me
   const [toastMessage, setToastMessage] = useState('');
   const [toastColor, setToastColor] = useState<'sage' | 'red' | 'amber'>('sage');
   const priceInputRef = useRef<HTMLInputElement>(null);
+  const [quickViewItem, setQuickViewItem] = useState<MenuItem | null>(null);
+  const [hoveredItemId, setHoveredItemId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!toastMessage) return;
@@ -176,13 +180,13 @@ export function MenuList({ userId, businessId, isOwnProfile, onMenusLoaded }: Me
         {Array.from({ length: 6 }).map((_, index) => (
           <div
             key={index}
-            className="bg-[var(--color-charcoal-lighter)] rounded-2xl overflow-hidden animate-pulse"
+            className="bg-[#F8F8F6] overflow-hidden animate-pulse"
           >
-            <div className="aspect-square bg-[var(--color-charcoal-lighter-plus)]"></div>
+            <div className="aspect-square bg-[#E8E8E4]"></div>
             <div className="p-3 space-y-2">
-              <div className="h-4 bg-[var(--color-charcoal-lighter-plus)] rounded w-3/4"></div>
-              <div className="h-4 bg-[var(--color-charcoal-lighter-plus)] rounded w-1/2"></div>
-              <div className="h-8 bg-[var(--color-charcoal-lighter-plus)] rounded"></div>
+              <div className="h-4 bg-[#E8E8E4] rounded w-3/4"></div>
+              <div className="h-4 bg-[#E8E8E4] rounded w-1/2"></div>
+              <div className="h-8 bg-[#E8E8E4] rounded"></div>
             </div>
           </div>
         ))}
@@ -205,7 +209,7 @@ export function MenuList({ userId, businessId, isOwnProfile, onMenusLoaded }: Me
             }
             setIsModalOpen(true);
           }}
-          className="w-full mb-6 bg-[#F5A623] hover:bg-[#F5A623]/90 text-black font-semibold rounded-lg py-3 transition-colors flex items-center justify-center gap-2 min-h-[48px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F5A623] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-charcoal)]"
+          className="w-full mb-6 bg-[#1A1A1A] hover:bg-[#1A1A1A]/90 text-white font-semibold py-3 transition-colors flex items-center justify-center gap-2 min-h-[48px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -220,7 +224,7 @@ export function MenuList({ userId, businessId, isOwnProfile, onMenusLoaded }: Me
           {menus[0].menu_items.map((item, index) => (
             <div
               key={item.id}
-              className={`menu-item-card bg-[var(--color-charcoal-light)] border border-[var(--color-charcoal-lighter-plus)] rounded-2xl overflow-hidden hover:scale-[0.97] transition-all duration-200 group relative ${
+              className={`menu-item-card bg-white border border-[#E8E8E4] overflow-hidden hover:scale-[0.97] transition-all duration-200 group relative ${
                 fadingOutItemId === item.id ? 'opacity-0 scale-95 pointer-events-none' : ''
               }`}
             >
@@ -229,7 +233,7 @@ export function MenuList({ userId, businessId, isOwnProfile, onMenusLoaded }: Me
                 <div className="absolute top-2 right-2 z-10 flex gap-1">
                   <button
                     onClick={(e) => { e.stopPropagation(); handleEditItem(item); }}
-                    className="w-8 h-8 flex items-center justify-center rounded-lg bg-[var(--color-charcoal)]/70 backdrop-blur-sm text-[var(--color-cream)] hover:text-[#F5A623] transition-colors"
+                    className="w-8 h-8 flex items-center justify-center bg-white/70 backdrop-blur-sm text-[#1A1A1A] hover:text-[#6B6B65] transition-colors"
                     aria-label={`Edit ${item.item_name}`}
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -238,7 +242,7 @@ export function MenuList({ userId, businessId, isOwnProfile, onMenusLoaded }: Me
                   </button>
                   <button
                     onClick={(e) => { e.stopPropagation(); setDeletingItemId(item.id); }}
-                    className="w-8 h-8 flex items-center justify-center rounded-lg bg-[var(--color-charcoal)]/70 backdrop-blur-sm text-[#E05C3A] hover:text-[#E05C3A]/80 transition-colors"
+                    className="w-8 h-8 flex items-center justify-center bg-white/70 backdrop-blur-sm text-[#E05C3A] hover:text-[#E05C3A]/80 transition-colors"
                     aria-label={`Delete ${item.item_name}`}
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -250,18 +254,18 @@ export function MenuList({ userId, businessId, isOwnProfile, onMenusLoaded }: Me
 
               {/* Inline Delete Confirmation */}
               {deletingItemId === item.id && (
-                <div className="absolute inset-0 z-20 bg-[var(--color-charcoal)]/90 backdrop-blur-sm flex flex-col items-center justify-center gap-3 p-4 rounded-2xl">
-                  <p className="text-[var(--color-cream)] text-sm font-medium text-center">Delete this item?</p>
+                <div className="absolute inset-0 z-20 bg-white/90 backdrop-blur-sm flex flex-col items-center justify-center gap-3 p-4">
+                  <p className="text-[#1A1A1A] text-sm font-medium text-center">Delete this item?</p>
                   <div className="flex gap-2">
                     <button
                       onClick={() => handleDeleteItemConfirm(item.id)}
-                      className="px-4 py-1.5 bg-[#E05C3A] hover:bg-[#E05C3A]/90 text-white text-xs font-semibold rounded-lg transition-colors"
+                      className="px-4 py-1.5 bg-[#E05C3A] hover:bg-[#E05C3A]/90 text-white text-xs font-semibold transition-colors"
                     >
                       Delete
                     </button>
                     <button
                       onClick={() => setDeletingItemId(null)}
-                      className="px-4 py-1.5 text-[var(--color-body-text)] hover:bg-[var(--color-charcoal-lighter)] text-xs font-medium rounded-lg transition-colors"
+                      className="px-4 py-1.5 text-[#6B6B65] hover:bg-[#F8F8F6] text-xs font-medium transition-colors"
                     >
                       Cancel
                     </button>
@@ -271,31 +275,61 @@ export function MenuList({ userId, businessId, isOwnProfile, onMenusLoaded }: Me
 
               {/* Item Image */}
               {item.image_url ? (
-                <div className="relative aspect-square overflow-hidden bg-[var(--color-charcoal)]">
+                <div
+                  className="relative aspect-square overflow-hidden bg-[#F8F8F6] cursor-pointer"
+                  onMouseEnter={() => setHoveredItemId(item.id)}
+                  onMouseLeave={() => setHoveredItemId(null)}
+                  onClick={() => !isOwnProfile && setQuickViewItem(item)}
+                >
                   <img
                     src={item.image_url}
                     alt={item.item_name}
                     className="w-full h-full object-cover group-active:scale-95 transition-transform duration-150"
                   />
+                  {/* Quick View hover overlay */}
+                  {!isOwnProfile && (
+                    <div
+                      className={`absolute inset-0 bg-black/40 flex items-center justify-center transition-opacity duration-200 ${
+                        hoveredItemId === item.id ? 'opacity-100' : 'opacity-0'
+                      }`}
+                    >
+                      <span className="text-white text-sm font-semibold uppercase tracking-wider">Quick View</span>
+                    </div>
+                  )}
                 </div>
               ) : (
-                <div className="aspect-square bg-[var(--color-charcoal-lighter-plus)] flex items-center justify-center">
+                <div
+                  className="aspect-square bg-[#F8F8F6] flex items-center justify-center cursor-pointer"
+                  onMouseEnter={() => setHoveredItemId(item.id)}
+                  onMouseLeave={() => setHoveredItemId(null)}
+                  onClick={() => !isOwnProfile && setQuickViewItem(item)}
+                >
                   <svg className="w-8 h-8 text-[#6BAF7A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
+                  {/* Quick View hover overlay */}
+                  {!isOwnProfile && (
+                    <div
+                      className={`absolute inset-0 bg-black/40 flex items-center justify-center transition-opacity duration-200 ${
+                        hoveredItemId === item.id ? 'opacity-100' : 'opacity-0'
+                      }`}
+                    >
+                      <span className="text-white text-sm font-semibold uppercase tracking-wider">Quick View</span>
+                    </div>
+                  )}
                 </div>
               )}
 
               {/* Item Details */}
               <div className="p-3 flex flex-col flex-1">
-                <h4 className="text-[var(--color-cream)] font-bold text-sm truncate mb-1">
+                <h4 className="text-[#1A1A1A] font-bold text-sm truncate mb-1">
                   {item.item_name}
                 </h4>
 
                 {/* Price — inline editable for owner */}
                 {isOwnProfile && editingPriceId === item.id ? (
                   <div className="flex items-center gap-1 mb-2">
-                    <span className="text-[#F5A623] font-bold text-sm">$</span>
+                    <span className="text-[#1A1A1A] font-bold text-sm">$</span>
                     <input
                       ref={priceInputRef}
                       type="number"
@@ -304,12 +338,12 @@ export function MenuList({ userId, businessId, isOwnProfile, onMenusLoaded }: Me
                       onChange={(e) => setEditingPriceValue(e.target.value)}
                       onKeyDown={(e) => handlePriceKeyDown(e, item.id)}
                       onBlur={() => handlePriceSave(item.id)}
-                      className="w-16 bg-[var(--color-charcoal-light)] border border-[#F5A623] rounded px-1 py-0.5 text-[#F5A623] font-bold text-sm focus:outline-none"
+                      className="w-16 bg-[#F8F8F6] border border-[#1A1A1A] px-1 py-0.5 text-[#1A1A1A] font-bold text-sm focus:outline-none"
                       autoFocus
                     />
                     <button
                       onMouseDown={(e) => { e.preventDefault(); handlePriceSave(item.id); }}
-                      className="text-[#F5A623] hover:text-[#F5A623]/80"
+                      className="text-[#1A1A1A] hover:text-[#1A1A1A]/80"
                       aria-label="Save price"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -319,8 +353,8 @@ export function MenuList({ userId, businessId, isOwnProfile, onMenusLoaded }: Me
                   </div>
                 ) : (
                   <span
-                    className={`text-[#F5A623] font-bold text-sm mb-2 transition-all duration-300 ${
-                      priceGlowId === item.id ? 'shadow-[0_0_12px_rgba(245,166,35,0.6)] rounded' : ''
+                    className={`text-[#1A1A1A] font-bold text-sm mb-2 transition-all duration-300 ${
+                      priceGlowId === item.id ? 'shadow-[0_0_12px_rgba(26,26,26,0.3)]' : ''
                     } ${isOwnProfile ? 'cursor-pointer hover:underline' : ''}`}
                     onClick={isOwnProfile ? () => handlePriceEdit(item) : undefined}
                     title={isOwnProfile ? 'Click to edit price' : undefined}
@@ -375,7 +409,7 @@ export function MenuList({ userId, businessId, isOwnProfile, onMenusLoaded }: Me
                 setSelectedMenu(null);
                 setIsModalOpen(true);
               }}
-              className="inline-block bg-[#F5A623] hover:bg-[#F5A623]/90 text-black font-semibold rounded-lg px-6 py-2 transition-colors"
+              className="inline-block bg-[#1B5EA8] hover:bg-[#1B5EA8]/90 text-black font-semibold rounded-lg px-6 py-2 transition-colors"
             >
               {t('menu.create_menu')}
             </button>
@@ -400,8 +434,8 @@ export function MenuList({ userId, businessId, isOwnProfile, onMenusLoaded }: Me
         <div
           className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 backdrop-blur-md px-6 py-3 rounded-full shadow-lg"
           style={{
-            backgroundColor: toastColor === 'red' ? 'rgba(224,92,58,0.9)' : toastColor === 'amber' ? 'rgba(245,166,35,0.9)' : 'rgba(107,175,122,0.9)',
-            color: toastColor === 'sage' || toastColor === 'red' ? '#fff' : '#000',
+            backgroundColor: toastColor === 'red' ? 'rgba(224,92,58,0.9)' : toastColor === 'amber' ? 'rgba(27,79,216,0.9)' : 'rgba(107,175,122,0.9)',
+            color: '#fff',
           }}
           role="status"
           aria-live="polite"
@@ -420,6 +454,24 @@ export function MenuList({ userId, businessId, isOwnProfile, onMenusLoaded }: Me
             <span className="text-sm font-medium">{toastMessage}</span>
           </div>
         </div>
+      )}
+
+      {/* Quick View Modal */}
+      {quickViewItem && (
+        <ProductQuickView
+          isOpen={!!quickViewItem}
+          onClose={() => setQuickViewItem(null)}
+          item={{
+            id: quickViewItem.id,
+            item_name: quickViewItem.item_name,
+            description: quickViewItem.description || undefined,
+            price: quickViewItem.price,
+            image_url: quickViewItem.image_url || undefined,
+            is_available: quickViewItem.is_available,
+          }}
+          sellerId={userId}
+          businessName={businessName || menus[0]?.menu_name || undefined}
+        />
       )}
     </div>
   );

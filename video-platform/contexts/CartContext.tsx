@@ -21,6 +21,7 @@ interface CartContextType {
   updateSpecialRequests: (itemId: string, specialRequests: string) => void;
   clearCart: () => void;
   getCartCount: () => number;
+  loaded: boolean;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -87,7 +88,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const getCartCount = useCallback(() => items.reduce((sum, i) => sum + i.quantity, 0), [items]);
 
   return (
-    <CartContext.Provider value={{ items, addToCart, removeFromCart, updateQuantity, updateSpecialRequests, clearCart, getCartCount }}>
+    <CartContext.Provider value={{ items, addToCart, removeFromCart, updateQuantity, updateSpecialRequests, clearCart, getCartCount, loaded }}>
       {children}
     </CartContext.Provider>
   );

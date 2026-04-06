@@ -535,7 +535,7 @@ function UserProfileContent() {
           <p className="text-[var(--color-cream)]/60 mb-6">{error || 'This profile does not exist.'}</p>
           <Link
             href="/"
-            className="bg-[#F5A623] text-black font-semibold px-6 py-3 rounded-lg hover:bg-[#F5A623]/90 transition-all duration-200"
+            className="bg-[#1B5EA8] text-black font-semibold px-6 py-3 rounded-lg hover:bg-[#1B5EA8]/90 transition-all duration-200"
           >
             Back to Home
           </Link>
@@ -551,7 +551,7 @@ function UserProfileContent() {
         <div className={`fixed top-6 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-lg text-sm font-medium shadow-lg transition-all duration-300 ${
           toastColor === 'sage' ? 'bg-[#6BAF7A] text-white' :
           toastColor === 'red' ? 'bg-[#E05C3A] text-white' :
-          'bg-[#F5A623] text-black'
+          'bg-[#1B5EA8] text-black'
         }`}>
           {toastMessage}
         </div>
@@ -564,8 +564,8 @@ function UserProfileContent() {
             <h3 className="text-lg font-semibold text-[var(--color-cream)] mb-4">Report @{profile.username}</h3>
             <div className="space-y-3">
               {REPORT_REASONS.map(r => (
-                <label key={r.value} className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors ${reportReason === r.value ? 'bg-[#F5A623]/20 border border-[#F5A623]/40' : 'bg-[var(--color-charcoal)] border border-[var(--color-charcoal-lighter-plus)] hover:border-[#F5A623]/30'}`}>
-                  <input type="radio" name="reason" value={r.value} checked={reportReason === r.value} onChange={() => setReportReason(r.value)} className="accent-[#F5A623]" />
+                <label key={r.value} className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors ${reportReason === r.value ? 'bg-[#1B5EA8]/20 border border-[#1B5EA8]/40' : 'bg-[var(--color-charcoal)] border border-[var(--color-charcoal-lighter-plus)] hover:border-[#1B5EA8]/30'}`}>
+                  <input type="radio" name="reason" value={r.value} checked={reportReason === r.value} onChange={() => setReportReason(r.value)} className="accent-[#1B5EA8]" />
                   <span className="text-sm text-[var(--color-cream)]">{r.label}</span>
                 </label>
               ))}
@@ -575,7 +575,7 @@ function UserProfileContent() {
                 placeholder="Additional details (optional)"
                 rows={3}
                 maxLength={500}
-                className="w-full bg-[var(--color-charcoal)] border border-[var(--color-charcoal-lighter-plus)] rounded-lg px-4 py-3 text-sm text-[var(--color-cream)] placeholder-[#9E9A90] focus:outline-none focus:border-[#F5A623]/50 resize-none"
+                className="w-full bg-[var(--color-charcoal)] border border-[var(--color-charcoal-lighter-plus)] rounded-lg px-4 py-3 text-sm text-[var(--color-cream)] placeholder-[#9E9A90] focus:outline-none focus:border-[#1B5EA8]/50 resize-none"
               />
             </div>
             <div className="flex gap-3 mt-5">
@@ -618,7 +618,7 @@ function UserProfileContent() {
               <div className="absolute right-0 top-full mt-1 bg-[var(--color-charcoal-light)] border border-[var(--color-charcoal-lighter-plus)] rounded-lg shadow-xl overflow-hidden min-w-[180px] z-20">
                 <button
                   onClick={() => { setShowMenu(false); setShowReportModal(true); }}
-                  className="w-full text-left px-4 py-3 text-sm text-[var(--color-cream)] hover:bg-[#F5A623]/10 transition-colors flex items-center gap-3"
+                  className="w-full text-left px-4 py-3 text-sm text-[var(--color-cream)] hover:bg-[#1B5EA8]/10 transition-colors flex items-center gap-3"
                 >
                   <svg className="w-4 h-4 text-[#E05C3A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
@@ -641,19 +641,19 @@ function UserProfileContent() {
       </div>
 
       {/* Profile Content */}
-      <div className="p-6 pb-32">
+      <div className="max-w-4xl mx-auto px-8 py-6 pb-32">
         <div className="flex flex-col items-center mb-6">
           <img
             src={profile.profile_picture_url || 'https://via.placeholder.com/120'}
             alt={profile.full_name}
-            className="w-32 h-32 rounded-full ring-2 ring-[#F5A623]/40 object-cover mb-4"
+            className="w-32 h-32 rounded-full ring-2 ring-[#1B5EA8]/40 object-cover mb-4"
           />
           <h2 className="text-2xl font-bold mb-1">{profile.full_name}</h2>
           <p className="text-[var(--color-cream)]/60 mb-1">@{profile.username}</p>
 
           {/* Follower count */}
           <p
-            className={`text-[var(--color-body-text)] text-sm mb-4 ${adminMode ? 'cursor-pointer hover:text-[#F5A623] transition-colors select-none' : ''}`}
+            className={`text-[var(--color-body-text)] text-sm mb-4 ${adminMode ? 'cursor-pointer hover:text-[#1B5EA8] transition-colors select-none' : ''}`}
             onClick={adminMode ? () => {
               setAdminFollowerBoost(b => b + 1);
               setFollowerCount(c => c + 1);
@@ -669,17 +669,18 @@ function UserProfileContent() {
           {/* Business Info */}
           {business && (
             <div className="flex items-center gap-2 flex-wrap justify-center mb-2">
-              <p className="text-[#F5A623] text-sm">🏪 {business.business_name}</p>
+              <p className="text-[#1B5EA8] text-sm">{business.business_name}</p>
               {business.business_type && (
-                <span className="bg-[#F5A623]/20 text-[#F5A623] text-xs px-2 py-1 rounded-full capitalize">
-                  {business.business_type === 'hybrid' ? '📦 Pickup & Delivery' : `🏷️ ${business.business_type}`}
+                <span className="bg-[#1A1A1A] text-white text-xs px-2 py-1 rounded-full capitalize">
+                  {business.business_type === 'hybrid' ? 'Pickup & Delivery' : business.business_type}
                 </span>
               )}
               <button
                 onClick={() => setShowBusinessHours(!showBusinessHours)}
-                className="bg-[#F5A623]/20 text-[#F5A623] text-xs px-2 py-1 rounded-full hover:bg-[#F5A623]/30 transition-colors"
+                className="text-xs transition-colors"
+                style={{ border: '1px solid #1A1A1A', color: '#1A1A1A', background: '#FFFFFF', borderRadius: 50, padding: '6px 16px' }}
               >
-                {showBusinessHours ? '⏰ Hide Hours' : '⏰ Show Hours'}
+                {showBusinessHours ? 'Hide Hours' : 'Show Hours'}
               </button>
             </div>
           )}
@@ -687,7 +688,7 @@ function UserProfileContent() {
           {/* Average Rating */}
           {avgRating !== null && (
             <p className="text-[var(--color-cream)] text-sm mb-4">
-              ⭐ {avgRating} <span className="text-[var(--color-body-text)]">({totalReviews} {totalReviews === 1 ? 'review' : 'reviews'})</span>
+              {avgRating} <span className="text-[var(--color-body-text)]">({totalReviews} {totalReviews === 1 ? 'review' : 'reviews'})</span>
             </p>
           )}
 
@@ -699,8 +700,8 @@ function UserProfileContent() {
               disabled={followLoading}
               className={`font-semibold px-5 py-2 rounded-lg transition-all duration-200 disabled:opacity-50 flex items-center gap-2 text-sm ${
                 isFollowing
-                  ? 'bg-[#F5A623] text-black hover:bg-[#F5A623]/90'
-                  : 'border-2 border-[#F5A623] text-[#F5A623] hover:bg-[#F5A623]/10'
+                  ? 'bg-[#1B5EA8] text-black hover:bg-[#1B5EA8]/90'
+                  : 'border-2 border-[#1B5EA8] text-[#1B5EA8] hover:bg-[#1B5EA8]/10'
               }`}
             >
               {isFollowing ? (
@@ -724,7 +725,7 @@ function UserProfileContent() {
             <button
               onClick={handleMessageClick}
               disabled={messagingLoading}
-              className="bg-[#F5A623] text-black font-semibold px-5 py-2 rounded-lg hover:bg-[#F5A623]/90 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 text-sm"
+              className="bg-[#1B5EA8] text-black font-semibold px-5 py-2 rounded-lg hover:bg-[#1B5EA8]/90 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 text-sm"
             >
               {messagingLoading ? (
                 <>
@@ -757,7 +758,7 @@ function UserProfileContent() {
         {/* Business Hours Section */}
         {showBusinessHours && (
           <div className="mt-8 mb-8">
-            <h3 className="text-xl font-semibold text-[var(--color-cream)] mb-4">⏰ Business Hours</h3>
+            <h3 className="text-xl font-semibold text-[var(--color-cream)] mb-4">Business Hours</h3>
             <div className="bg-[var(--color-charcoal-light)] border border-[var(--color-charcoal-lighter-plus)] rounded-lg p-6 space-y-2">
               {business?.business_hours ? (
                 ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'].map((day) => (
@@ -783,7 +784,7 @@ function UserProfileContent() {
         {businessLocations.length > 0 && (
           <div className="mt-8">
             <h3 className="text-xl font-semibold text-[var(--color-cream)] mb-4">
-              📍 Location{businessLocations.length > 1 ? 's' : ''}
+              Location{businessLocations.length > 1 ? 's' : ''}
             </h3>
             <div className="bg-[var(--color-charcoal-light)] border border-[var(--color-charcoal-lighter-plus)] rounded-lg overflow-hidden">
               <BusinessLocationMap
@@ -796,17 +797,17 @@ function UserProfileContent() {
 
         {/* Services Section (business only) */}
         {profile.type && (
-          <div className="mt-8">
-            <h3 className="text-xl font-semibold text-[var(--color-cream)] mb-4">⚙️ Services</h3>
+          <div className="mt-8 -mx-4 sm:-mx-6 md:-mx-8">
+            <h3 className="text-xl font-semibold text-[var(--color-cream)] mb-4 px-4 sm:px-6 md:px-8">Services</h3>
             <div className="bg-[var(--color-charcoal-light)] border border-[var(--color-charcoal-lighter-plus)] rounded-lg p-6">
-              <MenuList userId={profile.id} isOwnProfile={false} />
+              <MenuList userId={profile.id} isOwnProfile={false} businessName={business?.business_name || undefined} />
             </div>
           </div>
         )}
 
         {/* Videos Section */}
         <div className="mt-8">
-          <h3 className="text-xl font-semibold text-[var(--color-cream)] mb-4">📹 Videos</h3>
+          <h3 className="text-xl font-semibold text-[var(--color-cream)] mb-4">Videos</h3>
           <div className="bg-[var(--color-charcoal-light)] border border-[var(--color-charcoal-lighter-plus)] rounded-lg p-6">
             <PostedVideos userId={profile.id} isOwnProfile={false} />
           </div>
@@ -829,7 +830,7 @@ function UserProfileContent() {
             <span className={`text-xs ${pathname === '/search' ? 'text-[var(--color-cream)]' : 'text-[var(--color-cream)]/60'}`}>Search</span>
           </Link>
           <Link href="/upload" className="flex flex-col items-center gap-1 transition-transform duration-200 hover:scale-110 active:scale-95">
-            <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-200 ${pathname === '/upload' ? 'bg-[#F5A623]' : 'bg-[#F5A623]/20'}`}>
+            <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-200 ${pathname === '/upload' ? 'bg-[#1B5EA8]' : 'bg-[#1B5EA8]/20'}`}>
               <svg className={`w-6 h-6 ${pathname === '/upload' ? 'text-black' : 'text-[var(--color-cream)]'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
@@ -852,8 +853,8 @@ function UserProfileContent() {
 
       {/* Admin Mode Badge */}
       {adminMode && (
-        <div className="fixed bottom-20 left-3 z-50 rounded-full bg-[#F5A623]/90 px-2.5 py-1 text-[11px] font-semibold text-[#1A1A18] backdrop-blur-sm">
-          ⚡ Admin
+        <div className="fixed bottom-20 left-3 z-50 rounded-full bg-[#1B5EA8]/90 px-2.5 py-1 text-[11px] font-semibold text-[#1A1A18] backdrop-blur-sm">
+          Admin
         </div>
       )}
     </div>

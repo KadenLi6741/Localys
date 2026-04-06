@@ -48,8 +48,8 @@ export default function LoginPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-transparent text-[var(--text-primary)] flex items-center justify-center px-4">
-          <p className="text-[var(--text-secondary)]">Loading login...</p>
+        <div className="min-h-screen bg-[#F5F5F5] flex items-center justify-center px-4">
+          <p className="text-[#777]">Loading login...</p>
         </div>
       }
     >
@@ -168,21 +168,37 @@ function LoginPageContent() {
 
   if (resetMode) {
     return (
-      <div className="min-h-screen bg-transparent text-[var(--text-primary)] flex items-center justify-center px-4">
-        <div className="w-full max-w-md space-y-8 bg-[rgba(36,36,32,0.85)] backdrop-blur-md border border-[var(--color-charcoal-lighter-plus)] rounded-2xl p-8 shadow-xl" style={{ animation: 'fadeInUp 0.5s ease-out forwards', opacity: 0 }}>
+      <div className="min-h-screen bg-[#F0F0F0] flex items-center justify-center px-4 relative overflow-hidden">
+        {/* Animated floating icons background */}
+        <div className="login-floating-icons" aria-hidden="true">
+          <span className="login-icon" style={{ top: '8%', animationDuration: '18s', animationDelay: '0s', fontSize: '28px' }}>🍕</span>
+          <span className="login-icon" style={{ top: '22%', animationDuration: '22s', animationDelay: '2s', fontSize: '24px' }}>🏪</span>
+          <span className="login-icon" style={{ top: '38%', animationDuration: '20s', animationDelay: '4s', fontSize: '30px' }}>🍔</span>
+          <span className="login-icon" style={{ top: '55%', animationDuration: '24s', animationDelay: '1s', fontSize: '26px' }}>☕</span>
+          <span className="login-icon" style={{ top: '70%', animationDuration: '19s', animationDelay: '3s', fontSize: '28px' }}>🛒</span>
+          <span className="login-icon" style={{ top: '85%', animationDuration: '21s', animationDelay: '5s', fontSize: '22px' }}>🍰</span>
+          <span className="login-icon" style={{ top: '15%', animationDuration: '23s', animationDelay: '6s', fontSize: '26px' }}>🥗</span>
+          <span className="login-icon" style={{ top: '45%', animationDuration: '17s', animationDelay: '7s', fontSize: '32px' }}>🏬</span>
+          <span className="login-icon" style={{ top: '65%', animationDuration: '25s', animationDelay: '2.5s', fontSize: '24px' }}>🍜</span>
+          <span className="login-icon" style={{ top: '92%', animationDuration: '20s', animationDelay: '4.5s', fontSize: '28px' }}>✂️</span>
+        </div>
+        {/* Dark tint overlay */}
+        <div className="absolute inset-0 bg-black/30 z-[1]" />
+
+        <div className="w-full max-w-md space-y-8 bg-white rounded-2xl p-8 shadow-xl relative z-10" style={{ animation: 'fadeInUp 0.5s ease-out forwards', opacity: 0 }}>
           <div className="text-center">
-            <h1 className="entrance-slide text-4xl font-bold mb-2" style={{ animation: 'slideInLeft 0.4s ease-out 0.1s forwards', opacity: 0 }}>Localy</h1>
-            <p className="text-[var(--text-tertiary)]">Reset your password</p>
+            <h1 className="text-4xl font-bold mb-2 text-[#111]" style={{ animation: 'slideInLeft 0.4s ease-out 0.1s forwards', opacity: 0 }}>Localy</h1>
+            <p className="text-[#777]">Reset your password</p>
           </div>
 
           {resetSent ? (
             <div className="space-y-6">
-              <div className="bg-green-500/20 border border-green-500 text-green-200 px-4 py-3 rounded-lg">
+              <div className="bg-green-50 border border-green-300 text-green-800 px-4 py-3 rounded-lg">
                 Check your email for a password reset link.
               </div>
               <button
                 onClick={() => { switchToLogin(); setResetSent(false); }}
-                className="w-full bg-white text-black font-semibold py-3 rounded-lg hover:bg-white/90 active:scale-98 transition-all duration-200"
+                className="w-full bg-[#2A6FD6] text-white font-semibold py-3 rounded-lg hover:bg-[#245FCC] active:scale-[0.98] transition-all duration-200"
               >
                 Back to Sign In
               </button>
@@ -190,19 +206,19 @@ function LoginPageContent() {
           ) : (
             <form onSubmit={handleResetPassword} className="space-y-6">
               {isEmailVerified && (
-                <div className="bg-green-500/20 border border-green-500 text-green-200 px-4 py-3 rounded-lg">
+                <div className="bg-green-50 border border-green-300 text-green-800 px-4 py-3 rounded-lg">
                   Email verified. Please sign in again to continue.
                 </div>
               )}
 
               {error && (
-                <div className="bg-red-500/20 border border-red-500 text-red-200 px-4 py-3 rounded-lg">
+                <div className="bg-red-50 border border-red-300 text-red-700 px-4 py-3 rounded-lg">
                   {error}
                 </div>
               )}
 
               <div>
-                <label htmlFor="reset-email" className="block text-sm font-medium mb-2">
+                <label htmlFor="reset-email" className="block text-sm font-medium mb-2 text-[#111]">
                   Email
                 </label>
                 <input
@@ -211,7 +227,7 @@ function LoginPageContent() {
                   value={identifier}
                   onChange={(e) => setIdentifier(e.target.value)}
                   required
-                  className="w-full bg-[var(--glass-bg)] border border-[var(--glass-border)] rounded-lg px-4 py-3 text-[var(--text-primary)] placeholder-[var(--placeholder)] focus:outline-none focus:border-[var(--glass-border-focus)] focus:ring-2 focus:ring-white/20 transition-all duration-200"
+                  className="w-full bg-white border border-[#E0E0E0] rounded-lg px-4 py-3 text-[#111] placeholder-[#999] focus:outline-none focus:border-[#2A6FD6] focus:ring-2 focus:ring-[#2A6FD6]/20 transition-all duration-200"
                   placeholder="you@example.com"
                 />
               </div>
@@ -221,7 +237,7 @@ function LoginPageContent() {
                   siteKey={siteKey}
                   onVerify={setTurnstileToken}
                   onExpire={() => setTurnstileToken(null)}
-                  theme="dark"
+                  theme="light"
                   resetKey={turnstileResetKey}
                 />
               )}
@@ -229,7 +245,7 @@ function LoginPageContent() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-white text-black font-semibold py-3 rounded-lg disabled:bg-[var(--glass-bg-strong)] disabled:text-[var(--text-muted)] disabled:cursor-not-allowed hover:bg-white/90 active:scale-98 transition-all duration-200"
+                className="w-full bg-[#2A6FD6] text-white font-semibold py-3 rounded-lg disabled:bg-[#2A6FD6]/40 disabled:cursor-not-allowed hover:bg-[#245FCC] active:scale-[0.98] transition-all duration-200"
               >
                 {loading ? 'Sending...' : 'Send Reset Link'}
               </button>
@@ -237,10 +253,10 @@ function LoginPageContent() {
           )}
 
           {!resetSent && (
-            <p className="text-center text-[var(--text-tertiary)]">
+            <p className="text-center text-[#777]">
               <button
                 onClick={switchToLogin}
-                className="text-[var(--text-primary)] hover:underline"
+                className="text-[#2A6FD6] hover:underline font-medium"
               >
                 Back to Sign In
               </button>
@@ -252,28 +268,44 @@ function LoginPageContent() {
   }
 
   return (
-    <div className="min-h-screen bg-transparent text-[var(--text-primary)] flex items-center justify-center px-4">
-      <div className="w-full max-w-md space-y-8 bg-[rgba(36,36,32,0.85)] backdrop-blur-md border border-[var(--color-charcoal-lighter-plus)] rounded-2xl p-8 shadow-xl" style={{ animation: 'fadeInUp 0.5s ease-out forwards', opacity: 0 }}>
+    <div className="min-h-screen bg-[#F0F0F0] flex items-center justify-center px-4 relative overflow-hidden">
+      {/* Animated floating icons background */}
+      <div className="login-floating-icons" aria-hidden="true">
+        <span className="login-icon" style={{ top: '8%', animationDuration: '18s', animationDelay: '0s', fontSize: '28px' }}>🍕</span>
+        <span className="login-icon" style={{ top: '22%', animationDuration: '22s', animationDelay: '2s', fontSize: '24px' }}>🏪</span>
+        <span className="login-icon" style={{ top: '38%', animationDuration: '20s', animationDelay: '4s', fontSize: '30px' }}>🍔</span>
+        <span className="login-icon" style={{ top: '55%', animationDuration: '24s', animationDelay: '1s', fontSize: '26px' }}>☕</span>
+        <span className="login-icon" style={{ top: '70%', animationDuration: '19s', animationDelay: '3s', fontSize: '28px' }}>🛒</span>
+        <span className="login-icon" style={{ top: '85%', animationDuration: '21s', animationDelay: '5s', fontSize: '22px' }}>🍰</span>
+        <span className="login-icon" style={{ top: '15%', animationDuration: '23s', animationDelay: '6s', fontSize: '26px' }}>🥗</span>
+        <span className="login-icon" style={{ top: '45%', animationDuration: '17s', animationDelay: '7s', fontSize: '32px' }}>🏬</span>
+        <span className="login-icon" style={{ top: '65%', animationDuration: '25s', animationDelay: '2.5s', fontSize: '24px' }}>🍜</span>
+        <span className="login-icon" style={{ top: '92%', animationDuration: '20s', animationDelay: '4.5s', fontSize: '28px' }}>✂️</span>
+      </div>
+      {/* Dark tint overlay */}
+      <div className="absolute inset-0 bg-black/30 z-[1]" />
+
+      <div className="w-full max-w-md space-y-8 bg-white rounded-2xl p-8 shadow-xl relative z-10" style={{ animation: 'fadeInUp 0.5s ease-out forwards', opacity: 0 }}>
         <div className="text-center">
-          <h1 className="entrance-slide text-4xl font-bold mb-2" style={{ animation: 'slideInLeft 0.4s ease-out 0.1s forwards', opacity: 0 }}>Localy</h1>
-          <p className="text-[var(--text-tertiary)]">Sign in to your account</p>
+          <h1 className="text-4xl font-bold mb-2 text-[#111]" style={{ animation: 'slideInLeft 0.4s ease-out 0.1s forwards', opacity: 0 }}>Localy</h1>
+          <p className="text-[#777]">Sign in to your account</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {isEmailVerified && (
-            <div className="bg-green-500/20 border border-green-500 text-green-200 px-4 py-3 rounded-lg">
+            <div className="bg-green-50 border border-green-300 text-green-800 px-4 py-3 rounded-lg">
               Email verified. Please sign in again to continue.
             </div>
           )}
 
           {error && (
-            <div className="bg-red-500/20 border border-red-500 text-red-200 px-4 py-3 rounded-lg">
+            <div className="bg-red-50 border border-red-300 text-red-700 px-4 py-3 rounded-lg">
               {error}
             </div>
           )}
 
           <div>
-            <label htmlFor="email" className="block text-sm font-medium mb-2">
+            <label htmlFor="email" className="block text-sm font-medium mb-2 text-[#111]">
               Email
             </label>
             <input
@@ -282,20 +314,20 @@ function LoginPageContent() {
               value={identifier}
               onChange={(e) => setIdentifier(e.target.value)}
               required
-              className="w-full bg-[var(--glass-bg)] border border-[var(--glass-border)] rounded-lg px-4 py-3 text-[var(--text-primary)] placeholder-[var(--placeholder)] focus:outline-none focus:border-[var(--glass-border-focus)] focus:ring-2 focus:ring-white/20 transition-all duration-200"
+              className="w-full bg-white border border-[#E0E0E0] rounded-lg px-4 py-3 text-[#111] placeholder-[#999] focus:outline-none focus:border-[#2A6FD6] focus:ring-2 focus:ring-[#2A6FD6]/20 transition-all duration-200"
               placeholder="you@example.com"
             />
           </div>
 
           <div>
             <div className="flex items-center justify-between mb-2">
-              <label htmlFor="password" className="block text-sm font-medium">
+              <label htmlFor="password" className="block text-sm font-medium text-[#111]">
                 Password
               </label>
               <button
                 type="button"
                 onClick={switchToReset}
-                className="text-sm text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:underline transition-colors duration-200"
+                className="text-sm text-[#2A6FD6] hover:underline transition-colors duration-200"
               >
                 Forgot Password?
               </button>
@@ -306,7 +338,7 @@ function LoginPageContent() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full bg-[var(--glass-bg)] border border-[var(--glass-border)] rounded-lg px-4 py-3 text-[var(--text-primary)] placeholder-[var(--placeholder)] focus:outline-none focus:border-[var(--glass-border-focus)] focus:ring-2 focus:ring-white/20 transition-all duration-200"
+              className="w-full bg-white border border-[#E0E0E0] rounded-lg px-4 py-3 text-[#111] placeholder-[#999] focus:outline-none focus:border-[#2A6FD6] focus:ring-2 focus:ring-[#2A6FD6]/20 transition-all duration-200"
               placeholder="••••••••"
             />
           </div>
@@ -316,7 +348,7 @@ function LoginPageContent() {
               siteKey={siteKey}
               onVerify={setTurnstileToken}
               onExpire={() => setTurnstileToken(null)}
-              theme="dark"
+              theme="light"
               resetKey={turnstileResetKey}
             />
           )}
@@ -324,15 +356,15 @@ function LoginPageContent() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-white text-black font-semibold py-3 rounded-lg disabled:bg-[var(--glass-bg-strong)] disabled:text-[var(--text-muted)] disabled:cursor-not-allowed hover:bg-white/90 active:scale-98 transition-all duration-200"
+            className="w-full bg-[#2A6FD6] text-white font-semibold py-3 rounded-lg disabled:bg-[#2A6FD6]/40 disabled:cursor-not-allowed hover:bg-[#245FCC] active:scale-[0.98] transition-all duration-200"
           >
             {loading ? 'Signing in...' : 'Sign In'}
           </button>
         </form>
 
-        <p className="text-center text-[var(--text-tertiary)]">
+        <p className="text-center text-[#777]">
           Don't have an account?{' '}
-          <Link href="/signup" className="text-[var(--text-primary)] hover:underline">
+          <Link href="/signup" className="text-[#2A6FD6] hover:underline font-medium">
             Sign up
           </Link>
         </p>

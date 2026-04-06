@@ -156,7 +156,7 @@ export default function SignUpPage() {
                 className={`py-2 px-3 rounded-lg text-sm font-medium transition-all ${
                   accountType === 'user'
                     ? 'bg-blue-500 text-white'
-                    : 'bg-[var(--glass-bg)] text-gray-300 hover:bg-[var(--glass-bg-strong)]'
+                    : 'bg-[var(--glass-bg)] text-[#6B6B65] hover:bg-[var(--glass-bg-strong)]'
                 }`}
               >
                 USER
@@ -167,7 +167,7 @@ export default function SignUpPage() {
                 className={`py-2 px-3 rounded-lg text-sm font-medium transition-all ${
                   accountType === 'business'
                     ? 'bg-blue-500 text-white'
-                    : 'bg-[var(--glass-bg)] text-gray-300 hover:bg-[var(--glass-bg-strong)]'
+                    : 'bg-[var(--glass-bg)] text-[#6B6B65] hover:bg-[var(--glass-bg-strong)]'
                 }`}
               >
                 BUSINESS

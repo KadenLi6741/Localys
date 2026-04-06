@@ -39,15 +39,15 @@ export function PromotionActivityFeed({ history }: PromotionActivityFeedProps) {
 
   return (
     <div>
-      <h4 className="text-sm font-semibold text-[var(--text-secondary)] mb-3">🚀 Recent Promotions</h4>
+      <h4 className="text-sm font-semibold text-[var(--text-secondary)] mb-3">Recent Promotions</h4>
       <div className="space-y-0">
         {displayed.map((entry) => (
           <div
             key={entry.id}
-            className="flex gap-3 items-start py-3 border-b border-white/5 last:border-b-0"
+            className="flex gap-3 items-start py-3 border-b border-[#E8E8E4] last:border-b-0"
           >
             <div className="w-8 h-8 bg-yellow-500/20 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-              <span className="text-sm">🚀</span>
+              <svg className="w-4 h-4 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm text-[var(--text-primary)]">

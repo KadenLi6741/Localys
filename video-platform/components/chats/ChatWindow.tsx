@@ -75,7 +75,7 @@ export function ChatWindow({ messages, currentUserId, loading, messagesEndRef }:
     return (
       <div className="flex-1 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#F5A623] mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1B5EA8] mx-auto mb-4"></div>
           <p className="text-[var(--color-body-text)]">Loading messages...</p>
         </div>
       </div>
@@ -152,20 +152,20 @@ export function ChatWindow({ messages, currentUserId, loading, messagesEndRef }:
                     <textarea
                       value={editingContent}
                       onChange={(e) => setEditingContent(e.target.value)}
-                      className="w-full px-3 py-2 rounded-xl bg-[var(--color-charcoal-light)] border border-[var(--color-charcoal-lighter-plus)] text-[var(--color-cream)] placeholder-[#9E9A90]/50 focus:outline-none focus:border-[#F5A623] focus-visible:ring-2 focus-visible:ring-[#F5A623]"
+                      className="w-full px-3 py-2 rounded-xl bg-[var(--color-charcoal-light)] border border-[var(--color-charcoal-lighter-plus)] text-[var(--color-cream)] placeholder-[#9E9A90]/50 focus:outline-none focus:border-[#1B5EA8] focus-visible:ring-2 focus-visible:ring-[#1B5EA8]"
                       rows={2}
                       aria-label="Edit message"
                     />
                     <div className="flex gap-2 mt-2">
                       <button
                         onClick={() => handleEditSave(message.id)}
-                        className="text-xs px-3 py-1.5 min-h-[44px] bg-[#6BAF7A] text-black rounded-lg hover:bg-[#6BAF7A]/90 font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F5A623]"
+                        className="text-xs px-3 py-1.5 min-h-[44px] bg-[#6BAF7A] text-black rounded-lg hover:bg-[#6BAF7A]/90 font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1B5EA8]"
                       >
                         Save
                       </button>
                       <button
                         onClick={handleEditCancel}
-                        className="text-xs px-3 py-1.5 min-h-[44px] bg-[var(--color-charcoal-light)] border border-[var(--color-charcoal-lighter-plus)] text-[var(--color-body-text)] rounded-lg hover:bg-[var(--color-charcoal-lighter)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F5A623]"
+                        className="text-xs px-3 py-1.5 min-h-[44px] bg-[var(--color-charcoal-light)] border border-[var(--color-charcoal-lighter-plus)] text-[var(--color-body-text)] rounded-lg hover:bg-[var(--color-charcoal-lighter)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1B5EA8]"
                       >
                         Cancel
                       </button>
@@ -175,7 +175,7 @@ export function ChatWindow({ messages, currentUserId, loading, messagesEndRef }:
                   <div
                     className={`px-4 py-2 rounded-lg transition-all duration-200 ${
                       isOwn
-                        ? 'bg-[#F5A623] text-black shadow-lg shadow-[#F5A623]/30'
+                        ? 'bg-[#1B5EA8] text-black shadow-lg shadow-[#1B5EA8]/30'
                         : 'bg-[var(--color-charcoal-light)] border border-[var(--color-charcoal-lighter-plus)] text-[var(--color-cream)] hover:border-[var(--color-charcoal-lighter-plus)]'
                     }`}
                   >
@@ -204,7 +204,7 @@ export function ChatWindow({ messages, currentUserId, loading, messagesEndRef }:
                 <div className="relative flex items-center">
                   <button
                     onClick={() => setMenuOpenId(menuOpenId === message.id ? null : message.id || null)}
-                    className="min-w-[44px] min-h-[44px] flex items-center justify-center text-[var(--color-body-text)] hover:text-[var(--color-cream)] hover:bg-[var(--color-charcoal-lighter)] rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F5A623]"
+                    className="min-w-[44px] min-h-[44px] flex items-center justify-center text-[var(--color-body-text)] hover:text-[var(--color-cream)] hover:bg-[var(--color-charcoal-lighter)] rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1B5EA8]"
                     aria-label="Message options"
                   >
                     ⋯
@@ -216,9 +216,9 @@ export function ChatWindow({ messages, currentUserId, loading, messagesEndRef }:
                           handleEditStart(message);
                           setMenuOpenId(null);
                         }}
-                        className="w-full text-left px-4 py-2 text-sm text-[var(--color-cream)] hover:bg-[var(--color-charcoal-lighter)] flex items-center gap-2 hover:text-[#F5A623] transition-colors"
+                        className="w-full text-left px-4 py-2 text-sm text-[var(--color-cream)] hover:bg-[var(--color-charcoal-lighter)] flex items-center gap-2 hover:text-[#1B5EA8] transition-colors"
                       >
-                        ✏️ Edit
+                        Edit
                       </button>
                       <button
                         onClick={() => {
@@ -227,7 +227,7 @@ export function ChatWindow({ messages, currentUserId, loading, messagesEndRef }:
                         }}
                         className="w-full text-left px-4 py-2 text-sm text-[var(--color-cream)] hover:bg-[var(--color-charcoal-lighter)] flex items-center gap-2 hover:text-[#E05C3A] transition-colors border-t border-[var(--color-charcoal-lighter-plus)]"
                       >
-                        🗑️ Delete
+                        Delete
                       </button>
                     </div>
                   )}

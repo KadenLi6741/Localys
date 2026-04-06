@@ -141,15 +141,15 @@ export async function POST(request: NextRequest) {
         const itemIds = items.map(i => i.id);
         const { data: menuItems, error: menuError } = await supabase
           .from('menu_items')
-          .select('id, name, price, user_id')
+          .select('id, item_name, price, user_id')
           .in('id', itemIds);
 
         if (menuError) {
           console.error('Error fetching menu items for webhook:', menuError);
         }
 
-        const menuMap = new Map<string, { name: string; price: number; user_id: string }>();
-        (menuItems || []).forEach((mi: { id: string; name: string; price: number; user_id: string }) => {
+        const menuMap = new Map<string, { item_name: string; price: number; user_id: string }>();
+        (menuItems || []).forEach((mi: { id: string; item_name: string; price: number; user_id: string }) => {
           menuMap.set(mi.id, mi);
         });
 
@@ -164,7 +164,7 @@ export async function POST(request: NextRequest) {
             item_id: item.id,
             seller_id: menuItem?.user_id || sellerId,
             buyer_id: buyerId,
-            item_name: menuItem?.name || 'Unknown Item',
+            item_name: menuItem?.item_name || 'Unknown Item',
             price: paidPrice,
             quantity: item.qty || 1,
             ...(couponCode && {

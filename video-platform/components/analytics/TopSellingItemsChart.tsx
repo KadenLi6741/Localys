@@ -13,26 +13,26 @@ export function TopSellingItemsChart({ data }: TopSellingItemsChartProps) {
 
   return (
     <div>
-      <h4 className="text-sm font-semibold text-[var(--color-cream)]/80 mb-3">🏆 Top Selling Items</h4>
+      <h4 className="text-sm font-semibold text-[#1A1A1A] mb-3">Top Selling Items</h4>
       <div className="space-y-3">
         {data.map((item, i) => {
           const pct = (item.unitsSold / maxUnits) * 100;
           return (
             <div key={item.itemName} className="flex items-center gap-3">
-              <span className="text-[var(--color-cream)] text-sm w-28 truncate flex-shrink-0" title={item.itemName}>
+              <span className="text-[#1A1A1A] text-sm w-28 truncate flex-shrink-0" title={item.itemName}>
                 {item.itemName}
               </span>
-              <div className="flex-1 h-6 bg-[var(--color-charcoal)] rounded-full overflow-hidden">
+              <div className="flex-1 h-6 bg-[#F0F0EC] rounded-full overflow-hidden">
                 <div
                   className="h-full rounded-full transition-all duration-700"
                   style={{
                     width: `${pct}%`,
-                    background: 'linear-gradient(90deg, #F5A623, #F5A623cc)',
+                    background: 'linear-gradient(90deg, #1B5EA8, #1B5EA8cc)',
                     animationDelay: `${i * 0.1}s`,
                   }}
                 />
               </div>
-              <span className="text-[#F5A623] text-sm font-semibold w-8 text-right flex-shrink-0">
+              <span className="text-[#1B5EA8] text-sm font-semibold w-8 text-right flex-shrink-0">
                 {item.unitsSold}
               </span>
             </div>

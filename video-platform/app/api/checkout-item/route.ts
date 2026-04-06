@@ -50,10 +50,9 @@ export async function POST(request: NextRequest) {
     // Validate and apply coupon if provided
     if (couponCode) {
       const { createClient } = await import('@supabase/supabase-js');
-      const supabase = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-      );
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://dbqkpcwnzteljwxjoudj.supabase.co';
+      const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable_0KyfCBFYECxfh0NfQ15Flw_P_BMyk89';
+      const supabase = createClient(supabaseUrl, supabaseKey);
 
       const { data: coupon, error: couponError } = await supabase
         .from('coupons')

@@ -88,6 +88,7 @@ export function HomeContent({ isActive }: HomeContentProps) {
   const volumeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
+  const [videoErrors, setVideoErrors] = useState<Record<string, boolean>>({});
 
   // Admin mode state (Ctrl+Shift+D) — always starts OFF, must be toggled on manually
   const [adminMode, setAdminMode] = useState(false);
@@ -606,7 +607,7 @@ export function HomeContent({ isActive }: HomeContentProps) {
   }, []);
 
   const handleVolumeLeave = useCallback(() => {
-    volumeTimeoutRef.current = setTimeout(() => setShowVolumeSlider(false), 300);
+    volumeTimeoutRef.current = setTimeout(() => setShowVolumeSlider(false), 2000);
   }, []);
 
   const toggleMute = useCallback(() => {
@@ -897,9 +898,9 @@ export function HomeContent({ isActive }: HomeContentProps) {
 
   if (loading) {
     return (
-      <div className="fixed top-0 left-0 right-0 bottom-0 lg:left-60 overflow-hidden bg-[var(--color-charcoal)] text-foreground flex items-center justify-center">
+      <div className="fixed inset-0 overflow-hidden bg-black text-white flex items-center justify-center z-10">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-current mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
           <p>Loading videos...</p>
         </div>
       </div>
@@ -908,20 +909,20 @@ export function HomeContent({ isActive }: HomeContentProps) {
 
   if (filteredVideos.length === 0) {
     return (
-      <div className="fixed top-0 left-0 right-0 bottom-0 lg:left-60 overflow-hidden bg-[var(--color-charcoal)] text-foreground flex items-center justify-center">
+      <div className="fixed inset-0 overflow-hidden bg-black text-white flex items-center justify-center z-10">
         <div className="text-center">
           <h2 className="text-2xl font-bold mb-4">{distanceFilter !== Infinity ? 'No videos in this range' : 'No videos yet'}</h2>
           {distanceFilter !== Infinity ? (
             <button
               onClick={() => { setDistanceFilter(Infinity); setCurrentIndex(0); }}
-              className="bg-[#F5A623] text-black font-semibold px-6 py-3 rounded-lg hover:opacity-90 transition-all duration-200"
+              className="bg-white text-black font-semibold px-6 py-3 hover:opacity-90 transition-all duration-200"
             >
               Show All Videos
             </button>
           ) : (
             <Link
               href="/upload"
-              className="bg-[var(--foreground)] text-[var(--background)] font-semibold px-6 py-3 rounded-lg hover:opacity-90 transition-all duration-200"
+              className="bg-white text-black font-semibold px-6 py-3 hover:opacity-90 transition-all duration-200"
             >
               Upload First Video
             </Link>
@@ -934,9 +935,9 @@ export function HomeContent({ isActive }: HomeContentProps) {
   const currentVideo = filteredVideos[currentIndex];
   if (!currentVideo) {
     return (
-      <div className="fixed top-0 left-0 right-0 bottom-0 lg:left-60 overflow-hidden bg-[var(--color-charcoal)] text-foreground flex items-center justify-center">
+      <div className="fixed inset-0 overflow-hidden bg-black text-white flex items-center justify-center z-10">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-current mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
           <p>Loading video...</p>
         </div>
       </div>
@@ -977,7 +978,7 @@ export function HomeContent({ isActive }: HomeContentProps) {
           100% { transform: translate(-50%, 0) scale(1); }
         }
       `}</style>
-      <div className="home-content-root fixed top-0 left-0 right-0 bottom-0 lg:left-60 z-10 overflow-hidden overscroll-none bg-[var(--color-charcoal)] text-foreground">
+      <div className="home-content-root fixed inset-0 z-10 overflow-hidden overscroll-none bg-black text-white">
       {/* Ambient Particle Background - CSS shimmer effect */}
       <div className="home-feed-particles" aria-hidden="true" />
 
@@ -993,7 +994,7 @@ export function HomeContent({ isActive }: HomeContentProps) {
         {filteredVideos.map((video, index) => (
           <div
             key={video.id}
-            className={`absolute inset-0 transition-transform duration-500 ${
+            className={`absolute inset-0 transition-transform duration-500 bg-white dark:bg-[#1A1A18] flex flex-col ${
               index === currentIndex ? 'translate-y-0 animate-scale-in' :
               index < currentIndex ? '-translate-y-full' : 'translate-y-full'
             }`}
@@ -1007,6 +1008,10 @@ export function HomeContent({ isActive }: HomeContentProps) {
 
               return (
                 <>
+            {/* Video container - takes remaining space */}
+            <div className="relative flex-1 min-h-0">
+            {/* Main video at natural aspect ratio */}
+            {video.video_url && !videoErrors[video.id] ? (
             <video
               ref={(el) => { videoRefs.current[index] = el; }}
               src={video.video_url}
@@ -1014,65 +1019,46 @@ export function HomeContent({ isActive }: HomeContentProps) {
               controls={false}
               loop
               playsInline
+              preload="metadata"
               muted={!isActive || index !== currentIndex}
               autoPlay={index === currentIndex}
               onClick={index === currentIndex ? togglePlayPause : undefined}
+              onError={() => setVideoErrors((prev) => ({ ...prev, [video.id]: true }))}
             />
+            ) : (
+              <div className="h-full w-full flex items-center justify-center bg-[#F8F8F6]">
+                <div className="text-center">
+                  <svg className="w-12 h-12 mx-auto mb-2 text-[#9E9A90]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  </svg>
+                  <p className="text-sm text-[#9E9A90]">Video unavailable</p>
+                </div>
+              </div>
+            )}
 
             {/* Centered Play Icon - shown when paused */}
             {index === currentIndex && !isPlaying && (
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
-                <svg className="w-12 h-12 text-[var(--color-cream)] opacity-50 drop-shadow-lg" fill="currentColor" viewBox="0 0 24 24">
+                <svg className="w-12 h-12 text-white opacity-50 drop-shadow-lg" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M8 5v14l11-7z" />
                 </svg>
               </div>
             )}
 
-            {/* Business Info Overlay - Enhanced Glassmorphism */}
-            <div className="video-overlay-glass absolute bottom-0 left-0 right-0 px-4 pt-6 pb-3 border-t border-[var(--color-charcoal-lighter-plus)]">
-              <button
-                onClick={() => handleProfileClick(video.user_id, video.profiles?.username)}
-                onKeyDown={(e) => handleKeyDown(e, () => handleProfileClick(video.user_id, video.profiles?.username))}
-                className="text-left focus:outline-none focus:ring-2 focus:ring-[#F5A623] focus:ring-offset-2 focus:ring-offset-[var(--color-charcoal)] rounded"
-                aria-label={`View profile of ${feedBusiness?.business_name || video.profiles?.full_name || 'Business'}`}
-              >
-                <h2 className="text-2xl font-bold text-[var(--color-cream)] mb-2 hover:underline">
-                  {feedBusiness?.business_name || video.profiles?.full_name || 'Business'}
-                </h2>
-              </button>
-              <p className="text-[var(--color-cream)]/80 text-sm mb-2">{video.caption || ''}</p>
-              <div className="flex items-center gap-4 text-[var(--color-cream)]/90 text-sm">
-                {feedBusiness?.average_rating && (
-                  <>
-                    <span>⭐ {feedBusiness.average_rating.toFixed(1)}</span>
-                    <span>•</span>
-                  </>
-                )}
-                <span>{commentCounts[video.id] || 0} reviews</span>
-                {feedDistanceLabel && (
-                  <>
-                    <span>•</span>
-                    <span>{feedDistanceLabel} away</span>
-                  </>
-                )}
-              </div>
-
-            </div>
-
             {feedBusiness && (
-              <div className="absolute left-0 top-1/2 z-20 -translate-y-1/2 pl-2 sm:pl-3 lg:left-60">
+              <div className="absolute left-0 top-1/2 z-20 -translate-y-1/2 pl-2 sm:pl-3">
                 <div className="group flex items-center">
-                  <div className="rounded-r-xl border border-[var(--color-charcoal-lighter-plus)] bg-[var(--color-charcoal)]/85 p-2 sm:p-3 backdrop-blur-xl">
-                    <span className="text-base sm:text-xl" aria-hidden="true">📍</span>
+                  <div className="rounded-r-none border border-[#E8E8E4] bg-white/90 p-2 sm:p-3 backdrop-blur-md">
+                    <svg className="w-4 h-4 text-[#1A1A1A]" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" /></svg>
                     <span className="sr-only">Business quick info</span>
                   </div>
 
-                  <div className="ml-1 sm:ml-2 w-0 overflow-hidden rounded-xl border border-[var(--color-charcoal-lighter-plus)] bg-[var(--color-charcoal-light)]/85 opacity-0 backdrop-blur-xl transition-all duration-300 group-hover:w-[220px] group-hover:opacity-100 group-focus-within:w-[220px] group-focus-within:opacity-100 sm:group-hover:w-[260px] sm:group-focus-within:w-[260px]">
+                  <div className="ml-0 w-0 overflow-hidden border border-[#E8E8E4] bg-white/95 opacity-0 backdrop-blur-md transition-all duration-300 group-hover:w-[220px] group-hover:opacity-100 group-focus-within:w-[220px] group-focus-within:opacity-100 sm:group-hover:w-[260px] sm:group-focus-within:w-[260px]">
                     <div className="p-2 sm:p-3">
                       <div className="grid grid-cols-3 gap-1.5 sm:gap-2 text-[10px] sm:text-xs">
-                        <div className="rounded-lg bg-[var(--color-charcoal-lighter-plus)]/50 px-2 py-2">
-                          <p className="text-[var(--color-body-text)]">Avg Price</p>
-                          <p className="text-[var(--color-cream)] font-semibold">
+                        <div className="bg-[#F8F8F6] px-2 py-2">
+                          <p className="text-[#6B6B65]">Avg Price</p>
+                          <p className="text-[#1A1A1A] font-semibold">
                             {feedBusiness.id && priceRanges[feedBusiness.id]
                               ? (() => {
                                   const avgPrice = computeAveragePrice(priceRanges[feedBusiness.id]);
@@ -1081,13 +1067,13 @@ export function HomeContent({ isActive }: HomeContentProps) {
                               : '—'}
                           </p>
                         </div>
-                        <div className="rounded-lg bg-[var(--color-charcoal-lighter-plus)]/50 px-2 py-2">
-                          <p className="text-[var(--color-body-text)]">Distance</p>
-                          <p className="text-[var(--color-cream)] font-semibold">{feedDistanceLabel || 'Use GPS'}</p>
+                        <div className="bg-[#F8F8F6] px-2 py-2">
+                          <p className="text-[#6B6B65]">Distance</p>
+                          <p className="text-[#1A1A1A] font-semibold">{feedDistanceLabel || 'Use GPS'}</p>
                         </div>
-                        <div className="rounded-lg bg-[var(--color-charcoal-lighter-plus)]/50 px-2 py-2">
-                          <p className="text-[var(--color-body-text)]">ETA</p>
-                          <p className="text-[var(--color-cream)] font-semibold">{feedEta !== null ? `${feedEta} min` : '—'}</p>
+                        <div className="bg-[#F8F8F6] px-2 py-2">
+                          <p className="text-[#6B6B65]">ETA</p>
+                          <p className="text-[#1A1A1A] font-semibold">{feedEta !== null ? `${feedEta} min` : '—'}</p>
                         </div>
                       </div>
 
@@ -1099,13 +1085,13 @@ export function HomeContent({ isActive }: HomeContentProps) {
                           }
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="rounded-lg bg-[#F5A623] text-black text-[10px] sm:text-xs font-semibold px-2 py-1 sm:px-3 sm:py-1.5 hover:bg-[#F5A623]/90 transition-all"
+                          className="bg-[#1A1A1A] text-white text-[10px] sm:text-xs font-semibold px-2 py-1 sm:px-3 sm:py-1.5 hover:bg-[#1A1A1A]/90 transition-all"
                         >
                           Directions
                         </a>
                         <Link
                           href={`/profile/${video.profiles?.username || video.user_id}`}
-                          className="rounded-lg bg-[var(--color-charcoal-lighter-plus)]/50 border border-[var(--color-charcoal-lighter-plus)] text-[var(--color-cream)] text-[10px] sm:text-xs font-semibold px-2 py-1 sm:px-3 sm:py-1.5 hover:bg-[var(--color-charcoal-lighter-plus)]/80 transition-all"
+                          className="bg-[#F8F8F6] border border-[#E8E8E4] text-[#1A1A1A] text-[10px] sm:text-xs font-semibold px-2 py-1 sm:px-3 sm:py-1.5 hover:bg-[#E8E8E4] transition-all"
                         >
                           Menu
                         </Link>
@@ -1115,6 +1101,37 @@ export function HomeContent({ isActive }: HomeContentProps) {
                 </div>
               </div>
             )}
+            </div>
+
+            {/* Business Info - Stacked below video */}
+            <div className="flex-shrink-0 px-4 pt-3 pb-3 bg-white dark:bg-[#1A1A18] border-t border-[#E8E8E4]">
+              <button
+                onClick={() => handleProfileClick(video.user_id, video.profiles?.username)}
+                onKeyDown={(e) => handleKeyDown(e, () => handleProfileClick(video.user_id, video.profiles?.username))}
+                className="text-left focus:outline-none focus:ring-2 focus:ring-[#1A1A1A] focus:ring-offset-2 rounded"
+                aria-label={`View profile of ${feedBusiness?.business_name || video.profiles?.full_name || 'Business'}`}
+              >
+                <h2 className="text-2xl font-light text-[#1A1A1A] mb-1 hover:underline" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
+                  {feedBusiness?.business_name || video.profiles?.full_name || 'Business'}
+                </h2>
+              </button>
+              <p className="text-[#6B6B65] text-sm mb-1">{video.caption || ''}</p>
+              <div className="flex items-center gap-4 text-[#6B6B65] text-sm">
+                {feedBusiness?.average_rating && (
+                  <>
+                    <span>{feedBusiness.average_rating.toFixed(1)}</span>
+                    <span>•</span>
+                  </>
+                )}
+                <span>{commentCounts[video.id] || 0} reviews</span>
+                {feedDistanceLabel && (
+                  <>
+                    <span>•</span>
+                    <span>{feedDistanceLabel} away</span>
+                  </>
+                )}
+              </div>
+            </div>
                 </>
               );
             })()}
@@ -1123,9 +1140,9 @@ export function HomeContent({ isActive }: HomeContentProps) {
       </div>
 
       {/* Top Header */}
-      <header className="absolute top-0 left-0 right-0 z-30 border-b border-[var(--color-charcoal-lighter-plus)] bg-[var(--color-charcoal)]/80 backdrop-blur-xl">
+      <header className="absolute top-0 left-0 right-0 z-30 border-b border-[#E8E8E4] bg-white/90 backdrop-blur-md">
         <div className="flex items-center justify-between px-3 py-2 sm:px-4 sm:py-3 md:px-5">
-          <h1 className="text-base sm:text-lg md:text-xl font-bold text-[var(--color-cream)]">Localy</h1>
+          <h1 className="text-base sm:text-lg md:text-xl font-light text-[#1A1A1A]" style={{ fontFamily: 'Cormorant Garamond, serif' }}>Localy</h1>
 
           <div className="flex items-center gap-2 sm:gap-3">
             {/* Volume Dropdown */}
@@ -1137,33 +1154,39 @@ export function HomeContent({ isActive }: HomeContentProps) {
               <button
                 onClick={toggleMute}
                 onTouchStart={handleVolumeEnter}
-                className="flex h-9 w-9 items-center justify-center rounded-lg border border-[var(--color-charcoal-lighter-plus)] bg-[var(--color-charcoal-light)] transition-colors hover:bg-[var(--color-charcoal-lighter)] !p-0 text-base"
+                className="flex h-9 w-9 items-center justify-center border border-[#E8E8E4] bg-white transition-colors hover:bg-[#F8F8F6] !p-0 text-base"
                 aria-label={volume === 0 ? 'Unmute' : 'Mute'}
               >
-                <span className="text-[var(--color-cream)] leading-none">
-                  {volume === 0 ? '🔇' : volume < 0.5 ? '🔉' : '🔊'}
+                <span className="text-[#1A1A1A] leading-none">
+                  {volume === 0 ? (
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z" /></svg>
+                  ) : volume < 0.5 ? (
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M7 9v6h4l5 5V4l-5 5H7z" /></svg>
+                  ) : (
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" /></svg>
+                  )}
                 </span>
               </button>
-              {/* Dropdown slider */}
+              {/* Dropdown slider — vertical, above button */}
               <div
-                className={`absolute top-full right-0 mt-2 transition-all duration-200 ${showVolumeSlider ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}`}
+                className={`absolute bottom-full right-1/2 translate-x-1/2 mb-2 transition-all duration-200 ${showVolumeSlider ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}`}
+                onMouseEnter={handleVolumeEnter}
+                onMouseLeave={handleVolumeLeave}
               >
-                <div className="rounded-xl border border-[var(--color-charcoal-lighter-plus)] bg-[var(--color-charcoal)]/95 backdrop-blur-xl px-3 py-3 flex items-center gap-2 shadow-lg">
-                  <svg className="w-3.5 h-3.5 text-[var(--color-body-text)] shrink-0" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M7 9v6h4l5 5V4l-5 5H7z" />
-                  </svg>
+                <div className="border border-[#E8E8E4] bg-white/95 backdrop-blur-md px-2.5 py-3 flex flex-col items-center gap-2 shadow-lg rounded-sm" style={{ minHeight: '120px' }}>
+                  <span className="text-[10px] font-medium text-[#6B6B65]">{Math.round(volume * 100)}</span>
                   <input
                     type="range"
                     min="0"
                     max="100"
                     value={Math.round(volume * 100)}
                     onChange={(e) => setVolume(parseInt(e.target.value, 10) / 100)}
-                    className="h-1.5 w-24 cursor-pointer rounded-full bg-[var(--color-charcoal-lighter-plus)] accent-[#F5A623] outline-none"
+                    className="volume-slider-vertical"
                     aria-label="Volume slider"
                     onMouseEnter={handleVolumeEnter}
                   />
-                  <svg className="w-3.5 h-3.5 text-[var(--color-body-text)] shrink-0" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" />
+                  <svg className="w-3 h-3 text-[#6B6B65] shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M7 9v6h4l5 5V4l-5 5H7z" />
                   </svg>
                 </div>
               </div>
@@ -1174,10 +1197,9 @@ export function HomeContent({ isActive }: HomeContentProps) {
             {showCoinBadge && (
               <Link
                 href="/buy-coins"
-                className="inline-flex h-9 items-center gap-2 rounded-lg border border-[var(--color-charcoal-lighter-plus)] bg-[var(--color-charcoal-light)] px-3 py-2 text-sm font-medium text-[var(--color-cream)] transition-colors hover:bg-[var(--color-charcoal-lighter)]"
+                className="inline-flex h-9 items-center gap-2 border border-[#E8E8E4] bg-white px-3 py-2 text-sm font-medium text-[#1A1A1A] transition-colors hover:bg-[#F8F8F6]"
                 aria-label="Buy coins"
               >
-                <span>🪙</span>
                 <span>{userCoins}</span>
               </Link>
             )}
@@ -1193,16 +1215,16 @@ export function HomeContent({ isActive }: HomeContentProps) {
                   alt={headerProfile.full_name || headerProfile.username || 'Profile'}
                   width={32}
                   height={32}
-                  className="h-8 w-8 rounded-full object-cover border border-[var(--color-charcoal-lighter-plus)]"
+                  className="h-8 w-8 rounded-full object-cover border border-[#E8E8E4]"
                   unoptimized
                 />
               ) : (
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--color-charcoal-light)] text-xs font-semibold text-[var(--color-cream)] border border-[var(--color-charcoal-lighter-plus)]">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#F8F8F6] text-xs font-semibold text-[#1A1A1A] border border-[#E8E8E4]">
                   {(headerProfile?.full_name || headerProfile?.username || user?.email || 'U').charAt(0).toUpperCase()}
                 </div>
               )}
               <div className="max-w-[140px] leading-none">
-                <p className="mb-0 truncate text-xs font-semibold text-[var(--color-cream)]">
+                <p className="mb-0 truncate text-xs font-semibold text-[#1A1A1A]">
                   @{headerProfile?.username || 'profile'}
                 </p>
               </div>
@@ -1212,10 +1234,10 @@ export function HomeContent({ isActive }: HomeContentProps) {
       </header>
 
       {/* Distance Filter Pills */}
-      <div className="absolute top-[calc(2.75rem+1px)] sm:top-[calc(3.25rem+1px)] left-0 right-0 z-30 px-3 py-2 overflow-x-auto scrollbar-none">
+      <div className="absolute top-[calc(2.75rem+1px+2.75rem)] sm:top-[calc(3.25rem+1px+2.75rem)] left-0 right-0 z-30 px-3 py-2 overflow-x-auto scrollbar-none">
         <div className="flex gap-2 w-max">
           {([
-            { label: '#Nearby', km: 5 },
+            { label: '#Nearby', km: 10 },
             { label: '#Everywhere', km: Infinity },
           ] as const).map((opt) => (
             <button
@@ -1228,10 +1250,10 @@ export function HomeContent({ isActive }: HomeContentProps) {
                 setDistanceFilter(opt.km);
                 setCurrentIndex(0);
               }}
-              className={`px-3 py-1 rounded-full text-xs font-semibold transition-all duration-200 whitespace-nowrap ${
+              className={`px-3 py-1 text-xs font-semibold transition-all duration-200 whitespace-nowrap ${
                 distanceFilter === opt.km
-                  ? 'bg-[#F5A623] text-black shadow-md shadow-[#F5A623]/40'
-                  : 'bg-[var(--color-charcoal)]/80 border border-[var(--color-charcoal-lighter-plus)] text-[var(--color-cream)] backdrop-blur-sm hover:border-[#F5A623]'
+                  ? 'bg-[#1A1A1A] text-white shadow-md'
+                  : 'bg-white/80 border border-[#E8E8E4] text-[#1A1A1A] backdrop-blur-sm hover:border-[#1A1A1A]'
               }`}
             >
               {opt.label}
@@ -1247,7 +1269,7 @@ export function HomeContent({ isActive }: HomeContentProps) {
           <button
             onClick={() => handleProfileClick(currentVideo.user_id, currentVideo.profiles?.username)}
             onKeyDown={(e) => handleKeyDown(e, () => handleProfileClick(currentVideo.user_id, currentVideo.profiles?.username))}
-            className="action-button-animate rounded-full focus:outline-none focus:ring-2 focus:ring-[#F5A623] focus:ring-offset-2 focus:ring-offset-[var(--color-charcoal)]"
+            className="action-button-animate rounded-full focus:outline-none focus:ring-2 focus:ring-[#1A1A1A] focus:ring-offset-2"
             aria-label={`View profile of ${currentBusiness?.business_name || currentVideo.profiles?.full_name || 'user'}`}
           >
             <Image
@@ -1255,7 +1277,7 @@ export function HomeContent({ isActive }: HomeContentProps) {
               alt={currentBusiness?.business_name || 'Business'}
               width={56}
               height={56}
-              className="h-10 w-10 sm:h-12 sm:w-12 md:h-14 md:w-14 rounded-full border-2 border-[var(--color-charcoal-lighter-plus)] object-cover transition-transform duration-200 hover:scale-110 active:scale-95"
+              className="h-10 w-10 sm:h-12 sm:w-12 md:h-14 md:w-14 rounded-full border-2 border-white object-cover transition-transform duration-200 hover:scale-110 active:scale-95"
               unoptimized={!(currentBusiness?.profile_picture_url || currentVideo.profiles?.profile_picture_url)}
             />
           </button>
@@ -1269,8 +1291,8 @@ export function HomeContent({ isActive }: HomeContentProps) {
             >
               <div className={`h-[25px] w-[25px] rounded-full flex items-center justify-center text-[11px] font-bold transition-all duration-300 ${
                 followedUsers.has(currentVideo.user_id!)
-                  ? 'bg-[#F5A623] text-[#1A1A18]'
-                  : 'border border-[var(--color-cream)] bg-[var(--color-charcoal)]/80 text-[var(--color-cream)]'
+                  ? 'bg-[#1A1A1A] text-white'
+                  : 'border border-white bg-white/80 text-[#1A1A1A]'
               }`}>
                 {followedUsers.has(currentVideo.user_id!) ? '✓' : '+'}
               </div>
@@ -1286,10 +1308,10 @@ export function HomeContent({ isActive }: HomeContentProps) {
           aria-label={isLiked ? 'Unlike video' : 'Like video'}
         >
           <div className={`w-9 h-9 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center transition-all duration-300 ${
-            isLiked ? 'bg-[#F5A623] shadow-lg shadow-[#F5A623]/40' : 'border border-[var(--color-charcoal-lighter-plus)] bg-[var(--color-charcoal)]/80 backdrop-blur-xl hover:border-[#F5A623]/50 hover:shadow-lg hover:shadow-[#F5A623]/20'
+            isLiked ? 'border-2 border-[#1A1A1A] bg-transparent shadow-lg' : 'border-2 border-[#9E9A90] bg-transparent hover:border-[#1A1A1A]'
           } ${likeAnimating === currentVideo.id ? 'like-icon-pop' : ''}`}>
             <svg
-              className={`w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-[var(--color-cream)] transition-all duration-300 ${
+              className={`w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-[#1A1A1A] transition-all duration-300 ${
                 likeAnimating === currentVideo.id ? 'scale-150' : ''
               }`}
               fill={isLiked ? 'currentColor' : 'none'}
@@ -1299,7 +1321,7 @@ export function HomeContent({ isActive }: HomeContentProps) {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
             </svg>
           </div>
-          <span className="text-[var(--color-cream)] text-[10px] sm:text-xs font-semibold">
+          <span className="text-[#1A1A1A] text-[10px] sm:text-xs font-semibold drop-shadow">
             {likeCounts[likeKey] || 0}
           </span>
         </button>
@@ -1311,24 +1333,24 @@ export function HomeContent({ isActive }: HomeContentProps) {
           className="action-button-animate flex flex-col items-center gap-1 transition-transform duration-200 hover:scale-110 active:scale-95"
           aria-label="Add a review or comment"
         >
-          <div className="flex h-9 w-9 sm:h-10 sm:w-10 md:h-12 md:w-12 items-center justify-center rounded-full border border-[var(--color-charcoal-lighter-plus)] bg-[var(--color-charcoal)]/80 backdrop-blur-xl transition-all duration-300 hover:bg-[var(--color-charcoal-light)]/90 hover:border-[#F5A623] hover:shadow-lg hover:shadow-[#F5A623]/30 active:scale-95">
-            <svg className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-[var(--color-cream)] transition-colors duration-300 hover:text-[#F5A623]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="flex h-9 w-9 sm:h-10 sm:w-10 md:h-12 md:w-12 items-center justify-center rounded-full border-2 border-[#9E9A90] bg-transparent transition-all duration-300 hover:border-[#1A1A1A] active:scale-95">
+            <svg className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-[#1A1A1A] transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
             </svg>
           </div>
-          <span className="text-[var(--color-cream)] text-[10px] sm:text-xs font-semibold">{commentCounts[currentVideo.id] || 0}</span>
+          <span className="text-[#1A1A1A] text-[10px] sm:text-xs font-semibold drop-shadow">{commentCounts[currentVideo.id] || 0}</span>
         </button>
 
         {/* Location Button */}
         {distance && (
           <button className="action-button-animate flex flex-col items-center gap-1 transition-transform duration-200 hover:scale-110 active:scale-95" aria-label={`Distance: ${distance}`}>
-            <div className="flex h-9 w-9 sm:h-10 sm:w-10 md:h-12 md:w-12 items-center justify-center rounded-full border border-[var(--color-charcoal-lighter-plus)] bg-[var(--color-charcoal)]/80 backdrop-blur-xl transition-all duration-300 hover:bg-[var(--color-charcoal-light)]/90 hover:border-[#F5A623] hover:shadow-lg hover:shadow-[#F5A623]/30 active:scale-95">
-              <svg className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-[var(--color-cream)] transition-colors duration-300 hover:text-[#F5A623]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="flex h-9 w-9 sm:h-10 sm:w-10 md:h-12 md:w-12 items-center justify-center rounded-full border-2 border-[#9E9A90] bg-transparent transition-all duration-300 hover:border-[#1A1A1A] active:scale-95">
+              <svg className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-[#1A1A1A] transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
             </div>
-            <span className="text-[var(--color-cream)] text-[10px] sm:text-xs font-semibold">{distance}</span>
+            <span className="text-[#1A1A1A] text-[10px] sm:text-xs font-semibold drop-shadow">{distance}</span>
           </button>
         )}
 
@@ -1339,10 +1361,10 @@ export function HomeContent({ isActive }: HomeContentProps) {
           aria-label={isBookmarked ? 'Remove bookmark' : 'Bookmark video'}
         >
           <div className={`w-9 h-9 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center transition-all duration-300 ${
-            isBookmarked ? 'bg-[#F5A623] shadow-lg shadow-[#F5A623]/40' : 'border border-[var(--color-charcoal-lighter-plus)] bg-[var(--color-charcoal)]/80 backdrop-blur-xl hover:border-[#F5A623]/50 hover:shadow-lg hover:shadow-[#F5A623]/20'
+            isBookmarked ? 'border-2 border-[#1A1A1A] bg-transparent shadow-lg' : 'border-2 border-[#9E9A90] bg-transparent hover:border-[#1A1A1A]'
           } ${bookmarkAnimating === currentVideo.id ? 'bookmark-icon-pop' : ''}`}>
             <svg
-              className={`w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-[var(--color-cream)] transition-all duration-300 ${
+              className={`w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-[#1A1A1A] transition-all duration-300 ${
                 bookmarkAnimating === currentVideo.id ? 'scale-150' : ''
               }`}
               fill={isBookmarked ? 'currentColor' : 'none'}
@@ -1361,10 +1383,30 @@ export function HomeContent({ isActive }: HomeContentProps) {
           className="action-button-animate flex flex-col items-center gap-1 transition-transform duration-200 hover:scale-110 active:scale-95"
           aria-label="Share this video"
         >
-          <div className="flex h-9 w-9 sm:h-10 sm:w-10 md:h-12 md:w-12 items-center justify-center rounded-full border border-[var(--color-charcoal-lighter-plus)] bg-[var(--color-charcoal)]/80 backdrop-blur-xl transition-all duration-300 hover:bg-[var(--color-charcoal-light)]/90 hover:border-[#F5A623] hover:shadow-lg hover:shadow-[#F5A623]/30 active:scale-95">
-            <svg className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-[var(--color-cream)] transition-colors duration-300 hover:text-[#F5A623]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="flex h-9 w-9 sm:h-10 sm:w-10 md:h-12 md:w-12 items-center justify-center rounded-full border-2 border-[#9E9A90] bg-transparent transition-all duration-300 hover:border-[#1A1A1A] active:scale-95">
+            <svg className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-[#1A1A1A] transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
             </svg>
+          </div>
+        </button>
+
+        {/* Volume Button */}
+        <button
+          onClick={toggleMute}
+          className="action-button-animate flex flex-col items-center gap-1 transition-transform duration-200 hover:scale-110 active:scale-95"
+          aria-label={volume === 0 ? 'Unmute' : 'Mute'}
+        >
+          <div className="flex h-9 w-9 sm:h-10 sm:w-10 md:h-12 md:w-12 items-center justify-center rounded-full border-2 border-[#9E9A90] bg-transparent transition-all duration-300 hover:border-[#1A1A1A] active:scale-95">
+            {volume === 0 ? (
+              <svg className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-[#1A1A1A]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
+              </svg>
+            ) : (
+              <svg className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-[#1A1A1A]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15.536 8.464a5 5 0 010 7.072M18.364 5.636a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+              </svg>
+            )}
           </div>
         </button>
 
@@ -1391,8 +1433,8 @@ export function HomeContent({ isActive }: HomeContentProps) {
 
       {/* Admin Mode Badge */}
       {adminMode && (
-        <div className="fixed bottom-20 left-3 z-50 rounded-full bg-[#F5A623]/90 px-2.5 py-1 text-[11px] font-semibold text-[#1A1A18] backdrop-blur-sm">
-          ⚡ Admin
+        <div className="fixed bottom-20 left-3 z-50 bg-[#1A1A1A] px-2.5 py-1 text-[11px] font-semibold text-white backdrop-blur-sm">
+          Admin
         </div>
       )}
     </div>

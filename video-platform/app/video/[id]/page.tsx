@@ -357,7 +357,7 @@ export default function VideoDetailPage() {
                     onClick={() => handleSendQuickMessage(message)}
                     className="px-3 py-2 bg-blue-500/70 hover:bg-blue-600/70 text-white text-sm rounded-lg backdrop-blur-sm transition-all hover:scale-105"
                   >
-                    💬 {message}
+                    {message}
                   </button>
                 ))}
               </div>
@@ -423,7 +423,7 @@ export default function VideoDetailPage() {
                     disabled={isLocating}
                     className="px-3 py-2 bg-gray-700 hover:bg-gray-600 disabled:opacity-60 disabled:cursor-not-allowed text-white text-sm rounded-lg transition"
                   >
-                    {isLocating ? 'Locating...' : '📍 Use GPS'}
+                    {isLocating ? 'Locating...' : 'Use GPS'}
                   </button>
 
                   <a
@@ -445,7 +445,7 @@ export default function VideoDetailPage() {
 
                 {(video.businesses.average_rating || video.businesses.total_reviews) && (
                   <p className="text-sm text-gray-300">
-                    ⭐ {video.businesses.average_rating?.toFixed(1) || '—'} · {video.businesses.total_reviews || 0} reviews
+                    {video.businesses.average_rating?.toFixed(1) || '—'} · {video.businesses.total_reviews || 0} reviews
                   </p>
                 )}
               </div>

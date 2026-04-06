@@ -444,7 +444,7 @@ export default function ChatWindow({ conversationId, onBack }: ChatWindowProps) 
                               }}
                               className="w-full text-left px-4 py-2 text-sm text-[var(--text-primary)] hover:bg-[var(--glass-bg-strong)] flex items-center gap-2 hover:text-blue-400 transition-colors"
                             >
-                              ✏️ Edit
+                              Edit
                             </button>
                             <button
                               onClick={() => {
@@ -453,7 +453,7 @@ export default function ChatWindow({ conversationId, onBack }: ChatWindowProps) 
                               }}
                               className="w-full text-left px-4 py-2 text-sm text-[var(--text-primary)] hover:bg-[var(--glass-bg-strong)] flex items-center gap-2 hover:text-red-400 transition-colors border-t border-[var(--glass-border)]"
                             >
-                              🗑️ Delete
+                              Delete
                             </button>
                           </div>
                         )}

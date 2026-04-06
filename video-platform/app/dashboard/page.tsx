@@ -168,7 +168,7 @@ function DashboardContent() {
   }
 
   return (
-    <div className="min-h-screen bg-transparent text-[var(--text-primary)] pb-24">
+    <div className="min-h-screen bg-white text-[#1A1A1A] pb-24 lg:pb-8">
       <div className="w-full px-4 lg:px-12 py-6">
         <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
 

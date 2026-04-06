@@ -123,7 +123,7 @@ export function BookmarkedVideos({ userId }: BookmarkedVideosProps) {
               <div className="flex items-center gap-2 mt-2 text-xs text-[var(--text-tertiary)]">
                 {video.businesses.average_rating && (
                   <>
-                    <span>⭐ {video.businesses.average_rating.toFixed(1)}</span>
+                    <span>{video.businesses.average_rating.toFixed(1)}</span>
                     <span>•</span>
                   </>
                 )}

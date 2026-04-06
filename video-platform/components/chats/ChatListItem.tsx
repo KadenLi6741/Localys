@@ -33,7 +33,7 @@ export function ChatListItem({ chat, onClick }: ChatListItemProps) {
     <button
       type="button"
       onClick={onClick}
-      className={`w-full text-left flex items-center gap-4 px-4 py-5 border-b transition-colors duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F5A623] ${
+      className={`w-full text-left flex items-center gap-4 px-4 py-5 border-b transition-colors duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1B5EA8] ${
         unreadCount > 0
           ? 'border-b-[#3A3A34] bg-[var(--color-charcoal-light)]/50 hover:bg-[var(--color-charcoal-light)]'
           : 'border-b-[#3A3A34] hover:bg-[var(--color-charcoal-light)]/50'
@@ -42,7 +42,7 @@ export function ChatListItem({ chat, onClick }: ChatListItemProps) {
       {/* Avatar with Unread Indicator */}
       <div className={`relative w-14 h-14 rounded-full flex-shrink-0 overflow-hidden ring-2 transition-all duration-200 ${
         unreadCount > 0 
-          ? 'ring-[#F5A623] bg-[#F5A623]/10' 
+          ? 'ring-[#1B5EA8] bg-[#1B5EA8]/10' 
           : 'ring-[var(--color-charcoal-lighter-plus)] bg-[var(--color-charcoal-lighter)]'
       }`}>
         {avatarUrl ? (
@@ -58,7 +58,7 @@ export function ChatListItem({ chat, onClick }: ChatListItemProps) {
         )}
         {/* Unread dot indicator */}
         {unreadCount > 0 && (
-          <div className="absolute top-0 right-0 w-3 h-3 bg-[#F5A623] rounded-full border border-[var(--color-charcoal)] animate-pulse"></div>
+          <div className="absolute top-0 right-0 w-3 h-3 bg-[#1B5EA8] rounded-full border border-[var(--color-charcoal)] animate-pulse"></div>
         )}
       </div>
 
@@ -95,14 +95,14 @@ export function ChatListItem({ chat, onClick }: ChatListItemProps) {
         {chat.last_message?.created_at && (
           <p className={`text-xs mb-1 transition-colors duration-200 ${
             unreadCount > 0 
-              ? 'text-[#F5A623] font-semibold' 
+              ? 'text-[#1B5EA8] font-semibold' 
               : 'text-[var(--color-body-text)]'
           }`}>
             {formatTimestamp(chat.last_message.created_at)}
           </p>
         )}
         {unreadCount > 0 && (
-          <span className="bg-[#F5A623] text-black text-xs rounded-full px-2.5 py-1 inline-block font-bold shadow-lg shadow-[#F5A623]/30 animate-pulse">
+          <span className="bg-[#1B5EA8] text-black text-xs rounded-full px-2.5 py-1 inline-block font-bold shadow-lg shadow-[#1B5EA8]/30 animate-pulse">
             {unreadCount > 99 ? '99+' : unreadCount}
           </span>
         )}

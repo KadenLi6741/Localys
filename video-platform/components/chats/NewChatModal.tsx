@@ -80,7 +80,7 @@ export function NewChatModal({ isOpen, onClose, currentUserId }: NewChatModalPro
           await sendMessage({
             chat_id: data.id,
             sender_id: currentUserId,
-            content: 'Hi! Is this available? 👋',
+            content: 'Hi! Is this available?',
           });
         }
         onClose();
@@ -114,7 +114,7 @@ export function NewChatModal({ isOpen, onClose, currentUserId }: NewChatModalPro
           <h2 className="text-xl font-bold text-[var(--color-cream)]">New Chat</h2>
           <button
             onClick={onClose}
-            className="w-11 h-11 flex items-center justify-center rounded-full text-[var(--color-body-text)] hover:text-[var(--color-cream)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F5A623]"
+            className="w-11 h-11 flex items-center justify-center rounded-full text-[var(--color-body-text)] hover:text-[var(--color-cream)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1B5EA8]"
             aria-label="Close"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -130,7 +130,7 @@ export function NewChatModal({ isOpen, onClose, currentUserId }: NewChatModalPro
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search by name or username..."
-            className="w-full bg-[var(--color-charcoal-light)] border border-[var(--color-charcoal-lighter-plus)] rounded-xl px-4 py-3 text-[var(--color-cream)] placeholder-[#9E9A90]/50 focus:outline-none focus:ring-2 focus:ring-[#F5A623] focus:border-transparent"
+            className="w-full bg-[var(--color-charcoal-light)] border border-[var(--color-charcoal-lighter-plus)] rounded-xl px-4 py-3 text-[var(--color-cream)] placeholder-[#9E9A90]/50 focus:outline-none focus:ring-2 focus:ring-[#1B5EA8] focus:border-transparent"
             aria-label="Search users"
             autoFocus
           />
@@ -147,7 +147,7 @@ export function NewChatModal({ isOpen, onClose, currentUserId }: NewChatModalPro
         <div className="flex-1 overflow-y-auto p-6">
           {loading ? (
             <div className="text-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#F5A623] mx-auto"></div>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1B5EA8] mx-auto"></div>
             </div>
           ) : searchResults.length === 0 && searchQuery.trim() ? (
             <div className="text-center py-8 text-[var(--color-body-text)]">
@@ -164,7 +164,7 @@ export function NewChatModal({ isOpen, onClose, currentUserId }: NewChatModalPro
                   key={user.id}
                   onClick={() => handleSelectUser(user.id)}
                   disabled={creating}
-                  className="w-full flex items-center gap-4 p-4 bg-[var(--color-charcoal-light)] hover:bg-[var(--color-charcoal-lighter)] rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F5A623]"
+                  className="w-full flex items-center gap-4 p-4 bg-[var(--color-charcoal-light)] hover:bg-[var(--color-charcoal-lighter)] rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1B5EA8]"
                 >
                   {/* Avatar */}
                   <div className="w-12 h-12 rounded-full bg-[var(--color-charcoal-lighter)] flex-shrink-0 overflow-hidden">

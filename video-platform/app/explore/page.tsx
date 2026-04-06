@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
@@ -10,21 +11,16 @@ import { haversineDistance } from '@/lib/utils/geo';
 import { Toast } from '@/components/Toast';
 
 const TAGS = [
-  { id: 'hidden-gem', label: '#HiddenGem' },
-  { id: 'cheap-eats', label: '#CheapEats' },
-  { id: 'must-visit', label: '#MustVisit' },
-  { id: 'new-spot', label: '#NewSpot' },
-  { id: 'great-service', label: '#GreatService' },
+  { id: 'hidden-gem', label: 'Hidden Gem' },
+  { id: 'cheap-eats', label: 'Cheap Eats' },
 ];
 
 const TIME_FILTERS = [
   { id: 'latest', label: 'Latest' },
-  { id: 'week', label: 'This Week' },
   { id: 'month', label: 'This Month' },
-  { id: 'all', label: 'All Time' },
 ];
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 4;
 
 export default function ExplorePage() {
   const { user } = useAuth();
@@ -497,171 +493,201 @@ export default function ExplorePage() {
   };
 
   return (
-    <div className="min-h-screen bg-transparent pb-24 lg:pb-8">
-      <div className="max-w-3xl mx-auto px-4 pt-6">
+    <div className="min-h-screen bg-white pb-24 lg:pb-8">
+      <div className="max-w-5xl mx-auto px-4 lg:px-8 pt-8">
 
-        {/* ===== TOP SECTION: Create a Shoutout ===== */}
-        <div
-          className="bg-[var(--color-charcoal-light)] border border-[var(--color-charcoal-lighter-plus)] rounded-2xl p-4 mb-6"
-          style={{ animation: 'fadeInUp 0.3s ease-out' }}
-        >
-          <div className="mb-3">
-            <h1 className="text-2xl font-bold text-[var(--color-cream)]">Explore</h1>
-            <p className="text-xs text-[var(--color-body-text)] mt-0.5">Discover &amp; shoutout amazing local businesses</p>
-          </div>
-
-          {/* Input bar */}
-          <div className="flex items-center gap-3 mb-3">
-            {userProfile?.profile_picture_url ? (
-              <Image
-                src={userProfile.profile_picture_url}
-                alt={userProfile.username}
-                width={36}
-                height={36}
-                unoptimized
-                className="w-9 h-9 rounded-full object-cover shrink-0"
-              />
-            ) : (
-              <div className="w-9 h-9 rounded-full bg-[var(--color-charcoal-lighter-plus)] flex items-center justify-center shrink-0">
-                <span className="text-sm text-[var(--color-body-text)]">
-                  {userProfile?.username?.charAt(0)?.toUpperCase() || '?'}
-                </span>
-              </div>
-            )}
+        {/* ===== HEADER ===== */}
+        <div className="mb-8" style={{ animation: 'fadeInUp 0.3s ease-out' }}>
+          <div className="flex items-center justify-between mb-6">
+            <h1 className="text-4xl font-light text-[#1A1A1A]" style={{ fontFamily: 'Cormorant Garamond, serif' }}>Blogs</h1>
             <button
               onClick={() => setShowModal(true)}
-              className="flex-1 text-left bg-[var(--color-charcoal)] border border-[var(--color-charcoal-lighter-plus)] rounded-xl px-4 py-2.5 text-sm text-[var(--color-body-text)] hover:border-[#F5A623]/40 transition-colors"
+              className="px-5 py-2.5 bg-[#1A1A1A] text-white text-sm font-semibold hover:bg-[#1A1A1A]/90 transition-all active:scale-[0.98]"
             >
-              Shoutout a local business...
+              Write a Shoutout
             </button>
           </div>
-
+          <p className="text-sm text-[#6B6B65]">Discover and shoutout amazing local businesses</p>
         </div>
 
-        {/* ===== BOTTOM SECTION: Shoutout Feed ===== */}
-        <div>
-          {/* Filter bar */}
-          <div
-            className="flex flex-col gap-3 mb-5"
-            style={{ animation: 'fadeInUp 0.3s ease-out 0.1s both' }}
-          >
-            {/* Time filters */}
-            <div className="flex gap-2 w-full">
-              {TIME_FILTERS.map((f) => (
-                <button
-                  key={f.id}
-                  onClick={() => setTimeFilter(f.id)}
-                  className={`flex-1 text-center px-3 py-1.5 text-xs font-semibold rounded-full transition-all duration-200 ${
-                    timeFilter === f.id
-                      ? 'bg-[#F5A623] text-black'
-                      : 'bg-[var(--color-charcoal-light)] text-[var(--color-body-text)] hover:text-[var(--color-cream)] border border-[var(--color-charcoal-lighter-plus)]'
-                  }`}
-                >
-                  {f.label}
-                </button>
-              ))}
-            </div>
+        {/* ===== FILTERS ===== */}
+        <div className="flex gap-2 mb-8" style={{ animation: 'fadeInUp 0.3s ease-out 0.1s both' }}>
+          {TIME_FILTERS.map((f) => (
+            <button
+              key={f.id}
+              onClick={() => { setTimeFilter(f.id); setTagFilter(null); setQuickTag(null); }}
+              className={`flex-1 text-center px-3 py-1.5 text-xs font-semibold transition-all duration-200 ${
+                timeFilter === f.id && !tagFilter
+                  ? 'bg-[#1A1A1A] text-white'
+                  : 'bg-white text-[#6B6B65] hover:text-[#1A1A1A] border border-[#E8E8E4]'
+              }`}
+            >
+              {f.label}
+            </button>
+          ))}
+          {TAGS.map((tag) => (
+            <button
+              key={tag.id}
+              onClick={() => {
+                setTagFilter(tagFilter === tag.id ? null : tag.id);
+                setQuickTag(null);
+              }}
+              className={`flex-1 text-center px-3 py-1.5 text-xs font-semibold transition-all duration-200 ${
+                tagFilter === tag.id
+                  ? 'bg-[#1A1A1A] text-white'
+                  : 'bg-white text-[#6B6B65] hover:text-[#1A1A1A] border border-[#E8E8E4]'
+              }`}
+            >
+              {tag.label}
+            </button>
+          ))}
+        </div>
 
-            {/* Tag filters */}
-            <div className="flex flex-wrap gap-1.5">
-              {TAGS.map((tag) => (
-                <button
-                  key={tag.id}
-                  onClick={() => {
-                    setTagFilter(tagFilter === tag.id ? null : tag.id);
-                    setQuickTag(null);
-                  }}
-                  className={`px-2.5 py-1 text-[11px] font-semibold rounded-full transition-all duration-200 ${
-                    tagFilter === tag.id
-                      ? 'bg-[#F5A623] text-black'
-                      : 'bg-[var(--color-charcoal-light)] text-[var(--color-body-text)] hover:text-[var(--color-cream)] border border-[var(--color-charcoal-lighter-plus)]'
-                  }`}
-                >
-                  {tag.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Feed */}
-          {loading && shoutouts.length === 0 ? (
-            <div className="space-y-4">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="bg-[var(--color-charcoal-light)] border border-[var(--color-charcoal-lighter-plus)] rounded-2xl p-4 animate-pulse">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-10 h-10 rounded-full bg-[var(--color-charcoal-lighter-plus)]" />
-                    <div className="space-y-2 flex-1">
-                      <div className="h-3 w-24 bg-[var(--color-charcoal-lighter-plus)] rounded" />
-                      <div className="h-2 w-16 bg-[var(--color-charcoal-lighter-plus)] rounded" />
-                    </div>
-                  </div>
-                  <div className="h-3 w-3/4 bg-[var(--color-charcoal-lighter-plus)] rounded mb-2" />
-                  <div className="h-3 w-1/2 bg-[var(--color-charcoal-lighter-plus)] rounded" />
-                </div>
-              ))}
-            </div>
-          ) : shoutouts.length === 0 ? (
-            /* Empty state */
-            <div className="text-center py-16" style={{ animation: 'fadeInUp 0.4s ease-out' }}>
-              <svg className="w-12 h-12 mx-auto mb-4 text-[#6BAF7A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-              </svg>
-              <p className="text-[var(--color-cream)] font-semibold mb-2">No shoutouts yet</p>
-              <p className="text-sm text-[var(--color-body-text)] mb-4">Be the first to shoutout an amazing local business!</p>
-              <button
-                onClick={() => setShowModal(true)}
-                className="px-6 py-2.5 bg-[#F5A623] text-black font-semibold rounded-xl hover:bg-[#F5A623]/90 transition-all active:scale-[0.98]"
-              >
-                Create First Shoutout
-              </button>
-            </div>
-          ) : filteredShoutouts.length === 0 ? (
-            <div className="text-center py-16" style={{ animation: 'fadeInUp 0.4s ease-out' }}>
-              <p className="text-[var(--color-cream)] font-semibold mb-2">No shoutouts nearby</p>
-              <p className="text-sm text-[var(--color-body-text)] mb-4">Try switching to #Everywhere to see all shoutouts</p>
-              <button
-                onClick={() => setDistanceFilter(null)}
-                className="px-6 py-2.5 bg-[#F5A623] text-black font-semibold rounded-xl hover:bg-[#F5A623]/90 transition-all active:scale-[0.98]"
-              >
-                Show All Shoutouts
-              </button>
-            </div>
-          ) : (
-            <>
-              <div className="flex flex-col gap-3">
-                {filteredShoutouts.map((shoutout, i) => (
-                  <ShoutoutCard
-                    key={shoutout.id}
-                    shoutout={shoutout}
-                    index={i}
-                    onLike={handleLike}
-                    onComment={handleLoadComments}
-                    comments={commentsByShoutout[shoutout.id] || []}
-                    loadingComments={loadingComments[shoutout.id] || false}
-                    onLoadComments={handleLoadComments}
-                    onSubmitComment={handleSubmitComment}
-                    onLikeComment={handleLikeComment}
-                    currentUserId={user?.id || null}
-                    onEdit={handleEditShoutout}
-                    onDelete={handleDeleteShoutout}
-                  />
-                ))}
+        {/* ===== BLOG GRID ===== */}
+        {loading && shoutouts.length === 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="animate-pulse">
+                <div className="aspect-[4/3] bg-[#F8F8F6] mb-3" />
+                <div className="h-2 w-16 bg-[#F8F8F6] rounded mb-2" />
+                <div className="h-3 w-3/4 bg-[#F8F8F6] rounded mb-2" />
+                <div className="h-2 w-full bg-[#F8F8F6] rounded" />
               </div>
+            ))}
+          </div>
+        ) : filteredShoutouts.length === 0 ? (
+          <div className="text-center py-16" style={{ animation: 'fadeInUp 0.4s ease-out' }}>
+            <p className="text-[#1A1A1A] font-semibold mb-2">No posts yet</p>
+            <p className="text-sm text-[#6B6B65] mb-4">Be the first to shoutout an amazing local business!</p>
+            <button
+              onClick={() => setShowModal(true)}
+              className="px-6 py-2.5 bg-[#1A1A1A] text-white font-semibold hover:bg-[#1A1A1A]/90 transition-all active:scale-[0.98]"
+            >
+              Create First Shoutout
+            </button>
+          </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {filteredShoutouts.map((shoutout, i) => {
+                const photoUrl = shoutout.photos?.[0] || null;
+                const dateStr = new Date(shoutout.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                const excerpt = shoutout.text.length > 100 ? shoutout.text.slice(0, 100) + '...' : shoutout.text;
+                const isAuthor = user?.id === shoutout.user_id;
 
-              {hasMore && (
-                <div className="text-center mt-6">
-                  <button
-                    onClick={loadMore}
-                    disabled={loading}
-                    className="px-6 py-2.5 bg-[var(--color-charcoal-light)] border border-[var(--color-charcoal-lighter-plus)] text-[var(--color-cream)] font-semibold rounded-xl hover:bg-[var(--color-charcoal-lighter)] transition-all disabled:opacity-50"
+                return (
+                  <article
+                    key={shoutout.id}
+                    className="group relative"
+                    style={{ animation: `fadeInUp 0.3s ease-out ${0.05 * i}s both` }}
                   >
-                    {loading ? 'Loading...' : 'Load More'}
-                  </button>
-                </div>
-              )}
-            </>
-          )}
-        </div>
+                    <Link href={`/explore/${shoutout.id}`} className="block cursor-pointer">
+                    {/* 4:3 Photo */}
+                    <div className="relative aspect-[4/3] bg-[#F8F8F6] overflow-hidden mb-3">
+                      {photoUrl ? (
+                        <Image
+                          src={photoUrl}
+                          alt={shoutout.business_name}
+                          fill
+                          className="object-cover group-hover:scale-105 transition-transform duration-300"
+                          unoptimized
+                        />
+                      ) : shoutout.video_url ? (
+                        <video src={shoutout.video_url} className="w-full h-full object-cover" muted />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <svg className="w-10 h-10 text-[#E8E8E4]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+                          </svg>
+                        </div>
+                      )}
+                      {/* Tags overlay */}
+                      {shoutout.tags.length > 0 && (
+                        <div className="absolute bottom-2 left-2 flex gap-1">
+                          {shoutout.tags.slice(0, 2).map((tag) => (
+                            <span key={tag} className="bg-white/90 backdrop-blur-sm text-[10px] font-semibold text-[#1A1A1A] px-2 py-0.5">
+                              #{tag}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Date */}
+                    <p className="text-[11px] text-[#9E9A90] uppercase tracking-wider mb-1">{dateStr}</p>
+
+                    {/* Title (business name) */}
+                    <h3
+                      className="text-lg font-light text-[#1A1A1A] mb-1 group-hover:text-[#1B5EA8] transition-colors"
+                      style={{ fontFamily: 'Cormorant Garamond, serif' }}
+                    >
+                      {shoutout.business_name}
+                    </h3>
+
+                    {/* Excerpt */}
+                    <p className="text-xs text-[#6B6B65] leading-relaxed">{excerpt}</p>
+
+                    {/* Author */}
+                    <div className="flex items-center gap-2 mt-2 text-[10px] text-[#9E9A90]">
+                      <span>By @{shoutout.username}</span>
+                    </div>
+                    </Link>
+
+                    {/* Delete button — author only */}
+                    {isAuthor && (
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          if (confirm('Delete this blog post?')) {
+                            handleDeleteShoutout(shoutout.id);
+                          }
+                        }}
+                        className="absolute top-2 right-2 z-10 w-7 h-7 flex items-center justify-center bg-white/80 backdrop-blur-sm text-[#E05C3A] hover:bg-white hover:text-[#E05C3A]/80 transition-colors opacity-0 group-hover:opacity-100"
+                        aria-label="Delete post"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    )}
+                  </article>
+                );
+              })}
+            </div>
+
+            {/* Pagination */}
+            <div className="flex items-center justify-center gap-3 mt-10">
+              <button
+                onClick={() => {
+                  if (page > 0) {
+                    const prevPage = page - 1;
+                    setPage(prevPage);
+                    fetchShoutouts(prevPage, true);
+                  }
+                }}
+                disabled={page === 0}
+                className="px-4 py-2 text-sm font-medium border border-[#E8E8E4] text-[#1A1A1A] hover:bg-[#F8F8F6] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              >
+                Previous
+              </button>
+              <span className="text-sm text-[#6B6B65]">Page {page + 1}</span>
+              <button
+                onClick={() => {
+                  if (hasMore) {
+                    const nextPage = page + 1;
+                    setPage(nextPage);
+                    fetchShoutouts(nextPage, true);
+                  }
+                }}
+                disabled={!hasMore}
+                className="px-4 py-2 text-sm font-medium border border-[#E8E8E4] text-[#1A1A1A] hover:bg-[#F8F8F6] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              >
+                Next
+              </button>
+            </div>
+          </>
+        )}
       </div>
 
       {/* Create Shoutout Modal */}

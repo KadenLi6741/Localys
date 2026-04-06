@@ -29,6 +29,8 @@ export function MenuModal({ userId, businessId, menu, editItem, isOpen, onClose,
   const [itemPrice, setItemPrice] = useState('');
   const [itemDescription, setItemDescription] = useState('');
   const [itemCategory, setItemCategory] = useState('');
+  const [itemKeyInfo, setItemKeyInfo] = useState('');
+  const [itemAvailable, setItemAvailable] = useState(true);
   const [addingItem, setAddingItem] = useState(false);
   
   // Item image upload state
@@ -58,6 +60,8 @@ export function MenuModal({ userId, businessId, menu, editItem, isOpen, onClose,
         setItemPrice(editItem.price.toString());
         setItemDescription(editItem.description || '');
         setItemCategory(editItem.category || '');
+        setItemKeyInfo(editItem.key_info || '');
+        setItemAvailable(editItem.is_available !== false);
         setImagePreview(editItem.image_url || null);
         setSelectedImage(null);
       } else {
@@ -71,6 +75,8 @@ export function MenuModal({ userId, businessId, menu, editItem, isOpen, onClose,
     setItemPrice('');
     setItemDescription('');
     setItemCategory('');
+    setItemKeyInfo('');
+    setItemAvailable(true);
     setSelectedImage(null);
     setImagePreview(null);
     setUploadError(null);
@@ -93,17 +99,7 @@ export function MenuModal({ userId, businessId, menu, editItem, isOpen, onClose,
     return () => document.removeEventListener('keydown', handleEscape);
   }, [isOpen, onClose]);
 
-  // Prevent body scroll when modal is open
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [isOpen]);
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -264,11 +260,13 @@ export function MenuModal({ userId, businessId, menu, editItem, isOpen, onClose,
 
       if (editItem) {
         // Update existing item
-        const updateData: { item_name: string; price: number; description: string; category: string; image_url?: string } = {
+        const updateData: { item_name: string; price: number; description: string; category: string; key_info: string; is_available: boolean; image_url?: string } = {
           item_name: itemName,
           price: parseFloat(itemPrice),
           description: itemDescription,
           category: itemCategory,
+          key_info: itemKeyInfo,
+          is_available: itemAvailable,
         };
         if (imageUrl) {
           updateData.image_url = imageUrl;
@@ -291,6 +289,8 @@ export function MenuModal({ userId, businessId, menu, editItem, isOpen, onClose,
           description: itemDescription,
           category: itemCategory,
           image_url: imageUrl,
+          key_info: itemKeyInfo,
+          is_available: itemAvailable,
         });
 
         if (addError) {
@@ -318,236 +318,282 @@ export function MenuModal({ userId, businessId, menu, editItem, isOpen, onClose,
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-[var(--color-charcoal)]/70 backdrop-blur-sm"
+      className="fixed inset-0 z-50 overflow-y-auto"
+      style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}
       onClick={handleBackdropClick}
       role="dialog"
       aria-modal="true"
       aria-labelledby="menu-modal-title"
     >
-      <div className="relative w-full sm:max-w-lg bg-[var(--color-charcoal)] border border-[var(--color-charcoal-lighter-plus)] rounded-t-2xl sm:rounded-2xl shadow-2xl max-h-[80vh] sm:max-h-[600px] flex flex-col animate-[scaleIn_200ms_ease-out]">
+      <div className="flex items-center justify-center min-h-full p-4">
+      <div
+        className="bg-white rounded-lg shadow-2xl flex flex-col w-[90%] max-w-[560px] max-h-[85vh] relative"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-[var(--color-charcoal-lighter-plus)]">
-          <h2 id="menu-modal-title" className="text-lg font-semibold text-[var(--color-cream)]">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[#E0E0E0] shrink-0">
+          <h2 id="menu-modal-title" className="text-lg font-semibold text-[#111111]">
             {editItem ? 'Edit Item' : menu ? t('menu.edit_menu') || 'Edit Menu' : t('menu.create_menu') || 'Create Menu'}
           </h2>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-[var(--color-charcoal-lighter)] rounded-full transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F5A623]"
+            className="p-2 hover:bg-[#F5F5F5] rounded-md transition-colors min-w-[40px] min-h-[40px] flex items-center justify-center"
             aria-label="Close modal"
           >
-            <svg className="w-6 h-6 text-[var(--color-body-text)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 text-[#777777]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
 
-        {/* Content */}
-        <div className="flex flex-col flex-1 overflow-hidden">
-          <div className="flex-1 p-4 overflow-y-auto bg-[var(--color-charcoal)] space-y-4">
-            {/* Error Message */}
-            {error && (
-              <div className="bg-[#E05C3A]/10 border border-[#E05C3A]/50 text-[#E05C3A] rounded-xl p-3 text-sm">
-                {error}
-              </div>
-            )}
+        {/* Scrollable Content */}
+        <div className="flex-1 overflow-y-auto overscroll-contain px-6 py-4 space-y-4" style={{ WebkitOverflowScrolling: 'touch' }}>
+          {/* Error Message */}
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 rounded-md p-3 text-sm">
+              {error}
+            </div>
+          )}
 
-            {/* Menu Info Section - shown for create only */}
-            {!menu && (
-              <>
-                {/* Menu Name */}
+          {/* Menu Info Section - shown for create only */}
+          {!menu && (
+            <>
+              <div>
+                <label className="block text-[#111111] text-sm font-medium mb-1.5">
+                  {t('menu.menu_name') || 'Menu Name'}
+                </label>
+                <input
+                  type="text"
+                  value={menuName}
+                  onChange={(e) => setMenuName(e.target.value)}
+                  placeholder={t('menu.menu_name_placeholder') || 'e.g., Appetizers, Main Courses'}
+                  className="w-full border border-[#E0E0E0] rounded px-4 py-2.5 text-[#111111] placeholder:text-[#999] focus:outline-none focus:ring-2 focus:ring-[#2A6FD6] focus:border-transparent transition-all"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[#111111] text-sm font-medium mb-1.5">
+                  {t('menu.description') || 'Description'}
+                </label>
+                <textarea
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder={t('menu.description_placeholder') || 'Add a description for this menu section...'}
+                  rows={3}
+                  className="w-full border border-[#E0E0E0] rounded px-4 py-2.5 text-[#111111] placeholder:text-[#999] focus:outline-none focus:ring-2 focus:ring-[#2A6FD6] focus:border-transparent transition-all resize-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[#111111] text-sm font-medium mb-1.5">
+                  {t('menu.category') || 'Category'}
+                </label>
+                <select
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  className="w-full border border-[#E0E0E0] rounded px-4 py-2.5 text-[#111111] focus:outline-none focus:ring-2 focus:ring-[#2A6FD6] focus:border-transparent transition-all bg-white"
+                >
+                  <option value="General">General</option>
+                  <option value="Appetizers">Appetizers</option>
+                  <option value="Main Courses">Main Courses</option>
+                  <option value="Desserts">Desserts</option>
+                  <option value="Beverages">Beverages</option>
+                  <option value="Salads">Salads</option>
+                  <option value="Soups">Soups</option>
+                  <option value="Sides">Sides</option>
+                </select>
+              </div>
+            </>
+          )}
+
+          {/* Add/Edit Item Section */}
+          {(menu || editItem) && (
+            <div>
+              <h3 className="text-[#111111] text-sm font-semibold mb-4">
+                {editItem ? 'Edit Item' : 'Add Item to Menu'}
+              </h3>
+              <form onSubmit={handleAddItem} className="space-y-4">
+                {/* Item Name */}
                 <div>
-                  <label className="block text-[var(--color-cream)] text-sm font-medium mb-2">
-                    {t('menu.menu_name') || 'Menu Name'}
-                  </label>
+                  <label className="block text-[#111111] text-sm font-medium mb-1.5">Item Name *</label>
                   <input
                     type="text"
-                    value={menuName}
-                    onChange={(e) => setMenuName(e.target.value)}
-                    placeholder={t('menu.menu_name_placeholder') || 'e.g., Appetizers, Main Courses'}
-                    className="w-full bg-[var(--color-charcoal-light)] border border-[var(--color-charcoal-lighter-plus)] rounded-xl px-4 py-2 text-[var(--color-cream)] placeholder:text-[var(--color-body-text)]/50 focus:outline-none focus:ring-2 focus:ring-[#F5A623] focus:border-transparent transition-all"
+                    value={itemName}
+                    onChange={(e) => setItemName(e.target.value)}
+                    placeholder="e.g., Caesar Salad"
+                    className="w-full border border-[#E0E0E0] rounded px-4 py-2.5 text-[#111111] placeholder:text-[#999] focus:outline-none focus:ring-2 focus:ring-[#2A6FD6] focus:border-transparent"
                   />
                 </div>
 
-                {/* Description */}
-                <div>
-                  <label className="block text-[var(--color-cream)] text-sm font-medium mb-2">
-                    {t('menu.description') || 'Description'}
-                  </label>
-                  <textarea
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    placeholder={t('menu.description_placeholder') || 'Add a description for this menu section...'}
-                    rows={3}
-                    className="w-full bg-[var(--color-charcoal-light)] border border-[var(--color-charcoal-lighter-plus)] rounded-xl px-4 py-2 text-[var(--color-cream)] placeholder:text-[var(--color-body-text)]/50 focus:outline-none focus:ring-2 focus:ring-[#F5A623] focus:border-transparent transition-all resize-none"
-                  />
-                </div>
-
-                {/* Category */}
-                <div>
-                  <label className="block text-[var(--color-cream)] text-sm font-medium mb-2">
-                    {t('menu.category') || 'Category'}
-                  </label>
-                  <select
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
-                    className="w-full bg-[var(--color-charcoal-light)] border border-[var(--color-charcoal-lighter-plus)] rounded-xl px-4 py-2 text-[var(--color-cream)] focus:outline-none focus:ring-2 focus:ring-[#F5A623] focus:border-transparent transition-all"
-                  >
-                    <option value="General">General</option>
-                    <option value="Appetizers">Appetizers</option>
-                    <option value="Main Courses">Main Courses</option>
-                    <option value="Desserts">Desserts</option>
-                    <option value="Beverages">Beverages</option>
-                    <option value="Salads">Salads</option>
-                    <option value="Soups">Soups</option>
-                    <option value="Sides">Sides</option>
-                  </select>
-                </div>
-              </>
-            )}
-
-            {/* Add/Edit Item Section - Only when editing existing menu or editing an item */}
-            {(menu || editItem) && (
-              <div className="border-t border-[var(--color-charcoal-lighter-plus)] pt-4">
-                <h3 className="text-[var(--color-cream)] text-sm font-semibold mb-4">
-                  {editItem ? 'Edit Item' : 'Add Item to Menu'}
-                </h3>
-                <form onSubmit={handleAddItem} className="space-y-3">
+                {/* Price & Category row */}
+                <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-[var(--color-cream)] text-xs font-medium mb-2">Item Name *</label>
-                    <input
-                      type="text"
-                      value={itemName}
-                      onChange={(e) => setItemName(e.target.value)}
-                      placeholder="e.g., Caesar Salad"
-                      className="w-full bg-[var(--color-charcoal-light)] border border-[var(--color-charcoal-lighter-plus)] rounded-xl px-4 py-2 text-[var(--color-cream)] placeholder:text-[var(--color-body-text)]/50 focus:outline-none focus:ring-2 focus:ring-[#F5A623] focus:border-transparent transition-all"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-[var(--color-cream)] text-xs font-medium mb-2">Price *</label>
+                    <label className="block text-[#111111] text-sm font-medium mb-1.5">Price *</label>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#777]">$</span>
                       <input
                         type="number"
                         step="0.01"
                         value={itemPrice}
                         onChange={(e) => setItemPrice(e.target.value)}
                         placeholder="0.00"
-                        className="w-full bg-[var(--color-charcoal-light)] border border-[var(--color-charcoal-lighter-plus)] rounded-xl px-4 py-2 text-[var(--color-cream)] placeholder:text-[var(--color-body-text)]/50 focus:outline-none focus:ring-2 focus:ring-[#F5A623] focus:border-transparent transition-all"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-[var(--color-cream)] text-xs font-medium mb-2">Category</label>
-                      <input
-                        type="text"
-                        value={itemCategory}
-                        onChange={(e) => setItemCategory(e.target.value)}
-                        placeholder="e.g., Vegetarian"
-                        className="w-full bg-[var(--color-charcoal-light)] border border-[var(--color-charcoal-lighter-plus)] rounded-xl px-4 py-2 text-[var(--color-cream)] placeholder:text-[var(--color-body-text)]/50 focus:outline-none focus:ring-2 focus:ring-[#F5A623] focus:border-transparent transition-all"
+                        className="w-full border border-[#E0E0E0] rounded pl-7 pr-4 py-2.5 text-[#111111] placeholder:text-[#999] focus:outline-none focus:ring-2 focus:ring-[#2A6FD6] focus:border-transparent"
                       />
                     </div>
                   </div>
-
                   <div>
-                    <label className="block text-[var(--color-cream)] text-xs font-medium mb-2">Description</label>
-                    <textarea
-                      value={itemDescription}
-                      onChange={(e) => setItemDescription(e.target.value)}
-                      placeholder="Describe the item..."
-                      rows={2}
-                      className="w-full bg-[var(--color-charcoal-light)] border border-[var(--color-charcoal-lighter-plus)] rounded-xl px-4 py-2 text-[var(--color-cream)] placeholder:text-[var(--color-body-text)]/50 focus:outline-none focus:ring-2 focus:ring-[#F5A623] focus:border-transparent transition-all resize-none"
-                    />
+                    <label className="block text-[#111111] text-sm font-medium mb-1.5">Category</label>
+                    <select
+                      value={itemCategory}
+                      onChange={(e) => setItemCategory(e.target.value)}
+                      className="w-full border border-[#E0E0E0] rounded px-4 py-2.5 text-[#111111] focus:outline-none focus:ring-2 focus:ring-[#2A6FD6] focus:border-transparent bg-white"
+                    >
+                      <option value="">Select category</option>
+                      <option value="Appetizers">Appetizers</option>
+                      <option value="Main Courses">Main Courses</option>
+                      <option value="Desserts">Desserts</option>
+                      <option value="Beverages">Beverages</option>
+                      <option value="Salads">Salads</option>
+                      <option value="Soups">Soups</option>
+                      <option value="Sides">Sides</option>
+                      <option value="Vegetarian">Vegetarian</option>
+                      <option value="Vegan">Vegan</option>
+                    </select>
                   </div>
+                </div>
 
-                  {/* Image Upload Error */}
-                  {uploadError && (
-                    <div className="bg-[#E05C3A]/10 border border-[#E05C3A]/50 text-[#E05C3A] text-xs rounded-xl p-2">
-                      {uploadError}
-                    </div>
-                  )}
+                {/* Description */}
+                <div>
+                  <label className="block text-[#111111] text-sm font-medium mb-1.5">Description</label>
+                  <textarea
+                    value={itemDescription}
+                    onChange={(e) => setItemDescription(e.target.value)}
+                    placeholder="Describe this item..."
+                    rows={2}
+                    className="w-full border border-[#E0E0E0] rounded px-4 py-2.5 text-[#111111] placeholder:text-[#999] focus:outline-none focus:ring-2 focus:ring-[#2A6FD6] focus:border-transparent resize-none"
+                  />
+                </div>
 
-                  {/* Image Preview */}
-                  {imagePreview && (
-                    <div className="relative bg-[var(--color-charcoal-light)] rounded-xl p-2">
-                      <img
-                        src={imagePreview}
-                        alt="Preview"
-                        className="w-full h-32 object-cover rounded-xl"
-                      />
-                      <button
-                        type="button"
-                        onClick={removeImage}
-                        disabled={uploading}
-                        className="absolute top-2 right-2 bg-[#E05C3A]/80 hover:bg-[#E05C3A] disabled:opacity-50 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F5A623]"
-                        aria-label="Remove image"
-                      >
-                        <svg className="w-4 h-4 text-[var(--text-primary)]" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" />
-                        </svg>
-                      </button>
-                    </div>
-                  )}
+                {/* Things You Should Know */}
+                <div>
+                  <label className="block text-[#111111] text-sm font-medium mb-1.5">Things You Should Know</label>
+                  <textarea
+                    value={itemKeyInfo}
+                    onChange={(e) => setItemKeyInfo(e.target.value)}
+                    placeholder="Allergens, dietary info, preparation notes..."
+                    rows={2}
+                    className="w-full border border-[#E0E0E0] rounded px-4 py-2.5 text-[#111111] placeholder:text-[#999] focus:outline-none focus:ring-2 focus:ring-[#2A6FD6] focus:border-transparent resize-none"
+                  />
+                </div>
 
-                  {/* Image Upload Button */}
-                  <div className="flex gap-2">
-                    <input
-                      type="file"
-                      ref={fileInputRef}
-                      onChange={handleImageSelect}
-                      accept="image/*"
-                      disabled={uploading || addingItem}
-                      className="hidden"
+                {/* Image Upload */}
+                {uploadError && (
+                  <div className="bg-red-50 border border-red-200 text-red-700 text-xs rounded-md p-2">
+                    {uploadError}
+                  </div>
+                )}
+
+                {imagePreview && (
+                  <div className="relative bg-[#F5F5F5] rounded-md p-2">
+                    <img
+                      src={imagePreview}
+                      alt="Preview"
+                      className="w-full h-32 object-cover rounded-md"
                     />
                     <button
                       type="button"
-                      onClick={() => fileInputRef.current?.click()}
-                      disabled={uploading || addingItem}
-                      className="px-4 py-2 rounded-xl font-medium text-sm bg-[var(--color-charcoal-light)] border border-[var(--color-charcoal-lighter-plus)] text-[var(--color-cream)] hover:bg-[var(--color-charcoal-lighter)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
-                      title="Add item photo"
+                      onClick={removeImage}
+                      disabled={uploading}
+                      className="absolute top-3 right-3 bg-red-500 hover:bg-red-600 disabled:opacity-50 w-8 h-8 flex items-center justify-center rounded-full text-white"
+                      aria-label="Remove image"
                     >
-                      📷 Add Photo
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" />
+                      </svg>
                     </button>
                   </div>
-
-                  <button
-                    type="submit"
-                    disabled={addingItem || uploading || !itemName.trim() || !itemPrice}
-                    className="w-full px-4 py-2 bg-[#6BAF7A] hover:bg-[#6BAF7A]/90 disabled:bg-[#6BAF7A]/40 disabled:cursor-not-allowed text-black rounded-xl transition-colors font-medium text-sm min-h-[44px]"
-                  >
-                    {addingItem || uploading ? (uploading ? 'Uploading...' : (editItem ? 'Saving...' : 'Adding...')) : (editItem ? 'Save Changes' : 'Add Item')}
-                  </button>
-                </form>
-              </div>
-            )}
-          </div>
-
-          {/* Footer */}
-          <div className="flex items-center justify-end gap-3 p-4 border-t border-[var(--color-charcoal-lighter-plus)] bg-[var(--color-charcoal)]">
-            <button
-              type="button"
-              onClick={onClose}
-              disabled={loading}
-              className="px-4 py-2 text-[var(--color-body-text)] hover:bg-[var(--color-charcoal-lighter)] disabled:opacity-50 disabled:cursor-not-allowed rounded-xl transition-colors font-medium min-h-[44px]"
-            >
-              {t('common.cancel') || 'Cancel'}
-            </button>
-            {!menu && (
-              <button
-                onClick={handleSubmit}
-                disabled={loading || !menuName.trim()}
-                className="px-6 py-2 bg-[#F5A623] hover:bg-[#F5A623]/90 disabled:bg-[#F5A623]/40 disabled:cursor-not-allowed text-black rounded-xl transition-colors font-medium min-h-[44px]"
-              >
-                {loading ? (
-                  <span className="flex items-center gap-2">
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    {t('common.saving') || 'Saving...'}
-                  </span>
-                ) : (
-                  t('common.create') || 'Create'
                 )}
-              </button>
-            )}
-          </div>
+
+                <div>
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleImageSelect}
+                    accept="image/*"
+                    disabled={uploading || addingItem}
+                    className="hidden"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={uploading || addingItem}
+                    className="px-4 py-2 rounded font-medium text-sm bg-[#F5F5F5] border border-[#E0E0E0] text-[#111111] hover:bg-[#EEEEEE] disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                    Add Photo
+                  </button>
+                </div>
+
+                {/* Is Available toggle */}
+                <div className="flex items-center justify-between py-1">
+                  <label className="text-[#111111] text-sm font-medium">Is Available</label>
+                  <button
+                    type="button"
+                    onClick={() => setItemAvailable(!itemAvailable)}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                      itemAvailable ? 'bg-[#2A6FD6]' : 'bg-[#E0E0E0]'
+                    }`}
+                    role="switch"
+                    aria-checked={itemAvailable}
+                  >
+                    <span
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                        itemAvailable ? 'translate-x-6' : 'translate-x-1'
+                      }`}
+                    />
+                  </button>
+                </div>
+              </form>
+            </div>
+          )}
         </div>
+
+        {/* Footer — always visible */}
+        <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-[#E0E0E0] bg-white rounded-b-lg shrink-0">
+          <button
+            type="button"
+            onClick={onClose}
+            disabled={loading}
+            className="px-5 py-2.5 text-[#777] hover:bg-[#F5F5F5] disabled:opacity-50 rounded font-medium text-sm transition-colors border border-[#E0E0E0]"
+          >
+            {t('common.cancel') || 'Cancel'}
+          </button>
+          {(menu || editItem) ? (
+            <button
+              onClick={handleAddItem}
+              disabled={addingItem || uploading || !itemName.trim() || !itemPrice}
+              className="px-5 py-2.5 bg-[#2A6FD6] hover:bg-[#245FCC] disabled:bg-[#2A6FD6]/40 disabled:cursor-not-allowed text-white rounded font-medium text-sm transition-colors"
+            >
+              {addingItem || uploading ? (uploading ? 'Uploading...' : (editItem ? 'Saving...' : 'Adding...')) : (editItem ? 'Save Changes' : 'Add Item')}
+            </button>
+          ) : (
+            <button
+              onClick={handleSubmit}
+              disabled={loading || !menuName.trim()}
+              className="px-5 py-2.5 bg-[#2A6FD6] hover:bg-[#245FCC] disabled:bg-[#2A6FD6]/40 disabled:cursor-not-allowed text-white rounded font-medium text-sm transition-colors"
+            >
+              {loading ? (
+                <span className="flex items-center gap-2">
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  {t('common.saving') || 'Saving...'}
+                </span>
+              ) : (
+                t('common.create') || 'Create'
+              )}
+            </button>
+          )}
+        </div>
+      </div>
       </div>
     </div>
   );
