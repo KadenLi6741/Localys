@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { searchUsers, getOrCreateOneToOneChat } from '@/lib/supabase/messages';
+import { searchUsers, getOrCreateOneToOneChat, sendMessage } from '@/lib/supabase/messages';
 import { useRouter } from 'next/navigation';
 
 interface NewChatModalProps {
@@ -75,6 +75,14 @@ export function NewChatModal({ isOpen, onClose, currentUserId }: NewChatModalPro
       
       if (data) {
         console.log('Chat found/created:', data.id);
+        // Auto-send a default opening message for brand-new chats
+        if (!data.last_message) {
+          await sendMessage({
+            chat_id: data.id,
+            sender_id: currentUserId,
+            content: 'Hi! Is this available? 👋',
+          });
+        }
         onClose();
         router.push(`/chats/${data.id}`);
       } else {
@@ -95,18 +103,19 @@ export function NewChatModal({ isOpen, onClose, currentUserId }: NewChatModalPro
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+        className="absolute inset-0 bg-[#1A1A18]/80 backdrop-blur-sm"
         onClick={onClose}
       />
 
       {/* Modal */}
-      <div className="relative w-full max-w-lg mx-4 mb-4 sm:mb-0 bg-zinc-900 border border-white/10 rounded-2xl shadow-2xl max-h-[80vh] flex flex-col">
+      <div className="relative w-full max-w-lg mx-4 mb-4 sm:mb-0 bg-[#1A1A18] border border-[#3A3A34] rounded-2xl shadow-2xl max-h-[80vh] flex flex-col animate-[scaleIn_200ms_ease-out]">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-white/10">
-          <h2 className="text-xl font-bold text-white">New Chat</h2>
+        <div className="flex items-center justify-between p-6 border-b border-[#3A3A34]">
+          <h2 className="text-xl font-bold text-[#F5F0E8]">New Chat</h2>
           <button
             onClick={onClose}
-            className="text-white/60 hover:text-white transition-colors"
+            className="w-11 h-11 flex items-center justify-center rounded-full text-[#9E9A90] hover:text-[#F5F0E8] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F5A623]"
+            aria-label="Close"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -115,20 +124,21 @@ export function NewChatModal({ isOpen, onClose, currentUserId }: NewChatModalPro
         </div>
 
         {/* Search Input */}
-        <div className="p-6 border-b border-white/10">
+        <div className="p-6 border-b border-[#3A3A34]">
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search by name or username..."
-            className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-white/40 focus:outline-none focus:border-white/40"
+            className="w-full bg-[#242420] border border-[#3A3A34] rounded-xl px-4 py-3 text-[#F5F0E8] placeholder-[#9E9A90]/50 focus:outline-none focus:ring-2 focus:ring-[#F5A623] focus:border-transparent"
+            aria-label="Search users"
             autoFocus
           />
         </div>
 
         {/* Error Message */}
         {error && (
-          <div className="px-6 py-3 bg-red-500/20 border-b border-red-500/30 text-red-400 text-sm">
+          <div className="px-6 py-3 bg-[#E05C3A]/10 border-b border-[#E05C3A]/20 text-[#E05C3A] text-sm">
             {error}
           </div>
         )}
@@ -137,14 +147,14 @@ export function NewChatModal({ isOpen, onClose, currentUserId }: NewChatModalPro
         <div className="flex-1 overflow-y-auto p-6">
           {loading ? (
             <div className="text-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto"></div>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#F5A623] mx-auto"></div>
             </div>
           ) : searchResults.length === 0 && searchQuery.trim() ? (
-            <div className="text-center py-8 text-white/40">
+            <div className="text-center py-8 text-[#9E9A90]">
               No users found
             </div>
           ) : searchResults.length === 0 ? (
-            <div className="text-center py-8 text-white/40">
+            <div className="text-center py-8 text-[#9E9A90]">
               Search for users to start a chat
             </div>
           ) : (
@@ -154,10 +164,10 @@ export function NewChatModal({ isOpen, onClose, currentUserId }: NewChatModalPro
                   key={user.id}
                   onClick={() => handleSelectUser(user.id)}
                   disabled={creating}
-                  className="w-full flex items-center gap-4 p-4 bg-white/5 hover:bg-white/10 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full flex items-center gap-4 p-4 bg-[#242420] hover:bg-[#2E2E28] rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F5A623]"
                 >
                   {/* Avatar */}
-                  <div className="w-12 h-12 rounded-full bg-white/10 flex-shrink-0 overflow-hidden">
+                  <div className="w-12 h-12 rounded-full bg-[#2E2E28] flex-shrink-0 overflow-hidden">
                     {user.profile_picture_url ? (
                       <img
                         src={user.profile_picture_url}
@@ -165,7 +175,7 @@ export function NewChatModal({ isOpen, onClose, currentUserId }: NewChatModalPro
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center text-white/60 text-lg font-semibold">
+                      <div className="w-full h-full flex items-center justify-center text-[#9E9A90] text-lg font-semibold">
                         {(user.full_name || user.username || '?')[0]?.toUpperCase() || '?'}
                       </div>
                     )}
@@ -173,9 +183,9 @@ export function NewChatModal({ isOpen, onClose, currentUserId }: NewChatModalPro
 
                   {/* User Info */}
                   <div className="flex-1 text-left">
-                    <p className="font-semibold text-white">{user.full_name || user.username}</p>
+                    <p className="font-semibold text-[#F5F0E8]">{user.full_name || user.username}</p>
                     {user.username && user.full_name && (
-                      <p className="text-sm text-white/60">@{user.username}</p>
+                      <p className="text-sm text-[#9E9A90]">@{user.username}</p>
                     )}
                   </div>
                 </button>

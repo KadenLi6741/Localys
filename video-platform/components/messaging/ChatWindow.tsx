@@ -300,9 +300,9 @@ export default function ChatWindow({ conversationId, onBack }: ChatWindowProps) 
   }
 
   return (
-    <div className="flex flex-col h-full bg-black text-white">
+    <div className="flex flex-col h-full bg-transparent text-white">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-black/80 backdrop-blur-md border-b border-white/10 px-4 py-4">
+      <div className="sticky top-0 z-10 bg-[#1A1A18]/80 backdrop-blur-md border-b border-white/10 px-4 py-4">
         <div className="flex items-center gap-4">
           {onBack && (
             <button
@@ -350,7 +350,7 @@ export default function ChatWindow({ conversationId, onBack }: ChatWindowProps) 
       {/* Messages */}
       <div
         ref={messagesContainerRef}
-        className="flex-1 overflow-y-auto px-4 py-4 space-y-4"
+        className="flex-1 overflow-y-auto px-4 py-4 space-y-1"
       >
         {messages.length === 0 ? (
           <div className="flex items-center justify-center h-full text-gray-400">
@@ -363,7 +363,7 @@ export default function ChatWindow({ conversationId, onBack }: ChatWindowProps) 
             return (
               <div
                 key={message.id}
-                className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}
+                className={`flex py-1 ${isOwn ? 'justify-end' : 'justify-start'}`}
                 onMouseEnter={() => setHoveredMessageId(message.id || null)}
                 onMouseLeave={() => setHoveredMessageId(null)}
               >
@@ -470,7 +470,7 @@ export default function ChatWindow({ conversationId, onBack }: ChatWindowProps) 
       {/* Message Input */}
       <form
         onSubmit={handleSendMessage}
-        className="sticky bottom-0 bg-black/80 backdrop-blur-md border-t border-white/10 p-4"
+        className="sticky bottom-0 bg-[#1A1A18]/80 backdrop-blur-md border-t border-white/10 p-4"
       >
         <div className="flex gap-2">
           <input

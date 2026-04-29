@@ -16,7 +16,7 @@ export default function PurchaseSuccessPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-black text-white flex items-center justify-center p-4">
+        <div className="min-h-screen bg-transparent text-white flex items-center justify-center p-4">
           <p className="text-white/70">Loading purchase details...</p>
         </div>
       }
@@ -65,8 +65,8 @@ function PurchaseSuccessContent() {
   }, [sessionId]);
 
   return (
-    <div className="min-h-screen bg-black text-white pb-20">
-      <div className="max-w-md mx-auto px-4 py-8">
+    <div className="min-h-screen bg-transparent text-white pb-20">
+      <div className="w-full px-4 lg:px-12 py-8">
         <div className="text-center">
           <div className="mb-6">
             <svg
@@ -120,7 +120,7 @@ function PurchaseSuccessContent() {
           ) : null}
 
           {sessionId && (
-            <div className="bg-black/40 rounded-lg p-4 mb-6 text-left">
+            <div className="bg-[#1A1A18]/40 rounded-lg p-4 mb-6 text-left">
               <p className="text-white/60 text-xs mb-1">Session ID:</p>
               <p className="text-white/40 font-mono text-xs break-all">{sessionId}</p>
             </div>

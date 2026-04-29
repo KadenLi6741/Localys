@@ -161,15 +161,15 @@ function DashboardContent() {
 
   if (isBusiness === null || (loading && isBusiness)) {
     return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+      <div className="min-h-screen bg-transparent text-white flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-400"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-black text-white pb-24">
-      <div className="max-w-2xl mx-auto px-4 py-6">
+    <div className="min-h-screen bg-transparent text-white pb-24">
+      <div className="w-full px-4 lg:px-12 py-6">
         <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
 
         {/* Scan result notification */}

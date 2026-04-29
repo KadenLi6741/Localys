@@ -1,8 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
-import { PromotionModal } from '@/components/PromotionModal';
+import dynamic from 'next/dynamic';
+const PromotionModal = dynamic(() => import('@/components/PromotionModal').then(mod => mod.PromotionModal), { ssr: false });
 import { getUserCoins } from '@/lib/supabase/profiles';
 
 interface PostedVideo {
@@ -23,6 +25,7 @@ interface PostedVideosProps {
 }
 
 export function PostedVideos({ userId, isOwnProfile = true }: PostedVideosProps) {
+  const router = useRouter();
   const [videos, setVideos] = useState<PostedVideo[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingVideoId, setDeletingVideoId] = useState<string | null>(null);
@@ -181,11 +184,14 @@ export function PostedVideos({ userId, isOwnProfile = true }: PostedVideosProps)
       {videos.map((video) => (
         <div
           key={video.id}
-          className="bg-black border border-white/10 rounded-lg overflow-hidden hover:border-white/20 transition-all duration-200"
+          className="bg-transparent border border-white/10 rounded-lg overflow-hidden hover:border-white/20 transition-all duration-200"
         >
           <div className="flex gap-4 p-4">
             {/* Video Thumbnail */}
-            <div className="flex-shrink-0 w-20 h-20">
+            <div
+              className="flex-shrink-0 w-20 h-20 cursor-pointer"
+              onClick={() => router.push(`/?videoId=${video.id}`)}
+            >
               <video
                 src={video.video_url}
                 className="w-full h-full object-cover rounded"

@@ -8,7 +8,7 @@ import { useAuth } from '@/contexts/AuthContext';
 export default function CheckoutSuccessPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-black text-white flex items-center justify-center p-4">
+      <div className="min-h-screen bg-transparent text-white flex items-center justify-center p-4">
         <p className="text-white/70">Loading confirmation...</p>
       </div>
     }>
@@ -44,7 +44,7 @@ function CheckoutSuccessContent() {
   }, [sessionId, user]);
 
   return (
-    <div className="min-h-screen bg-black text-white flex items-center justify-center p-4">
+    <div className="min-h-screen bg-transparent text-white flex items-center justify-center p-4">
       <div className="max-w-md w-full">
         <div className="bg-white/5 border border-green-500/30 rounded-lg p-8 text-center">
           {/* Success Icon */}
@@ -66,7 +66,7 @@ function CheckoutSuccessContent() {
 
           {/* Session ID */}
           {sessionId && (
-            <div className="bg-black/40 rounded-lg p-4 mb-6 text-left">
+            <div className="bg-[#1A1A18]/40 rounded-lg p-4 mb-6 text-left">
               <p className="text-white/60 text-xs mb-1">Session ID:</p>
               <p className="text-white/40 font-mono text-xs break-all">{sessionId}</p>
             </div>

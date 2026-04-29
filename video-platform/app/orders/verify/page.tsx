@@ -57,7 +57,7 @@ function VerifyContent() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+      <div className="min-h-screen bg-transparent text-white flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
       </div>
     );
@@ -65,7 +65,7 @@ function VerifyContent() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center p-4">
+      <div className="min-h-screen bg-transparent text-white flex items-center justify-center p-4">
         <div className="max-w-md w-full text-center">
           <h1 className="text-2xl font-bold mb-4">Sign in required</h1>
           <p className="text-white/60 mb-6">You need to be signed in as the business owner to verify this order.</p>
@@ -78,8 +78,8 @@ function VerifyContent() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white pb-20">
-      <div className="max-w-md mx-auto px-4 py-8">
+    <div className="min-h-screen bg-transparent text-white pb-20">
+      <div className="w-full px-4 lg:px-12 py-8">
         {success ? (
           <div className="text-center">
             <svg className="w-20 h-20 mx-auto text-green-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -150,7 +150,7 @@ export default function VerifyOrderPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="min-h-screen bg-transparent text-white flex items-center justify-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
         </div>
       }

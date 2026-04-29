@@ -5,7 +5,8 @@ import { useParams, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { likeItem, unlikeItem, getLikeCounts } from '@/lib/supabase/videos';
-import { CommentModal } from '@/components/CommentModal';
+import dynamic from 'next/dynamic';
+const CommentModal = dynamic(() => import('@/components/CommentModal').then(mod => mod.CommentModal), { ssr: false });
 import Link from 'next/link';
 import Image from 'next/image';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -295,7 +296,7 @@ export default function VideoDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
+      <div className="min-h-screen bg-transparent flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
       </div>
     );
@@ -303,7 +304,7 @@ export default function VideoDetailPage() {
 
   if (error || !video) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
+      <div className="min-h-screen bg-transparent flex items-center justify-center">
         <div className="text-center">
           <p className="text-white text-xl mb-4">{error || 'Video not found'}</p>
           <button
@@ -326,8 +327,8 @@ export default function VideoDetailPage() {
     : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(creatorName)}`;
 
   return (
-    <div className="min-h-screen bg-black">
-      <div className="max-w-4xl mx-auto py-8 px-4">
+    <div className="min-h-screen bg-transparent">
+      <div className="w-full px-4 lg:px-12 py-8">
         {/* Back Button */}
         <button
           onClick={() => router.back()}
@@ -339,7 +340,7 @@ export default function VideoDetailPage() {
         {/* Video Container */}
         <div className="bg-gray-900 rounded-lg overflow-hidden">
           {/* Video Player */}
-          <div className="relative bg-black aspect-video flex items-center justify-center group">
+          <div className="relative bg-transparent aspect-video flex items-center justify-center group">
             <video
               src={video.video_url}
               controls

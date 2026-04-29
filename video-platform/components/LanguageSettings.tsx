@@ -36,7 +36,7 @@ export function LanguageSettings() {
       </button>
 
       {isOpen && (
-        <div className="absolute top-full right-0 mt-2 w-48 bg-black border border-white/20 rounded-lg shadow-lg z-50">
+        <div className="absolute top-full right-0 mt-2 w-48 bg-transparent border border-white/20 rounded-lg shadow-lg z-50">
           <div className="p-2">
             <p className="text-white/60 text-xs uppercase tracking-wide mb-2 px-2">{t('common.language')}</p>
             {(Object.entries(LANGUAGES) as [Language, typeof LANGUAGES[Language]][]).map(([code, { name, nativeName }]) => (

@@ -121,14 +121,11 @@ export async function POST(request: NextRequest) {
       };
     });
 
-    // Store items data in metadata as JSON
+    // Store only item IDs and quantities in metadata to stay under Stripe's 500-char limit.
+    // Full item details (name, price, seller) are looked up from Supabase in the webhook.
     const itemsMetadata = items.map((item) => ({
       id: item.itemId,
-      name: item.itemName,
-      sid: item.sellerId,
-      price: item.itemPrice,
       qty: item.quantity || 1,
-      sr: item.specialRequests || '',
     }));
 
     const buyerId = items[0].buyerId;
@@ -142,6 +139,7 @@ export async function POST(request: NextRequest) {
       cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://localys.xyz'}/profile/${firstSellerId}?canceled=true`,
       metadata: {
         buyerId,
+        sellerId: firstSellerId,
         items: JSON.stringify(itemsMetadata),
         ...(appliedCouponCode && {
           couponCode: appliedCouponCode,

@@ -197,7 +197,7 @@ export default function BusinessLocationMap({ locations, businessName }: Busines
 
       {/* Badge: nearest drive time (or straight-line while loading) */}
       {badgeLabel && (
-        <div className="absolute top-3 right-3 z-[1000] bg-black/80 text-white text-sm font-medium px-3 py-1.5 rounded-full backdrop-blur-sm border border-white/20 pointer-events-none">
+        <div className="absolute top-3 right-3 z-[1000] bg-[#1A1A18]/80 text-white text-sm font-medium px-3 py-1.5 rounded-full backdrop-blur-sm border border-white/20 pointer-events-none">
           {badgeLabel}
         </div>
       )}

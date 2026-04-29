@@ -98,9 +98,9 @@ export function QRScanner({ onScan, onClose }: QRScannerProps) {
   }, [onScan, cleanup]);
 
   return (
-    <div className="fixed inset-0 z-50 bg-black flex flex-col">
+    <div className="fixed inset-0 z-50 bg-transparent flex flex-col">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 bg-black/80">
+      <div className="flex items-center justify-between p-4 bg-[#1A1A18]/80">
         <h2 className="text-white font-semibold text-lg">Scan QR Code</h2>
         <button
           onClick={() => { cleanup(); onClose(); }}

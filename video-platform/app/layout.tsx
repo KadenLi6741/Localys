@@ -6,7 +6,11 @@ import { LanguageProvider } from "@/contexts/LanguageContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { CartProvider } from "@/contexts/CartContext";
 import { AppBottomNav } from "@/components/AppBottomNav";
+import { ActivityPanel } from "@/components/ActivityPanel";
+import { ActivityProvider } from "@/contexts/ActivityContext";
 import { PersistentVideoFeed } from "@/components/PersistentVideoFeed";
+import { CursorOrb } from "@/components/CursorOrb";
+import { DesktopSidebar } from "@/components/DesktopSidebar";
 
 const outfit = Outfit({
   variable: "--font-outfit",
@@ -33,15 +37,29 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full">
       <body
-        className={`${outfit.variable} ${jetbrainsMono.variable} antialiased h-full dark`}
+        className={`${outfit.variable} ${jetbrainsMono.variable} antialiased h-full dark bg-[#1A1A18] text-[#F5F0E8]`}
       >
         <ThemeProvider>
           <AuthProvider>
             <LanguageProvider>
               <CartProvider>
+                <ActivityProvider>
+                <a href="#main-content" className="skip-to-main">Skip to main content</a>
+                {/* Premium background elements */}
+                <div className="premium-blob premium-blob--amber" aria-hidden="true" />
+                <div className="premium-blob premium-blob--sage" aria-hidden="true" />
+                <div className="premium-blob premium-blob--warm" aria-hidden="true" />
+                <CursorOrb />
                 <PersistentVideoFeed />
-                {children}
+                <div className="app-layout">
+                  <DesktopSidebar />
+                  <main id="main-content" className="responsive-container">
+                    {children}
+                  </main>
+                </div>
                 <AppBottomNav />
+                <ActivityPanel />
+                </ActivityProvider>
               </CartProvider>
             </LanguageProvider>
           </AuthProvider>

@@ -24,7 +24,7 @@ export default function EmailVerifiedPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-black text-white flex items-center justify-center px-4">
+    <div className="min-h-screen bg-transparent text-white flex items-center justify-center px-4">
       <div className="w-full max-w-md space-y-6 text-center">
         <h1 className="text-3xl font-bold">Email verified</h1>
         <p className="text-white/70">
