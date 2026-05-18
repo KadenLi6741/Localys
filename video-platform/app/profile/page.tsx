@@ -339,7 +339,7 @@ function ProfileView({ profile, business, user, onEditClick, onSignOut, onProfil
         </div>
 
         {/* Bookmarked Videos Section */}
-        <div className="mb-8" style={{ animation: 'fadeInUp 0.4s ease-out 0.35s forwards', opacity: 0 }}>
+        <div id="saved" className="mb-8 scroll-mt-24" style={{ animation: 'fadeInUp 0.4s ease-out 0.35s forwards', opacity: 0 }}>
           <h3 className="entrance-slide text-xl font-semibold mb-4" style={{ animation: 'slideInLeft 0.4s ease-out 0.35s forwards', opacity: 0 }}>{t('profile.bookmarked')}</h3>
           <div className="bg-white/5 border border-white/10 rounded-lg p-6">
             <BookmarkedVideos userId={user.id} />

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Outfit, JetBrains_Mono } from "next/font/google";
+import "leaflet/dist/leaflet.css";
 import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
@@ -8,7 +9,6 @@ import { CartProvider } from "@/contexts/CartContext";
 import { AppBottomNav } from "@/components/AppBottomNav";
 import { ActivityPanel } from "@/components/ActivityPanel";
 import { ActivityProvider } from "@/contexts/ActivityContext";
-import { PersistentVideoFeed } from "@/components/PersistentVideoFeed";
 import { CursorOrb } from "@/components/CursorOrb";
 import { DesktopSidebar } from "@/components/DesktopSidebar";
 
@@ -50,7 +50,6 @@ export default function RootLayout({
                 <div className="premium-blob premium-blob--sage" aria-hidden="true" />
                 <div className="premium-blob premium-blob--warm" aria-hidden="true" />
                 <CursorOrb />
-                <PersistentVideoFeed />
                 <div className="app-layout">
                   <DesktopSidebar />
                   <main id="main-content" className="responsive-container">

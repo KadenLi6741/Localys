@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
@@ -17,6 +17,45 @@ const DRINK_OPTIONS = ['Alcohol Served', 'Cocktails', 'Wine', 'Coffee / Specialt
 const AMENITY_OPTIONS = ['Free Wi-Fi', 'Parking Available', 'Wheelchair Accessible', 'Pet-Friendly'];
 const PAYMENT_OPTIONS = ['Credit / Debit', 'Cash', 'Apple Pay / Google Pay', 'Split Bills'];
 const MODERN_TAGS = ['Locally Owned', 'Eco-Friendly', 'Black-Owned', 'Women-Owned', 'Michelin / Awards', 'Featured'];
+
+type GeocodedLocation = {
+  lat: number;
+  lng: number;
+  label: string;
+};
+
+async function geocodeLocation(location: string): Promise<GeocodedLocation | null> {
+  const trimmed = location.trim();
+  if (!trimmed) return null;
+
+  try {
+    const response = await fetch(
+      `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q=${encodeURIComponent(trimmed)}`
+    );
+    if (!response.ok) return null;
+
+    const results = await response.json() as Array<{
+      lat?: string;
+      lon?: string;
+      display_name?: string;
+    }>;
+
+    const first = results[0];
+    if (!first?.lat || !first.lon) return null;
+
+    const lat = Number(first.lat);
+    const lng = Number(first.lon);
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+
+    return {
+      lat,
+      lng,
+      label: first.display_name || trimmed,
+    };
+  } catch {
+    return null;
+  }
+}
 
 export default function SearchPage() {
   return (
@@ -50,6 +89,9 @@ function SearchContent() {
   const [radius, setRadius] = useState(10);
   const [userLat, setUserLat] = useState<number | undefined>();
   const [userLng, setUserLng] = useState<number | undefined>();
+  const [customLocation, setCustomLocation] = useState('');
+  const [resolvedLocationLabel, setResolvedLocationLabel] = useState('');
+  const [locationStatus, setLocationStatus] = useState<'idle' | 'loading' | 'error'>('idle');
 
   const [hoveredBusiness, setHoveredBusiness] = useState<any>(null);
 
@@ -107,6 +149,70 @@ function SearchContent() {
     }
   }, []);
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const initialQuery = params.get('query') || '';
+    const initialCategory = params.get('category') || '';
+    const initialLocation = params.get('location') || '';
+    const initialMode: SearchMode = params.get('mode') === 'videos' ? 'videos' : 'businesses';
+    const wantsNearMe = params.get('nearMe') === '1';
+    const allowedCategory = ['food', 'retail', 'service'].includes(initialCategory)
+      ? initialCategory as 'food' | 'retail' | 'service'
+      : '';
+
+    if (initialQuery) setQuery(initialQuery);
+    if (allowedCategory) setCategory(allowedCategory);
+    if (initialLocation) setCustomLocation(initialLocation);
+    setSearchMode(initialMode);
+
+    const shouldSearch = initialQuery || allowedCategory || initialLocation || wantsNearMe;
+    if (!shouldSearch) return;
+
+    const runInitialSearch = (latitude?: number, longitude?: number) => {
+      executeSearch({
+        query: initialQuery || undefined,
+        category: allowedCategory || undefined,
+        latitude,
+        longitude,
+        maxDistance: latitude && longitude ? 10 : undefined,
+      }, initialMode);
+    };
+
+    if (initialLocation) {
+      setLocationStatus('loading');
+      void geocodeLocation(initialLocation).then((location) => {
+        if (!location) {
+          setLocationStatus('error');
+          runInitialSearch();
+          return;
+        }
+
+        setUserLat(location.lat);
+        setUserLng(location.lng);
+        setNearMe(true);
+        setResolvedLocationLabel(location.label);
+        setLocationStatus('idle');
+        runInitialSearch(location.lat, location.lng);
+      });
+      return;
+    }
+
+    if (wantsNearMe && navigator.geolocation) {
+      setNearMe(true);
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserLat(position.coords.latitude);
+          setUserLng(position.coords.longitude);
+          runInitialSearch(position.coords.latitude, position.coords.longitude);
+        },
+        () => runInitialSearch()
+      );
+      return;
+    }
+
+    runInitialSearch();
+  }, [executeSearch]);
+
   const handleSearch = useCallback(() => {
     const filters = buildFilters();
     executeSearch(filters, searchMode);
@@ -131,6 +237,33 @@ function SearchContent() {
     } else {
       setNearMe(!nearMe);
     }
+  };
+
+  const handleCustomLocation = async () => {
+    if (!customLocation.trim()) {
+      setLocationStatus('error');
+      return;
+    }
+
+    setLocationStatus('loading');
+    const location = await geocodeLocation(customLocation);
+    if (!location) {
+      setLocationStatus('error');
+      return;
+    }
+
+    setUserLat(location.lat);
+    setUserLng(location.lng);
+    setNearMe(true);
+    setResolvedLocationLabel(location.label);
+    setLocationStatus('idle');
+
+    executeSearch({
+      ...buildFilters(),
+      latitude: location.lat,
+      longitude: location.lng,
+      maxDistance: radius,
+    }, searchMode);
   };
 
   const handleMinRatingStarClick = (starValue: number) => {
@@ -161,11 +294,16 @@ function SearchContent() {
     setTags([]);
     setNearMe(false);
     setRadius(10);
+    setCustomLocation('');
+    setResolvedLocationLabel('');
+    setLocationStatus('idle');
+    setUserLat(undefined);
+    setUserLng(undefined);
   };
 
   const hasActiveFilters = category || minRating || priceRange[0] > 0 || priceRange[1] < 1000
     || cuisineType || formality || specialType || dietary.length > 0 || features.length > 0
-    || amenities.length > 0 || payment.length > 0 || tags.length > 0 || nearMe;
+    || amenities.length > 0 || payment.length > 0 || tags.length > 0 || nearMe || customLocation;
 
   return (
     <div className="min-h-screen bg-[#1A1A18] text-foreground pb-20">
@@ -397,6 +535,38 @@ function SearchContent() {
                   {/* Location */}
                   <FilterSection title="📍 Location">
                     <div className="space-y-3">
+                      <div className="grid gap-2 sm:grid-cols-[1fr_auto]">
+                        <input
+                          type="text"
+                          value={customLocation}
+                          onChange={(event) => {
+                            setCustomLocation(event.target.value);
+                            setLocationStatus('idle');
+                          }}
+                          onKeyDown={(event) => {
+                            if (event.key === 'Enter') {
+                              event.preventDefault();
+                              void handleCustomLocation();
+                            }
+                          }}
+                          placeholder="City, address, or neighborhood"
+                          className="min-h-10 rounded-lg border border-[#3A3A34] bg-[#1A1A18] px-3 text-sm text-[#F5F0E8] outline-none placeholder:text-[#9E9A90] focus:border-[#F5A623]"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => void handleCustomLocation()}
+                          disabled={locationStatus === 'loading'}
+                          className="rounded-lg bg-[#F5A623] px-4 py-2 text-sm font-semibold text-black disabled:cursor-not-allowed disabled:opacity-60"
+                        >
+                          {locationStatus === 'loading' ? 'Setting...' : 'Set'}
+                        </button>
+                      </div>
+                      {resolvedLocationLabel && (
+                        <p className="text-xs text-[#6BAF7A]">Searching near {resolvedLocationLabel}</p>
+                      )}
+                      {locationStatus === 'error' && (
+                        <p className="text-xs text-[#E05C3A]">Could not find that location. Try a city, address, or neighborhood.</p>
+                      )}
                       <button
                         onClick={handleNearMe}
                         className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${

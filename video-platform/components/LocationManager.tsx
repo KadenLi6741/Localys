@@ -1,7 +1,6 @@
 'use client';
 
-import 'leaflet/dist/leaflet.css';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import {
@@ -56,16 +55,22 @@ export default function LocationManager({ profileId }: LocationManagerProps) {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const loadLocations = useCallback(async () => {
-    setLoading(true);
-    const { data } = await getBusinessLocations(profileId);
-    setLocations(data ?? []);
-    setLoading(false);
-  }, [profileId]);
-
   useEffect(() => {
-    loadLocations();
-  }, [loadLocations]);
+    let isMounted = true;
+
+    const loadInitialLocations = async () => {
+      const { data } = await getBusinessLocations(profileId);
+      if (!isMounted) return;
+      setLocations(data ?? []);
+      setLoading(false);
+    };
+
+    void loadInitialLocations();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [profileId]);
 
   const handleSave = async () => {
     if (!pending) return;

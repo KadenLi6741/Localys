@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Localys — Discover Local Businesses Near You</title>
+  <meta
+    name="description"
+    content="Discover cafés, shops, makers, services, and hidden gems near you with Localys."
+  />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="#">
+        <span class="brand-icon">●</span>
+        <span>Localys</span>
+      </a>
+
+      <nav class="main-nav" aria-label="Main navigation">
+        <a class="active" href="#">Explore</a>
+        <a href="#">Map</a>
+        <a href="#">Collections</a>
+        <a href="#">Add Business</a>
+        <a href="#">Saved</a>
+      </nav>
+
+      <button class="profile-button" type="button">
+        <span class="avatar"></span>
+        <span>Profile</span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <section class="search-strip">
+      <div class="container search-inner">
+        <label class="search-box">
+          <span>⌕</span>
+          <input type="search" placeholder="Search for cafés, shops, makers, and more..." />
+        </label>
+
+        <button class="location-select" type="button">
+          <span>📍</span>
+          Kensington, Toronto
+          <span>⌄</span>
+        </button>
+
+        <button class="icon-button" type="button" aria-label="Use current location">
+          ◎
+        </button>
+      </div>
+    </section>
+
+    <section class="hero">
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow">Local is better</p>
+          <h1>Discover local businesses near you</h1>
+          <p class="hero-text">
+            From cozy cafés to indie shops, local makers to helpful services —
+            explore the best spots in your community and uncover hidden gems.
+          </p>
+
+          <div class="hero-actions">
+            <a class="button button-primary" href="#">Explore nearby</a>
+            <a class="button button-secondary" href="#">Add a business</a>
+          </div>
+        </div>
+
+        <div class="hero-visual" aria-label="Illustration of a local neighborhood">
+          <div class="hero-card">
+            <strong>You’re in Kensington</strong>
+            <span>Explore what locals love right around you.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="categories">
+      <div class="container category-grid">
+        <a class="category-card" href="#">
+          <span>☕</span>
+          Coffee
+        </a>
+        <a class="category-card" href="#">
+          <span>🍔</span>
+          Food
+        </a>
+        <a class="category-card" href="#">
+          <span>👕</span>
+          Thrift
+        </a>
+        <a class="category-card" href="#">
+          <span>🧴</span>
+          Beauty
+        </a>
+        <a class="category-card" href="#">
+          <span>🏋️</span>
+          Fitness
+        </a>
+        <a class="category-card" href="#">
+          <span>📚</span>
+          Study Spots
+        </a>
+        <a class="category-card" href="#">
+          <span>🎨</span>
+          Makers
+        </a>
+        <a class="category-card" href="#">
+          <span>📅</span>
+          Events
+        </a>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-heading">
+          <h2>Trending near you</h2>
+          <a href="#">View all →</a>
+        </div>
+
+        <div class="business-grid">
+          <article class="business-card">
+            <div class="business-image image-coffee">
+              <span class="distance">🚶 0.4 km</span>
+              <span class="status">Open</span>
+            </div>
+            <div class="business-body">
+              <h3>Daily Ritual Coffee</h3>
+              <p class="meta">Coffee Shop · Kensington</p>
+              <p>Bright café with great lattes and even better people.</p>
+              <div class="card-actions">
+                <button type="button">♡ Save</button>
+                <a href="#">View →</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="business-card">
+            <div class="business-image image-food">
+              <span class="distance">🚶 0.6 km</span>
+              <span class="status">Open</span>
+            </div>
+            <div class="business-body">
+              <h3>Falafel World</h3>
+              <p class="meta">Middle Eastern · Kensington Market</p>
+              <p>Fresh, fast, and full of flavour. A local favourite.</p>
+              <div class="card-actions">
+                <button type="button">♡ Save</button>
+                <a href="#">View →</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="business-card">
+            <div class="business-image image-thrift">
+              <span class="distance">🚶 0.8 km</span>
+              <span class="status">Open</span>
+            </div>
+            <div class="business-body">
+              <h3>Common Sort</h3>
+              <p class="meta">Thrift Store · Kensington</p>
+              <p>Curated vintage finds with new treasures daily.</p>
+              <div class="card-actions">
+                <button type="button">♡ Save</button>
+                <a href="#">View →</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="business-card">
+            <div class="business-image image-beauty">
+              <span class="distance">🚶 1.1 km</span>
+              <span class="status">Open</span>
+            </div>
+            <div class="business-body">
+              <h3>Greenhouse Skin</h3>
+              <p class="meta">Beauty · Little Italy</p>
+              <p>Clean beauty and good vibes only.</p>
+              <div class="card-actions">
+                <button type="button">♡ Save</button>
+                <a href="#">View →</a>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-split">
+      <div class="container split-grid">
+        <div>
+          <div class="section-heading">
+            <h2>Collections</h2>
+            <a href="#">View all collections →</a>
+          </div>
+
+          <div class="collection-grid">
+            <article class="collection-card">
+              <div class="collection-image image-study"></div>
+              <h3>Best study cafés</h3>
+              <p>12 spots</p>
+            </article>
+
+            <article class="collection-card">
+              <div class="collection-image image-hidden"></div>
+              <h3>Hidden gems</h3>
+              <p>18 spots</p>
+            </article>
+
+            <article class="collection-card">
+              <div class="collection-image image-market"></div>
+              <h3>Weekend markets</h3>
+              <p>9 spots</p>
+            </article>
+          </div>
+        </div>
+
+        <aside class="map-panel">
+          <div class="section-heading">
+            <h2>Explore nearby on the map</h2>
+            <a href="#">View full map →</a>
+          </div>
+
+          <div class="map-placeholder">
+            <span class="map-pin pin-1">📍</span>
+            <span class="map-pin pin-2">📍</span>
+            <span class="map-pin pin-3">📍</span>
+            <span class="map-pin pin-4">📍</span>
+            <span class="user-dot"></span>
+          </div>
+
+          <div class="map-legend">
+            <span>🍴 Food</span>
+            <span>☕ Coffee</span>
+            <span>🛍 Shops</span>
+            <span>💈 Services</span>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="why-section">
+      <div class="container">
+        <h2>Why people love Localys</h2>
+
+        <div class="why-grid">
+          <div>
+            <span>📍</span>
+            <h3>Discover nearby</h3>
+            <p>Find great local spots around you, every day.</p>
+          </div>
+
+          <div>
+            <span>♡</span>
+            <h3>Saved in one place</h3>
+            <p>Build your go-to list of local favourites.</p>
+          </div>
+
+          <div>
+            <span>👥</span>
+            <h3>Community picks</h3>
+            <p>Real recommendations from real locals.</p>
+          </div>
+
+          <div>
+            <span>✨</span>
+            <h3>Hidden gems</h3>
+            <p>Find places you did not know you needed.</p>
+          </div>
+
+          <div>
+            <span>＋</span>
+            <h3>Support local</h3>
+            <p>Every discovery helps small businesses thrive.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div>
+        <a class="brand footer-brand" href="#">
+          <span class="brand-icon">●</span>
+          <span>Localys</span>
+        </a>
+        <p>Discover more. Support local. Be part of your community.</p>
+      </div>
+
+      <div>
+        <h4>Explore</h4>
+        <a href="#">All categories</a>
+        <a href="#">Nearby</a>
+        <a href="#">Map</a>
+        <a href="#">Collections</a>
+      </div>
+
+      <div>
+        <h4>For Businesses</h4>
+        <a href="#">Add your business</a>
+        <a href="#">Business guide</a>
+        <a href="#">Resources</a>
+      </div>
+
+      <div>
+        <h4>Company</h4>
+        <a href="#">About us</a>
+        <a href="#">Our mission</a>
+        <a href="#">Contact</a>
+      </div>
+
+      <form class="newsletter">
+        <h4>Stay in the loop</h4>
+        <p>Get local tips and new spot highlights.</p>
+        <input type="email" placeholder="Enter your email" />
+        <button type="submit">Subscribe</button>
+      </form>
+    </div>
+
+    <p class="copyright">© 2026 Localys. All rights reserved.</p>
+  </footer>
+</body>
+</html>
