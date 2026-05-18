@@ -28,26 +28,24 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 const CART_KEY = 'localys-cart';
 
 export function CartProvider({ children }: { children: ReactNode }) {
-  const [items, setItems] = useState<CartItem[]>([]);
-  const [loaded, setLoaded] = useState(false);
+  const [items, setItems] = useState<CartItem[]>(() => {
+    if (typeof window === 'undefined') return [];
 
-  useEffect(() => {
     try {
       const stored = localStorage.getItem(CART_KEY);
       if (stored) {
-        setItems(JSON.parse(stored));
+        return JSON.parse(stored);
       }
     } catch {
       // ignore
     }
-    setLoaded(true);
-  }, []);
+
+    return [];
+  });
 
   useEffect(() => {
-    if (loaded) {
-      localStorage.setItem(CART_KEY, JSON.stringify(items));
-    }
-  }, [items, loaded]);
+    localStorage.setItem(CART_KEY, JSON.stringify(items));
+  }, [items]);
 
   const addToCart = useCallback((item: CartItem) => {
     setItems((prev) => {

@@ -171,7 +171,7 @@ function LoginPageContent() {
       <div className="min-h-screen bg-transparent text-white flex items-center justify-center px-4">
         <div className="w-full max-w-md space-y-8 bg-[rgba(36,36,32,0.85)] backdrop-blur-md border border-[#3A3A34] rounded-2xl p-8 shadow-xl" style={{ animation: 'fadeInUp 0.5s ease-out forwards', opacity: 0 }}>
           <div className="text-center">
-            <h1 className="entrance-slide text-4xl font-bold mb-2" style={{ animation: 'slideInLeft 0.4s ease-out 0.1s forwards', opacity: 0 }}>Localy</h1>
+            <h1 className="entrance-slide text-4xl font-bold mb-2" style={{ animation: 'slideInLeft 0.4s ease-out 0.1s forwards', opacity: 0 }}>Localys</h1>
             <p className="text-white/60">Reset your password</p>
           </div>
 
@@ -255,7 +255,7 @@ function LoginPageContent() {
     <div className="min-h-screen bg-transparent text-white flex items-center justify-center px-4">
       <div className="w-full max-w-md space-y-8 bg-[rgba(36,36,32,0.85)] backdrop-blur-md border border-[#3A3A34] rounded-2xl p-8 shadow-xl" style={{ animation: 'fadeInUp 0.5s ease-out forwards', opacity: 0 }}>
         <div className="text-center">
-          <h1 className="entrance-slide text-4xl font-bold mb-2" style={{ animation: 'slideInLeft 0.4s ease-out 0.1s forwards', opacity: 0 }}>Localy</h1>
+          <h1 className="entrance-slide text-4xl font-bold mb-2" style={{ animation: 'slideInLeft 0.4s ease-out 0.1s forwards', opacity: 0 }}>Localys</h1>
           <p className="text-white/60">Sign in to your account</p>
         </div>
 
@@ -331,7 +331,7 @@ function LoginPageContent() {
         </form>
 
         <p className="text-center text-white/60">
-          Don't have an account?{' '}
+          Don&apos;t have an account?{' '}
           <Link href="/signup" className="text-white hover:underline">
             Sign up
           </Link>

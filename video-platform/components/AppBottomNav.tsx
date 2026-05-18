@@ -20,6 +20,17 @@ export function AppBottomNav() {
   const [unreadMessages, setUnreadMessages] = useState(0);
   const [pendingOrders, setPendingOrders] = useState(0);
 
+  const getActiveHref = () => {
+    if (pathname === '/') return '/';
+    if (pathname?.startsWith('/search')) return '/search';
+    if (pathname?.startsWith('/upload')) return '/upload';
+    if (pathname?.startsWith('/chats')) return '/chats';
+    if (pathname?.startsWith('/cart')) return '/cart';
+    if (pathname?.startsWith('/dashboard')) return '/dashboard';
+    if (pathname?.startsWith('/profile')) return '/profile';
+    return null;
+  };
+
   useEffect(() => {
     if (!user) {
       setIsBusiness(false);
@@ -104,17 +115,6 @@ export function AppBottomNav() {
       width: `${itemWidth}%`,
     });
   }, [pathname]);
-
-  const getActiveHref = () => {
-    if (pathname === '/') return '/';
-    if (pathname?.startsWith('/search')) return '/search';
-    if (pathname?.startsWith('/upload')) return '/upload';
-    if (pathname?.startsWith('/chats')) return '/chats';
-    if (pathname?.startsWith('/cart')) return '/cart';
-    if (pathname?.startsWith('/dashboard')) return '/dashboard';
-    if (pathname?.startsWith('/profile')) return '/profile';
-    return null;
-  };
 
   if (pathname === '/login' || pathname === '/signup' || pathname === '/reset-password') {
     return null;

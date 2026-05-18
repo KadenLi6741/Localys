@@ -31,7 +31,6 @@ function CollectionDetailContent() {
 
   useEffect(() => {
     let mounted = true;
-    setLoading(true);
 
     getCollectionBySlug(slug, user?.id).then(({ data }) => {
       if (!mounted) return;
@@ -204,13 +203,14 @@ function CollectionDetailContent() {
                   className="grid gap-4 rounded-2xl border border-[#3A3A34] bg-[#242420] p-5 shadow-lg shadow-black/10 sm:grid-cols-[4.5rem_1fr]"
                 >
                   {business.profile_picture_url ? (
-                    <img
-                      src={business.profile_picture_url}
-                      alt={business.full_name || business.username || 'Business'}
-                      className="h-18 w-18 rounded-xl object-cover"
+                    <div
+                      className="h-[4.5rem] w-[4.5rem] rounded-xl bg-cover bg-center"
+                      style={{ backgroundImage: `url(${business.profile_picture_url})` }}
+                      aria-label={business.full_name || business.username || 'Business'}
+                      role="img"
                     />
                   ) : (
-                    <div className="grid h-18 w-18 place-items-center rounded-xl bg-[#F5A623]/10 text-[#F5A623]">
+                    <div className="grid h-[4.5rem] w-[4.5rem] place-items-center rounded-xl bg-[#F5A623]/10 text-[#F5A623]">
                       <StoreIcon />
                     </div>
                   )}

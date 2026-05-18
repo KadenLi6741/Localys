@@ -346,8 +346,8 @@ function SearchContent() {
             </div>
 
             {/* Search Bar */}
-            <div className="mx-1 flex gap-2 rounded-xl border border-[var(--border-color)] bg-[var(--surface-1)] px-4 py-3 transition-all duration-200 hover:bg-[var(--surface-2)]">
-              <svg className="mt-0.5 h-5 w-5 flex-shrink-0 text-[var(--muted-foreground)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="mx-1 flex items-center gap-2 rounded-xl border border-[var(--border-color)] bg-[var(--surface-1)] px-4 py-3 transition-all duration-200 hover:bg-[var(--surface-2)]">
+              <svg className="h-5 w-5 flex-shrink-0 text-[var(--muted-foreground)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
               <input
@@ -356,7 +356,8 @@ function SearchContent() {
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 placeholder={searchMode === 'businesses' ? 'Search businesses, cuisine, keywords...' : 'Search videos by keywords, business name...'}
-                className="min-w-0 flex-1 bg-transparent text-[var(--foreground)] placeholder-[var(--muted-foreground)] outline-none"
+                className="min-w-0 flex-1 bg-transparent text-[var(--foreground)] placeholder-[var(--muted-foreground)] outline-none focus:outline-none focus-visible:outline-none"
+                style={{ outline: 'none' }}
                 aria-label="Search"
                 autoFocus
               />
@@ -694,11 +695,11 @@ function SearchContent() {
             
             {/* Popular Categories / Suggested Businesses Section */}
             {(!hasSearched || results.length === 0) && (
-              <div className="mt-12 pt-8 border-t border-[var(--border-color)]">
-                <h3 className="mb-6 text-lg font-semibold">
+              <div className="mt-10 border-t border-[var(--border-color)] pt-6">
+                <h3 className="mb-7 flex items-center gap-2 text-xl font-bold leading-none">
                   {searchMode === 'businesses' ? '🌟 Popular Categories' : '🎬 Popular Videos'}
                 </h3>
-                <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
                   {searchMode === 'businesses' ? (
                     <>
                       {['🍔 Food', '🛍️ Retail', '💇 Services', '☕ Cafes', '🍕 Pizza', '🥘 Mexican', '🍜 Asian', '🍰 Bakery'].map((cat) => (
@@ -711,10 +712,10 @@ function SearchContent() {
                               setCuisineType(category);
                             }
                           }}
-                          className="rounded-lg border border-[var(--border-color)] bg-gradient-to-br from-[var(--surface-1)] to-[var(--surface-2)] p-4 text-center transition-all duration-200 hover:border-[#F5A623] hover:shadow-md hover:shadow-[#F5A623]/20 active:scale-95"
+                          className="group flex min-h-24 flex-col items-center justify-center rounded-lg border border-[var(--border-color)] bg-gradient-to-br from-[var(--surface-1)] to-[var(--surface-2)] px-4 py-5 text-center transition-all duration-200 hover:-translate-y-0.5 hover:border-[#F5A623] hover:shadow-md hover:shadow-[#F5A623]/20 active:scale-95"
                         >
-                          <span className="text-lg">{cat.split(' ')[0]}</span>
-                          <p className="mt-2 text-sm font-medium text-[#F5A623]">{cat.split(' ')[1]}</p>
+                          <span className="grid h-8 place-items-center text-xl leading-none transition-transform duration-200 group-hover:scale-110">{cat.split(' ')[0]}</span>
+                          <p className="mt-2 text-sm font-semibold leading-5 text-[#F5A623]">{cat.split(' ')[1]}</p>
                         </button>
                       ))}
                     </>
@@ -724,10 +725,10 @@ function SearchContent() {
                         <button
                           key={cat}
                           onClick={() => setQuery(cat.split(' ').slice(1).join(' '))}
-                          className="rounded-lg border border-[var(--border-color)] bg-gradient-to-br from-[var(--surface-1)] to-[var(--surface-2)] p-4 text-center transition-all duration-200 hover:border-[#F5A623] hover:shadow-md hover:shadow-[#F5A623]/20 active:scale-95"
+                          className="group flex min-h-24 flex-col items-center justify-center rounded-lg border border-[var(--border-color)] bg-gradient-to-br from-[var(--surface-1)] to-[var(--surface-2)] px-4 py-5 text-center transition-all duration-200 hover:-translate-y-0.5 hover:border-[#F5A623] hover:shadow-md hover:shadow-[#F5A623]/20 active:scale-95"
                         >
-                          <span className="text-lg">{cat.split(' ')[0]}</span>
-                          <p className="mt-2 text-sm font-medium text-[#F5A623]">{cat.split(' ').slice(1).join(' ')}</p>
+                          <span className="grid h-8 place-items-center text-xl leading-none transition-transform duration-200 group-hover:scale-110">{cat.split(' ')[0]}</span>
+                          <p className="mt-2 text-sm font-semibold leading-5 text-[#F5A623]">{cat.split(' ').slice(1).join(' ')}</p>
                         </button>
                       ))}
                     </>

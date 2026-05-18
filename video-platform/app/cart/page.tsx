@@ -19,7 +19,6 @@ export default function CartPage() {
   // Fetch coupons from the sellers of items in the cart
   useEffect(() => {
     if (items.length === 0) {
-      setCoupons([]);
       return;
     }
 

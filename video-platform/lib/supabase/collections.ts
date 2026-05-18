@@ -31,6 +31,18 @@ export interface BusinessCollection {
   businesses?: CollectionBusiness[];
 }
 
+interface CollectionRow {
+  id: string;
+  owner_id: string | null;
+  slug: string;
+  title: string;
+  description: string | null;
+  image_class: string | null;
+  is_public: boolean;
+  created_at: string | null;
+  updated_at: string | null;
+}
+
 const fallbackCollections: BusinessCollection[] = [
   {
     id: 'fallback-best-study-cafes',
@@ -205,7 +217,7 @@ export async function unlikeCollection(collectionId: string, userId: string) {
   return { error };
 }
 
-async function hydrateCollections(rows: any[], viewerId?: string | null): Promise<BusinessCollection[]> {
+async function hydrateCollections(rows: CollectionRow[], viewerId?: string | null): Promise<BusinessCollection[]> {
   if (!rows.length) return [];
 
   const collectionIds = rows.map((row) => row.id).filter(Boolean);

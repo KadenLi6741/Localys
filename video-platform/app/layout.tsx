@@ -25,7 +25,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Localy - Small Business Discovery",
+  title: "Localys - Small Business Discovery",
   description: "Discover local small businesses through TikTok-style video scrolling",
 };
 

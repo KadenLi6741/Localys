@@ -120,7 +120,7 @@ export function DesktopSidebar() {
   return (
     <aside className="hidden lg:flex sticky top-0 h-screen z-20 w-60 shrink-0 flex-col border-r border-[#3A3A34] bg-[#1A1A18]/95 backdrop-blur-xl">
       <div className="px-5 py-6">
-        <Link href="/" className="text-2xl font-bold text-[#F5F0E8]">Localy</Link>
+        <Link href="/" className="text-2xl font-bold text-[#F5F0E8]">Localys</Link>
       </div>
       <nav className="px-3 space-y-1">
         {navItems.map((item) => {

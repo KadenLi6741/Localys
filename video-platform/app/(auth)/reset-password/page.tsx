@@ -59,7 +59,7 @@ export default function ResetPasswordPage() {
     <div className="min-h-screen bg-transparent text-white flex items-center justify-center px-4">
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
-          <h1 className="text-4xl font-bold mb-2">Localy</h1>
+          <h1 className="text-4xl font-bold mb-2">Localys</h1>
           <p className="text-white/60">Set your new password</p>
         </div>
 

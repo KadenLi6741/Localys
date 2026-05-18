@@ -1,11 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { FormEvent, ReactNode } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
+import { getVideosFeed } from '@/lib/supabase/videos';
 
 const HomeMap = dynamic(() => import('@/components/HomeMap'), {
   ssr: false,
@@ -39,6 +40,25 @@ type Collection = {
   count: string;
   href: string;
   imageClass: string;
+};
+
+type TrendingVideo = {
+  id: string;
+  user_id: string;
+  video_url: string;
+  caption: string | null;
+  created_at: string;
+  business_id?: string | null;
+  view_count?: number | null;
+  profiles?: {
+    username?: string | null;
+    full_name?: string | null;
+    profile_picture_url?: string | null;
+  } | null;
+  businesses?: {
+    business_name?: string | null;
+    category?: string | null;
+  } | null;
 };
 
 const categories: Category[] = [
@@ -130,11 +150,27 @@ export default function Home() {
 
 function HomePage() {
   const router = useRouter();
+  const trendingScrollerRef = useRef<HTMLDivElement | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [locationQuery, setLocationQuery] = useState('Kensington, Toronto');
-  const [savedBusinesses, setSavedBusinesses] = useState<string[]>([]);
+  const [trendingVideos, setTrendingVideos] = useState<TrendingVideo[]>([]);
+  const [videosLoading, setVideosLoading] = useState(true);
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [newsletterStatus, setNewsletterStatus] = useState('');
+
+  useEffect(() => {
+    let mounted = true;
+
+    getVideosFeed(12).then(({ data }) => {
+      if (!mounted) return;
+      setTrendingVideos((data || []) as TrendingVideo[]);
+      setVideosLoading(false);
+    });
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   const submitSearch = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -148,14 +184,6 @@ function HomePage() {
     router.push(`/search${params.toString() ? `?${params.toString()}` : ''}`);
   };
 
-  const toggleSaved = (businessName: string) => {
-    setSavedBusinesses((current) =>
-      current.includes(businessName)
-        ? current.filter((name) => name !== businessName)
-        : [...current, businessName]
-    );
-  };
-
   const submitNewsletter = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setNewsletterStatus(
@@ -163,6 +191,16 @@ function HomePage() {
         ? 'You are on the list.'
         : 'Enter an email to subscribe.'
     );
+  };
+
+  const scrollTrendingVideos = (direction: 'left' | 'right') => {
+    const scroller = trendingScrollerRef.current;
+    if (!scroller) return;
+
+    scroller.scrollBy({
+      left: direction === 'left' ? -scroller.clientWidth * 0.82 : scroller.clientWidth * 0.82,
+      behavior: 'smooth',
+    });
   };
 
   return (
@@ -299,55 +337,105 @@ function HomePage() {
         </section>
 
         <section className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-10">
-          <SectionHeading title="Trending near you" href="/search" label="View all" />
-
-          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-            {trendingBusinesses.map((business) => {
-              const isSaved = savedBusinesses.includes(business.name);
-
-              return (
-                <article
-                  key={business.name}
-                  className="overflow-hidden rounded-2xl border border-[#3A3A34] bg-[#242420] shadow-lg shadow-black/10"
-                >
-                  <div className={`relative h-40 bg-gradient-to-br ${business.imageClass}`}>
-                    <span className="absolute left-3 top-3 rounded-full bg-[#1A1A18]/85 px-3 py-1 text-xs font-bold text-[#F5F0E8]">
-                      {business.distance}
-                    </span>
-                    <span className="absolute right-3 top-3 rounded-full bg-[#6BAF7A] px-3 py-1 text-xs font-bold text-[#1A1A18]">
-                      Open
-                    </span>
-                  </div>
-                  <div className="p-5">
-                    <h3 className="text-lg font-bold text-[#F5F0E8]">{business.name}</h3>
-                    <p className="mt-1 text-sm text-[#F5A623]">{business.meta}</p>
-                    <p className="mt-3 min-h-12 text-sm leading-6 text-[#C5BFB3]">{business.description}</p>
-                    <div className="mt-5 grid grid-cols-2 gap-2">
-                      <button
-                        type="button"
-                        onClick={() => toggleSaved(business.name)}
-                        className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border px-3 text-sm font-bold ${
-                          isSaved
-                            ? 'border-[#F5A623] bg-[#F5A623] text-[#1A1A18]'
-                            : 'border-[#3A3A34] bg-[#1A1A18] text-[#F5F0E8] hover:border-[#F5A623]'
-                        }`}
-                      >
-                        <HeartIcon filled={isSaved} />
-                        {isSaved ? 'Saved' : 'Save'}
-                      </button>
-                      <Link
-                        href={business.href}
-                        className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-[#F5A623] px-3 text-sm font-bold text-[#1A1A18] hover:bg-[#ffc15a]"
-                      >
-                        View
-                        <ArrowRightIcon />
-                      </Link>
-                    </div>
-                  </div>
-                </article>
-              );
-            })}
+          <div className="mb-5 flex items-center justify-between gap-4">
+            <div>
+              <h2 className="text-2xl font-bold text-[#F5F0E8]">Trending near you</h2>
+              <p className="mt-1 text-sm text-[#9E9A90]">Swipe sideways through local videos.</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => scrollTrendingVideos('left')}
+                className="grid h-10 w-10 place-items-center rounded-lg border border-[#3A3A34] bg-[#242420] text-[#F5F0E8] hover:border-[#F5A623] hover:text-[#F5A623]"
+                aria-label="Scroll trending videos left"
+              >
+                <ChevronLeftIcon />
+              </button>
+              <button
+                type="button"
+                onClick={() => scrollTrendingVideos('right')}
+                className="grid h-10 w-10 place-items-center rounded-lg border border-[#3A3A34] bg-[#242420] text-[#F5F0E8] hover:border-[#F5A623] hover:text-[#F5A623]"
+                aria-label="Scroll trending videos right"
+              >
+                <ChevronRightIcon />
+              </button>
+              <Link href="/search?mode=videos" className="hidden items-center gap-1 text-sm font-bold text-[#F5A623] hover:text-[#ffc15a] sm:inline-flex">
+                View all
+                <ArrowRightIcon />
+              </Link>
+            </div>
           </div>
+
+          {videosLoading ? (
+            <div className="flex gap-4 overflow-hidden rounded-2xl">
+              {[0, 1, 2, 3].map((item) => (
+                <div
+                  key={item}
+                  className="h-[27rem] w-[17rem] shrink-0 animate-pulse rounded-2xl border border-[#3A3A34] bg-[#242420] sm:w-[19rem]"
+                />
+              ))}
+            </div>
+          ) : trendingVideos.length > 0 ? (
+            <div className="relative">
+              <div
+                ref={trendingScrollerRef}
+                className="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain scroll-smooth px-4 pb-4 sm:-mx-6 sm:px-6 lg:-mx-10 lg:px-10"
+                aria-label="Trending local video carousel"
+              >
+                {trendingVideos.map((video) => {
+                  const creatorName = video.businesses?.business_name
+                    || video.profiles?.full_name
+                    || video.profiles?.username
+                    || 'Local creator';
+
+                  return (
+                    <article
+                      key={video.id}
+                      className="group isolate w-[17rem] shrink-0 snap-start overflow-hidden rounded-2xl bg-[#242420] shadow-lg shadow-black/10 ring-1 ring-inset ring-[#3A3A34] hover:ring-[#F5A623] sm:w-[19rem]"
+                    >
+                      <Link href={`/video/${video.id}`} className="block">
+                        <div className="relative aspect-[9/16] overflow-hidden bg-[#1A1A18]">
+                          <video
+                            src={video.video_url}
+                            className="h-full w-full object-cover"
+                            muted
+                            loop
+                            playsInline
+                            preload="metadata"
+                            onMouseEnter={(event) => {
+                              event.currentTarget.play().catch(() => {});
+                            }}
+                            onMouseLeave={(event) => {
+                              event.currentTarget.pause();
+                              event.currentTarget.currentTime = 0;
+                            }}
+                          />
+                          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#1A1A18] via-[#1A1A18]/75 to-transparent p-4 pt-12">
+                            <p className="line-clamp-2 text-sm font-bold leading-5 text-[#F5F0E8]">
+                              {video.caption || creatorName}
+                            </p>
+                          </div>
+                          <span className="absolute left-3 top-3 rounded-full bg-[#1A1A18]/85 px-3 py-1 text-xs font-bold text-[#F5F0E8]">
+                            {video.view_count || 0} views
+                          </span>
+                        </div>
+                      </Link>
+                      <div className="p-4">
+                        <p className="truncate text-sm font-bold text-[#F5F0E8]">{creatorName}</p>
+                        <p className="mt-1 truncate text-xs capitalize text-[#F5A623]">
+                          {video.businesses?.category || 'Trending video'}
+                        </p>
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+            </div>
+          ) : (
+            <div className="rounded-2xl border border-[#3A3A34] bg-[#242420] p-8 text-center text-[#C5BFB3]">
+              No trending videos yet.
+            </div>
+          )}
         </section>
 
         <section id="collections" className="mx-auto grid w-full max-w-7xl gap-6 px-4 py-8 sm:px-6 lg:grid-cols-[1.18fr_0.82fr] lg:px-10">
@@ -559,6 +647,22 @@ function ArrowRightIcon() {
   return (
     <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14m-6-6 6 6-6 6" />
+    </svg>
+  );
+}
+
+function ChevronLeftIcon() {
+  return (
+    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="m15 18-6-6 6-6" />
+    </svg>
+  );
+}
+
+function ChevronRightIcon() {
+  return (
+    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="m9 18 6-6-6-6" />
     </svg>
   );
 }

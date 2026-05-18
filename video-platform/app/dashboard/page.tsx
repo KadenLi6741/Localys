@@ -26,16 +26,57 @@ function DashboardContent() {
   const [showScanner, setShowScanner] = useState(false);
   const [scanResult, setScanResult] = useState<{ success: boolean; message: string; order?: { item_name: string; price: number } } | null>(null);
 
+  const checkBusinessStatus = useCallback(async () => {
+    if (!user) return;
+    const { data } = await supabase
+      .from('profiles')
+      .select('type')
+      .eq('id', user.id)
+      .single();
+
+    if (data?.type) {
+      setIsBusiness(true);
+    } else {
+      setIsBusiness(false);
+      router.replace('/profile');
+    }
+  }, [router, user]);
+
+  const loadOrders = useCallback(async () => {
+    if (!user) return;
+    setLoading(true);
+
+    const [{ data: pending }, { data: completed }] = await Promise.all([
+      supabase
+        .from('item_purchases')
+        .select('*')
+        .eq('seller_id', user.id)
+        .eq('status', 'paid')
+        .order('purchased_at', { ascending: false }),
+      supabase
+        .from('item_purchases')
+        .select('*')
+        .eq('seller_id', user.id)
+        .eq('status', 'completed')
+        .order('purchased_at', { ascending: false })
+        .limit(20),
+    ]);
+
+    setPendingOrders(pending || []);
+    setCompletedOrders(completed || []);
+    setLoading(false);
+  }, [user]);
+
   useEffect(() => {
     if (!user) return;
     checkBusinessStatus();
-  }, [user]);
+  }, [checkBusinessStatus, user]);
 
   useEffect(() => {
     if (isBusiness === true && user) {
       loadOrders();
     }
-  }, [isBusiness, user]);
+  }, [isBusiness, loadOrders, user]);
 
   // Real-time: listen for new orders and status changes
   useEffect(() => {
@@ -80,47 +121,6 @@ function DashboardContent() {
       supabase.removeChannel(channel);
     };
   }, [user, isBusiness]);
-
-  const checkBusinessStatus = async () => {
-    if (!user) return;
-    const { data } = await supabase
-      .from('profiles')
-      .select('type')
-      .eq('id', user.id)
-      .single();
-
-    if (data?.type) {
-      setIsBusiness(true);
-    } else {
-      setIsBusiness(false);
-      router.replace('/profile');
-    }
-  };
-
-  const loadOrders = async () => {
-    if (!user) return;
-    setLoading(true);
-
-    const [{ data: pending }, { data: completed }] = await Promise.all([
-      supabase
-        .from('item_purchases')
-        .select('*')
-        .eq('seller_id', user.id)
-        .eq('status', 'paid')
-        .order('purchased_at', { ascending: false }),
-      supabase
-        .from('item_purchases')
-        .select('*')
-        .eq('seller_id', user.id)
-        .eq('status', 'completed')
-        .order('purchased_at', { ascending: false })
-        .limit(20),
-    ]);
-
-    setPendingOrders(pending || []);
-    setCompletedOrders(completed || []);
-    setLoading(false);
-  };
 
   const handleScan = useCallback(async (data: string) => {
     setShowScanner(false);
