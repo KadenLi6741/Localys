@@ -207,7 +207,7 @@ function HomePage() {
     <div id="top" className="min-h-screen bg-[#1A1A18] text-[#F5F0E8] pb-24 lg:pb-12">
       <header className="sticky top-0 z-20 border-b border-[#3A3A34] bg-[#1A1A18]/92 backdrop-blur-xl">
         <div className="mx-auto flex min-h-20 w-full max-w-7xl items-center gap-5 px-4 sm:px-6 lg:px-10">
-          <Link href="/" className="flex items-center gap-3 text-xl font-bold text-[#F5F0E8]">
+          <Link href="/feed" className="flex items-center gap-3 text-xl font-bold text-[#F5F0E8]">
             <span className="grid h-9 w-9 place-items-center rounded-lg bg-[#F5A623] text-[#1A1A18]">
               <MapPinIcon />
             </span>
@@ -491,7 +491,7 @@ function HomePage() {
       <footer className="border-t border-[#3A3A34] bg-[#242420]/70">
         <div className="mx-auto grid w-full max-w-7xl gap-8 px-4 py-10 sm:px-6 md:grid-cols-2 xl:grid-cols-[1.25fr_0.7fr_0.8fr_0.7fr_1.2fr] lg:px-10">
           <div>
-            <Link href="/" className="flex items-center gap-3 text-xl font-bold">
+            <Link href="/feed" className="flex items-center gap-3 text-xl font-bold">
               <span className="grid h-9 w-9 place-items-center rounded-lg bg-[#F5A623] text-[#1A1A18]">
                 <MapPinIcon />
               </span>

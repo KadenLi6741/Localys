@@ -66,7 +66,7 @@ function CollectionsContent() {
       <div className="mx-auto w-full max-w-7xl">
         <header className="flex flex-col gap-5 border-b border-[#3A3A34] pb-8 md:flex-row md:items-end md:justify-between">
           <div>
-            <Link href="/" className="inline-flex items-center gap-2 text-sm font-bold text-[#F5A623] hover:text-[#ffc15a]">
+            <Link href="/feed" className="inline-flex items-center gap-2 text-sm font-bold text-[#F5A623] hover:text-[#ffc15a]">
               <ArrowLeftIcon />
               Home
             </Link>
