@@ -53,6 +53,7 @@ interface BusinessResult {
   total_reviews: number | null;
   price_range_min: number | null;
   price_range_max: number | null;
+  isAccount?: boolean;
 }
 
 const DISTANCE_MAX_KM = 50; // slider ceiling; max = "Any distance"
@@ -80,6 +81,8 @@ export function AppHeader({ onMenuOpen }: { onMenuOpen?: () => void }) {
   // Live results + filters
   const [results, setResults] = useState<BusinessResult[]>([]);
   const [searching, setSearching] = useState(false);
+  const [category, setCategory] = useState<'all' | 'food' | 'retail' | 'service'>('all');
+  const [accountType, setAccountType] = useState<'all' | 'business' | 'user'>('all');
   const [priceMax, setPriceMax] = useState(100); // 100 = no price cap
   const [minRating, setMinRating] = useState(0); // 0 = any rating
   const [maxDistanceKm, setMaxDistanceKm] = useState(DISTANCE_MAX_KM); // ceiling = any
@@ -129,41 +132,72 @@ export function AppHeader({ onMenuOpen }: { onMenuOpen?: () => void }) {
     );
   }, []);
 
-  // Live inline business autocomplete — debounced, queries real data, never
-  // navigates. Filters (price / rating / distance) refine the same query.
-  // All state writes happen inside the debounce callback (not synchronously
-  // in the effect body) so the search runs as an external-data sync.
+  // Live search — debounced, queries real data, never navigates.
+  //  • Empty query  → lists every business (a browse/directory).
+  //  • Typed query  → username/name substring match across businesses AND
+  //    regular user accounts (case-insensitive).
+  // Filters (category / account-type / rating / distance / price) refine it.
+  // All state writes happen inside the debounce callback (not synchronously in
+  // the effect body) so the search runs as an external-data sync.
   useEffect(() => {
     if (!searchOpen) return;
     const q = query.trim();
     let cancelled = false;
     const t = setTimeout(async () => {
-      if (q.length < 2) {
-        if (!cancelled) {
-          setResults([]);
-          setSearching(false);
-        }
-        return;
-      }
       setSearching(true);
-      const { data } = await searchBusinesses({
-        query: q,
-        priceMax: priceMax < 100 ? priceMax : undefined,
+
+      const filters = {
+        query: q || undefined,
+        category: category !== 'all' ? category : undefined,
         minRating: minRating > 0 ? minRating : undefined,
+        priceMax: priceMax < 100 ? priceMax : undefined,
         maxDistance: coords && maxDistanceKm < DISTANCE_MAX_KM ? maxDistanceKm : undefined,
         latitude: coords?.lat,
         longitude: coords?.lng,
-      });
-      if (!cancelled) {
-        setResults((data ?? []).slice(0, 6) as BusinessResult[]);
-        setSearching(false);
-      }
+      };
+
+      // Businesses (skipped when filtering to user accounts only).
+      const bizPromise =
+        accountType === 'user'
+          ? Promise.resolve({ data: [] as Record<string, unknown>[] })
+          : searchBusinesses(filters);
+
+      // Regular user accounts (type is null) — only when actually typing.
+      const userPromise =
+        q.length >= 1 && accountType !== 'business'
+          ? supabase
+              .from('profiles')
+              .select('id, username, full_name, profile_picture_url, type')
+              .is('type', null)
+              .or(`username.ilike.%${q}%,full_name.ilike.%${q}%`)
+              .limit(10)
+          : Promise.resolve({ data: [] as Record<string, unknown>[] });
+
+      const [bizRes, userRes] = await Promise.all([bizPromise, userPromise]);
+      if (cancelled) return;
+
+      const businesses = ((bizRes.data ?? []) as BusinessResult[]).map((b) => ({ ...b, isAccount: false }));
+      const users = ((userRes.data ?? []) as Record<string, unknown>[]).map((u) => ({
+        id: u.id as string,
+        username: (u.username as string) ?? null,
+        business_name: (u.full_name as string) ?? (u.username as string) ?? null,
+        category: 'Account',
+        profile_picture_url: (u.profile_picture_url as string) ?? null,
+        average_rating: null,
+        total_reviews: null,
+        price_range_min: null,
+        price_range_max: null,
+        isAccount: true,
+      }));
+
+      setResults([...businesses, ...users].slice(0, 25));
+      setSearching(false);
     }, 250);
     return () => {
       cancelled = true;
       clearTimeout(t);
     };
-  }, [query, searchOpen, priceMax, minRating, maxDistanceKm, coords]);
+  }, [query, searchOpen, category, accountType, priceMax, minRating, maxDistanceKm, coords]);
 
   if (pathname === '/login' || pathname === '/signup' || pathname === '/reset-password') return null;
 
@@ -219,11 +253,11 @@ export function AppHeader({ onMenuOpen }: { onMenuOpen?: () => void }) {
       <div ref={searchRef} className="relative mx-auto min-w-0 flex-1 max-w-[640px]">
         <div
           className={cn(
-            'flex h-10 items-center gap-2 rounded-[4px] border bg-surface px-3 transition-colors',
+            'relative flex h-10 items-center rounded-[4px] border bg-surface transition-colors',
             searchOpen ? 'border-primary' : 'border-border hover:border-primary/50'
           )}
         >
-          <Search className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
           <input
             type="search"
             value={query}
@@ -234,7 +268,8 @@ export function AppHeader({ onMenuOpen }: { onMenuOpen?: () => void }) {
               if (e.key === 'Escape') setSearchOpen(false);
             }}
             placeholder="Find anything"
-            className="h-full w-full min-w-0 bg-transparent text-body-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
+            /* pl clears the magnifier, pr clears the Search button so text never runs underneath */
+            className="h-full w-full min-w-0 bg-transparent pl-9 pr-[84px] text-body-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
             aria-label="Find anything"
           />
           {searchOpen && (
@@ -242,7 +277,7 @@ export function AppHeader({ onMenuOpen }: { onMenuOpen?: () => void }) {
               type="button"
               onMouseDown={(e) => e.preventDefault()}
               onClick={submitSearch}
-              className="shrink-0 rounded-[4px] bg-primary px-3 py-1 text-caption font-bold text-primary-foreground transition-colors hover:bg-primary/90"
+              className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded-[4px] bg-primary px-3 py-1.5 text-caption font-bold text-primary-foreground transition-colors hover:bg-primary/90"
             >
               Search
             </button>
@@ -256,6 +291,50 @@ export function AppHeader({ onMenuOpen }: { onMenuOpen?: () => void }) {
             {/* Filters — each in its own full-width row so nothing overlaps and
                 all five rating stars stay fully clickable. */}
             <div className="flex flex-col gap-4 border-b border-border p-3">
+              {/* Category */}
+              <div>
+                <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Category</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {([['all', 'All'], ['food', 'Food'], ['retail', 'Retail'], ['service', 'Services']] as const).map(([val, label]) => (
+                    <button
+                      key={val}
+                      type="button"
+                      onClick={() => setCategory(val)}
+                      className={cn(
+                        'rounded-[4px] border px-2.5 py-1 text-caption font-semibold transition-colors',
+                        category === val
+                          ? 'border-primary bg-primary text-primary-foreground'
+                          : 'border-border text-muted-foreground hover:bg-surface hover:text-foreground',
+                      )}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Account type — business vs user */}
+              <div>
+                <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Type</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {([['all', 'All'], ['business', 'Businesses'], ['user', 'People']] as const).map(([val, label]) => (
+                    <button
+                      key={val}
+                      type="button"
+                      onClick={() => setAccountType(val)}
+                      className={cn(
+                        'rounded-[4px] border px-2.5 py-1 text-caption font-semibold transition-colors',
+                        accountType === val
+                          ? 'border-primary bg-primary text-primary-foreground'
+                          : 'border-border text-muted-foreground hover:bg-surface hover:text-foreground',
+                      )}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               {/* Price slider */}
               <div>
                 <div className="mb-1.5 flex items-center justify-between">
@@ -333,17 +412,18 @@ export function AppHeader({ onMenuOpen }: { onMenuOpen?: () => void }) {
               </div>
             </div>
 
-            {/* Live results */}
+            {/* Live results (empty query lists every business as a directory) */}
             <div className="max-h-80 overflow-y-auto p-1">
-              {query.trim().length < 2 ? (
-                <p className="px-3 py-4 text-center text-caption text-muted-foreground">
-                  Start typing to find local businesses
+              {!query.trim() && (
+                <p className="px-3 pt-2 pb-1 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                  Browse all businesses
                 </p>
-              ) : searching && results.length === 0 ? (
+              )}
+              {searching && results.length === 0 ? (
                 <p className="px-3 py-4 text-center text-caption text-muted-foreground">Searching…</p>
               ) : results.length === 0 ? (
                 <p className="px-3 py-4 text-center text-caption text-muted-foreground">
-                  No businesses match &ldquo;{query.trim()}&rdquo;
+                  {query.trim() ? `No results match “${query.trim()}”` : 'No businesses found'}
                 </p>
               ) : (
                 results.map((b) => (
