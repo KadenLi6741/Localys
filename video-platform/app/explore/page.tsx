@@ -16,7 +16,19 @@ import {
   Share2,
   Bookmark,
   MoreHorizontal,
+  ChevronDown,
+  Check,
+  LayoutGrid,
+  Rows3,
 } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+} from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 
 const TAGS = [
@@ -60,6 +72,7 @@ export default function ExplorePage() {
 
   // Filters / sorting
   const [sortMode, setSortMode] = useState<SortMode>('Best');
+  const [viewMode, setViewMode] = useState<'card' | 'compact'>('card');
   const [timeFilter, setTimeFilter] = useState('latest');
   const [tagFilter, setTagFilter] = useState<string | null>(null);
   const [quickTag, setQuickTag] = useState<string | null>(null);
@@ -481,28 +494,39 @@ export default function ExplorePage() {
           </button>
         </div>
 
-        {/* ===== SORT TABS (Reddit pattern) ===== */}
-        <div className="mb-2 flex items-center gap-1 border-b border-border pb-2">
-          {SORT_TABS.map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setSortMode(tab)}
-              className={cn(
-                'rounded-full px-3.5 py-1.5 text-body-sm font-semibold transition-colors',
-                sortMode === tab
-                  ? 'bg-surface text-primary'
-                  : 'text-muted-foreground hover:bg-surface hover:text-foreground'
-              )}
-              aria-pressed={sortMode === tab}
+        {/* ===== SORT + VIEW (compact Reddit-style dropdowns) ===== */}
+        <div className="mb-3 flex items-center gap-2 border-b border-border pb-2">
+          {/* Sort dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              className="inline-flex items-center gap-1.5 rounded-[4px] px-3 py-1.5 text-body-sm font-bold text-foreground transition-colors hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              aria-label={`Sort: ${sortMode}`}
             >
-              {tab}
-            </button>
-          ))}
+              {sortMode}
+              <ChevronDown className="h-4 w-4" aria-hidden="true" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-44">
+              <DropdownMenuLabel>Sort by</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {SORT_TABS.map((tab) => (
+                <DropdownMenuItem
+                  key={tab}
+                  onSelect={() => setSortMode(tab)}
+                  className={cn(sortMode === tab && 'text-primary')}
+                >
+                  {tab}
+                  {sortMode === tab && <Check className="ml-auto h-4 w-4 text-primary" aria-hidden="true" />}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          {/* Timeframe (only for Top) */}
           {sortMode === 'Top' && (
             <select
               value={timeFilter}
               onChange={(e) => setTimeFilter(e.target.value)}
-              className="ml-1 rounded-[4px] border border-border bg-surface px-2 py-1.5 text-caption font-semibold text-foreground focus:outline-none focus:border-primary"
+              className="rounded-[4px] border border-border bg-surface px-2 py-1.5 text-caption font-semibold text-foreground focus:outline-none focus:border-primary"
               aria-label="Top timeframe"
             >
               {TOP_TIMEFRAMES.map((t) => (
@@ -510,6 +534,39 @@ export default function ExplorePage() {
               ))}
             </select>
           )}
+
+          {/* Layout view dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              className="ml-auto inline-flex items-center gap-1 rounded-[4px] px-2 py-1.5 text-muted-foreground transition-colors hover:bg-surface hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              aria-label="Change layout view"
+            >
+              {viewMode === 'card' ? (
+                <LayoutGrid className="h-4 w-4" aria-hidden="true" />
+              ) : (
+                <Rows3 className="h-4 w-4" aria-hidden="true" />
+              )}
+              <ChevronDown className="h-3.5 w-3.5" aria-hidden="true" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-40">
+              <DropdownMenuLabel>View</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onSelect={() => setViewMode('card')}
+                className={cn(viewMode === 'card' && 'text-primary')}
+              >
+                <LayoutGrid className="h-4 w-4" aria-hidden="true" /> Card
+                {viewMode === 'card' && <Check className="ml-auto h-4 w-4 text-primary" aria-hidden="true" />}
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onSelect={() => setViewMode('compact')}
+                className={cn(viewMode === 'compact' && 'text-primary')}
+              >
+                <Rows3 className="h-4 w-4" aria-hidden="true" /> Compact
+                {viewMode === 'compact' && <Check className="ml-auto h-4 w-4 text-primary" aria-hidden="true" />}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
         {/* ===== TAG FILTERS ===== */}
@@ -569,7 +626,7 @@ export default function ExplorePage() {
                 return (
                   <article
                     key={shoutout.id}
-                    className="flex overflow-hidden rounded-[4px] border border-border bg-card transition-colors hover:border-primary/40"
+                    className="flex overflow-hidden border border-border bg-card transition-colors hover:border-primary/40"
                   >
                     {/* Vote column */}
                     <div className="flex w-11 shrink-0 flex-col items-center gap-0.5 bg-surface/50 py-3">
@@ -667,14 +724,14 @@ export default function ExplorePage() {
                         <p className="mt-1 line-clamp-3 text-body-sm text-muted-foreground">{shoutout.text}</p>
                       </Link>
 
-                      {/* Media */}
-                      {photoUrl ? (
+                      {/* Media (hidden in compact view) */}
+                      {viewMode === 'card' && photoUrl ? (
                         <Link href={`/explore/${shoutout.id}`} className="mt-2 block">
                           <div className="relative aspect-video overflow-hidden rounded-[4px] bg-surface">
                             <Image src={photoUrl} alt={shoutout.business_name} fill unoptimized className="object-cover" />
                           </div>
                         </Link>
-                      ) : shoutout.video_url ? (
+                      ) : viewMode === 'card' && shoutout.video_url ? (
                         <div className="mt-2 overflow-hidden rounded-[4px] bg-black">
                           <video src={shoutout.video_url} className="max-h-96 w-full object-contain" controls muted playsInline />
                         </div>

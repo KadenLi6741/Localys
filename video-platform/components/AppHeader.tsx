@@ -20,10 +20,13 @@ import {
   User,
   BarChart3,
   LogOut,
+  Star,
+  Store,
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useActivity } from '@/contexts/ActivityContext';
 import { getUserCoins } from '@/lib/supabase/profiles';
+import { searchBusinesses } from '@/lib/supabase/search';
 import { supabase } from '@/lib/supabase/client';
 import { cn } from '@/lib/utils';
 import {
@@ -41,50 +44,20 @@ interface HeaderProfile {
   profile_picture_url: string | null;
 }
 
-/* Search filter options (backbone — selections feed the /search navigation). */
-const FILTER_CATEGORIES = ['All', 'Food', 'Retail', 'Service'];
-const FILTER_DISTANCES = ['Nearby', '5 km', '10 km', '25 km', 'Any'];
-const FILTER_PRICES = ['$', '$$', '$$$', 'Any'];
-const FILTER_RATINGS = ['Any', '3+', '4+', '4.5+'];
-const FILTER_SORTS = ['Relevance', 'Rating', 'Distance', 'Newest'];
-
-/** One row of pill-chips inside the expanding search filter panel. */
-function FilterChipRow({
-  label,
-  options,
-  value,
-  onChange,
-}: {
-  label: string;
-  options: string[];
-  value: string;
-  onChange: (v: string) => void;
-}) {
-  return (
-    <div>
-      <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-        {label}
-      </p>
-      <div className="flex flex-wrap gap-1.5">
-        {options.map((opt) => (
-          <button
-            key={opt}
-            type="button"
-            onClick={() => onChange(opt)}
-            className={cn(
-              'rounded-[4px] border px-2.5 py-1 text-caption font-semibold transition-colors',
-              value === opt
-                ? 'border-primary bg-primary text-primary-foreground'
-                : 'border-border bg-transparent text-muted-foreground hover:bg-surface hover:text-foreground'
-            )}
-          >
-            {opt}
-          </button>
-        ))}
-      </div>
-    </div>
-  );
+/** One business returned by the live search (shape from searchBusinesses). */
+interface BusinessResult {
+  id: string;
+  username: string | null;
+  business_name: string | null;
+  category: string | null;
+  profile_picture_url: string | null;
+  average_rating: number | null;
+  total_reviews: number | null;
+  price_range_min: number | null;
+  price_range_max: number | null;
 }
+
+const DISTANCE_MAX_KM = 50; // slider ceiling; max = "Any distance"
 
 /**
  * Reddit-style fixed top bar: Locally logo (left), expanding search with a
@@ -104,11 +77,14 @@ export function AppHeader({ onMenuOpen }: { onMenuOpen?: () => void }) {
   const [query, setQuery] = useState('');
   const [searchOpen, setSearchOpen] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
-  const [fCategory, setFCategory] = useState('All');
-  const [fDistance, setFDistance] = useState('Any');
-  const [fPrice, setFPrice] = useState('Any');
-  const [fRating, setFRating] = useState('Any');
-  const [fSort, setFSort] = useState('Relevance');
+
+  // Live results + filters
+  const [results, setResults] = useState<BusinessResult[]>([]);
+  const [searching, setSearching] = useState(false);
+  const [priceMax, setPriceMax] = useState(100); // 100 = no price cap
+  const [minRating, setMinRating] = useState(0); // 0 = any rating
+  const [maxDistanceKm, setMaxDistanceKm] = useState(DISTANCE_MAX_KM); // ceiling = any
+  const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -141,6 +117,52 @@ export function AppHeader({ onMenuOpen }: { onMenuOpen?: () => void }) {
     return () => document.removeEventListener('mousedown', handler);
   }, [searchOpen]);
 
+  // Best-effort geolocation so the distance filter can apply (no prompt nag).
+  useEffect(() => {
+    if (!navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition(
+      (pos) => setCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+      () => {},
+      { enableHighAccuracy: false, timeout: 8000 },
+    );
+  }, []);
+
+  // Live inline business autocomplete — debounced, queries real data, never
+  // navigates. Filters (price / rating / distance) refine the same query.
+  // All state writes happen inside the debounce callback (not synchronously
+  // in the effect body) so the search runs as an external-data sync.
+  useEffect(() => {
+    if (!searchOpen) return;
+    const q = query.trim();
+    let cancelled = false;
+    const t = setTimeout(async () => {
+      if (q.length < 2) {
+        if (!cancelled) {
+          setResults([]);
+          setSearching(false);
+        }
+        return;
+      }
+      setSearching(true);
+      const { data } = await searchBusinesses({
+        query: q,
+        priceMax: priceMax < 100 ? priceMax : undefined,
+        minRating: minRating > 0 ? minRating : undefined,
+        maxDistance: coords && maxDistanceKm < DISTANCE_MAX_KM ? maxDistanceKm : undefined,
+        latitude: coords?.lat,
+        longitude: coords?.lng,
+      });
+      if (!cancelled) {
+        setResults((data ?? []).slice(0, 6) as BusinessResult[]);
+        setSearching(false);
+      }
+    }, 250);
+    return () => {
+      cancelled = true;
+      clearTimeout(t);
+    };
+  }, [query, searchOpen, priceMax, minRating, maxDistanceKm, coords]);
+
   if (pathname === '/login' || pathname === '/signup' || pathname === '/reset-password') return null;
 
   const initial = (profile?.full_name || profile?.username || user?.email || 'U')
@@ -152,9 +174,20 @@ export function AppHeader({ onMenuOpen }: { onMenuOpen?: () => void }) {
     router.push('/login');
   };
 
-  const submitSearch = () => {
+  // Open a business profile from a live result.
+  const goToBusiness = (b: BusinessResult) => {
     setSearchOpen(false);
-    router.push(query.trim() ? `/search?q=${encodeURIComponent(query.trim())}` : '/search');
+    setQuery('');
+    router.push(`/profile/${b.username || b.id}`);
+  };
+
+  // Enter with no specific pick: jump to the first live result if any.
+  const submitSearch = () => {
+    if (results.length > 0) {
+      goToBusiness(results[0]);
+      return;
+    }
+    setSearchOpen(false);
   };
 
   // Reddit-style circular hover highlight for icon-only actions.
@@ -203,33 +236,140 @@ export function AppHeader({ onMenuOpen }: { onMenuOpen?: () => void }) {
           />
         </div>
 
-        {/* Filter panel — appears on focus, collapses on blur/click-away */}
+        {/* Live results + filters — opaque panel below the bar, high z-index
+            so it floats cleanly over page content without bleed-through. */}
         {searchOpen && (
-          <div className="absolute left-0 right-0 top-full z-50 mt-1 rounded-[4px] border border-border bg-popover p-4 shadow-[inset_0_0_0_1px_var(--border)]">
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <FilterChipRow label="Category" options={FILTER_CATEGORIES} value={fCategory} onChange={setFCategory} />
-              <FilterChipRow label="Distance" options={FILTER_DISTANCES} value={fDistance} onChange={setFDistance} />
-              <FilterChipRow label="Price" options={FILTER_PRICES} value={fPrice} onChange={setFPrice} />
-              <FilterChipRow label="Rating" options={FILTER_RATINGS} value={fRating} onChange={setFRating} />
-              <div className="sm:col-span-2">
-                <FilterChipRow label="Sort by" options={FILTER_SORTS} value={fSort} onChange={setFSort} />
+          <div className="absolute left-0 right-0 top-full z-[70] mt-1 overflow-hidden rounded-[4px] border border-border bg-popover shadow-[inset_0_0_0_1px_var(--border)]">
+            {/* Filters */}
+            <div className="grid grid-cols-1 gap-3 border-b border-border p-3 sm:grid-cols-3">
+              {/* Price slider */}
+              <div>
+                <div className="mb-1.5 flex items-center justify-between">
+                  <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Max price</span>
+                  <span className="text-caption font-bold text-foreground tabular-nums">
+                    {priceMax >= 100 ? 'Any' : `$${priceMax}`}
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min={0}
+                  max={100}
+                  step={5}
+                  value={priceMax}
+                  onChange={(e) => setPriceMax(Number(e.target.value))}
+                  className="h-1.5 w-full cursor-pointer appearance-none rounded-[4px] bg-surface-2 accent-primary"
+                  aria-label="Maximum price filter"
+                />
+              </div>
+
+              {/* Rating stars */}
+              <div>
+                <div className="mb-1.5 flex items-center justify-between">
+                  <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Min rating</span>
+                  <button
+                    type="button"
+                    onClick={() => setMinRating(0)}
+                    className="text-caption font-semibold text-muted-foreground hover:text-foreground"
+                  >
+                    {minRating > 0 ? 'Clear' : 'Any'}
+                  </button>
+                </div>
+                <div className="flex items-center gap-0.5">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() => setMinRating(star === minRating ? 0 : star)}
+                      aria-label={`At least ${star} stars`}
+                      aria-pressed={minRating >= star}
+                    >
+                      <Star
+                        className={cn(
+                          'h-5 w-5 transition-colors',
+                          minRating >= star ? 'fill-primary text-primary' : 'text-muted-foreground',
+                        )}
+                      />
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Distance slider */}
+              <div>
+                <div className="mb-1.5 flex items-center justify-between">
+                  <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Distance</span>
+                  <span className="text-caption font-bold text-foreground tabular-nums">
+                    {maxDistanceKm >= DISTANCE_MAX_KM ? 'Any' : `${maxDistanceKm} km`}
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min={1}
+                  max={DISTANCE_MAX_KM}
+                  step={1}
+                  value={maxDistanceKm}
+                  onChange={(e) => setMaxDistanceKm(Number(e.target.value))}
+                  className="h-1.5 w-full cursor-pointer appearance-none rounded-[4px] bg-surface-2 accent-primary disabled:opacity-40"
+                  aria-label="Maximum distance filter"
+                  disabled={!coords}
+                />
+                {!coords && (
+                  <p className="mt-1 text-[10px] text-muted-foreground">Enable location to filter by distance</p>
+                )}
               </div>
             </div>
-            <div className="mt-4 flex justify-end gap-2 border-t border-border pt-3">
-              <button
-                type="button"
-                onClick={() => setSearchOpen(false)}
-                className="rounded-[4px] border border-border px-4 py-1.5 text-body-sm font-semibold text-muted-foreground transition-colors hover:bg-surface hover:text-foreground"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={submitSearch}
-                className="rounded-[4px] bg-primary px-4 py-1.5 text-body-sm font-bold text-primary-foreground transition-colors hover:bg-primary/90"
-              >
-                Search
-              </button>
+
+            {/* Live results */}
+            <div className="max-h-80 overflow-y-auto p-1">
+              {query.trim().length < 2 ? (
+                <p className="px-3 py-4 text-center text-caption text-muted-foreground">
+                  Start typing to find local businesses
+                </p>
+              ) : searching && results.length === 0 ? (
+                <p className="px-3 py-4 text-center text-caption text-muted-foreground">Searching…</p>
+              ) : results.length === 0 ? (
+                <p className="px-3 py-4 text-center text-caption text-muted-foreground">
+                  No businesses match &ldquo;{query.trim()}&rdquo;
+                </p>
+              ) : (
+                results.map((b) => (
+                  <button
+                    key={b.id}
+                    type="button"
+                    onClick={() => goToBusiness(b)}
+                    className="flex w-full items-center gap-3 rounded-[4px] px-3 py-2 text-left transition-colors hover:bg-surface"
+                  >
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border bg-surface">
+                      {b.profile_picture_url ? (
+                        <Image
+                          src={b.profile_picture_url}
+                          alt=""
+                          width={36}
+                          height={36}
+                          className="h-full w-full object-cover"
+                          unoptimized
+                        />
+                      ) : (
+                        <Store className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
+                      )}
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-body-sm font-semibold text-foreground">
+                        {b.business_name || b.username}
+                      </span>
+                      <span className="flex items-center gap-2 text-caption text-muted-foreground">
+                        {b.category && <span className="capitalize">{b.category}</span>}
+                        {b.average_rating != null && (
+                          <span className="inline-flex items-center gap-0.5">
+                            <Star className="h-3 w-3 fill-primary text-primary" aria-hidden="true" />
+                            {Number(b.average_rating).toFixed(1)}
+                          </span>
+                        )}
+                      </span>
+                    </span>
+                  </button>
+                ))
+              )}
             </div>
           </div>
         )}
