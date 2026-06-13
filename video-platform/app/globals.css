@@ -32,7 +32,8 @@
   --secondary: #f2f2f2;
   --secondary-foreground: #121212;
   --muted: #f2f2f2;
-  --muted-foreground: #666666;
+  /* Secondary text reads near-black in light mode for full-contrast legibility. */
+  --muted-foreground: #3a3a3a;
   --accent: #f97316;
   --accent-foreground: #ffffff;
   --destructive: #dc2626;
@@ -173,7 +174,7 @@
   --secondary: #303030;
   --secondary-foreground: #ffffff;
   --muted: #303030;
-  --muted-foreground: #999999;
+  --muted-foreground: #c4c4c4;
   --accent: #ff7a1a;
   --accent-foreground: #121212;
   --destructive: #ef4444;

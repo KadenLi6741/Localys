@@ -386,8 +386,8 @@ function RewardsContent() {
                         </span>
                       </div>
                       <p className="text-body font-semibold text-foreground">{c.title}</p>
-                      {c.business && <p className="mt-0.5 text-caption text-muted-foreground">{c.business}</p>}
-                      {c.finePrint && <p className="mt-2 text-caption text-muted-foreground">{c.finePrint}</p>}
+                      {c.business && <p className="mt-0.5 text-caption text-foreground">{c.business}</p>}
+                      {c.finePrint && <p className="mt-2 text-caption text-foreground">{c.finePrint}</p>}
                       <div className="mt-3 flex items-center justify-between gap-2">
                         <CoinPrice cost={c.cost} />
                       </div>
