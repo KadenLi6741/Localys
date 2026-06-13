@@ -239,14 +239,25 @@ export function AppHeader({ onMenuOpen }: { onMenuOpen?: () => void }) {
             className="h-full w-full min-w-0 bg-transparent text-body-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
             aria-label="Find anything"
           />
+          {searchOpen && (
+            <button
+              type="button"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={submitSearch}
+              className="shrink-0 rounded-[4px] bg-primary px-3 py-1 text-caption font-bold text-primary-foreground transition-colors hover:bg-primary/90"
+            >
+              Search
+            </button>
+          )}
         </div>
 
         {/* Live results + filters — opaque panel below the bar, high z-index
             so it floats cleanly over page content without bleed-through. */}
         {searchOpen && (
           <div className="absolute left-0 right-0 top-full z-[70] mt-1 overflow-hidden rounded-[4px] border border-border bg-popover shadow-[inset_0_0_0_1px_var(--border)]">
-            {/* Filters */}
-            <div className="grid grid-cols-1 gap-3 border-b border-border p-3 sm:grid-cols-3">
+            {/* Filters — each in its own full-width row so nothing overlaps and
+                all five rating stars stay fully clickable. */}
+            <div className="flex flex-col gap-4 border-b border-border p-3">
               {/* Price slider */}
               <div>
                 <div className="mb-1.5 flex items-center justify-between">
