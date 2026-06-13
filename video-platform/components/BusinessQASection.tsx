@@ -30,7 +30,10 @@ export function BusinessQASection({ businessId, isOwner }: BusinessQASectionProp
   const loadQuestions = useCallback(async () => {
     const { data, error: loadError } = await getBusinessQuestions(businessId);
     if (loadError) {
-      setError(loadError.message);
+      // Fail gracefully: if the Q&A tables aren't provisioned yet (or PostgREST's
+      // schema cache is stale), show the empty state instead of a raw error.
+      console.warn('Business Q&A unavailable:', loadError.message);
+      setQuestions([]);
     } else {
       setQuestions(data);
     }
