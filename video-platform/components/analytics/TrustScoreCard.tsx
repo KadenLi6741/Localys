@@ -75,7 +75,7 @@ export function TrustScoreCard({ userId, isBusinessProfile = true }: TrustScoreC
 
   if (loading) {
     return (
-      <div className="bg-white border border-[#E8E8E4] rounded-2xl p-6 animate-pulse">
+      <div className="bg-card border border-border rounded-2xl p-6 animate-pulse">
         <div className="h-5 bg-gray-200 rounded w-32 mb-4" />
         <div className="h-12 bg-gray-200 rounded w-40 mb-6" />
         <div className="space-y-3">
@@ -89,8 +89,8 @@ export function TrustScoreCard({ userId, isBusinessProfile = true }: TrustScoreC
 
   if (error) {
     return (
-      <div className="bg-white border border-[#E8E8E4] rounded-2xl p-6">
-        <h3 className="text-lg font-semibold text-[#1A1A1A] mb-2">Trust Score</h3>
+      <div className="bg-card border border-border rounded-2xl p-6">
+        <h3 className="text-lg font-semibold text-foreground mb-2">Trust Score</h3>
         <p className="text-sm text-red-600">{error}</p>
         <p className="text-sm text-[#6B6B66] mt-2">
           Run the latest Supabase migrations if this business has not been upgraded yet.
@@ -116,7 +116,7 @@ export function TrustScoreCard({ userId, isBusinessProfile = true }: TrustScoreC
   }[result.color];
 
   return (
-    <div className="bg-white border border-[#E8E8E4] rounded-2xl p-6 shadow-sm">
+    <div className="bg-card border border-border rounded-2xl p-6 shadow-sm">
       {warningMessage && (
         <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3">
           <p className="text-sm font-medium text-red-700">{warningMessage}</p>
@@ -125,7 +125,7 @@ export function TrustScoreCard({ userId, isBusinessProfile = true }: TrustScoreC
 
       <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
         <div>
-          <h3 className="text-lg font-semibold text-[#1A1A1A]">Trust Score</h3>
+          <h3 className="text-lg font-semibold text-foreground">Trust Score</h3>
           <p className="text-sm text-[#6B6B66] mt-1">
             Reliability score based on verification, ratings, orders, response time, and fraud signals.
           </p>
@@ -174,13 +174,13 @@ export function TrustScoreCard({ userId, isBusinessProfile = true }: TrustScoreC
 
       {isBusinessProfile && (
         <div className="mt-6">
-          <h4 className="text-sm font-semibold text-[#1A1A1A] mb-3">Score Breakdown</h4>
+          <h4 className="text-sm font-semibold text-foreground mb-3">Score Breakdown</h4>
           <div className="space-y-3">
             {result.breakdown.map((item) => (
               <div key={item.key} className="rounded-xl border border-[#ECEBE5] px-4 py-3">
                 <div className="flex items-center justify-between gap-4">
                   <div>
-                    <p className="text-sm font-medium text-[#1A1A1A]">{item.label}</p>
+                    <p className="text-sm font-medium text-foreground">{item.label}</p>
                     <p className="text-sm text-[#6B6B66]">{item.detail}</p>
                   </div>
                   <span className={`text-sm font-semibold ${item.points < 0 ? 'text-red-600' : item.points > 0 ? 'text-green-600' : 'text-[#6B6B66]'}`}>
@@ -199,7 +199,7 @@ export function TrustScoreCard({ userId, isBusinessProfile = true }: TrustScoreC
         <div className="mt-6 rounded-xl border border-dashed border-[#D8D5CC] bg-[#FAF8F2] p-4">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p className="text-sm font-semibold text-[#1A1A1A]">Development Demo</p>
+              <p className="text-sm font-semibold text-foreground">Development Demo</p>
               <p className="text-sm text-[#6B6B66]">
                 Simulate suspicious activity without changing production data.
               </p>
@@ -216,7 +216,7 @@ export function TrustScoreCard({ userId, isBusinessProfile = true }: TrustScoreC
                 type="button"
                 onClick={() => setSimulatedFlagCount(0)}
                 disabled={simulatedFlagCount === 0}
-                className="rounded-lg border border-[#D8D5CC] bg-white px-4 py-2 text-sm font-medium text-[#1A1A1A] transition-colors hover:bg-[#F5F3EC] disabled:cursor-not-allowed disabled:opacity-50"
+                className="rounded-lg border border-[#D8D5CC] bg-card px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-[#F5F3EC] disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Reset
               </button>
@@ -242,7 +242,7 @@ function MetricPill({
   return (
     <div className={`rounded-xl border px-4 py-3 ${danger ? 'border-red-200 bg-red-50' : 'border-[#ECEBE5] bg-[#FAF8F2]'}`}>
       <p className="text-xs font-semibold uppercase tracking-wide text-[#6B6B66]">{label}</p>
-      <p className={`mt-2 text-base font-semibold ${danger ? 'text-red-700' : 'text-[#1A1A1A]'}`}>{value}</p>
+      <p className={`mt-2 text-base font-semibold ${danger ? 'text-red-700' : 'text-foreground'}`}>{value}</p>
       <p className="mt-1 text-sm text-[#6B6B66]">{helper}</p>
     </div>
   );

@@ -13,13 +13,13 @@ export function TopSellingItemsChart({ data }: TopSellingItemsChartProps) {
 
   return (
     <div>
-      <h4 className="text-sm font-semibold text-[#1A1A1A] mb-3">Top Selling Items</h4>
+      <h4 className="text-sm font-semibold text-foreground mb-3">Top Selling Items</h4>
       <div className="space-y-3">
         {data.map((item, i) => {
           const pct = (item.unitsSold / maxUnits) * 100;
           return (
             <div key={item.itemName} className="flex items-center gap-3">
-              <span className="text-[#1A1A1A] text-sm w-28 truncate flex-shrink-0" title={item.itemName}>
+              <span className="text-foreground text-sm w-28 truncate flex-shrink-0" title={item.itemName}>
                 {item.itemName}
               </span>
               <div className="flex-1 h-6 bg-[#F0F0EC] rounded-full overflow-hidden">

@@ -25,13 +25,13 @@ export function FinancialStatCards({ summary }: FinancialStatCardsProps) {
         return (
           <div
             key={card.key}
-            className="entrance-fade bg-[#F8F8F6] rounded-xl p-4 transition-shadow duration-200 hover:shadow-[0_0_20px_rgba(27,79,216,0.1)]"
+            className="entrance-fade bg-surface rounded-xl p-4 transition-shadow duration-200 hover:shadow-[0_0_20px_rgba(27,79,216,0.1)]"
             style={{
               animation: `fadeInUp 0.4s ease-out ${i * 0.08}s forwards`,
               opacity: 0,
             }}
           >
-            <p className="text-[12px] text-[#6B6B65] mb-1">
+            <p className="text-[12px] text-muted-foreground mb-1">
               {card.label}
             </p>
             <p className="text-[24px] font-bold text-[var(--primary)]">{formatted}</p>

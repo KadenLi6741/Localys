@@ -40,7 +40,7 @@ export function VideoConversionChart({ data }: VideoConversionChartProps) {
 
   return (
     <div>
-      <h4 className="text-sm font-semibold text-[#1A1A1A] mb-3">Video Performance</h4>
+      <h4 className="text-sm font-semibold text-foreground mb-3">Video Performance</h4>
       <ResponsiveContainer width="100%" height={250}>
         <BarChart data={chartData} margin={{ top: 5, right: 10, left: -10, bottom: 5 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#E8E8E4" />

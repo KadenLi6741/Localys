@@ -31,7 +31,7 @@ export function VideoPerformanceTable({ videos }: VideoPerformanceTableProps) {
                     className="w-full h-full object-cover rounded-lg"
                   />
                 ) : (
-                  <span className="text-lg text-[#6B6B65]">&#9654;</span>
+                  <span className="text-lg text-muted-foreground">&#9654;</span>
                 )}
                 {index === 0 && videos.length > 1 && (
                   <span className="absolute -top-1 -right-1 text-xs bg-yellow-500 text-white rounded-full w-4 h-4 flex items-center justify-center font-bold">1</span>

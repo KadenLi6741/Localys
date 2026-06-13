@@ -51,7 +51,7 @@ export function OrdersBreakdownChart({ data }: OrdersBreakdownChartProps) {
 
   return (
     <div>
-      <h4 className="text-sm font-semibold text-[#1A1A1A] mb-3">Orders Breakdown</h4>
+      <h4 className="text-sm font-semibold text-foreground mb-3">Orders Breakdown</h4>
       <ResponsiveContainer width="100%" height={260}>
         <PieChart>
           <Pie
@@ -72,7 +72,7 @@ export function OrdersBreakdownChart({ data }: OrdersBreakdownChartProps) {
           </Pie>
           <Tooltip content={<BreakdownTooltip />} />
           <Legend
-            formatter={(value: string) => <span className="text-[#6B6B65] text-xs">{value}</span>}
+            formatter={(value: string) => <span className="text-muted-foreground text-xs">{value}</span>}
             wrapperStyle={{ fontSize: '12px' }}
           />
         </PieChart>

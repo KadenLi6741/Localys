@@ -45,7 +45,7 @@ export function RevenueChart({ data }: RevenueChartProps) {
   return (
     <div>
       <div className="flex items-center justify-between mb-3">
-        <h4 className="text-sm font-semibold text-[#1A1A1A]">Revenue Over Time</h4>
+        <h4 className="text-sm font-semibold text-foreground">Revenue Over Time</h4>
         <div className="flex gap-1">
           {(['week', 'month', 'all'] as const).map(r => (
             <button
@@ -54,7 +54,7 @@ export function RevenueChart({ data }: RevenueChartProps) {
               className={`px-3 py-1 rounded-lg text-xs font-medium transition-all ${
                 range === r
                   ? 'bg-[var(--primary)] text-white'
-                  : 'bg-[#F8F8F6] text-[#6B6B65] hover:text-[#1A1A1A]'
+                  : 'bg-surface text-muted-foreground hover:text-foreground'
               }`}
             >
               {r === 'week' ? 'Week' : r === 'month' ? 'Month' : 'All Time'}
@@ -64,7 +64,7 @@ export function RevenueChart({ data }: RevenueChartProps) {
       </div>
 
       {filtered.length < 2 ? (
-        <div className="h-[200px] flex items-center justify-center text-[#6B6B65] text-sm">
+        <div className="h-[200px] flex items-center justify-center text-muted-foreground text-sm">
           Not enough data to display chart
         </div>
       ) : (
