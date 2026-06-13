@@ -12,14 +12,15 @@ import { cn } from '@/lib/utils';
 /* ============================ Categories ============================ */
 // Icons are PNGs the user adds under /public/categories/. Each has an emoji
 // fallback so the row never renders blank if a file is missing.
+// Filenames are case-sensitive on the host; match the repo files exactly.
 const CATEGORIES: { id: string; label: string; file: string; emoji: string; type?: string }[] = [
   { id: 'grocery', label: 'Grocery', file: 'grocery.png', emoji: '🍌', type: 'retail' },
-  { id: 'fast-food', label: 'Fast Food', file: 'fastfood.png', emoji: '🍕', type: 'food' },
+  { id: 'fast-food', label: 'Fast Food', file: 'Fast-food.png', emoji: '🍕', type: 'food' },
   { id: 'bakery', label: 'Bakery', file: 'bakery.png', emoji: '🥐', type: 'food' },
   { id: 'restaurants', label: 'Restaurants', file: 'restaurants.png', emoji: '🍲', type: 'food' },
-  { id: 'flowers', label: 'Flower Shops', file: 'flowers.png', emoji: '🌸', type: 'retail' },
-  { id: 'services', label: 'Services', file: 'services.png', emoji: '🛠️', type: 'service' },
-  { id: 'cafes', label: 'Cafés', file: 'cafes.png', emoji: '☕', type: 'food' },
+  { id: 'flowers', label: 'Flower Shops', file: 'flower.png', emoji: '🌸', type: 'retail' },
+  { id: 'services', label: 'Services', file: 'service.png', emoji: '🛠️', type: 'service' },
+  { id: 'cafes', label: 'Cafés', file: 'cafe.png', emoji: '☕', type: 'food' },
   { id: 'clothing', label: 'Clothing', file: 'clothing.png', emoji: '🧥', type: 'retail' },
   { id: 'toys', label: 'Toy Stores', file: 'toys.png', emoji: '🧸', type: 'retail' },
   { id: 'pet', label: 'Pet', file: 'pet.png', emoji: '🐾', type: 'retail' },

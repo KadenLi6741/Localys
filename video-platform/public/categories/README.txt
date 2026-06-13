@@ -1,14 +1,14 @@
-Drop category icons here as PNG (square, ~80×80, transparent). The Home
-category row uses these filenames; until a file exists, an emoji fallback shows.
+Category icons for the Home category row. Filenames are CASE-SENSITIVE and must
+match exactly (the code references these). Until a file exists, an emoji shows.
 
-grocery.png      (Grocery)      fallback 🍌  — banana
-fastfood.png     (Fast Food)    fallback 🍕  — pizza
-bakery.png       (Bakery)       fallback 🥐  — croissant
-restaurants.png  (Restaurants)  fallback 🍲  — poke bowl
-flowers.png      (Flower Shops) fallback 🌸  — flower
-services.png     (Services)     fallback 🛠️  — gear-in-hand
-cafes.png        (Cafés)        fallback ☕  — latte
-clothing.png     (Clothing)     fallback 🧥  — jacket
-toys.png         (Toy Stores)   fallback 🧸
-pet.png          (Pet)          fallback 🐾  — pet food bag
-health.png       (Health)       fallback 🩺
+grocery.png        (Grocery)       fallback 🍌
+Fast-food.png      (Fast Food)     fallback 🍕   ← capital F, hyphen
+bakery.png         (Bakery)        fallback 🥐
+restaurants.png    (Restaurants)   fallback 🍲
+flower.png         (Flower Shops)  fallback 🌸   ← singular
+service.png        (Services)      fallback 🛠️   ← singular
+cafe.png           (Cafés)         fallback ☕   ← no "s", no accent
+clothing.png       (Clothing)      fallback 🧥
+toys.png           (Toy Stores)    fallback 🧸
+pet.png            (Pet)           fallback 🐾
+health.png         (Health)        fallback 🩺
