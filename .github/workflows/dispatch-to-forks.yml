@@ -1,4 +1,4 @@
-name: Force sync from upstream (overwrite main)
+name: Force sync from upstream (overwrite master)
 
 on:
   # Triggered by the upstream repo workflow (Option B)
@@ -10,7 +10,7 @@ on:
 
 env:
   UPSTREAM_REPO: https://github.com/KadenLi6741/Localys.git
-  BRANCH: main
+  BRANCH: master
 
 permissions:
   contents: write
@@ -19,7 +19,7 @@ jobs:
   force-sync:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout fork main
+      - name: Checkout fork master
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.UPSTREAM_SYNC_PAT }}
@@ -30,7 +30,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-      - name: Add upstream and fetch upstream/main
+      - name: Add upstream and fetch upstream/master
         run: |
           git remote add upstream "${{ env.UPSTREAM_REPO }}" || true
           git fetch upstream ${{ env.BRANCH }} --prune --tags
