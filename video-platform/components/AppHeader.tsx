@@ -7,10 +7,8 @@ import { useEffect, useRef, useState } from 'react';
 import { useTheme } from 'next-themes';
 import {
   Search,
-  Bell,
   Coins,
   Plus,
-  Megaphone,
   Menu,
   Settings,
   Trophy,
@@ -403,13 +401,15 @@ export function AppHeader({ onMenuOpen }: { onMenuOpen?: () => void }) {
           <span className="tabular-nums">{coins ?? '—'}</span>
         </Link>
 
-        {/* Advertise */}
+        {/* Advertise — inline SVG (same proven approach as the video-feed icons) */}
         <button
           type="button"
           className={cn(iconBtn, 'group relative hidden sm:inline-flex')}
           aria-label="Advertise on Locally"
         >
-          <Megaphone className="h-5 w-5" />
+          <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" aria-hidden="true">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
+          </svg>
           <span
             className="pointer-events-none absolute right-0 top-full mt-1.5 whitespace-nowrap rounded-[4px] border border-border bg-popover px-2 py-1 text-caption text-foreground opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
             role="tooltip"
@@ -428,9 +428,11 @@ export function AppHeader({ onMenuOpen }: { onMenuOpen?: () => void }) {
           <span className="hidden md:inline">Create</span>
         </Link>
 
-        {/* Notifications */}
+        {/* Notifications — inline SVG bell */}
         <button type="button" onClick={togglePanel} className={cn(iconBtn, 'relative')} aria-label="Notifications">
-          <Bell className="h-5 w-5" />
+          <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" aria-hidden="true">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
+          </svg>
           {unreadCount > 0 && (
             <span className="absolute right-0.5 top-0.5 inline-flex h-4 min-w-[16px] items-center justify-center rounded-[4px] bg-primary px-1 text-[10px] font-bold text-primary-foreground">
               {unreadCount > 9 ? '9+' : unreadCount}
@@ -441,21 +443,22 @@ export function AppHeader({ onMenuOpen }: { onMenuOpen?: () => void }) {
         {/* Profile */}
         <DropdownMenu>
           <DropdownMenuTrigger
-            className="ml-0.5 inline-flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border border-border bg-surface text-body-sm font-bold text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="relative ml-0.5 inline-flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border bg-surface text-body-sm font-bold text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             aria-label="Open profile menu"
           >
-            {profile?.profile_picture_url && !avatarError ? (
+            {/* Initials base — always present, so the avatar is never an empty/grey box. */}
+            <span aria-hidden="true">{initial}</span>
+            {/* Image overlays the initials only when it loads successfully. */}
+            {profile?.profile_picture_url && !avatarError && (
               <Image
                 src={profile.profile_picture_url}
                 alt=""
                 width={40}
                 height={40}
-                className="h-full w-full object-cover"
+                className="absolute inset-0 h-full w-full rounded-full object-cover"
                 onError={() => setAvatarError(true)}
                 unoptimized
               />
-            ) : (
-              <span aria-hidden="true">{initial}</span>
             )}
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
