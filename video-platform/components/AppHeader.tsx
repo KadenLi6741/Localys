@@ -217,19 +217,17 @@ export function AppHeader({ onMenuOpen }: { onMenuOpen?: () => void }) {
     router.push(`/profile/${b.username || b.id}`);
   };
 
-  // Enter with no specific pick: jump to the first live result if any.
+  // Enter / Search → full results page (lists every match).
   const submitSearch = () => {
-    if (results.length > 0) {
-      goToBusiness(results[0]);
-      return;
-    }
+    const q = query.trim();
     setSearchOpen(false);
+    router.push(q ? `/search?q=${encodeURIComponent(q)}` : '/search');
   };
 
   // Icon-only actions: full-contrast foreground icon, orange on hover, with a
-  // circular surface highlight (Reddit-style).
+  // subtle (low-emphasis) surface highlight.
   const iconBtn =
-    'inline-flex h-10 w-10 items-center justify-center rounded-full text-foreground transition-colors hover:bg-surface hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring';
+    'inline-flex h-10 w-10 items-center justify-center rounded-full text-foreground transition-colors hover:bg-surface/60 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring';
 
   return (
     <header className="fixed inset-x-0 top-0 z-40 flex h-14 items-center gap-2 border-b border-border bg-card px-3 md:gap-4 md:px-4">
@@ -253,11 +251,11 @@ export function AppHeader({ onMenuOpen }: { onMenuOpen?: () => void }) {
       <div ref={searchRef} className="relative mx-auto min-w-0 flex-1 max-w-[640px]">
         <div
           className={cn(
-            'relative flex h-10 items-center rounded-[4px] border bg-surface transition-colors',
+            'relative flex h-10 items-center rounded-full border bg-surface transition-colors',
             searchOpen ? 'border-primary' : 'border-border hover:border-primary/50'
           )}
         >
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
+          <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
           <input
             type="search"
             value={query}
@@ -269,19 +267,19 @@ export function AppHeader({ onMenuOpen }: { onMenuOpen?: () => void }) {
             }}
             placeholder="Find anything"
             /* pl clears the magnifier, pr clears the Search button so text never runs underneath */
-            className="h-full w-full min-w-0 bg-transparent pl-9 pr-[84px] text-body-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
+            className="h-full w-full min-w-0 bg-transparent pl-10 pr-[92px] text-body-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
             aria-label="Find anything"
           />
-          {searchOpen && (
-            <button
-              type="button"
-              onMouseDown={(e) => e.preventDefault()}
-              onClick={submitSearch}
-              className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded-[4px] bg-primary px-3 py-1.5 text-caption font-bold text-primary-foreground transition-colors hover:bg-primary/90"
-            >
-              Search
-            </button>
-          )}
+          {/* Always-visible, right-anchored Search pill */}
+          <button
+            type="button"
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={submitSearch}
+            className="absolute right-1 top-1/2 inline-flex -translate-y-1/2 items-center gap-1 rounded-full bg-primary px-3.5 py-1.5 text-caption font-bold text-primary-foreground transition-colors hover:bg-primary/90"
+          >
+            <Search className="h-3.5 w-3.5" aria-hidden="true" />
+            Search
+          </button>
         </div>
 
         {/* Live results + filters — opaque panel below the bar, high z-index
@@ -474,7 +472,7 @@ export function AppHeader({ onMenuOpen }: { onMenuOpen?: () => void }) {
         {/* Points pill → Rewards (coupons + coin shop) */}
         <Link
           href="/rewards"
-          className="inline-flex h-10 items-center gap-1.5 rounded-full px-3 text-body-sm font-bold text-foreground transition-colors hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="inline-flex h-10 items-center gap-1.5 rounded-full px-3 text-body-sm font-bold text-foreground transition-colors hover:bg-surface/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           aria-label={`${coins ?? 0} coins — open rewards`}
         >
           <Coins className="h-4 w-4 text-primary" aria-hidden="true" />
@@ -498,15 +496,24 @@ export function AppHeader({ onMenuOpen }: { onMenuOpen?: () => void }) {
           </span>
         </button>
 
-        {/* Create */}
-        <Link
-          href="/upload"
-          className="inline-flex h-10 items-center gap-1.5 rounded-full px-3 text-body-sm font-semibold text-foreground transition-colors hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          aria-label="Create a post"
-        >
-          <Plus className="h-5 w-5" aria-hidden="true" />
-          <span className="hidden md:inline">Create</span>
-        </Link>
+        {/* Create — choose Post or Community */}
+        <DropdownMenu>
+          <DropdownMenuTrigger
+            className="inline-flex h-10 items-center gap-1.5 rounded-full px-3 text-body-sm font-semibold text-foreground transition-colors hover:bg-surface/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            aria-label="Create"
+          >
+            <Plus className="h-5 w-5" aria-hidden="true" />
+            <span className="hidden md:inline">Create</span>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuItem onSelect={() => router.push('/upload')}>
+              <Plus className="mr-2 h-4 w-4" aria-hidden="true" /> Create Post
+            </DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => router.push('/communities/new')}>
+              <Store className="mr-2 h-4 w-4" aria-hidden="true" /> Create Community
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
 
         {/* Notifications — inline SVG bell */}
         <button type="button" onClick={togglePanel} className={cn(iconBtn, 'relative')} aria-label="Notifications">

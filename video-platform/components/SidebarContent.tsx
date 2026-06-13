@@ -19,6 +19,7 @@ import { useCart } from '@/contexts/CartContext';
 import { useUnreadMessages } from '@/contexts/UnreadMessagesContext';
 import { supabase } from '@/lib/supabase/client';
 import { RECENTLY_VIEWED_EVENT, RECENTLY_VIEWED_KEY } from '@/lib/utils/recentlyViewed';
+import { COMMUNITIES_EVENT, COMMUNITIES_KEY, type Community } from '@/lib/utils/communities';
 import { cn } from '@/lib/utils';
 
 type NavItem = {
@@ -34,15 +35,6 @@ const DAILY_CHALLENGES = [
   { id: 'visit-3', label: 'Visit 3 small businesses this week', progress: 1, total: 3 },
   { id: 'review-2', label: 'Leave 2 reviews', progress: 0, total: 2 },
   { id: 'watch-10', label: 'Watch 10 local videos', progress: 6, total: 10 },
-];
-
-/** Seeded category/location communities (Reddit-style list with favorites). */
-const COMMUNITIES = [
-  { id: 'coffeeshops', name: 'b/coffeeshops' },
-  { id: 'foodtrucks', name: 'b/foodtrucks' },
-  { id: 'bookstores', name: 'b/bookstores' },
-  { id: 'farmersmarkets', name: 'b/farmersmarkets' },
-  { id: 'barbersandsalons', name: 'b/barbersandsalons' },
 ];
 
 /** RESOURCES list — each entry links to a section on the /info page. */
@@ -187,6 +179,27 @@ export function SidebarContent({
       return [];
     }
   }, [viewedJson]);
+
+  // Real communities (localStorage). The section only renders when some exist.
+  const communitiesJson = useSyncExternalStore(
+    (cb) => {
+      window.addEventListener(COMMUNITIES_EVENT, cb);
+      window.addEventListener('storage', cb);
+      return () => {
+        window.removeEventListener(COMMUNITIES_EVENT, cb);
+        window.removeEventListener('storage', cb);
+      };
+    },
+    () => window.localStorage.getItem(COMMUNITIES_KEY) || '[]',
+    () => '[]',
+  );
+  const communities = useMemo<Community[]>(() => {
+    try {
+      return JSON.parse(communitiesJson) as Community[];
+    } catch {
+      return [];
+    }
+  }, [communitiesJson]);
 
   // Discovery fallback for when the user hasn't viewed any profiles yet.
   useEffect(() => {
@@ -354,43 +367,43 @@ export function SidebarContent({
         )}
       </SidebarSection>
 
-      <hr className="my-2 border-border" />
-
-      {/* Communities */}
-      <SidebarSection id="communities" title="Communities">
-        {COMMUNITIES.map((c) => {
-          const fav = !!favorites[c.id];
-          return (
-            <div
-              key={c.id}
-              className="group flex items-center gap-3 rounded-[4px] px-4 py-2 transition-colors hover:bg-surface"
-            >
-              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/15 text-caption font-bold text-primary">
-                {c.name.charAt(2).toUpperCase()}
-              </span>
-              <Link
-                href={`/search?q=${encodeURIComponent(c.name.slice(2))}`}
-                onClick={onNavigate}
-                className="min-w-0 flex-1 truncate text-body-sm text-foreground"
-              >
-                {c.name}
-              </Link>
-              <button
-                type="button"
-                onClick={() => setFavorites((prev) => ({ ...prev, [c.id]: !prev[c.id] }))}
-                className="text-muted-foreground transition-colors hover:text-foreground"
-                aria-label={fav ? `Remove ${c.name} from favorites` : `Add ${c.name} to favorites`}
-                aria-pressed={fav}
-              >
-                <Star
-                  className={cn('h-4 w-4', fav && 'fill-primary text-primary')}
-                  aria-hidden="true"
-                />
-              </button>
-            </div>
-          );
-        })}
-      </SidebarSection>
+      {/* Communities — only shown when the user has actually created some */}
+      {communities.length > 0 && (
+        <>
+          <hr className="my-2 border-border" />
+          <SidebarSection id="communities" title="Communities">
+            {communities.map((c) => {
+              const fav = !!favorites[c.slug];
+              return (
+                <div
+                  key={c.slug}
+                  className="group flex items-center gap-3 rounded-[4px] px-4 py-2 transition-colors hover:bg-surface/60"
+                >
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/15 text-caption font-bold text-primary">
+                    {c.name.charAt(0).toUpperCase()}
+                  </span>
+                  <Link
+                    href={`/communities/${c.slug}`}
+                    onClick={onNavigate}
+                    className="min-w-0 flex-1 truncate text-body-sm text-foreground"
+                  >
+                    b/{c.slug}
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={() => setFavorites((prev) => ({ ...prev, [c.slug]: !prev[c.slug] }))}
+                    className="text-muted-foreground transition-colors hover:text-foreground"
+                    aria-label={fav ? `Remove ${c.name} from favorites` : `Add ${c.name} to favorites`}
+                    aria-pressed={fav}
+                  >
+                    <Star className={cn('h-4 w-4', fav && 'fill-primary text-primary')} aria-hidden="true" />
+                  </button>
+                </div>
+              );
+            })}
+          </SidebarSection>
+        </>
+      )}
 
       <hr className="my-2 border-border" />
 
