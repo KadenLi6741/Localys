@@ -482,18 +482,18 @@ export function AppHeader({ onMenuOpen }: { onMenuOpen?: () => void }) {
           className="inline-flex h-10 items-center gap-1.5 rounded-full px-3 text-body-sm font-bold text-foreground transition-colors hover:bg-surface/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           aria-label={`${coins ?? 0} coins — open rewards`}
         >
-          <Coins className="h-4 w-4 text-primary" aria-hidden="true" />
-          <span className="tabular-nums">{coins ?? '—'}</span>
+          <Coins className="h-4 w-4 text-foreground" aria-hidden="true" />
+          <span className="tabular-nums text-foreground">{coins ?? '—'}</span>
         </Link>
 
-        {/* Advertise — inline SVG (same proven approach as the video-feed icons) */}
+        {/* Advertise — inline SVG, exact structure of the working video-feed icons */}
         <button
           type="button"
-          className={cn(iconBtn, 'group relative hidden sm:inline-flex')}
+          className={cn(iconBtn, 'group relative')}
           aria-label="Advertise on Locally"
         >
-          <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" aria-hidden="true">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
+          <svg width={20} height={20} className="h-5 w-5 text-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
           </svg>
           <span
             className="pointer-events-none absolute right-0 top-full mt-1.5 whitespace-nowrap rounded-[4px] border border-border bg-popover px-2 py-1 text-caption text-foreground opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
@@ -522,10 +522,10 @@ export function AppHeader({ onMenuOpen }: { onMenuOpen?: () => void }) {
           </DropdownMenuContent>
         </DropdownMenu>
 
-        {/* Notifications — inline SVG bell */}
+        {/* Notifications — inline SVG bell, exact structure of the video-feed icons */}
         <button type="button" onClick={togglePanel} className={cn(iconBtn, 'relative')} aria-label="Notifications">
-          <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" aria-hidden="true">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
+          <svg width={20} height={20} className="h-5 w-5 text-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
           </svg>
           {unreadCount > 0 && (
             <span className="absolute right-0.5 top-0.5 inline-flex h-4 min-w-[16px] items-center justify-center rounded-[4px] bg-primary px-1 text-[10px] font-bold text-primary-foreground">

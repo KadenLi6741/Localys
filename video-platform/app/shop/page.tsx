@@ -326,10 +326,17 @@ export default function ShopPage() {
                       <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Min rating</span>
                       <button type="button" onClick={() => setMinRating(0)} className="text-caption font-semibold text-muted-foreground hover:text-foreground">{minRating > 0 ? 'Clear' : 'Any'}</button>
                     </div>
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-0.5">
                       {[1, 2, 3, 4, 5].map((star) => (
-                        <button key={star} type="button" onClick={() => setMinRating(star === minRating ? 0 : star)} aria-label={`At least ${star} stars`} aria-pressed={minRating >= star}>
-                          <Star className={cn('h-6 w-6', minRating >= star ? 'fill-primary text-primary' : 'text-muted-foreground')} />
+                        <button
+                          key={star}
+                          type="button"
+                          onClick={() => setMinRating(star === minRating ? 0 : star)}
+                          aria-label={`At least ${star} stars`}
+                          aria-pressed={minRating >= star}
+                          className="shrink-0 p-0.5"
+                        >
+                          <Star className={cn('h-5 w-5', minRating >= star ? 'fill-primary text-primary' : 'text-muted-foreground')} />
                         </button>
                       ))}
                     </div>
