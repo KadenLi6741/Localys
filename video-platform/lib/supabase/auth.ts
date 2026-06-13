@@ -26,9 +26,12 @@ async function ensureOwnProfile({ id, email, name, username }: EnsureProfileInpu
     username: sanitizedUsername || (email ? email.split('@')[0].toLowerCase().replace(/[^a-z0-9_]/g, '').slice(0, 30) : fallbackUsername),
   };
 
+  // ignoreDuplicates: only INSERT when the profile is missing — never overwrite
+  // an existing row. Otherwise every sign-in would clobber the user's edited
+  // full_name/username with the original auth-metadata values (name-reset bug).
   const firstAttempt = await supabase
     .from('profiles')
-    .upsert(profilePayload, { onConflict: 'id' });
+    .upsert(profilePayload, { onConflict: 'id', ignoreDuplicates: true });
 
   if (!firstAttempt.error) {
     return firstAttempt;
@@ -50,7 +53,7 @@ async function ensureOwnProfile({ id, email, name, username }: EnsureProfileInpu
         ...profilePayload,
         username: `${fallbackUsername}_${id.replace(/-/g, '').slice(0, 4)}`,
       },
-      { onConflict: 'id' }
+      { onConflict: 'id', ignoreDuplicates: true }
     );
 }
 
