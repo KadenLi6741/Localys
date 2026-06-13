@@ -18,7 +18,7 @@ export function FloatingCartButton() {
   return (
     <Link
       href="/cart"
-      className="fixed bottom-20 right-0 z-30 flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-3 rounded-full shadow-lg shadow-blue-500/30 transition-all hover:scale-105 active:scale-95 max-w-[15%] w-auto"
+      className="fixed bottom-20 right-0 z-[500] flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-3 rounded-full shadow-lg shadow-blue-500/30 transition-all hover:scale-105 active:scale-95 max-w-[15%] w-auto"
     >
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z" />

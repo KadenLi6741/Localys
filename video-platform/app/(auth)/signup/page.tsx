@@ -120,26 +120,26 @@ export default function SignUpPage() {
   };
 
   return (
-    <div className="min-h-screen bg-transparent text-[var(--text-primary)] flex items-center justify-center px-4">
-      <div className="w-full max-w-md space-y-8 bg-[rgba(36,36,32,0.85)] backdrop-blur-md border border-[var(--color-charcoal-lighter-plus)] rounded-2xl p-8 shadow-xl" style={{ animation: 'fadeInUp 0.5s ease-out forwards', opacity: 0 }}>
+    <div className="min-h-screen bg-background text-foreground flex items-center justify-center px-4">
+      <div className="w-full max-w-md space-y-8 bg-card backdrop-blur-md border border-border rounded-[4px] p-8" style={{ animation: 'fadeInUp 0.5s ease-out forwards', opacity: 0 }}>
         <div className="text-center">
           <h1 className="entrance-slide text-4xl font-bold mb-2" style={{ animation: 'slideInLeft 0.4s ease-out 0.1s forwards', opacity: 0 }}>Localy</h1>
-          <p className="text-[var(--text-tertiary)]">Create your account</p>
+          <p className="text-muted-foreground">Create your account</p>
         </div>
 
         {verificationEmail ? (
           <div className="space-y-6">
-            <div className="bg-green-500/20 border border-green-500 text-green-200 px-4 py-3 rounded-lg">
+            <div className="bg-success/10 border border-success text-success px-4 py-3 rounded-[4px]">
               Account created. Check <span className="font-semibold">{verificationEmail}</span> to verify your account before signing in.
             </div>
-            <p className="text-[var(--text-secondary)] text-sm">
+            <p className="text-muted-foreground text-sm">
               If you don&apos;t see the email, check spam/junk and try again in a minute.
             </p>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
-              <div className="bg-red-500/20 border border-red-500 text-red-200 px-4 py-3 rounded-lg">
+              <div className="bg-destructive/10 border border-destructive text-destructive px-4 py-3 rounded-[4px]">
                 {error}
               </div>
             )}
@@ -153,10 +153,10 @@ export default function SignUpPage() {
                   setAccountType('user');
                   setBusinessType('');
                 }}
-                className={`py-2 px-3 rounded-lg text-sm font-medium transition-all ${
+                className={`py-2 px-3 rounded-[4px] text-sm font-medium transition-all ${
                   accountType === 'user'
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-[var(--glass-bg)] text-[#6B6B65] hover:bg-[var(--glass-bg-strong)]'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-surface text-muted-foreground hover:bg-surface-2'
                 }`}
               >
                 USER
@@ -164,10 +164,10 @@ export default function SignUpPage() {
               <button
                 type="button"
                 onClick={() => setAccountType('business')}
-                className={`py-2 px-3 rounded-lg text-sm font-medium transition-all ${
+                className={`py-2 px-3 rounded-[4px] text-sm font-medium transition-all ${
                   accountType === 'business'
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-[var(--glass-bg)] text-[#6B6B65] hover:bg-[var(--glass-bg-strong)]'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-surface text-muted-foreground hover:bg-surface-2'
                 }`}
               >
                 BUSINESS
@@ -185,7 +185,7 @@ export default function SignUpPage() {
                 value={businessType}
                 onChange={(e) => setBusinessType(e.target.value as 'food' | 'retail' | 'service' | '')}
                 required
-                className="w-full bg-[var(--glass-bg)] border border-[var(--glass-border)] rounded-lg px-4 py-3 text-[var(--text-primary)] focus:outline-none focus:border-[var(--glass-border-focus)] focus:ring-2 focus:ring-white/20 transition-all duration-200"
+                className="w-full bg-surface border border-border rounded-[4px] px-4 py-3 text-foreground focus:outline-none focus:border-primary focus:bg-surface-2 focus:ring-2 focus:ring-primary/30 transition-all duration-200"
               >
                 <option value="">Select business type</option>
                 <option value="food">Food</option>
@@ -205,7 +205,7 @@ export default function SignUpPage() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
-              className="w-full bg-[var(--glass-bg)] border border-[var(--glass-border)] rounded-lg px-4 py-3 text-[var(--text-primary)] placeholder-[var(--placeholder)] focus:outline-none focus:border-[var(--glass-border-focus)] focus:ring-2 focus:ring-white/20 transition-all duration-200"
+              className="w-full bg-surface border border-border rounded-[4px] px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary focus:bg-surface-2 focus:ring-2 focus:ring-primary/30 transition-all duration-200"
               placeholder="John Doe"
             />
           </div>
@@ -220,7 +220,7 @@ export default function SignUpPage() {
               value={username}
               onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))}
               required
-              className="w-full bg-[var(--glass-bg)] border border-[var(--glass-border)] rounded-lg px-4 py-3 text-[var(--text-primary)] placeholder-[var(--placeholder)] focus:outline-none focus:border-[var(--glass-border-focus)] focus:ring-2 focus:ring-white/20 transition-all duration-200"
+              className="w-full bg-surface border border-border rounded-[4px] px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary focus:bg-surface-2 focus:ring-2 focus:ring-primary/30 transition-all duration-200"
               placeholder="johndoe"
             />
           </div>
@@ -235,7 +235,7 @@ export default function SignUpPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full bg-[var(--glass-bg)] border border-[var(--glass-border)] rounded-lg px-4 py-3 text-[var(--text-primary)] placeholder-[var(--placeholder)] focus:outline-none focus:border-[var(--glass-border-focus)] focus:ring-2 focus:ring-white/20 transition-all duration-200"
+              className="w-full bg-surface border border-border rounded-[4px] px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary focus:bg-surface-2 focus:ring-2 focus:ring-primary/30 transition-all duration-200"
               placeholder="you@example.com"
             />
           </div>
@@ -251,10 +251,10 @@ export default function SignUpPage() {
               onChange={(e) => setPassword(e.target.value)}
               required
               minLength={6}
-              className="w-full bg-[var(--glass-bg)] border border-[var(--glass-border)] rounded-lg px-4 py-3 text-[var(--text-primary)] placeholder-[var(--placeholder)] focus:outline-none focus:border-[var(--glass-border-focus)] focus:ring-2 focus:ring-white/20 transition-all duration-200"
+              className="w-full bg-surface border border-border rounded-[4px] px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary focus:bg-surface-2 focus:ring-2 focus:ring-primary/30 transition-all duration-200"
               placeholder="••••••••"
             />
-            <p className="text-xs text-[var(--text-muted)] mt-1">At least 6 characters</p>
+            <p className="text-xs text-muted-foreground mt-1">At least 6 characters</p>
           </div>
 
           {turnstileEnabled && (
@@ -270,16 +270,16 @@ export default function SignUpPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-white text-black font-semibold py-3 rounded-lg disabled:bg-[var(--glass-bg-strong)] disabled:text-[var(--text-muted)] disabled:cursor-not-allowed hover:bg-white/90 active:scale-98 transition-all duration-200"
+              className="w-full bg-primary text-primary-foreground font-bold py-3 rounded-[4px] disabled:opacity-40 disabled:cursor-not-allowed hover:bg-primary/90 active:scale-[0.98] transition-colors"
             >
               {loading ? 'Creating account...' : 'Sign Up'}
             </button>
           </form>
         )}
 
-        <p className="text-center text-[var(--text-tertiary)]">
+        <p className="text-center text-muted-foreground">
           Already have an account?{' '}
-          <Link href="/login" className="text-[var(--text-primary)] hover:underline">
+          <Link href="/login" className="text-primary hover:underline">
             Sign in
           </Link>
         </p>

@@ -75,8 +75,8 @@ export function ChatWindow({ messages, currentUserId, loading, messagesEndRef }:
     return (
       <div className="flex-1 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1B5EA8] mx-auto mb-4"></div>
-          <p className="text-[var(--color-body-text)]">Loading messages...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading messages...</p>
         </div>
       </div>
     );
@@ -85,7 +85,7 @@ export function ChatWindow({ messages, currentUserId, loading, messagesEndRef }:
   if (messages.length === 0) {
     return (
       <div className="flex-1 flex items-center justify-center">
-        <div className="text-center text-[var(--color-body-text)]">
+        <div className="text-center text-muted-foreground">
           <p>No messages yet</p>
           <p className="text-sm mt-2">Start the conversation!</p>
         </div>
@@ -96,7 +96,7 @@ export function ChatWindow({ messages, currentUserId, loading, messagesEndRef }:
   return (
     <div className="flex-1 overflow-y-auto px-4 py-4 space-y-1">
       {error && (
-        <div className="bg-[#E05C3A]/10 text-[#E05C3A] px-4 py-2 text-sm rounded-xl border border-[#E05C3A]/30">
+        <div className="bg-destructive/10 text-destructive px-4 py-2 text-sm rounded-[4px] border border-destructive/30">
           {error}
         </div>
       )}
@@ -120,7 +120,7 @@ export function ChatWindow({ messages, currentUserId, loading, messagesEndRef }:
                 href={`/profile/${sender?.username || message.sender_id}`}
                 className="flex-shrink-0"
               >
-                <div className="w-8 h-8 rounded-full bg-[var(--color-charcoal-light)] overflow-hidden cursor-pointer hover:opacity-80 transition-opacity">
+                <div className="w-8 h-8 rounded-full bg-surface overflow-hidden cursor-pointer hover:opacity-80 transition-opacity">
                   {senderAvatar ? (
                     <img
                       src={senderAvatar}
@@ -128,7 +128,7 @@ export function ChatWindow({ messages, currentUserId, loading, messagesEndRef }:
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center text-[var(--color-body-text)] text-sm font-semibold">
+                    <div className="w-full h-full flex items-center justify-center text-muted-foreground text-sm font-semibold">
                       {senderName[0]?.toUpperCase() || '?'}
                     </div>
                   )}
@@ -142,7 +142,7 @@ export function ChatWindow({ messages, currentUserId, loading, messagesEndRef }:
                 {!isOwn && (
                   <Link 
                     href={`/profile/${sender?.username || message.sender_id}`}
-                    className="text-xs text-[var(--color-body-text)] mb-1 px-2 hover:text-[var(--color-cream)] transition-colors"
+                    className="text-xs text-muted-foreground mb-1 px-2 hover:text-foreground transition-colors"
                   >
                     {senderName}
                   </Link>
@@ -152,20 +152,20 @@ export function ChatWindow({ messages, currentUserId, loading, messagesEndRef }:
                     <textarea
                       value={editingContent}
                       onChange={(e) => setEditingContent(e.target.value)}
-                      className="w-full px-3 py-2 rounded-xl bg-[var(--color-charcoal-light)] border border-[var(--color-charcoal-lighter-plus)] text-[var(--color-cream)] placeholder-[#9E9A90]/50 focus:outline-none focus:border-[#1B5EA8] focus-visible:ring-2 focus-visible:ring-[#1B5EA8]"
+                      className="w-full px-3 py-2 rounded-[4px] bg-surface border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary focus-visible:ring-2 focus-visible:ring-ring"
                       rows={2}
                       aria-label="Edit message"
                     />
                     <div className="flex gap-2 mt-2">
                       <button
                         onClick={() => handleEditSave(message.id)}
-                        className="text-xs px-3 py-1.5 min-h-[44px] bg-[#6BAF7A] text-black rounded-lg hover:bg-[#6BAF7A]/90 font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1B5EA8]"
+                        className="text-xs px-3 py-1.5 min-h-[44px] bg-primary text-primary-foreground rounded-[4px] hover:bg-primary/90 font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                       >
                         Save
                       </button>
                       <button
                         onClick={handleEditCancel}
-                        className="text-xs px-3 py-1.5 min-h-[44px] bg-[var(--color-charcoal-light)] border border-[var(--color-charcoal-lighter-plus)] text-[var(--color-body-text)] rounded-lg hover:bg-[var(--color-charcoal-lighter)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1B5EA8]"
+                        className="text-xs px-3 py-1.5 min-h-[44px] bg-surface border border-border text-muted-foreground rounded-[4px] hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                       >
                         Cancel
                       </button>
@@ -173,24 +173,24 @@ export function ChatWindow({ messages, currentUserId, loading, messagesEndRef }:
                   </div>
                 ) : (
                   <div
-                    className={`px-4 py-2 rounded-lg transition-all duration-200 ${
+                    className={`px-4 py-2 rounded-[4px] transition-all duration-200 ${
                       isOwn
-                        ? 'bg-[#1B5EA8] text-black shadow-lg shadow-[#1B5EA8]/30'
-                        : 'bg-[var(--color-charcoal-light)] border border-[var(--color-charcoal-lighter-plus)] text-[var(--color-cream)] hover:border-[var(--color-charcoal-lighter-plus)]'
+                        ? 'bg-primary text-primary-foreground'
+                        : 'bg-surface border border-border text-foreground'
                     }`}
                   >
-                    <p className={`text-sm whitespace-pre-wrap break-words ${message.deleted ? 'italic text-[var(--color-body-text)]' : ''}`}>
+                    <p className={`text-sm whitespace-pre-wrap break-words ${message.deleted ? 'italic opacity-70' : ''}`}>
                       {message.content}
                     </p>
                     <div className={`flex items-center gap-1 mt-1 ${isOwn ? 'justify-end' : 'justify-start'}`}>
-                      <p className={`text-xs ${isOwn ? 'text-black/70' : 'text-[var(--color-body-text)]'}`}>
+                      <p className={`text-xs ${isOwn ? 'text-primary-foreground/70' : 'text-muted-foreground'}`}>
                         {new Date(message.created_at!).toLocaleTimeString([], {
                           hour: '2-digit',
                           minute: '2-digit',
                         })}
                       </p>
                       {message.edited_at && (
-                        <span className={`text-xs ${isOwn ? 'text-black/70' : 'text-[var(--color-body-text)]'}`}>
+                        <span className={`text-xs ${isOwn ? 'text-primary-foreground/70' : 'text-muted-foreground'}`}>
                           (edited)
                         </span>
                       )}
@@ -204,19 +204,19 @@ export function ChatWindow({ messages, currentUserId, loading, messagesEndRef }:
                 <div className="relative flex items-center">
                   <button
                     onClick={() => setMenuOpenId(menuOpenId === message.id ? null : message.id || null)}
-                    className="min-w-[44px] min-h-[44px] flex items-center justify-center text-[var(--color-body-text)] hover:text-[var(--color-cream)] hover:bg-[var(--color-charcoal-lighter)] rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1B5EA8]"
+                    className="min-w-[44px] min-h-[44px] flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-surface-2 rounded-[4px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                     aria-label="Message options"
                   >
                     ⋯
                   </button>
                   {menuOpenId === message.id && (
-                    <div className="absolute top-full mt-1 right-0 bg-[var(--color-charcoal-light)] backdrop-blur-sm border border-[var(--color-charcoal-lighter-plus)] rounded-xl shadow-lg z-50 whitespace-nowrap overflow-hidden">
+                    <div className="absolute top-full mt-1 right-0 bg-popover border border-border rounded-[4px] z-50 whitespace-nowrap overflow-hidden">
                       <button
                         onClick={() => {
                           handleEditStart(message);
                           setMenuOpenId(null);
                         }}
-                        className="w-full text-left px-4 py-2 text-sm text-[var(--color-cream)] hover:bg-[var(--color-charcoal-lighter)] flex items-center gap-2 hover:text-[#1B5EA8] transition-colors"
+                        className="w-full text-left px-4 py-2 text-sm text-foreground hover:bg-surface flex items-center gap-2 hover:text-primary transition-colors"
                       >
                         Edit
                       </button>
@@ -225,7 +225,7 @@ export function ChatWindow({ messages, currentUserId, loading, messagesEndRef }:
                           handleDelete(message.id);
                           setMenuOpenId(null);
                         }}
-                        className="w-full text-left px-4 py-2 text-sm text-[var(--color-cream)] hover:bg-[var(--color-charcoal-lighter)] flex items-center gap-2 hover:text-[#E05C3A] transition-colors border-t border-[var(--color-charcoal-lighter-plus)]"
+                        className="w-full text-left px-4 py-2 text-sm text-foreground hover:bg-surface flex items-center gap-2 hover:text-destructive transition-colors border-t border-border"
                       >
                         Delete
                       </button>

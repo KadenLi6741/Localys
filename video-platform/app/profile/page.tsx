@@ -1,26 +1,24 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import type { User } from '@supabase/supabase-js';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
-import { usePathname, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTranslation } from '@/hooks/useTranslation';
-import { signOut } from '@/lib/supabase/auth';
 import { supabase } from '@/lib/supabase/client';
 import { useRouter as useNavRouter } from 'next/navigation';
 import { EditableProfilePicture } from '@/components/EditableProfilePicture';
 import { LanguageSettings } from '@/components/LanguageSettings';
 import { BookmarkedVideos } from '@/components/BookmarkedVideos';
-import { PostedVideos } from '@/components/PostedVideos';
-import { MenuList } from '@/components/MenuList';
+import { VideoFeed } from '@/components/profile/VideoFeed';
+import { ServicesPanel } from '@/components/profile/ServicesPanel';
 import { 
   uploadProfilePicture,
   updateProfile,
-  getUserBusiness,
   updateBusinessInfo,
-  createBusiness,
   ensureUserBusiness,
   Profile,
   Business,
@@ -31,8 +29,8 @@ import {
   BYTES_TO_MB
 } from '@/lib/supabase/profiles';
 import { OrderHistory } from '@/components/OrderHistory';
-import { AnalyticsDashboard } from '@/components/analytics';
-import { FinancialOverview } from '@/components/analytics/FinancialOverview';
+
+type ProfilePanel = 'bookmarked' | 'orders';
 
 const LocationManager = dynamic(
   () => import('@/components/LocationManager'),
@@ -65,8 +63,8 @@ function OrderHistoryCollapsible({ userId, isBusiness }: { userId: string; isBus
         </svg>
       </button>
       <div
-        className="transition-all duration-300 ease-in-out overflow-hidden"
-        style={{ maxHeight: expanded ? '2000px' : '280px' }}
+        className={`transition-all duration-300 ease-in-out ${expanded ? 'overflow-y-auto' : 'overflow-hidden'}`}
+        style={{ maxHeight: expanded ? '80vh' : '280px' }}
       >
         <div className="px-6 pb-6">
           <OrderHistory userId={userId} isBusiness={isBusiness} />
@@ -87,11 +85,36 @@ function OrderHistoryCollapsible({ userId, isBusiness }: { userId: string; isBus
   );
 }
 
+function CollapsibleSection({ title, defaultOpen = false, children }: { title: string; defaultOpen?: boolean; children: React.ReactNode }) {
+  const [expanded, setExpanded] = useState(defaultOpen);
+
+  return (
+    <div className="bg-[var(--glass-bg-subtle)] border border-[var(--glass-border)] overflow-hidden transition-all duration-300">
+      <button
+        onClick={() => setExpanded(e => !e)}
+        className="w-full flex items-center justify-between px-6 py-4 hover:bg-[var(--glass-bg)] transition-colors"
+      >
+        <h3 className="text-xl font-semibold text-[#1A1A1A]">{title}</h3>
+        <svg
+          className={`w-5 h-5 text-[#6B6B65] transition-transform duration-300 ${expanded ? 'rotate-180' : ''}`}
+          fill="none" stroke="currentColor" viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+      {expanded && (
+        <div className="px-6 pb-6">
+          {children}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function ProfileContent() {
   const { user, signOut: contextSignOut } = useAuth();
   const { t } = useTranslation();
   const router = useRouter();
-  const pathname = usePathname();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [business, setBusiness] = useState<Business | null>(null);
   const [loading, setLoading] = useState(true);
@@ -123,7 +146,7 @@ function ProfileContent() {
 
       if (error) throw error;
       setProfile(data);
-    } catch (error) {
+    } catch {
       setProfile(null);
     } finally {
       setLoading(false);
@@ -142,7 +165,7 @@ function ProfileContent() {
         }
         setBusiness(data);
       }
-    } catch (error) {
+    } catch {
       setBusiness(null);
     }
   };
@@ -162,6 +185,8 @@ function ProfileContent() {
       </div>
     );
   }
+
+  if (!user) return null;
 
   return (
     <div className="min-h-screen bg-white text-[#1A1A1A] pb-24 lg:pb-8">
@@ -197,7 +222,6 @@ function ProfileContent() {
             onEditClick={() => setIsEditMode(true)}
             onSignOut={handleSignOut}
             onProfileUpdated={loadProfile}
-            pathname={pathname}
           />
         </div>
       )}
@@ -208,11 +232,10 @@ function ProfileContent() {
 interface ProfileViewProps {
   profile: Profile | null;
   business: Business | null;
-  user: any;
+  user: User;
   onEditClick: () => void;
   onSignOut: () => void;
   onProfileUpdated: () => void;
-  pathname: string;
 }
 
 interface FollowingUser {
@@ -223,10 +246,12 @@ interface FollowingUser {
   type?: string | null;
 }
 
-function ProfileView({ profile, business, user, onEditClick, onSignOut, onProfileUpdated, pathname }: ProfileViewProps) {
+function ProfileView({ profile, business, user, onEditClick, onSignOut, onProfileUpdated }: ProfileViewProps) {
   const { t } = useTranslation();
   const navRouter = useNavRouter();
   const [showBusinessHours, setShowBusinessHours] = useState(false);
+  const [activeProfilePanel, setActiveProfilePanel] = useState<ProfilePanel | null>(null);
+  const [activeMediaTab, setActiveMediaTab] = useState<'videos' | 'services'>('videos');
   const [following, setFollowing] = useState<FollowingUser[]>([]);
   const [followingLoading, setFollowingLoading] = useState(true);
 
@@ -235,6 +260,47 @@ function ProfileView({ profile, business, user, onEditClick, onSignOut, onProfil
       loadFollowing();
     }
   }, [user?.id]);
+
+  useEffect(() => {
+    const handleHashChange = () => {
+      if (window.location.hash === '#bookmarked') {
+        setActiveProfilePanel('bookmarked');
+        return;
+      }
+
+      if (window.location.hash === '#orders') {
+        setActiveProfilePanel('orders');
+        return;
+      }
+
+      setActiveProfilePanel(null);
+    };
+
+    window.addEventListener('hashchange', handleHashChange);
+    handleHashChange();
+
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
+
+  useEffect(() => {
+    if (!activeProfilePanel) return;
+
+    const hash = activeProfilePanel === 'bookmarked' ? 'bookmarked' : 'orders';
+    const timeoutId = window.setTimeout(() => {
+      document.getElementById(`profile-panel-${hash}`)?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [activeProfilePanel]);
+
+  useEffect(() => {
+    if (!business) {
+      setActiveMediaTab('videos');
+    }
+  }, [business]);
 
   const loadFollowing = async () => {
     try {
@@ -263,7 +329,7 @@ function ProfileView({ profile, business, user, onEditClick, onSignOut, onProfil
     <>
       <div className="w-full px-4 lg:px-12 py-8">
         {/* Profile Header */}
-        <div className="flex items-center gap-6 mb-8" style={{ animation: 'fadeInUp 0.4s ease-out forwards', opacity: 0 }}>
+        <div className="flex items-start gap-4 sm:gap-6 mb-8" style={{ animation: 'fadeInUp 0.4s ease-out forwards', opacity: 0 }}>
           <EditableProfilePicture
             userId={user.id}
             currentImageUrl={profile?.profile_picture_url}
@@ -273,7 +339,7 @@ function ProfileView({ profile, business, user, onEditClick, onSignOut, onProfil
             onImageUpdated={onProfileUpdated}
             className="w-24 h-24"
           />
-          <div className="flex-1">
+          <div className="flex-1 min-w-0">
             <h2 className="text-2xl font-bold mb-2">{profile?.full_name || <span className="text-[#9E9A90] italic">No name set</span>}</h2>
             <p className="text-[var(--text-tertiary)] mb-2">@{profile?.username || <span className="italic">no username</span>}</p>
             {profile?.bio && (
@@ -349,56 +415,80 @@ function ProfileView({ profile, business, user, onEditClick, onSignOut, onProfil
           </div>
         )}
 
-        {/* Analytics Dashboard Section */}
-        <div style={{ animation: 'fadeInUp 0.4s ease-out 0.2s forwards', opacity: 0 }}>
-          <AnalyticsDashboard userId={user.id} />
-        </div>
-
-        {/* Financial Overview Section (business only) */}
-        {business && (
-          <div style={{ animation: 'fadeInUp 0.4s ease-out 0.22s forwards', opacity: 0 }}>
-            <FinancialOverview userId={user.id} />
+        {/* Profile menu panels */}
+        {activeProfilePanel === 'bookmarked' && (
+          <div id="profile-panel-bookmarked" className="scroll-mt-24 mb-8" style={{ animation: 'fadeInUp 0.4s ease-out 0.22s forwards', opacity: 0 }}>
+            <CollapsibleSection title={t('profile.bookmarked')} defaultOpen>
+              <BookmarkedVideos userId={user.id} />
+            </CollapsibleSection>
           </div>
         )}
 
-        {/* Services Section (business only) */}
-        {business && (
-          <div className="mb-8" style={{ animation: 'fadeInUp 0.4s ease-out 0.25s forwards', opacity: 0 }}>
-            <h3 className="entrance-slide text-xl font-semibold mb-4" style={{ animation: 'slideInLeft 0.4s ease-out 0.25s forwards', opacity: 0 }}>Services</h3>
-            <div className="bg-[var(--glass-bg-subtle)] border border-[var(--glass-border)] rounded-lg p-6">
-              <MenuList userId={user.id} businessId={business?.id} businessName={business?.business_name || undefined} isOwnProfile={true} />
-            </div>
+        {activeProfilePanel === 'orders' && (
+          <div id="profile-panel-orders" className="scroll-mt-24 mb-8" style={{ animation: 'fadeInUp 0.4s ease-out 0.22s forwards', opacity: 0 }}>
+            <OrderHistoryCollapsible userId={user.id} isBusiness={!!business} />
           </div>
         )}
 
-        {/* Posted Videos Section */}
+        {/* Media Layout: videos + services */}
         <div className="mb-8" style={{ animation: 'fadeInUp 0.4s ease-out 0.3s forwards', opacity: 0 }}>
-          <h3 className="entrance-slide text-xl font-semibold mb-4" style={{ animation: 'slideInLeft 0.4s ease-out 0.3s forwards', opacity: 0 }}>{t('profile.videos')}</h3>
-          <div className="bg-[var(--glass-bg-subtle)] border border-[var(--glass-border)] rounded-lg p-6">
-            <PostedVideos userId={user.id} isOwnProfile={true} />
-          </div>
-        </div>
+          {business && (
+            <div className="mb-5 w-full">
+              <div className="relative w-full border-b border-[var(--glass-border)]">
+                <div className="grid grid-cols-2 w-full">
+                  <button
+                    onClick={() => setActiveMediaTab('videos')}
+                    className={`py-3 text-base font-semibold text-center transition-colors ${
+                      activeMediaTab === 'videos'
+                        ? 'text-[#1A1A1A]'
+                        : 'text-[#6B6B65] hover:text-[#1A1A1A]'
+                    }`}
+                  >
+                    Videos
+                  </button>
+                  <button
+                    onClick={() => setActiveMediaTab('services')}
+                    className={`py-3 text-base font-semibold text-center transition-colors ${
+                      activeMediaTab === 'services'
+                        ? 'text-[#1A1A1A]'
+                        : 'text-[#6B6B65] hover:text-[#1A1A1A]'
+                    }`}
+                  >
+                    Services
+                  </button>
+                </div>
+                <span
+                  className="absolute bottom-0 left-0 h-[2px] w-1/2 bg-[#1A1A1A] transition-transform duration-300 ease-out"
+                  style={{
+                    transform: activeMediaTab === 'videos' ? 'translateX(0%)' : 'translateX(100%)',
+                  }}
+                />
+              </div>
+            </div>
+          )}
 
-        {/* Bookmarked Videos Section */}
-        <div className="mb-8" style={{ animation: 'fadeInUp 0.4s ease-out 0.35s forwards', opacity: 0 }}>
-          <h3 className="entrance-slide text-xl font-semibold mb-4" style={{ animation: 'slideInLeft 0.4s ease-out 0.35s forwards', opacity: 0 }}>{t('profile.bookmarked')}</h3>
-          <div className="bg-[var(--glass-bg-subtle)] border border-[var(--glass-border)] rounded-lg p-6">
-            <BookmarkedVideos userId={user.id} />
+          <div className="transition-opacity duration-200">
+            {!business || activeMediaTab === 'videos' ? (
+              <VideoFeed
+                userId={user.id}
+                isOwnProfile={true}
+                title={t('profile.videos')}
+              />
+            ) : (
+              <ServicesPanel
+                userId={user.id}
+                businessId={business.id}
+                businessName={business.business_name || undefined}
+                isOwnProfile={true}
+              />
+            )}
           </div>
-        </div>
-
-        {/* Orders History Section — Collapsible */}
-        <div className="mb-8" style={{ animation: 'fadeInUp 0.4s ease-out 0.4s forwards', opacity: 0 }}>
-          <OrderHistoryCollapsible userId={user.id} isBusiness={!!business} />
         </div>
 
         {/* Following Preview Section */}
         <div className="mb-8" style={{ animation: 'fadeInUp 0.4s ease-out 0.42s forwards', opacity: 0 }}>
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-xl font-semibold">Following</h3>
-            {following.length > 0 && (
-              <Link href="/search" className="text-[#1A1A1A] text-sm hover:underline">View All</Link>
-            )}
           </div>
           {followingLoading ? (
             <div className="flex gap-4">
@@ -463,7 +553,7 @@ function ProfileView({ profile, business, user, onEditClick, onSignOut, onProfil
 interface ProfileEditFormProps {
   profile: Profile | null;
   business: Business | null;
-  user: any;
+  user: User;
   onSave: () => void;
   onCancel: () => void;
 }
@@ -614,8 +704,8 @@ function ProfileEditForm({ profile, business, user, onSave, onCancel }: ProfileE
       setTimeout(() => {
         onSave();
       }, 1000);
-    } catch (err: any) {
-      setError(err.message || 'Failed to update profile');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to update profile');
     } finally {
       setLoading(false);
     }

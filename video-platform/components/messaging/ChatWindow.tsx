@@ -1,5 +1,7 @@
 'use client';
 
+import { TrustMetricsBadge } from '@/components/TrustMetricsBadge';
+
 /**
  * ChatWindow Component
  * 
@@ -335,6 +337,9 @@ export default function ChatWindow({ conversationId, onBack }: ChatWindowProps) 
               </h1>
               {conversation?.other_user?.username && (
                 <p className="text-sm text-gray-400">@{conversation.other_user.username}</p>
+              )}
+              {conversation?.other_user?.id && (
+                <TrustMetricsBadge userId={conversation.other_user.id} compact />
               )}
             </div>
           </div>

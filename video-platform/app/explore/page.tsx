@@ -5,22 +5,46 @@ import Image from 'next/image';
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase/client';
-import { ShoutoutCard, type Shoutout, type ShoutoutComment } from '@/components/explore/ShoutoutCard';
+import { type Shoutout } from '@/components/explore/ShoutoutCard';
 import { CreateShoutoutModal } from '@/components/explore/CreateShoutoutModal';
 import { haversineDistance } from '@/lib/utils/geo';
 import { Toast } from '@/components/Toast';
+import {
+  ArrowBigUp,
+  ArrowBigDown,
+  MessageSquare,
+  Share2,
+  Bookmark,
+  MoreHorizontal,
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 const TAGS = [
   { id: 'hidden-gem', label: 'Hidden Gem' },
   { id: 'cheap-eats', label: 'Cheap Eats' },
 ];
 
-const TIME_FILTERS = [
-  { id: 'latest', label: 'Latest' },
-  { id: 'month', label: 'This Month' },
+/** Reddit-style sort tabs. */
+const SORT_TABS = ['Best', 'Hot', 'New', 'Top', 'Rising'] as const;
+type SortMode = (typeof SORT_TABS)[number];
+
+/** Timeframes for the Top sort (maps to the server-side time filter). */
+const TOP_TIMEFRAMES = [
+  { id: 'latest', label: 'All time' },
+  { id: 'month', label: 'This month' },
+  { id: 'week', label: 'This week' },
 ];
 
-const PAGE_SIZE = 4;
+const PAGE_SIZE = 10;
+
+function timeAgo(dateStr: string): string {
+  const diff = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
+  if (diff < 60) return 'just now';
+  if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+  if (diff < 604800) return `${Math.floor(diff / 86400)}d ago`;
+  return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
 
 export default function ExplorePage() {
   const { user } = useAuth();
@@ -34,26 +58,28 @@ export default function ExplorePage() {
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(0);
 
-  // Filters
+  // Filters / sorting
+  const [sortMode, setSortMode] = useState<SortMode>('Best');
   const [timeFilter, setTimeFilter] = useState('latest');
   const [tagFilter, setTagFilter] = useState<string | null>(null);
   const [quickTag, setQuickTag] = useState<string | null>(null);
 
-  // Comments cache
-  const [commentsByShoutout, setCommentsByShoutout] = useState<Record<string, ShoutoutComment[]>>({});
-  const [loadingComments, setLoadingComments] = useState<Record<string, boolean>>({});
+  // Per-post local UI state (downvotes and saves are visual-only for now)
+  const [downvoted, setDownvoted] = useState<Record<string, boolean>>({});
+  const [saved, setSaved] = useState<Record<string, boolean>>({});
+  const [menuOpenFor, setMenuOpenFor] = useState<string | null>(null);
 
   // User profile for avatar
   const [userProfile, setUserProfile] = useState<{ profile_picture_url: string | null; username: string } | null>(null);
 
   // Distance filter
-  const [distanceFilter, setDistanceFilter] = useState<number | null>(null);
+  const [distanceFilter] = useState<number | null>(null);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
-  const [businessLocations, setBusinessLocations] = useState<Record<string, { latitude: number; longitude: number }>>({}); 
+  const [businessLocations, setBusinessLocations] = useState<Record<string, { latitude: number; longitude: number }>>({});
   const [toastMessage, setToastMessage] = useState('');
 
   useEffect(() => {
-    if (!user) { setUserProfile(null); return; }
+    if (!user) return;
     supabase
       .from('profiles')
       .select('profile_picture_url, username')
@@ -105,6 +131,31 @@ export default function ExplorePage() {
       return haversineDistance(userLocation.lat, userLocation.lng, loc.latitude, loc.longitude) <= distanceFilter;
     });
   }, [shoutouts, distanceFilter, userLocation, businessLocations]);
+
+  // Client-side ranking for the Reddit-style sort tabs. Ages are measured
+  // relative to the newest post (pure — no clock reads during render).
+  const sortedShoutouts = useMemo(() => {
+    const list = [...filteredShoutouts];
+    const newest = list.reduce((max, s) => Math.max(max, +new Date(s.created_at)), 0);
+    const ageHours = (s: Shoutout) => (newest - new Date(s.created_at).getTime()) / 36e5;
+    switch (sortMode) {
+      case 'New':
+        return list.sort((a, b) => +new Date(b.created_at) - +new Date(a.created_at));
+      case 'Top':
+        return list.sort((a, b) => b.likes - a.likes);
+      case 'Hot':
+        return list.sort(
+          (a, b) => b.likes / Math.pow(ageHours(b) + 2, 1.5) - a.likes / Math.pow(ageHours(a) + 2, 1.5)
+        );
+      case 'Rising':
+        return list.sort((a, b) => b.likes / (ageHours(b) + 1) - a.likes / (ageHours(a) + 1));
+      case 'Best':
+      default:
+        return list.sort(
+          (a, b) => b.likes * 2 + b.comment_count * 3 - (a.likes * 2 + a.comment_count * 3)
+        );
+    }
+  }, [filteredShoutouts, sortMode]);
 
   const getTimeRange = useCallback(() => {
     const now = new Date();
@@ -188,19 +239,20 @@ export default function ExplorePage() {
     setLoading(false);
   }, [user, getTimeRange, tagFilter, quickTag]);
 
-  // Reload when filters change
+  // Reload when filters change; pagination resets once the new query lands.
   useEffect(() => {
-    setPage(0);
-    fetchShoutouts(0, true);
+    let stale = false;
+    Promise.resolve()
+      .then(() => (stale ? undefined : fetchShoutouts(0, true)))
+      .then(() => {
+        if (!stale) setPage(0);
+      });
+    return () => {
+      stale = true;
+    };
   }, [fetchShoutouts]);
 
-  const loadMore = () => {
-    const nextPage = page + 1;
-    setPage(nextPage);
-    fetchShoutouts(nextPage);
-  };
-
-  // Like a shoutout
+  // Like a shoutout (powers the upvote arrow)
   const handleLike = async (shoutoutId: string) => {
     if (!user) return;
     const existing = shoutouts.find((s) => s.id === shoutoutId);
@@ -221,102 +273,24 @@ export default function ExplorePage() {
     );
   };
 
-  // Load comments for a shoutout
-  const handleLoadComments = async (shoutoutId: string) => {
-    setLoadingComments((prev) => ({ ...prev, [shoutoutId]: true }));
-    const { data } = await supabase
-      .from('shoutout_comments')
-      .select(`
-        id, user_id, shoutout_id, parent_comment_id, text, created_at,
-        profiles!shoutout_comments_user_id_fkey(username, profile_picture_url),
-        shoutout_comment_likes(user_id)
-      `)
-      .eq('shoutout_id', shoutoutId)
-      .order('created_at', { ascending: true });
-
-    const mapped: ShoutoutComment[] = (data || []).map((c: Record<string, unknown>) => {
-      const profile = c.profiles as { username: string; profile_picture_url: string | null } | null;
-      const likes = (c.shoutout_comment_likes as { user_id: string }[]) || [];
-      return {
-        id: c.id as string,
-        user_id: c.user_id as string,
-        username: profile?.username || 'Unknown',
-        profile_picture_url: profile?.profile_picture_url || null,
-        text: c.text as string,
-        created_at: c.created_at as string,
-        parent_comment_id: c.parent_comment_id as string | null,
-        likes: likes.length,
-        liked_by_me: user ? likes.some((l) => l.user_id === user.id) : false,
-      };
-    });
-
-    setCommentsByShoutout((prev) => ({ ...prev, [shoutoutId]: mapped }));
-    setLoadingComments((prev) => ({ ...prev, [shoutoutId]: false }));
+  const handleUpvote = (shoutoutId: string) => {
+    setDownvoted((prev) => ({ ...prev, [shoutoutId]: false }));
+    handleLike(shoutoutId);
   };
 
-  // Submit a comment
-  const handleSubmitComment = async (shoutoutId: string, text: string, parentId?: string) => {
-    if (!user) return;
-    const { data } = await supabase
-      .from('shoutout_comments')
-      .insert({
-        user_id: user.id,
-        shoutout_id: shoutoutId,
-        parent_comment_id: parentId || null,
-        text,
-      })
-      .select('id, created_at')
-      .single();
-
-    if (data) {
-      const newComment: ShoutoutComment = {
-        id: data.id,
-        user_id: user.id,
-        username: userProfile?.username || 'You',
-        profile_picture_url: userProfile?.profile_picture_url || null,
-        text,
-        created_at: data.created_at,
-        parent_comment_id: parentId || null,
-        likes: 0,
-        liked_by_me: false,
-      };
-      setCommentsByShoutout((prev) => ({
-        ...prev,
-        [shoutoutId]: [...(prev[shoutoutId] || []), newComment],
-      }));
-      setShoutouts((prev) =>
-        prev.map((s) => s.id === shoutoutId ? { ...s, comment_count: s.comment_count + 1 } : s)
-      );
-    }
+  const handleDownvote = (shoutoutId: string) => {
+    const post = shoutouts.find((s) => s.id === shoutoutId);
+    if (post?.liked_by_me) handleLike(shoutoutId); // remove the upvote first
+    setDownvoted((prev) => ({ ...prev, [shoutoutId]: !prev[shoutoutId] }));
   };
 
-  // Like a comment
-  const handleLikeComment = async (commentId: string) => {
-    if (!user) return;
-    // Find which shoutout this comment belongs to
-    let shoutoutId = '';
-    for (const [sid, comments] of Object.entries(commentsByShoutout)) {
-      if (comments.some((c) => c.id === commentId)) { shoutoutId = sid; break; }
+  const handleShare = async (shoutoutId: string) => {
+    try {
+      await navigator.clipboard.writeText(`${window.location.origin}/explore/${shoutoutId}`);
+      setToastMessage('Link copied to clipboard');
+    } catch {
+      // Silently fail
     }
-    if (!shoutoutId) return;
-
-    const comment = commentsByShoutout[shoutoutId]?.find((c) => c.id === commentId);
-    if (!comment) return;
-
-    if (comment.liked_by_me) {
-      await supabase.from('shoutout_comment_likes').delete().eq('user_id', user.id).eq('comment_id', commentId);
-    } else {
-      await supabase.from('shoutout_comment_likes').insert({ user_id: user.id, comment_id: commentId });
-    }
-
-    setCommentsByShoutout((prev) => ({
-      ...prev,
-      [shoutoutId]: prev[shoutoutId].map((c) =>
-        c.id === commentId
-          ? { ...c, liked_by_me: !c.liked_by_me, likes: c.liked_by_me ? c.likes - 1 : c.likes + 1 }
-          : c
-      ),
-    }));
   };
 
   // Submit a shoutout
@@ -493,38 +467,53 @@ export default function ExplorePage() {
   };
 
   return (
-    <div className="min-h-screen bg-white pb-24 lg:pb-8">
-      <div className="max-w-5xl mx-auto px-4 lg:px-8 pt-8">
+    <div className="min-h-screen bg-background pb-24 lg:pb-12">
+      <div className="mx-auto max-w-3xl px-4 pt-6 lg:px-6">
 
         {/* ===== HEADER ===== */}
-        <div className="mb-8" style={{ animation: 'fadeInUp 0.3s ease-out' }}>
-          <div className="flex items-center justify-between mb-6">
-            <h1 className="text-4xl font-light text-[#1A1A1A]" style={{ fontFamily: 'Cormorant Garamond, serif' }}>Blogs</h1>
-            <button
-              onClick={() => setShowModal(true)}
-              className="px-5 py-2.5 bg-[#1A1A1A] text-white text-sm font-semibold hover:bg-[#1A1A1A]/90 transition-all active:scale-[0.98]"
-            >
-              Write a Shoutout
-            </button>
-          </div>
-          <p className="text-sm text-[#6B6B65]">Discover and shoutout amazing local businesses</p>
+        <div className="mb-4 flex items-center justify-between">
+          <h1 className="text-heading-sm font-bold text-foreground">Explore</h1>
+          <button
+            onClick={() => setShowModal(true)}
+            className="rounded-[4px] bg-primary px-4 py-2 text-body-sm font-bold text-primary-foreground transition-colors hover:bg-primary/90 active:scale-[0.98]"
+          >
+            Create Post
+          </button>
         </div>
 
-        {/* ===== FILTERS ===== */}
-        <div className="flex gap-2 mb-8" style={{ animation: 'fadeInUp 0.3s ease-out 0.1s both' }}>
-          {TIME_FILTERS.map((f) => (
+        {/* ===== SORT TABS (Reddit pattern) ===== */}
+        <div className="mb-2 flex items-center gap-1 border-b border-border pb-2">
+          {SORT_TABS.map((tab) => (
             <button
-              key={f.id}
-              onClick={() => { setTimeFilter(f.id); setTagFilter(null); setQuickTag(null); }}
-              className={`flex-1 text-center px-3 py-1.5 text-xs font-semibold transition-all duration-200 ${
-                timeFilter === f.id && !tagFilter
-                  ? 'bg-[#1A1A1A] text-white'
-                  : 'bg-white text-[#6B6B65] hover:text-[#1A1A1A] border border-[#E8E8E4]'
-              }`}
+              key={tab}
+              onClick={() => setSortMode(tab)}
+              className={cn(
+                'rounded-full px-3.5 py-1.5 text-body-sm font-semibold transition-colors',
+                sortMode === tab
+                  ? 'bg-surface text-primary'
+                  : 'text-muted-foreground hover:bg-surface hover:text-foreground'
+              )}
+              aria-pressed={sortMode === tab}
             >
-              {f.label}
+              {tab}
             </button>
           ))}
+          {sortMode === 'Top' && (
+            <select
+              value={timeFilter}
+              onChange={(e) => setTimeFilter(e.target.value)}
+              className="ml-1 rounded-[4px] border border-border bg-surface px-2 py-1.5 text-caption font-semibold text-foreground focus:outline-none focus:border-primary"
+              aria-label="Top timeframe"
+            >
+              {TOP_TIMEFRAMES.map((t) => (
+                <option key={t.id} value={t.id}>{t.label}</option>
+              ))}
+            </select>
+          )}
+        </div>
+
+        {/* ===== TAG FILTERS ===== */}
+        <div className="mb-4 flex gap-2">
           {TAGS.map((tag) => (
             <button
               key={tag.id}
@@ -532,132 +521,203 @@ export default function ExplorePage() {
                 setTagFilter(tagFilter === tag.id ? null : tag.id);
                 setQuickTag(null);
               }}
-              className={`flex-1 text-center px-3 py-1.5 text-xs font-semibold transition-all duration-200 ${
+              className={cn(
+                'rounded-[4px] border px-3 py-1 text-caption font-semibold transition-colors',
                 tagFilter === tag.id
-                  ? 'bg-[#1A1A1A] text-white'
-                  : 'bg-white text-[#6B6B65] hover:text-[#1A1A1A] border border-[#E8E8E4]'
-              }`}
+                  ? 'border-primary bg-primary text-primary-foreground'
+                  : 'border-border text-muted-foreground hover:bg-surface hover:text-foreground'
+              )}
             >
-              {tag.label}
+              #{tag.label.replace(' ', '')}
             </button>
           ))}
         </div>
 
-        {/* ===== BLOG GRID ===== */}
+        {/* ===== POST FEED ===== */}
         {loading && shoutouts.length === 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="animate-pulse">
-                <div className="aspect-[4/3] bg-[#F8F8F6] mb-3" />
-                <div className="h-2 w-16 bg-[#F8F8F6] rounded mb-2" />
-                <div className="h-3 w-3/4 bg-[#F8F8F6] rounded mb-2" />
-                <div className="h-2 w-full bg-[#F8F8F6] rounded" />
+          <div className="flex flex-col gap-3">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="animate-pulse rounded-[4px] border border-border bg-card p-4">
+                <div className="mb-2 h-3 w-40 rounded-[4px] bg-surface" />
+                <div className="mb-2 h-5 w-3/4 rounded-[4px] bg-surface" />
+                <div className="h-3 w-full rounded-[4px] bg-surface" />
               </div>
             ))}
           </div>
-        ) : filteredShoutouts.length === 0 ? (
-          <div className="text-center py-16" style={{ animation: 'fadeInUp 0.4s ease-out' }}>
-            <p className="text-[#1A1A1A] font-semibold mb-2">No posts yet</p>
-            <p className="text-sm text-[#6B6B65] mb-4">Be the first to shoutout an amazing local business!</p>
+        ) : sortedShoutouts.length === 0 ? (
+          <div className="rounded-[4px] border border-border bg-card py-16 text-center">
+            <p className="mb-2 font-semibold text-foreground">No posts yet</p>
+            <p className="mb-4 text-body-sm text-muted-foreground">Be the first to shoutout an amazing local business!</p>
             <button
               onClick={() => setShowModal(true)}
-              className="px-6 py-2.5 bg-[#1A1A1A] text-white font-semibold hover:bg-[#1A1A1A]/90 transition-all active:scale-[0.98]"
+              className="rounded-[4px] bg-primary px-6 py-2.5 font-bold text-primary-foreground transition-colors hover:bg-primary/90 active:scale-[0.98]"
             >
-              Create First Shoutout
+              Create First Post
             </button>
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {filteredShoutouts.map((shoutout, i) => {
+            <div className="flex flex-col gap-3">
+              {sortedShoutouts.map((shoutout) => {
                 const photoUrl = shoutout.photos?.[0] || null;
-                const dateStr = new Date(shoutout.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-                const excerpt = shoutout.text.length > 100 ? shoutout.text.slice(0, 100) + '...' : shoutout.text;
                 const isAuthor = user?.id === shoutout.user_id;
+                const isDown = !!downvoted[shoutout.id];
+                const isSaved = !!saved[shoutout.id];
+                const score = shoutout.likes - (isDown ? 1 : 0);
+                const community = shoutout.tags[0] ? `b/${shoutout.tags[0].replace(/-/g, '')}` : 'b/local';
 
                 return (
                   <article
                     key={shoutout.id}
-                    className="group relative"
-                    style={{ animation: `fadeInUp 0.3s ease-out ${0.05 * i}s both` }}
+                    className="flex overflow-hidden rounded-[4px] border border-border bg-card transition-colors hover:border-primary/40"
                   >
-                    <Link href={`/explore/${shoutout.id}`} className="block cursor-pointer">
-                    {/* 4:3 Photo */}
-                    <div className="relative aspect-[4/3] bg-[#F8F8F6] overflow-hidden mb-3">
-                      {photoUrl ? (
-                        <Image
-                          src={photoUrl}
-                          alt={shoutout.business_name}
-                          fill
-                          className="object-cover group-hover:scale-105 transition-transform duration-300"
-                          unoptimized
-                        />
-                      ) : shoutout.video_url ? (
-                        <video src={shoutout.video_url} className="w-full h-full object-cover" muted />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center">
-                          <svg className="w-10 h-10 text-[#E8E8E4]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
-                          </svg>
-                        </div>
-                      )}
-                      {/* Tags overlay */}
-                      {shoutout.tags.length > 0 && (
-                        <div className="absolute bottom-2 left-2 flex gap-1">
-                          {shoutout.tags.slice(0, 2).map((tag) => (
-                            <span key={tag} className="bg-white/90 backdrop-blur-sm text-[10px] font-semibold text-[#1A1A1A] px-2 py-0.5">
-                              #{tag}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Date */}
-                    <p className="text-[11px] text-[#9E9A90] uppercase tracking-wider mb-1">{dateStr}</p>
-
-                    {/* Title (business name) */}
-                    <h3
-                      className="text-lg font-light text-[#1A1A1A] mb-1 group-hover:text-[#1B5EA8] transition-colors"
-                      style={{ fontFamily: 'Cormorant Garamond, serif' }}
-                    >
-                      {shoutout.business_name}
-                    </h3>
-
-                    {/* Excerpt */}
-                    <p className="text-xs text-[#6B6B65] leading-relaxed">{excerpt}</p>
-
-                    {/* Author */}
-                    <div className="flex items-center gap-2 mt-2 text-[10px] text-[#9E9A90]">
-                      <span>By @{shoutout.username}</span>
-                    </div>
-                    </Link>
-
-                    {/* Delete button — author only */}
-                    {isAuthor && (
+                    {/* Vote column */}
+                    <div className="flex w-11 shrink-0 flex-col items-center gap-0.5 bg-surface/50 py-3">
                       <button
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          if (confirm('Delete this blog post?')) {
-                            handleDeleteShoutout(shoutout.id);
-                          }
-                        }}
-                        className="absolute top-2 right-2 z-10 w-7 h-7 flex items-center justify-center bg-white/80 backdrop-blur-sm text-[#E05C3A] hover:bg-white hover:text-[#E05C3A]/80 transition-colors opacity-0 group-hover:opacity-100"
-                        aria-label="Delete post"
+                        type="button"
+                        onClick={() => handleUpvote(shoutout.id)}
+                        className={cn(
+                          'rounded-[4px] p-0.5 transition-colors hover:bg-surface',
+                          shoutout.liked_by_me ? 'text-primary' : 'text-muted-foreground hover:text-primary'
+                        )}
+                        aria-label="Upvote"
+                        aria-pressed={shoutout.liked_by_me}
                       >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
+                        <ArrowBigUp className={cn('h-6 w-6', shoutout.liked_by_me && 'fill-primary')} />
                       </button>
-                    )}
+                      <span
+                        className={cn(
+                          'text-caption font-bold tabular-nums',
+                          shoutout.liked_by_me ? 'text-primary' : isDown ? 'text-primary' : 'text-foreground'
+                        )}
+                      >
+                        {score}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => handleDownvote(shoutout.id)}
+                        className={cn(
+                          'rounded-[4px] p-0.5 transition-colors hover:bg-surface',
+                          isDown ? 'text-primary' : 'text-muted-foreground hover:text-primary'
+                        )}
+                        aria-label="Downvote"
+                        aria-pressed={isDown}
+                      >
+                        <ArrowBigDown className={cn('h-6 w-6', isDown && 'fill-primary')} />
+                      </button>
+                    </div>
+
+                    {/* Post body */}
+                    <div className="min-w-0 flex-1 p-3">
+                      {/* Meta row */}
+                      <div className="mb-1.5 flex items-center gap-1.5 text-caption text-muted-foreground">
+                        <span className="font-bold text-foreground">{community}</span>
+                        <span>·</span>
+                        <Link href={`/profile/${shoutout.user_id}`} className="hover:underline">
+                          Posted by u/{shoutout.username}
+                        </Link>
+                        <span>·</span>
+                        <span>{timeAgo(shoutout.created_at)}</span>
+                        {shoutout.star_rating ? (
+                          <>
+                            <span>·</span>
+                            <span className="text-warning">{'★'.repeat(shoutout.star_rating)}</span>
+                          </>
+                        ) : null}
+
+                        {/* Author menu */}
+                        {isAuthor && (
+                          <div className="relative ml-auto">
+                            <button
+                              type="button"
+                              onClick={() => setMenuOpenFor(menuOpenFor === shoutout.id ? null : shoutout.id)}
+                              className="rounded-full p-1 text-muted-foreground transition-colors hover:bg-surface hover:text-foreground"
+                              aria-label="Post options"
+                            >
+                              <MoreHorizontal className="h-4 w-4" />
+                            </button>
+                            {menuOpenFor === shoutout.id && (
+                              <div className="absolute right-0 top-full z-20 mt-1 w-32 overflow-hidden rounded-[4px] border border-border bg-popover">
+                                <button
+                                  onClick={() => { setMenuOpenFor(null); handleEditShoutout(shoutout); }}
+                                  className="w-full px-3 py-2 text-left text-body-sm text-foreground transition-colors hover:bg-surface"
+                                >
+                                  Edit
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    setMenuOpenFor(null);
+                                    if (confirm('Delete this post?')) handleDeleteShoutout(shoutout.id);
+                                  }}
+                                  className="w-full px-3 py-2 text-left text-body-sm text-destructive transition-colors hover:bg-surface"
+                                >
+                                  Delete
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Title + preview → detail page */}
+                      <Link href={`/explore/${shoutout.id}`} className="block">
+                        <h2 className="text-body font-semibold leading-snug text-foreground hover:text-primary">
+                          {shoutout.business_name}
+                        </h2>
+                        <p className="mt-1 line-clamp-3 text-body-sm text-muted-foreground">{shoutout.text}</p>
+                      </Link>
+
+                      {/* Media */}
+                      {photoUrl ? (
+                        <Link href={`/explore/${shoutout.id}`} className="mt-2 block">
+                          <div className="relative aspect-video overflow-hidden rounded-[4px] bg-surface">
+                            <Image src={photoUrl} alt={shoutout.business_name} fill unoptimized className="object-cover" />
+                          </div>
+                        </Link>
+                      ) : shoutout.video_url ? (
+                        <div className="mt-2 overflow-hidden rounded-[4px] bg-black">
+                          <video src={shoutout.video_url} className="max-h-96 w-full object-contain" controls muted playsInline />
+                        </div>
+                      ) : null}
+
+                      {/* Footer actions */}
+                      <div className="mt-2 flex items-center gap-1">
+                        <Link
+                          href={`/explore/${shoutout.id}`}
+                          className="flex items-center gap-1.5 rounded-[4px] px-2 py-1.5 text-caption font-semibold text-muted-foreground transition-colors hover:bg-surface hover:text-foreground"
+                        >
+                          <MessageSquare className="h-4 w-4" aria-hidden="true" />
+                          {shoutout.comment_count} comments
+                        </Link>
+                        <button
+                          type="button"
+                          onClick={() => handleShare(shoutout.id)}
+                          className="flex items-center gap-1.5 rounded-[4px] px-2 py-1.5 text-caption font-semibold text-muted-foreground transition-colors hover:bg-surface hover:text-foreground"
+                        >
+                          <Share2 className="h-4 w-4" aria-hidden="true" />
+                          Share
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setSaved((prev) => ({ ...prev, [shoutout.id]: !prev[shoutout.id] }))}
+                          className={cn(
+                            'flex items-center gap-1.5 rounded-[4px] px-2 py-1.5 text-caption font-semibold transition-colors hover:bg-surface',
+                            isSaved ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
+                          )}
+                          aria-pressed={isSaved}
+                        >
+                          <Bookmark className={cn('h-4 w-4', isSaved && 'fill-primary')} aria-hidden="true" />
+                          {isSaved ? 'Saved' : 'Save'}
+                        </button>
+                      </div>
+                    </div>
                   </article>
                 );
               })}
             </div>
 
             {/* Pagination */}
-            <div className="flex items-center justify-center gap-3 mt-10">
+            <div className="mt-8 flex items-center justify-center gap-3">
               <button
                 onClick={() => {
                   if (page > 0) {
@@ -667,11 +727,11 @@ export default function ExplorePage() {
                   }
                 }}
                 disabled={page === 0}
-                className="px-4 py-2 text-sm font-medium border border-[#E8E8E4] text-[#1A1A1A] hover:bg-[#F8F8F6] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                className="rounded-[4px] border border-border px-4 py-2 text-body-sm font-medium text-foreground transition-colors hover:bg-surface disabled:cursor-not-allowed disabled:opacity-30"
               >
                 Previous
               </button>
-              <span className="text-sm text-[#6B6B65]">Page {page + 1}</span>
+              <span className="text-body-sm text-muted-foreground">Page {page + 1}</span>
               <button
                 onClick={() => {
                   if (hasMore) {
@@ -681,7 +741,7 @@ export default function ExplorePage() {
                   }
                 }}
                 disabled={!hasMore}
-                className="px-4 py-2 text-sm font-medium border border-[#E8E8E4] text-[#1A1A1A] hover:bg-[#F8F8F6] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                className="rounded-[4px] border border-border px-4 py-2 text-body-sm font-medium text-foreground transition-colors hover:bg-surface disabled:cursor-not-allowed disabled:opacity-30"
               >
                 Next
               </button>

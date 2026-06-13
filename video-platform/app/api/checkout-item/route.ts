@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
+import { supabase } from '@/lib/supabase/client';
 
 interface CheckoutItem {
   itemId: string;
@@ -25,7 +26,7 @@ export async function POST(request: NextRequest) {
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
     const body = await request.json();
-    const { items, couponCode } = body as { items: CheckoutItem[]; couponCode?: string };
+    const { items, couponCode, specialRequests, bookingDate, bookingTime, businessId } = body as { items: CheckoutItem[]; couponCode?: string; specialRequests?: string; bookingDate?: string; bookingTime?: string; businessId?: string };
 
     if (!items || !Array.isArray(items) || items.length === 0) {
       return NextResponse.json(
@@ -49,11 +50,6 @@ export async function POST(request: NextRequest) {
 
     // Validate and apply coupon if provided
     if (couponCode) {
-      const { createClient } = await import('@supabase/supabase-js');
-      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://dbqkpcwnzteljwxjoudj.supabase.co';
-      const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable_0KyfCBFYECxfh0NfQ15Flw_P_BMyk89';
-      const supabase = createClient(supabaseUrl, supabaseKey);
-
       const { data: coupon, error: couponError } = await supabase
         .from('coupons')
         .select('*')
@@ -134,8 +130,8 @@ export async function POST(request: NextRequest) {
       payment_method_types: ['card'],
       line_items: lineItems,
       mode: 'payment',
-      success_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://localys.xyz'}/purchase-success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://localys.xyz'}/profile/${firstSellerId}?canceled=true`,
+      success_url: `${process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/purchase-success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/profile/${firstSellerId}?canceled=true`,
       metadata: {
         buyerId,
         sellerId: firstSellerId,
@@ -144,6 +140,10 @@ export async function POST(request: NextRequest) {
           couponCode: appliedCouponCode,
           discountPercentage: discountPercentage.toString(),
         }),
+        ...(specialRequests && { specialRequests: specialRequests.slice(0, 450) }),
+        ...(bookingDate && { bookingDate }),
+        ...(bookingTime && { bookingTime: bookingTime.slice(0, 20) }),
+        ...(businessId && { businessId }),
       },
     });
 

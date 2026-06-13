@@ -1,11 +1,15 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
 import dynamic from 'next/dynamic';
-const PromotionModal = dynamic(() => import('@/components/PromotionModal').then(mod => mod.PromotionModal), { ssr: false });
 import { getUserCoins } from '@/lib/supabase/profiles';
+
+const PromotionModal = dynamic(
+  () => import('@/components/PromotionModal').then((mod) => mod.PromotionModal),
+  { ssr: false }
+);
 
 interface PostedVideo {
   id: string;
@@ -24,22 +28,51 @@ interface PostedVideosProps {
   isOwnProfile?: boolean;
 }
 
+type VideoRow = {
+  id: string;
+  video_url: string;
+  caption: string | null;
+  created_at: string;
+  boost_value: number | null;
+  coins_spent_on_promotion: number | null;
+  view_count: number | null;
+};
+
+type LikeRow = {
+  video_id: string | null;
+};
+
+type CommentRow = {
+  video_id: string | null;
+};
+
+function formatViewCount(value: number) {
+  if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`;
+  if (value >= 1_000) return `${(value / 1_000).toFixed(1)}K`;
+  return `${value}`;
+}
+
+function getDisplayedViews(video: Pick<PostedVideo, 'views' | 'likes'>) {
+  const safeViews = Number.isFinite(video.views) ? Math.max(0, video.views) : 0;
+  const safeLikes = Number.isFinite(video.likes) ? Math.max(0, video.likes) : 0;
+  return safeViews + safeLikes;
+}
+
 export function PostedVideos({ userId, isOwnProfile = true }: PostedVideosProps) {
   const router = useRouter();
   const [videos, setVideos] = useState<PostedVideo[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingVideoId, setDeletingVideoId] = useState<string | null>(null);
   const [promotingVideoId, setPromotingVideoId] = useState<string | null>(null);
+  const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null);
   const [userCoins, setUserCoins] = useState(0);
 
-  useEffect(() => {
-    loadPostedVideos();
-    if (isOwnProfile) {
-      getUserCoins(userId).then(({ data }) => setUserCoins(data ?? 0));
-    }
-  }, [userId, isOwnProfile]);
+  const selectedVideo = useMemo(
+    () => videos.find((video) => video.id === selectedVideoId) ?? null,
+    [videos, selectedVideoId]
+  );
 
-  const loadPostedVideos = async () => {
+  const loadPostedVideos = useCallback(async () => {
     try {
       setLoading(true);
 
@@ -50,82 +83,50 @@ export function PostedVideos({ userId, isOwnProfile = true }: PostedVideosProps)
         .order('created_at', { ascending: false });
 
       if (videosError) throw videosError;
-      if (!userVideos || userVideos.length === 0) {
+
+      const typedVideos = (userVideos ?? []) as VideoRow[];
+      if (typedVideos.length === 0) {
         setVideos([]);
         return;
       }
 
-      const { data: allLikes } = await supabase
-        .from('likes')
-        .select('video_id');
+      const videoIds = typedVideos.map((video) => video.id);
 
-      const likesMap: { [key: string]: number } = {};
-      if (allLikes) {
-        allLikes.forEach((like: any) => {
-          if (like.video_id) {
-            likesMap[like.video_id] = (likesMap[like.video_id] || 0) + 1;
-          }
-        });
-      }
-
-      const videoIds = userVideos.map(v => v.id);
-      console.log('PostedVideos - Loading comments for videos:', videoIds.slice(0, 3), '... (' + videoIds.length + ' total)');
-
-      let allComments: any[] = [];
-
-      try {
-        if (videoIds.length > 0) {
-          const { data, error } = await supabase
+      const [{ data: likesRows, error: likesError }, { data: commentsRows, error: commentsError }] =
+        await Promise.all([
+          supabase.from('likes').select('video_id').in('video_id', videoIds),
+          supabase
             .from('comments')
-            .select('id, video_id, content, user_id')
+            .select('video_id')
             .in('video_id', videoIds)
-            .is('parent_comment_id', null);
+            .is('parent_comment_id', null),
+        ]);
 
-          if (error) {
-            console.error('Error with .in() filter on comments:', error);
-          } else if (data && data.length > 0) {
-            console.log('PostedVideos - Got comments with .in() filter:', data.length);
-            allComments = data;
-          } else {
-            console.log('PostedVideos - No comments found with .in() filter');
-          }
-        }
-      } catch (err) {
-        console.error('Exception fetching comments with .in():', err);
+      if (likesError) throw likesError;
+      if (commentsError) throw commentsError;
+
+      const likesMap: Record<string, number> = {};
+      for (const row of (likesRows ?? []) as LikeRow[]) {
+        if (!row.video_id) continue;
+        likesMap[row.video_id] = (likesMap[row.video_id] ?? 0) + 1;
       }
 
-      if (allComments.length === 0 && videoIds.length > 0) {
-        try {
-          console.log('PostedVideos - Trying fallback: fetch all parent comments');
-          const { data, error } = await supabase
-            .from('comments')
-            .select('id, video_id, content, user_id')
-            .is('parent_comment_id', null);
-
-          if (error) {
-            console.error('Error fetching all comments:', error);
-          } else if (data) {
-            allComments = data.filter((c: any) => videoIds.includes(c.video_id));
-            console.log('PostedVideos - Fallback got comments:', allComments.length);
-          }
-        } catch (err) {
-          console.error('Exception fetching all comments:', err);
-        }
+      const commentsMap: Record<string, number> = {};
+      for (const row of (commentsRows ?? []) as CommentRow[]) {
+        if (!row.video_id) continue;
+        commentsMap[row.video_id] = (commentsMap[row.video_id] ?? 0) + 1;
       }
 
-      const commentsMap: { [key: string]: number } = {};
-      allComments.forEach((comment: any) => {
-        if (comment.video_id) {
-          commentsMap[comment.video_id] = (commentsMap[comment.video_id] || 0) + 1;
-        }
-      });
-      console.log('PostedVideos - Final comments map:', commentsMap);
-
-      const videosWithStats = userVideos.map((video: any) => ({
-        ...video,
-        likes: likesMap[video.id] || 0,
-        comments: commentsMap[video.id] || 0,
-        views: video.view_count || 0,
+      const videosWithStats: PostedVideo[] = typedVideos.map((video) => ({
+        id: video.id,
+        video_url: video.video_url,
+        caption: video.caption ?? undefined,
+        created_at: video.created_at,
+        boost_value: video.boost_value ?? undefined,
+        coins_spent_on_promotion: video.coins_spent_on_promotion ?? undefined,
+        likes: likesMap[video.id] ?? 0,
+        comments: commentsMap[video.id] ?? 0,
+        views: video.view_count ?? 0,
       }));
 
       setVideos(videosWithStats);
@@ -135,38 +136,63 @@ export function PostedVideos({ userId, isOwnProfile = true }: PostedVideosProps)
     } finally {
       setLoading(false);
     }
-  };
+  }, [userId]);
 
-  const deleteVideo = async (videoId: string) => {
-    if (!confirm('Are you sure you want to delete this video? This action cannot be undone.')) {
-      return;
-    }
+  useEffect(() => {
+    loadPostedVideos();
+  }, [loadPostedVideos]);
 
-    try {
-      setDeletingVideoId(videoId);
+  useEffect(() => {
+    if (!isOwnProfile) return;
 
-      // Delete from database
-      const { error } = await supabase
-        .from('videos')
-        .delete()
-        .eq('id', videoId);
+    getUserCoins(userId).then(({ data }) => setUserCoins(data ?? 0));
+  }, [isOwnProfile, userId]);
 
-      if (error) throw error;
+  useEffect(() => {
+    if (!selectedVideoId) return;
 
-      // Remove from local state
-      setVideos(videos.filter(v => v.id !== videoId));
-    } catch (error) {
-      console.error('Error deleting video:', error);
-      alert('Failed to delete video. Please try again.');
-    } finally {
-      setDeletingVideoId(null);
-    }
-  };
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setSelectedVideoId(null);
+      }
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [selectedVideoId]);
+
+  const deleteVideo = useCallback(
+    async (videoId: string) => {
+      if (!confirm('Are you sure you want to delete this video? This action cannot be undone.')) {
+        return;
+      }
+
+      try {
+        setDeletingVideoId(videoId);
+
+        const { error } = await supabase
+          .from('videos')
+          .delete()
+          .eq('id', videoId);
+
+        if (error) throw error;
+
+        setVideos((prev) => prev.filter((video) => video.id !== videoId));
+        setSelectedVideoId((prev) => (prev === videoId ? null : prev));
+      } catch (error) {
+        console.error('Error deleting video:', error);
+        alert('Failed to delete video. Please try again.');
+      } finally {
+        setDeletingVideoId(null);
+      }
+    },
+    []
+  );
 
   if (loading) {
     return (
       <div className="flex justify-center items-center py-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white/60"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white/60" />
       </div>
     );
   }
@@ -180,80 +206,127 @@ export function PostedVideos({ userId, isOwnProfile = true }: PostedVideosProps)
   }
 
   return (
-    <div className="space-y-4">
-      {videos.map((video) => (
+    <>
+      <div className="grid grid-cols-3 gap-2 md:gap-3">
+        {videos.map((video) => (
+          <button
+            key={video.id}
+            onClick={() => setSelectedVideoId(video.id)}
+            className="relative aspect-[9/16] overflow-hidden rounded-md bg-black/10 group text-left"
+            aria-label={`Open video ${video.caption || video.id}`}
+          >
+            <video
+              src={video.video_url}
+              className="w-full h-full object-cover transition-transform duration-200 group-hover:scale-[1.03]"
+              preload="metadata"
+              muted
+              playsInline
+            />
+
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+            <div className="pointer-events-none absolute left-2 bottom-2 flex items-center gap-3 text-white">
+              <div className="flex items-center gap-1">
+                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M12 5c5.5 0 9.7 4.1 11 6.9-1.3 2.8-5.5 6.9-11 6.9S2.3 14.7 1 11.9C2.3 9.1 6.5 5 12 5zm0 2.2a4.7 4.7 0 100 9.4 4.7 4.7 0 000-9.4z" />
+                </svg>
+                <span className="text-xs font-semibold">{formatViewCount(getDisplayedViews(video))}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5A4.5 4.5 0 016.5 4c1.74 0 3.41.81 4.5 2.09A5.9 5.9 0 0115.5 4 4.5 4.5 0 0120 8.5c0 3.78-3.4 6.86-8.55 11.54z" />
+                </svg>
+                <span className="text-xs font-semibold">{formatViewCount(video.likes)}</span>
+              </div>
+            </div>
+          </button>
+        ))}
+      </div>
+
+      {selectedVideo && (
         <div
-          key={video.id}
-          className="bg-transparent border border-[var(--glass-border)] rounded-lg overflow-hidden hover:border-[var(--glass-border)] transition-all duration-200"
+          className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4"
+          onClick={() => setSelectedVideoId(null)}
         >
-          <div className="flex gap-4 p-4">
-            {/* Video Thumbnail */}
-            <div
-              className="flex-shrink-0 w-20 h-20 cursor-pointer"
-              onClick={() => router.push(`/?videoId=${video.id}`)}
-            >
-              <video
-                src={video.video_url}
-                className="w-full h-full object-cover rounded"
-              />
-            </div>
-
-            {/* Video Info */}
-            <div className="flex-1 min-w-0">
-              <h4 className="text-sm font-semibold text-[var(--text-primary)] truncate mb-2">
-                {video.caption || 'Untitled Video'}
-              </h4>
-              <p className="text-xs text-[var(--text-tertiary)] mb-3">
-                {new Date(video.created_at).toLocaleDateString()}
+          <div
+            className="w-full max-w-3xl bg-[#0F0F0F] text-white rounded-xl border border-white/10 overflow-hidden"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
+              <p className="text-sm font-medium truncate pr-4">
+                {selectedVideo.caption || 'Video details'}
               </p>
-
-              {/* Stats */}
-              <div className="flex gap-4 text-xs">
-                <div className="flex items-center gap-1 text-[var(--text-secondary)]">
-                  <span>{video.views} views</span>
-                </div>
-                <div className="flex items-center gap-1 text-[var(--text-secondary)]">
-                  <span>{video.likes} likes</span>
-                </div>
-                <div className="flex items-center gap-1 text-[var(--text-secondary)]">
-                  <span>{video.comments} comments</span>
-                </div>
-              </div>
-
-            {/* Boost Info */}
-            {video.boost_value && video.boost_value > 1 && (
-              <div className="mt-2 inline-flex items-center gap-1 bg-yellow-500/20 border border-yellow-500/50 rounded px-2 py-1">
-                <span className="text-xs text-yellow-300">Boosted</span>
-                <span className="text-xs text-yellow-300/70">
-                  (Boost: {video.boost_value.toFixed(1)})
-                </span>
-              </div>
-            )}
+              <button
+                onClick={() => setSelectedVideoId(null)}
+                className="text-white/80 hover:text-white transition-colors"
+                aria-label="Close video details"
+              >
+                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 6l12 12M18 6l-12 12" />
+                </svg>
+              </button>
             </div>
 
-            {/* Actions */}
-            {isOwnProfile && (
-              <div className="flex flex-col justify-center gap-2 ml-2">
-                <button
-                  onClick={() => setPromotingVideoId(video.id)}
-                  className="text-yellow-400 hover:text-yellow-300 transition-colors text-sm font-medium px-3 py-1.5 rounded hover:bg-yellow-500/10"
-                  title="Boost this video"
-                >
-                  Boost
-                </button>
-                <button
-                  onClick={() => deleteVideo(video.id)}
-                  disabled={deletingVideoId === video.id}
-                  className="text-red-400 hover:text-red-300 transition-colors text-sm font-medium px-3 py-1.5 rounded hover:bg-red-500/10 disabled:opacity-50 disabled:cursor-not-allowed"
-                  title="Delete this video"
-                >
-                  {deletingVideoId === video.id ? '...' : 'Delete'}
-                </button>
+            <div className="grid lg:grid-cols-[minmax(0,1fr)_280px]">
+              <div className="bg-black">
+                <video
+                  src={selectedVideo.video_url}
+                  controls
+                  autoPlay
+                  className="w-full h-full max-h-[72vh] object-contain"
+                />
               </div>
-            )}
+
+              <div className="p-4 border-t lg:border-t-0 lg:border-l border-white/10 space-y-4">
+                <div className="space-y-1">
+                  <p className="text-xs uppercase tracking-wide text-white/50">Views</p>
+                  <p className="text-sm font-semibold">{getDisplayedViews(selectedVideo).toLocaleString()}</p>
+                  <p className="text-xs text-white/60">
+                    {new Date(selectedVideo.created_at).toLocaleDateString()}
+                  </p>
+                </div>
+
+                <button
+                  onClick={() => router.push(`/video/${selectedVideo.id}`)}
+                  className="w-full bg-white/10 hover:bg-white/20 text-white text-sm font-medium py-2.5 rounded-lg transition-colors"
+                >
+                  Open Full Video Page
+                </button>
+
+                {isOwnProfile && (
+                  <div className="space-y-2 pt-2 border-t border-white/10">
+                    <p className="text-xs uppercase tracking-wide text-white/50">Owner Controls</p>
+
+                    <button
+                      onClick={() => setPromotingVideoId(selectedVideo.id)}
+                      className="w-full bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-200 text-sm font-medium py-2.5 rounded-lg transition-colors"
+                    >
+                      Boost Video
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        setSelectedVideoId(null);
+                        router.push('/analytics');
+                      }}
+                      className="w-full bg-blue-500/20 hover:bg-blue-500/30 text-blue-200 text-sm font-medium py-2.5 rounded-lg transition-colors"
+                    >
+                      View Analytics
+                    </button>
+
+                    <button
+                      onClick={() => deleteVideo(selectedVideo.id)}
+                      disabled={deletingVideoId === selectedVideo.id}
+                      className="w-full bg-red-500/20 hover:bg-red-500/30 text-red-200 text-sm font-medium py-2.5 rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                    >
+                      {deletingVideoId === selectedVideo.id ? 'Deleting...' : 'Delete Video'}
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </div>
-      ))}
+      )}
 
       {isOwnProfile && (
         <PromotionModal
@@ -263,20 +336,20 @@ export function PostedVideos({ userId, isOwnProfile = true }: PostedVideosProps)
           userCoins={userCoins}
           onSuccess={(newBoost, coinsSpent, remainingCoins) => {
             setUserCoins(remainingCoins);
-            setVideos(prev =>
-              prev.map(v =>
-                v.id === promotingVideoId
+            setVideos((prev) =>
+              prev.map((video) =>
+                video.id === promotingVideoId
                   ? {
-                      ...v,
+                      ...video,
                       boost_value: newBoost,
-                      coins_spent_on_promotion: (v.coins_spent_on_promotion || 0) + coinsSpent,
+                      coins_spent_on_promotion: (video.coins_spent_on_promotion || 0) + coinsSpent,
                     }
-                  : v
+                  : video
               )
             );
           }}
         />
       )}
-    </div>
+    </>
   );
 }

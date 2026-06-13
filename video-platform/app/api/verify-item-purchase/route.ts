@@ -4,12 +4,8 @@ import { createClient } from '@supabase/supabase-js';
 import { generateToken } from '@/lib/verification';
 
 function getSupabaseAdminClient() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-  if (!supabaseUrl || !supabaseKey) {
-    return null;
-  }
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://dbqkpcwnzteljwxjoudj.supabase.co';
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable_0KyfCBFYECxfh0NfQ15Flw_P_BMyk89';
 
   return createClient(supabaseUrl, supabaseKey);
 }
@@ -63,16 +59,40 @@ export async function POST(request: NextRequest) {
     const couponCode = metadata.couponCode || null;
     const discountPercentage = parseInt(metadata.discountPercentage || '0');
 
-    // Handle multi-item format
+    // Handle multi-item format (compact: { id, qty })
     if (metadata.items && metadata.buyerId) {
-      const items = JSON.parse(metadata.items) as { id: string; name: string; sid: string; price: number }[];
+      const items = JSON.parse(metadata.items) as { id: string; qty?: number; name?: string; sid?: string; price?: number }[];
       const buyerId = metadata.buyerId;
+      const sellerId = metadata.sellerId || '';
+
+      // Look up item details from Supabase since compact format only has id/qty
+      const supabase = getSupabaseAdminClient();
+      let menuMap = new Map<string, { item_name: string; price: number; user_id: string }>();
+
+      if (supabase) {
+        const itemIds = items.map(i => i.id);
+        const { data: menuItems } = await supabase
+          .from('menu_items')
+          .select('id, item_name, price, user_id')
+          .in('id', itemIds);
+
+        (menuItems || []).forEach((mi: any) => {
+          menuMap.set(mi.id, mi);
+        });
+      }
 
       const orders = [];
       for (const item of items) {
+        const menuItem = menuMap.get(item.id);
         const result = await processPurchase(
-          item.id, item.sid, buyerId, item.name, item.price,
-          sessionId, couponCode, discountPercentage
+          item.id,
+          item.sid || menuItem?.user_id || sellerId,
+          buyerId,
+          item.name || menuItem?.item_name || 'Unknown Item',
+          item.price ?? menuItem?.price ?? 0,
+          sessionId,
+          couponCode,
+          discountPercentage
         );
         if (result) orders.push(result);
       }
@@ -130,10 +150,6 @@ async function processPurchase(
 ): Promise<{ orderId: string; token: string; itemName: string; price: number } | null> {
   try {
     const supabase = getSupabaseAdminClient();
-    if (!supabase) {
-      console.error('Supabase environment variables are missing; skipping purchase processing');
-      return null;
-    }
 
     // Check if already processed (may have been created by webhook)
     const { data: existing } = await supabase

@@ -6,11 +6,15 @@ import { generateToken } from '@/lib/verification';
 export async function POST(request: NextRequest) {
   const stripeKey = process.env.STRIPE_SECRET_KEY;
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://dbqkpcwnzteljwxjoudj.supabase.co';
   const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-  if (!stripeKey || !webhookSecret || !supabaseUrl || !supabaseKey) {
-    console.error('Missing required Stripe webhook environment variables');
+  if (!stripeKey || !webhookSecret || !supabaseKey) {
+    console.error('Missing required Stripe webhook environment variables:', {
+      hasStripeKey: !!stripeKey,
+      hasWebhookSecret: !!webhookSecret,
+      hasSupabaseKey: !!supabaseKey,
+    });
     return NextResponse.json(
       { error: 'Webhook not configured' },
       { status: 500 }
@@ -121,6 +125,7 @@ export async function POST(request: NextRequest) {
         const buyerId = metadata.buyerId;
         const couponCode = metadata.couponCode || null;
         const discountPercentage = parseInt(metadata.discountPercentage || '0');
+        const specialRequests = metadata.specialRequests || null;
 
         // Check if already processed (deduplication)
         const { data: existingItem } = await supabase
@@ -172,6 +177,7 @@ export async function POST(request: NextRequest) {
               coupon_code: couponCode,
               discount_percentage: discountPercentage,
             }),
+            ...(specialRequests && { special_requests: specialRequests }),
             stripe_session_id: session.id,
             status: 'paid',
             purchased_at: new Date().toISOString(),
@@ -202,12 +208,29 @@ export async function POST(request: NextRequest) {
           }
         }
 
+        // Create booking record if reservation data is present
+        if (metadata.bookingDate && metadata.bookingTime && inserted) {
+          for (const row of inserted) {
+            await supabase.from('bookings').insert({
+              buyer_id: buyerId,
+              seller_id: sellerId,
+              business_id: metadata.businessId || null,
+              item_purchase_id: row.id,
+              booking_date: metadata.bookingDate,
+              booking_time: metadata.bookingTime,
+              stripe_session_id: session.id,
+              status: 'confirmed',
+            });
+          }
+          console.log(`Booking created for ${metadata.bookingDate} at ${metadata.bookingTime}`);
+        }
+
         const itemNames = purchaseRecords.map(r => r.item_name).join(', ');
         console.log(`Item purchases recorded: ${itemNames} bought by ${buyerId}`);
         return NextResponse.json({ success: true });
       } else if (metadata.itemId && metadata.buyerId && metadata.sellerId) {
         // --- ITEM PURCHASE ---
-        const { itemId, sellerId, buyerId, itemName, itemPrice, couponCode, discountPercentage, finalPrice } = metadata;
+        const { itemId, sellerId, buyerId, itemName, itemPrice, couponCode, discountPercentage, finalPrice, specialRequests: singleSpecialRequests } = metadata;
 
         // Check if already processed (deduplication)
         const { data: existingItem } = await supabase
@@ -235,6 +258,7 @@ export async function POST(request: NextRequest) {
             coupon_code: couponCode,
             discount_percentage: parseInt(discountPercentage || '0'),
           }),
+          ...(singleSpecialRequests && { special_requests: singleSpecialRequests }),
           stripe_session_id: session.id,
           status: 'paid',
           purchased_at: new Date().toISOString(),

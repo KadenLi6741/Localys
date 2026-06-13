@@ -1104,19 +1104,19 @@ export function HomeContent({ isActive }: HomeContentProps) {
             </div>
 
             {/* Business Info - Stacked below video */}
-            <div className="flex-shrink-0 px-4 pt-3 pb-3 bg-white dark:bg-[#1A1A18] border-t border-[#E8E8E4]">
+            <div className="flex-shrink-0 px-4 pt-3 pb-3 bg-card border-t border-border">
               <button
                 onClick={() => handleProfileClick(video.user_id, video.profiles?.username)}
                 onKeyDown={(e) => handleKeyDown(e, () => handleProfileClick(video.user_id, video.profiles?.username))}
-                className="text-left focus:outline-none focus:ring-2 focus:ring-[#1A1A1A] focus:ring-offset-2 rounded"
+                className="text-left focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded"
                 aria-label={`View profile of ${feedBusiness?.business_name || video.profiles?.full_name || 'Business'}`}
               >
-                <h2 className="text-2xl font-light text-[#1A1A1A] mb-1 hover:underline" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
+                <h2 className="text-2xl font-semibold text-foreground mb-1 hover:underline">
                   {feedBusiness?.business_name || video.profiles?.full_name || 'Business'}
                 </h2>
               </button>
-              <p className="text-[#6B6B65] text-sm mb-1">{video.caption || ''}</p>
-              <div className="flex items-center gap-4 text-[#6B6B65] text-sm">
+              <p className="text-muted-foreground text-sm mb-1">{video.caption || ''}</p>
+              <div className="flex items-center gap-4 text-muted-foreground text-sm">
                 {feedBusiness?.average_rating && (
                   <>
                     <span>{feedBusiness.average_rating.toFixed(1)}</span>
@@ -1140,9 +1140,9 @@ export function HomeContent({ isActive }: HomeContentProps) {
       </div>
 
       {/* Top Header */}
-      <header className="absolute top-0 left-0 right-0 z-30 border-b border-[#E8E8E4] bg-white/90 backdrop-blur-md">
+      <header className="absolute top-0 left-0 right-0 z-30 border-b border-border bg-card/90 backdrop-blur-md">
         <div className="flex items-center justify-between px-3 py-2 sm:px-4 sm:py-3 md:px-5">
-          <h1 className="text-base sm:text-lg md:text-xl font-light text-[#1A1A1A]" style={{ fontFamily: 'Cormorant Garamond, serif' }}>Localy</h1>
+          <h1 className="text-base sm:text-lg md:text-xl font-bold text-primary">Localys</h1>
 
           <div className="flex items-center gap-2 sm:gap-3">
             {/* Volume Dropdown */}

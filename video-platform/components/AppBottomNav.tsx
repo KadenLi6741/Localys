@@ -2,233 +2,69 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useEffect, useState, useRef } from 'react';
+import { Home, Compass, Upload, MessageCircle, ShoppingCart, type LucideIcon } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
-import { useAuth } from '@/contexts/AuthContext';
-import { useActivity } from '@/contexts/ActivityContext';
 import { useUnreadMessages } from '@/contexts/UnreadMessagesContext';
-import { supabase } from '@/lib/supabase/client';
+import { cn } from '@/lib/utils';
 
+type BottomNavItem = { href: string; label: string; icon: LucideIcon; badge?: 'messages' | 'cart' };
+
+/**
+ * Mobile / tablet bottom navigation (below lg). Mirrors the desktop sidebar's
+ * five primary destinations so the immersive home feed keeps reachable nav
+ * even though it overlays the header. Active destination is orange.
+ */
 export function AppBottomNav() {
   const pathname = usePathname();
   const { getCartCount } = useCart();
-  const { user } = useAuth();
-  const { togglePanel, unreadCount } = useActivity();
   const { unreadMessages } = useUnreadMessages();
   const cartCount = getCartCount();
-  const [isBusiness, setIsBusiness] = useState(false);
-  const [indicatorStyle, setIndicatorStyle] = useState<{ left: string; width: string }>({ left: '0%', width: '0%' });
-  const navRef = useRef<HTMLDivElement>(null);
-  const [pendingOrders, setPendingOrders] = useState(0);
 
-  useEffect(() => {
-    if (!user) {
-      setIsBusiness(false);
-      return;
-    }
+  if (pathname === '/login' || pathname === '/signup' || pathname === '/reset-password') return null;
 
-    const checkBusiness = async () => {
-      const { data } = await supabase
-        .from('profiles')
-        .select('type')
-        .eq('id', user.id)
-        .single();
-      setIsBusiness(!!data?.type);
-    };
+  const isActive = (href: string) => (href === '/' ? pathname === '/' : pathname?.startsWith(href));
 
-    checkBusiness();
-  }, [user]);
-
-  // Fetch pending orders count (business only)
-  useEffect(() => {
-    if (!user || !isBusiness) { setPendingOrders(0); return; }
-    const fetchPending = async () => {
-      const { count } = await supabase
-        .from('item_purchases')
-        .select('id', { count: 'exact', head: true })
-        .eq('seller_id', user.id)
-        .eq('status', 'pending');
-      setPendingOrders(count || 0);
-    };
-    fetchPending();
-    const channel = supabase.channel('bottomnav-orders').on('postgres_changes', { event: '*', schema: 'public', table: 'item_purchases' }, () => fetchPending()).subscribe();
-    return () => { supabase.removeChannel(channel); };
-  }, [user, isBusiness]);
-
-  useEffect(() => {
-    // Calculate indicator position based on active tab
-    if (!navRef.current) return;
-
-    const navItems = navRef.current.querySelectorAll('[data-nav-item]');
-    let activeIndex = 0;
-
-    navItems.forEach((item, index) => {
-      if (item.querySelector('a')?.getAttribute('href') === getActiveHref()) {
-        activeIndex = index;
-      }
-    });
-
-    const totalItems = navItems.length;
-    const itemWidth = 100 / totalItems;
-    const itemLeft = activeIndex * itemWidth;
-
-    setIndicatorStyle({
-      left: `${itemLeft}%`,
-      width: `${itemWidth}%`,
-    });
-  }, [pathname]);
-
-  const getActiveHref = () => {
-    if (pathname === '/') return '/';
-    if (pathname?.startsWith('/search')) return '/search';
-    if (pathname?.startsWith('/explore')) return '/explore';
-    if (pathname?.startsWith('/upload')) return '/upload';
-    if (pathname?.startsWith('/chats')) return '/chats';
-    if (pathname?.startsWith('/cart')) return '/cart';
-    if (pathname?.startsWith('/dashboard')) return '/dashboard';
-    if (pathname?.startsWith('/profile')) return '/profile';
-    return null;
-  };
-
-  if (pathname === '/login' || pathname === '/signup' || pathname === '/reset-password') {
-    return null;
-  }
-
-  const isActive = (href: string) => {
-    if (href === '/') {
-      return pathname === '/';
-    }
-
-    return pathname?.startsWith(href);
-  };
-
-  // Define nav items exactly once
-  const navItems = [
-    {
-      href: '/',
-      label: 'Home',
-      icon: <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />,
-      fillIcon: true,
-    },
-    {
-      href: '/search',
-      label: 'Search',
-      icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />,
-    },
-    {
-      href: '/explore',
-      label: 'Explore',
-      icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />,
-    },
-    {
-      href: '/upload',
-      label: 'Upload',
-      icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />,
-    },
-    {
-      href: '/chats',
-      label: 'Chats',
-      icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />,
-      badgeCount: unreadMessages,
-    },
-    {
-      href: '/cart',
-      label: 'Cart',
-      icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z" />,
-      isCart: true,
-    },
-    {
-      href: '/dashboard',
-      label: 'Orders',
-      icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />,
-      businessOnly: true,
-      badgeCount: pendingOrders,
-    },
-    {
-      href: '#activity',
-      label: 'Activity',
-      icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />,
-      isBell: true,
-    },
-    {
-      href: '/profile',
-      label: 'Profile',
-      icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />,
-    },
+  const navItems: BottomNavItem[] = [
+    { href: '/', label: 'Home', icon: Home },
+    { href: '/explore', label: 'Explore', icon: Compass },
+    { href: '/upload', label: 'Upload', icon: Upload },
+    { href: '/chats', label: 'Messages', icon: MessageCircle, badge: 'messages' },
+    { href: '/cart', label: 'Cart', icon: ShoppingCart, badge: 'cart' },
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-30 border-t border-[#E8E8E4] lg:hidden bg-white/95 backdrop-blur-md">
-      {/* Animated Indicator Bar */}
-      <div
-        className="absolute top-0 h-[2px] bg-[#1A1A1A] transition-all duration-200 ease-out"
-        style={{
-          left: indicatorStyle.left,
-          width: indicatorStyle.width,
-        }}
-      />
-      
-      <div ref={navRef} className="flex items-center justify-around py-3">
-        {navItems.map((item) => {
-          // Skip Orders if not a business account
-          if (item.businessOnly && !isBusiness) {
-            return null;
-          }
+    <nav
+      className="fixed inset-x-0 bottom-0 z-30 flex items-center justify-around border-t border-border bg-card/95 px-2 py-2 backdrop-blur-md lg:hidden"
+      aria-label="Primary"
+    >
+      {navItems.map((item) => {
+        const active = isActive(item.href);
+        const Icon = item.icon;
+        const count = item.badge === 'messages' ? unreadMessages : item.badge === 'cart' ? cartCount : 0;
 
-          // Render Activity bell — identical structure to NavItem
-          if (item.isBell) {
-            return (
-              <div key="activity" data-nav-item>
-                <NavItem href="#" label={item.label} active={false} icon={item.icon} onClick={(e: React.MouseEvent) => { e.preventDefault(); togglePanel(); }} badge={unreadCount} />
-              </div>
-            );
-          }
-
-          // Render Cart with special handling for badge
-          if (item.isCart) {
-            return (
-              <div key={item.href} data-nav-item>
-                <Link href={item.href} className="relative flex flex-col items-center gap-1 transition-colors duration-200 hover:scale-105 active:scale-95">
-                  <svg className={`h-6 w-6 ${isActive(item.href) ? 'text-[#1A1A1A]' : 'text-[#6B6B65]'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    {item.icon}
-                  </svg>
-                  {cartCount > 0 && (
-                    <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#1A1A1A] text-[10px] font-bold text-white">
-                      {cartCount}
-                    </span>
-                  )}
-                  <span className={`text-xs ${isActive(item.href) ? 'text-[#1A1A1A] font-medium' : 'text-[#6B6B65]'}`} style={{ fontFamily: 'var(--font-serif)' }}>{item.label}</span>
-                </Link>
-              </div>
-            );
-          }
-
-          // Render all other nav items
-          return (
-            <div key={item.href} data-nav-item>
-              <NavItem href={item.href} label={item.label} active={isActive(item.href)} icon={item.icon} fillIcon={item.fillIcon} badge={'badgeCount' in item ? (item as { badgeCount: number }).badgeCount : undefined} />
-            </div>
-          );
-        })}
-      </div>
+        return (
+          <Link
+            key={item.href}
+            href={item.href}
+            aria-label={item.label}
+            aria-current={active ? 'page' : undefined}
+            className={cn(
+              'relative flex flex-1 flex-col items-center gap-1 rounded-[4px] py-1 text-caption font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+              active ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
+            )}
+          >
+            <span className="relative">
+              <Icon className="h-6 w-6" aria-hidden="true" />
+              {count > 0 && (
+                <span className="absolute -right-2 -top-1 inline-flex h-4 min-w-[16px] items-center justify-center rounded-[4px] bg-primary px-1 text-[10px] font-bold text-primary-foreground">
+                  {count > 9 ? '9+' : count}
+                </span>
+              )}
+            </span>
+            <span>{item.label}</span>
+          </Link>
+        );
+      })}
     </nav>
-  );
-}
-
-function NavItem({ href, label, active, icon, fillIcon = false, onClick, badge }: { href: string; label: string; active: boolean; icon: React.ReactNode; fillIcon?: boolean; onClick?: (e: React.MouseEvent) => void; badge?: number }) {
-  const colorClass = active ? 'text-[#1A1A1A]' : 'text-[#6B6B65]';
-
-  return (
-    <Link href={href} onClick={onClick} className="relative flex flex-col items-center gap-1 transition-colors duration-200 hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] rounded-lg p-1" aria-label={label}>
-      <svg className={`h-6 w-6 ${colorClass}`} fill={fillIcon ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-        {icon}
-      </svg>
-      {badge !== undefined && badge > 0 && (
-        <span className="absolute -top-1 -right-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-[#1A1A1A] text-[10px] font-bold text-white px-0.5">
-          {badge > 9 ? '9+' : badge}
-        </span>
-      )}
-      <span className={`text-xs ${active ? 'font-medium' : ''} ${colorClass}`} style={{ fontFamily: 'var(--font-serif)' }}>{label}</span>
-    </Link>
   );
 }

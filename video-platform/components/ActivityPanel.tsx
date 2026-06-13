@@ -486,10 +486,10 @@ export function ActivityPanel() {
               <button
                 key={f.key}
                 onClick={() => setActiveFilter(f.key)}
-                className={`whitespace-nowrap px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 shrink-0 ${
+                className={`whitespace-nowrap px-3 py-1.5 rounded-[4px] text-xs font-medium transition-all duration-200 shrink-0 ${
                   activeFilter === f.key
-                    ? 'bg-[#1B5EA8] text-black'
-                    : 'border border-[#1B5EA8] text-[#1B5EA8] hover:bg-[#1B5EA8]/10'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'border border-border text-muted-foreground hover:bg-surface hover:text-foreground'
                 }`}
               >
                 {f.label}
@@ -502,7 +502,7 @@ export function ActivityPanel() {
         <div className="flex-1 overflow-y-auto">
           {loading ? (
             <div className="flex items-center justify-center py-12">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1B5EA8]" />
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
             </div>
           ) : filtered.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 px-6">
@@ -533,7 +533,7 @@ export function ActivityPanel() {
                     >
                       {/* Avatar */}
                       <div className={`w-12 h-12 rounded-full overflow-hidden shrink-0 ${
-                        item.isBusinessUser ? 'ring-2 ring-[#1B5EA8]' : 'ring-1 ring-[var(--color-charcoal-lighter-plus)]'
+                        item.isBusinessUser ? 'ring-2 ring-primary' : 'ring-1 ring-border'
                       }`}>
                         {item.avatarUrl ? (
                           <img src={item.avatarUrl} alt={item.fullName} className="w-full h-full object-cover" />
@@ -557,7 +557,7 @@ export function ActivityPanel() {
                       {item.type === 'follow' && !item.isFollowingBack ? (
                         <button
                           onClick={(e) => { e.stopPropagation(); handleFollowBack(item.userId); }}
-                          className="shrink-0 border border-[#1B5EA8] text-[#1B5EA8] text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-[#1B5EA8]/10 transition-colors"
+                          className="shrink-0 border border-primary text-primary text-xs font-medium px-3 py-1.5 rounded-[4px] hover:bg-primary/10 transition-colors"
                         >
                           Follow Back
                         </button>

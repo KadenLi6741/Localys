@@ -48,8 +48,8 @@ export default function LoginPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-[#F5F5F5] flex items-center justify-center px-4">
-          <p className="text-[#777]">Loading login...</p>
+        <div className="min-h-screen bg-background flex items-center justify-center px-4">
+          <p className="text-muted-foreground">Loading login...</p>
         </div>
       }
     >
@@ -168,7 +168,7 @@ function LoginPageContent() {
 
   if (resetMode) {
     return (
-      <div className="min-h-screen bg-[#F0F0F0] flex items-center justify-center px-4 relative overflow-hidden">
+      <div className="min-h-screen bg-background flex items-center justify-center px-4 relative overflow-hidden">
         {/* Animated floating icons background */}
         <div className="login-floating-icons" aria-hidden="true">
           <span className="login-icon" style={{ top: '8%', animationDuration: '18s', animationDelay: '0s', fontSize: '28px' }}>🍕</span>
@@ -185,20 +185,20 @@ function LoginPageContent() {
         {/* Dark tint overlay */}
         <div className="absolute inset-0 bg-black/30 z-[1]" />
 
-        <div className="w-full max-w-md space-y-8 bg-white rounded-2xl p-8 shadow-xl relative z-10" style={{ animation: 'fadeInUp 0.5s ease-out forwards', opacity: 0 }}>
+        <div className="w-full max-w-md space-y-8 bg-card border border-border rounded-[4px] p-8 relative z-10" style={{ animation: 'fadeInUp 0.5s ease-out forwards', opacity: 0 }}>
           <div className="text-center">
-            <h1 className="text-4xl font-bold mb-2 text-[#111]" style={{ animation: 'slideInLeft 0.4s ease-out 0.1s forwards', opacity: 0 }}>Localy</h1>
-            <p className="text-[#777]">Reset your password</p>
+            <h1 className="text-4xl font-bold mb-2 text-foreground" style={{ animation: 'slideInLeft 0.4s ease-out 0.1s forwards', opacity: 0 }}>Localy</h1>
+            <p className="text-muted-foreground">Reset your password</p>
           </div>
 
           {resetSent ? (
             <div className="space-y-6">
-              <div className="bg-green-50 border border-green-300 text-green-800 px-4 py-3 rounded-lg">
+              <div className="bg-success/10 border border-success text-success px-4 py-3 rounded-[4px]">
                 Check your email for a password reset link.
               </div>
               <button
                 onClick={() => { switchToLogin(); setResetSent(false); }}
-                className="w-full bg-[#2A6FD6] text-white font-semibold py-3 rounded-lg hover:bg-[#245FCC] active:scale-[0.98] transition-all duration-200"
+                className="w-full rounded-[4px] bg-primary py-3 font-bold text-primary-foreground transition-colors hover:bg-primary/90 active:scale-[0.98]"
               >
                 Back to Sign In
               </button>
@@ -206,19 +206,19 @@ function LoginPageContent() {
           ) : (
             <form onSubmit={handleResetPassword} className="space-y-6">
               {isEmailVerified && (
-                <div className="bg-green-50 border border-green-300 text-green-800 px-4 py-3 rounded-lg">
+                <div className="bg-success/10 border border-success text-success px-4 py-3 rounded-[4px]">
                   Email verified. Please sign in again to continue.
                 </div>
               )}
 
               {error && (
-                <div className="bg-red-50 border border-red-300 text-red-700 px-4 py-3 rounded-lg">
+                <div className="bg-destructive/10 border border-destructive text-destructive px-4 py-3 rounded-[4px]">
                   {error}
                 </div>
               )}
 
               <div>
-                <label htmlFor="reset-email" className="block text-sm font-medium mb-2 text-[#111]">
+                <label htmlFor="reset-email" className="block text-sm font-medium mb-2 text-foreground">
                   Email
                 </label>
                 <input
@@ -227,7 +227,7 @@ function LoginPageContent() {
                   value={identifier}
                   onChange={(e) => setIdentifier(e.target.value)}
                   required
-                  className="w-full bg-white border border-[#E0E0E0] rounded-lg px-4 py-3 text-[#111] placeholder-[#999] focus:outline-none focus:border-[#2A6FD6] focus:ring-2 focus:ring-[#2A6FD6]/20 transition-all duration-200"
+                  className="w-full bg-surface border border-border rounded-[4px] px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary focus:bg-surface-2 focus:ring-2 focus:ring-ring/30 transition-colors"
                   placeholder="you@example.com"
                 />
               </div>
@@ -245,7 +245,7 @@ function LoginPageContent() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-[#2A6FD6] text-white font-semibold py-3 rounded-lg disabled:bg-[#2A6FD6]/40 disabled:cursor-not-allowed hover:bg-[#245FCC] active:scale-[0.98] transition-all duration-200"
+                className="w-full rounded-[4px] bg-primary py-3 font-bold text-primary-foreground transition-colors hover:bg-primary/90 active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 {loading ? 'Sending...' : 'Send Reset Link'}
               </button>
@@ -253,10 +253,10 @@ function LoginPageContent() {
           )}
 
           {!resetSent && (
-            <p className="text-center text-[#777]">
+            <p className="text-center text-muted-foreground">
               <button
                 onClick={switchToLogin}
-                className="text-[#2A6FD6] hover:underline font-medium"
+                className="text-primary hover:underline font-medium"
               >
                 Back to Sign In
               </button>
@@ -268,7 +268,7 @@ function LoginPageContent() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F0F0F0] flex items-center justify-center px-4 relative overflow-hidden">
+    <div className="min-h-screen bg-background flex items-center justify-center px-4 relative overflow-hidden">
       {/* Animated floating icons background */}
       <div className="login-floating-icons" aria-hidden="true">
         <span className="login-icon" style={{ top: '8%', animationDuration: '18s', animationDelay: '0s', fontSize: '28px' }}>🍕</span>
@@ -285,27 +285,27 @@ function LoginPageContent() {
       {/* Dark tint overlay */}
       <div className="absolute inset-0 bg-black/30 z-[1]" />
 
-      <div className="w-full max-w-md space-y-8 bg-white rounded-2xl p-8 shadow-xl relative z-10" style={{ animation: 'fadeInUp 0.5s ease-out forwards', opacity: 0 }}>
+      <div className="w-full max-w-md space-y-8 bg-card border border-border rounded-[4px] p-8 relative z-10" style={{ animation: 'fadeInUp 0.5s ease-out forwards', opacity: 0 }}>
         <div className="text-center">
-          <h1 className="text-4xl font-bold mb-2 text-[#111]" style={{ animation: 'slideInLeft 0.4s ease-out 0.1s forwards', opacity: 0 }}>Localy</h1>
-          <p className="text-[#777]">Sign in to your account</p>
+          <h1 className="text-4xl font-bold mb-2 text-foreground" style={{ animation: 'slideInLeft 0.4s ease-out 0.1s forwards', opacity: 0 }}>Localy</h1>
+          <p className="text-muted-foreground">Sign in to your account</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {isEmailVerified && (
-            <div className="bg-green-50 border border-green-300 text-green-800 px-4 py-3 rounded-lg">
+            <div className="bg-success/10 border border-success text-success px-4 py-3 rounded-[4px]">
               Email verified. Please sign in again to continue.
             </div>
           )}
 
           {error && (
-            <div className="bg-red-50 border border-red-300 text-red-700 px-4 py-3 rounded-lg">
+            <div className="bg-destructive/10 border border-destructive text-destructive px-4 py-3 rounded-[4px]">
               {error}
             </div>
           )}
 
           <div>
-            <label htmlFor="email" className="block text-sm font-medium mb-2 text-[#111]">
+            <label htmlFor="email" className="block text-sm font-medium mb-2 text-foreground">
               Email
             </label>
             <input
@@ -314,20 +314,20 @@ function LoginPageContent() {
               value={identifier}
               onChange={(e) => setIdentifier(e.target.value)}
               required
-              className="w-full bg-white border border-[#E0E0E0] rounded-lg px-4 py-3 text-[#111] placeholder-[#999] focus:outline-none focus:border-[#2A6FD6] focus:ring-2 focus:ring-[#2A6FD6]/20 transition-all duration-200"
+              className="w-full bg-surface border border-border rounded-[4px] px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary focus:bg-surface-2 focus:ring-2 focus:ring-ring/30 transition-colors"
               placeholder="you@example.com"
             />
           </div>
 
           <div>
             <div className="flex items-center justify-between mb-2">
-              <label htmlFor="password" className="block text-sm font-medium text-[#111]">
+              <label htmlFor="password" className="block text-sm font-medium text-foreground">
                 Password
               </label>
               <button
                 type="button"
                 onClick={switchToReset}
-                className="text-sm text-[#2A6FD6] hover:underline transition-colors duration-200"
+                className="text-sm text-primary hover:underline transition-colors duration-200"
               >
                 Forgot Password?
               </button>
@@ -338,7 +338,7 @@ function LoginPageContent() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full bg-white border border-[#E0E0E0] rounded-lg px-4 py-3 text-[#111] placeholder-[#999] focus:outline-none focus:border-[#2A6FD6] focus:ring-2 focus:ring-[#2A6FD6]/20 transition-all duration-200"
+              className="w-full bg-surface border border-border rounded-[4px] px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary focus:bg-surface-2 focus:ring-2 focus:ring-ring/30 transition-colors"
               placeholder="••••••••"
             />
           </div>
@@ -356,15 +356,15 @@ function LoginPageContent() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-[#2A6FD6] text-white font-semibold py-3 rounded-lg disabled:bg-[#2A6FD6]/40 disabled:cursor-not-allowed hover:bg-[#245FCC] active:scale-[0.98] transition-all duration-200"
+            className="w-full rounded-[4px] bg-primary py-3 font-bold text-primary-foreground transition-colors hover:bg-primary/90 active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {loading ? 'Signing in...' : 'Sign In'}
           </button>
         </form>
 
-        <p className="text-center text-[#777]">
+        <p className="text-center text-muted-foreground">
           Don't have an account?{' '}
-          <Link href="/signup" className="text-[#2A6FD6] hover:underline font-medium">
+          <Link href="/signup" className="text-primary hover:underline font-medium">
             Sign up
           </Link>
         </p>

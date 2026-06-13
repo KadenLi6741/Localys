@@ -32,13 +32,13 @@ export function MenuModal({ userId, businessId, menu, editItem, isOpen, onClose,
   const [itemKeyInfo, setItemKeyInfo] = useState('');
   const [itemAvailable, setItemAvailable] = useState(true);
   const [addingItem, setAddingItem] = useState(false);
-  
+
   // Item image upload state
-  const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [selectedImages, setSelectedImages] = useState<(File | null)[]>([null, null, null]);
+  const [imagePreviews, setImagePreviews] = useState<(string | null)[]>([null, null, null]);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const fileInputRefs = [useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null)];
 
   // Reset form when modal opens or menu changes
   useEffect(() => {
@@ -62,8 +62,18 @@ export function MenuModal({ userId, businessId, menu, editItem, isOpen, onClose,
         setItemCategory(editItem.category || '');
         setItemKeyInfo(editItem.key_info || '');
         setItemAvailable(editItem.is_available !== false);
-        setImagePreview(editItem.image_url || null);
-        setSelectedImage(null);
+        // Pre-fill existing images
+        const existingUrls = editItem.image_urls || [];
+        const primary = editItem.image_url || null;
+        const previews: (string | null)[] = [primary, existingUrls[1] || null, existingUrls[2] || null];
+        // If primary is in image_urls, use image_urls directly
+        if (existingUrls.length > 0) {
+          previews[0] = existingUrls[0] || primary;
+          previews[1] = existingUrls[1] || null;
+          previews[2] = existingUrls[2] || null;
+        }
+        setImagePreviews(previews);
+        setSelectedImages([null, null, null]);
       } else {
         resetItemForm();
       }
@@ -77,12 +87,10 @@ export function MenuModal({ userId, businessId, menu, editItem, isOpen, onClose,
     setItemCategory('');
     setItemKeyInfo('');
     setItemAvailable(true);
-    setSelectedImage(null);
-    setImagePreview(null);
+    setSelectedImages([null, null, null]);
+    setImagePreviews([null, null, null]);
     setUploadError(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
+    fileInputRefs.forEach(ref => { if (ref.current) ref.current.value = ''; });
   };
 
   // Handle escape key to close modal
@@ -148,61 +156,64 @@ export function MenuModal({ userId, businessId, menu, editItem, isOpen, onClose,
     }
   };
 
-  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageSelect = (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
       setUploadError('Image must be less than 5MB');
       return;
     }
 
-    // Validate file type
     if (!file.type.startsWith('image/')) {
       setUploadError('Please select an image file');
       return;
     }
 
-    setSelectedImage(file);
+    const newImages = [...selectedImages];
+    newImages[index] = file;
+    setSelectedImages(newImages);
     setUploadError(null);
 
-    // Create preview
     const reader = new FileReader();
     reader.onload = (e) => {
-      setImagePreview(e.target?.result as string);
+      const newPreviews = [...imagePreviews];
+      newPreviews[index] = e.target?.result as string;
+      setImagePreviews(newPreviews);
     };
     reader.readAsDataURL(file);
   };
 
-  const removeImage = () => {
-    setSelectedImage(null);
-    setImagePreview(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+  const removeImage = (index: number) => {
+    const newImages = [...selectedImages];
+    newImages[index] = null;
+    setSelectedImages(newImages);
+    const newPreviews = [...imagePreviews];
+    newPreviews[index] = null;
+    setImagePreviews(newPreviews);
+    if (fileInputRefs[index]?.current) {
+      fileInputRefs[index].current!.value = '';
     }
   };
 
-  const uploadItemImage = async (): Promise<string | null> => {
-    if (!selectedImage) return null;
-
+  const uploadItemImage = async (file: File): Promise<string | null> => {
     try {
       setUploadError(null);
-      const fileExt = selectedImage.name.split('.').pop()?.toLowerCase();
-      
+      const fileExt = file.name.split('.').pop()?.toLowerCase();
+
       if (!fileExt || !['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'].includes(fileExt)) {
         setUploadError('Invalid file type. Allowed: JPG, PNG, GIF, WEBP, BMP');
         return null;
       }
 
-      const fileName = `menu-item-images/${userId}/${Date.now()}.${fileExt}`;
+      const fileName = `menu-item-images/${userId}/${Date.now()}-${Math.random().toString(36).slice(2, 6)}.${fileExt}`;
 
       const { data, error: uploadError } = await supabase.storage
         .from('avatars')
-        .upload(fileName, selectedImage, {
+        .upload(fileName, file, {
           cacheControl: '3600',
           upsert: false,
-          contentType: selectedImage.type,
+          contentType: file.type,
         });
 
       if (uploadError) {
@@ -229,7 +240,7 @@ export function MenuModal({ userId, businessId, menu, editItem, isOpen, onClose,
 
     setError(null);
     setAddingItem(true);
-    setUploading(!!selectedImage);
+    setUploading(selectedImages.some(img => img !== null));
 
     try {
       if (!itemName.trim()) {
@@ -246,21 +257,28 @@ export function MenuModal({ userId, businessId, menu, editItem, isOpen, onClose,
         return;
       }
 
-      let imageUrl: string | undefined;
-      if (selectedImage) {
-        const url = await uploadItemImage();
-        if (url) {
-          imageUrl = url;
-        } else {
-          setAddingItem(false);
-          setUploading(false);
-          return;
+      // Upload all selected images
+      const uploadedUrls: string[] = [];
+      for (let i = 0; i < 3; i++) {
+        if (selectedImages[i]) {
+          const url = await uploadItemImage(selectedImages[i]!);
+          if (url) {
+            uploadedUrls.push(url);
+          } else {
+            setAddingItem(false);
+            setUploading(false);
+            return;
+          }
+        } else if (imagePreviews[i] && !selectedImages[i]) {
+          // Keep existing image URL (editing mode)
+          uploadedUrls.push(imagePreviews[i]!);
         }
       }
 
+      const primaryImageUrl = uploadedUrls[0] || undefined;
+
       if (editItem) {
-        // Update existing item
-        const updateData: { item_name: string; price: number; description: string; category: string; key_info: string; is_available: boolean; image_url?: string } = {
+        const updateData: { item_name: string; price: number; description: string; category: string; key_info: string; is_available: boolean; image_url?: string; image_urls?: string[] } = {
           item_name: itemName,
           price: parseFloat(itemPrice),
           description: itemDescription,
@@ -268,9 +286,10 @@ export function MenuModal({ userId, businessId, menu, editItem, isOpen, onClose,
           key_info: itemKeyInfo,
           is_available: itemAvailable,
         };
-        if (imageUrl) {
-          updateData.image_url = imageUrl;
+        if (primaryImageUrl) {
+          updateData.image_url = primaryImageUrl;
         }
+        updateData.image_urls = uploadedUrls;
 
         const { error: updateError } = await updateMenuItem(editItem.id, updateData);
 
@@ -288,7 +307,8 @@ export function MenuModal({ userId, businessId, menu, editItem, isOpen, onClose,
           price: parseFloat(itemPrice),
           description: itemDescription,
           category: itemCategory,
-          image_url: imageUrl,
+          image_url: primaryImageUrl,
+          image_urls: uploadedUrls,
           key_info: itemKeyInfo,
           is_available: itemAvailable,
         });
@@ -318,8 +338,7 @@ export function MenuModal({ userId, businessId, menu, editItem, isOpen, onClose,
 
   return (
     <div
-      className="fixed inset-0 z-50 overflow-y-auto"
-      style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}
+      className="fixed inset-0 z-50 overflow-y-auto bg-black/50"
       onClick={handleBackdropClick}
       role="dialog"
       aria-modal="true"
@@ -327,20 +346,20 @@ export function MenuModal({ userId, businessId, menu, editItem, isOpen, onClose,
     >
       <div className="flex items-center justify-center min-h-full p-4">
       <div
-        className="bg-white rounded-lg shadow-2xl flex flex-col w-[90%] max-w-[560px] max-h-[85vh] relative"
+        className="bg-card rounded-[4px] shadow-[inset_0_0_0_1px_var(--border)] flex flex-col w-[90%] max-w-[560px] max-h-[85vh] relative"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#E0E0E0] shrink-0">
-          <h2 id="menu-modal-title" className="text-lg font-semibold text-[#111111]">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-border shrink-0">
+          <h2 id="menu-modal-title" className="text-lg font-semibold text-foreground">
             {editItem ? 'Edit Item' : menu ? t('menu.edit_menu') || 'Edit Menu' : t('menu.create_menu') || 'Create Menu'}
           </h2>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-[#F5F5F5] rounded-md transition-colors min-w-[40px] min-h-[40px] flex items-center justify-center"
+            className="p-2 hover:bg-surface rounded-[4px] transition-colors min-w-[40px] min-h-[40px] flex items-center justify-center"
             aria-label="Close modal"
           >
-            <svg className="w-5 h-5 text-[#777777]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
@@ -350,7 +369,7 @@ export function MenuModal({ userId, businessId, menu, editItem, isOpen, onClose,
         <div className="flex-1 overflow-y-auto overscroll-contain px-6 py-4 space-y-4" style={{ WebkitOverflowScrolling: 'touch' }}>
           {/* Error Message */}
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 rounded-md p-3 text-sm">
+            <div className="bg-destructive/10 border border-destructive text-destructive rounded-[4px] p-3 text-sm">
               {error}
             </div>
           )}
@@ -359,7 +378,7 @@ export function MenuModal({ userId, businessId, menu, editItem, isOpen, onClose,
           {!menu && (
             <>
               <div>
-                <label className="block text-[#111111] text-sm font-medium mb-1.5">
+                <label className="block text-foreground text-sm font-medium mb-1.5">
                   {t('menu.menu_name') || 'Menu Name'}
                 </label>
                 <input
@@ -367,12 +386,12 @@ export function MenuModal({ userId, businessId, menu, editItem, isOpen, onClose,
                   value={menuName}
                   onChange={(e) => setMenuName(e.target.value)}
                   placeholder={t('menu.menu_name_placeholder') || 'e.g., Appetizers, Main Courses'}
-                  className="w-full border border-[#E0E0E0] rounded px-4 py-2.5 text-[#111111] placeholder:text-[#999] focus:outline-none focus:ring-2 focus:ring-[#2A6FD6] focus:border-transparent transition-all"
+                  className="w-full bg-surface border border-border rounded-[4px] px-4 py-2.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
                 />
               </div>
 
               <div>
-                <label className="block text-[#111111] text-sm font-medium mb-1.5">
+                <label className="block text-foreground text-sm font-medium mb-1.5">
                   {t('menu.description') || 'Description'}
                 </label>
                 <textarea
@@ -380,18 +399,18 @@ export function MenuModal({ userId, businessId, menu, editItem, isOpen, onClose,
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder={t('menu.description_placeholder') || 'Add a description for this menu section...'}
                   rows={3}
-                  className="w-full border border-[#E0E0E0] rounded px-4 py-2.5 text-[#111111] placeholder:text-[#999] focus:outline-none focus:ring-2 focus:ring-[#2A6FD6] focus:border-transparent transition-all resize-none"
+                  className="w-full bg-surface border border-border rounded-[4px] px-4 py-2.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all resize-none"
                 />
               </div>
 
               <div>
-                <label className="block text-[#111111] text-sm font-medium mb-1.5">
+                <label className="block text-foreground text-sm font-medium mb-1.5">
                   {t('menu.category') || 'Category'}
                 </label>
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  className="w-full border border-[#E0E0E0] rounded px-4 py-2.5 text-[#111111] focus:outline-none focus:ring-2 focus:ring-[#2A6FD6] focus:border-transparent transition-all bg-white"
+                  className="w-full bg-surface border border-border rounded-[4px] px-4 py-2.5 text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
                 >
                   <option value="General">General</option>
                   <option value="Appetizers">Appetizers</option>
@@ -409,44 +428,44 @@ export function MenuModal({ userId, businessId, menu, editItem, isOpen, onClose,
           {/* Add/Edit Item Section */}
           {(menu || editItem) && (
             <div>
-              <h3 className="text-[#111111] text-sm font-semibold mb-4">
+              <h3 className="text-foreground text-sm font-semibold mb-4">
                 {editItem ? 'Edit Item' : 'Add Item to Menu'}
               </h3>
               <form onSubmit={handleAddItem} className="space-y-4">
                 {/* Item Name */}
                 <div>
-                  <label className="block text-[#111111] text-sm font-medium mb-1.5">Item Name *</label>
+                  <label className="block text-foreground text-sm font-medium mb-1.5">Item Name *</label>
                   <input
                     type="text"
                     value={itemName}
                     onChange={(e) => setItemName(e.target.value)}
                     placeholder="e.g., Caesar Salad"
-                    className="w-full border border-[#E0E0E0] rounded px-4 py-2.5 text-[#111111] placeholder:text-[#999] focus:outline-none focus:ring-2 focus:ring-[#2A6FD6] focus:border-transparent"
+                    className="w-full bg-surface border border-border rounded-[4px] px-4 py-2.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
                   />
                 </div>
 
                 {/* Price & Category row */}
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-[#111111] text-sm font-medium mb-1.5">Price *</label>
+                    <label className="block text-foreground text-sm font-medium mb-1.5">Price *</label>
                     <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#777]">$</span>
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
                       <input
                         type="number"
                         step="0.01"
                         value={itemPrice}
                         onChange={(e) => setItemPrice(e.target.value)}
                         placeholder="0.00"
-                        className="w-full border border-[#E0E0E0] rounded pl-7 pr-4 py-2.5 text-[#111111] placeholder:text-[#999] focus:outline-none focus:ring-2 focus:ring-[#2A6FD6] focus:border-transparent"
+                        className="w-full bg-surface border border-border rounded-[4px] pl-7 pr-4 py-2.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
                       />
                     </div>
                   </div>
                   <div>
-                    <label className="block text-[#111111] text-sm font-medium mb-1.5">Category</label>
+                    <label className="block text-foreground text-sm font-medium mb-1.5">Category</label>
                     <select
                       value={itemCategory}
                       onChange={(e) => setItemCategory(e.target.value)}
-                      className="w-full border border-[#E0E0E0] rounded px-4 py-2.5 text-[#111111] focus:outline-none focus:ring-2 focus:ring-[#2A6FD6] focus:border-transparent bg-white"
+                      className="w-full bg-surface border border-border rounded-[4px] px-4 py-2.5 text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
                     >
                       <option value="">Select category</option>
                       <option value="Appetizers">Appetizers</option>
@@ -464,84 +483,96 @@ export function MenuModal({ userId, businessId, menu, editItem, isOpen, onClose,
 
                 {/* Description */}
                 <div>
-                  <label className="block text-[#111111] text-sm font-medium mb-1.5">Description</label>
+                  <label className="block text-foreground text-sm font-medium mb-1.5">Description</label>
                   <textarea
                     value={itemDescription}
                     onChange={(e) => setItemDescription(e.target.value)}
                     placeholder="Describe this item..."
                     rows={2}
-                    className="w-full border border-[#E0E0E0] rounded px-4 py-2.5 text-[#111111] placeholder:text-[#999] focus:outline-none focus:ring-2 focus:ring-[#2A6FD6] focus:border-transparent resize-none"
+                    className="w-full bg-surface border border-border rounded-[4px] px-4 py-2.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary resize-none"
                   />
                 </div>
 
                 {/* Things You Should Know */}
                 <div>
-                  <label className="block text-[#111111] text-sm font-medium mb-1.5">Things You Should Know</label>
+                  <label className="block text-foreground text-sm font-medium mb-1.5">Things You Should Know</label>
                   <textarea
                     value={itemKeyInfo}
                     onChange={(e) => setItemKeyInfo(e.target.value)}
                     placeholder="Allergens, dietary info, preparation notes..."
                     rows={2}
-                    className="w-full border border-[#E0E0E0] rounded px-4 py-2.5 text-[#111111] placeholder:text-[#999] focus:outline-none focus:ring-2 focus:ring-[#2A6FD6] focus:border-transparent resize-none"
+                    className="w-full bg-surface border border-border rounded-[4px] px-4 py-2.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary resize-none"
                   />
                 </div>
 
-                {/* Image Upload */}
+                {/* Image Upload — up to 3 images */}
                 {uploadError && (
-                  <div className="bg-red-50 border border-red-200 text-red-700 text-xs rounded-md p-2">
+                  <div className="bg-destructive/10 border border-destructive text-destructive text-xs rounded-[4px] p-2">
                     {uploadError}
                   </div>
                 )}
 
-                {imagePreview && (
-                  <div className="relative bg-[#F5F5F5] rounded-md p-2">
-                    <img
-                      src={imagePreview}
-                      alt="Preview"
-                      className="w-full h-32 object-cover rounded-md"
-                    />
-                    <button
-                      type="button"
-                      onClick={removeImage}
-                      disabled={uploading}
-                      className="absolute top-3 right-3 bg-red-500 hover:bg-red-600 disabled:opacity-50 w-8 h-8 flex items-center justify-center rounded-full text-white"
-                      aria-label="Remove image"
-                    >
-                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" />
-                      </svg>
-                    </button>
-                  </div>
-                )}
-
                 <div>
-                  <input
-                    type="file"
-                    ref={fileInputRef}
-                    onChange={handleImageSelect}
-                    accept="image/*"
-                    disabled={uploading || addingItem}
-                    className="hidden"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => fileInputRef.current?.click()}
-                    disabled={uploading || addingItem}
-                    className="px-4 py-2 rounded font-medium text-sm bg-[#F5F5F5] border border-[#E0E0E0] text-[#111111] hover:bg-[#EEEEEE] disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-                    Add Photo
-                  </button>
+                  <label className="block text-foreground text-sm font-medium mb-1.5">Photos (up to 3)</label>
+                  <div className="grid grid-cols-3 gap-3">
+                    {[0, 1, 2].map((index) => (
+                      <div key={index} className="relative">
+                        {imagePreviews[index] ? (
+                          <div className="relative aspect-square bg-surface rounded-[4px] overflow-hidden">
+                            <img
+                              src={imagePreviews[index]!}
+                              alt={`Preview ${index + 1}`}
+                              className="w-full h-full object-cover"
+                            />
+                            {index === 0 && (
+                              <span className="absolute top-1 left-1 text-[9px] font-bold bg-primary text-primary-foreground px-1.5 py-0.5 rounded-[4px]">Primary</span>
+                            )}
+                            <button
+                              type="button"
+                              onClick={() => removeImage(index)}
+                              disabled={uploading}
+                              className="absolute top-1 right-1 bg-destructive hover:bg-destructive/90 disabled:opacity-50 w-6 h-6 flex items-center justify-center rounded-full text-white"
+                              aria-label="Remove image"
+                            >
+                              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" />
+                              </svg>
+                            </button>
+                          </div>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => fileInputRefs[index]?.current?.click()}
+                            disabled={uploading || addingItem}
+                            className="aspect-square w-full border-2 border-dashed border-border rounded-[4px] flex flex-col items-center justify-center gap-1 hover:border-primary hover:bg-primary/5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            <svg className="w-5 h-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                            </svg>
+                            <span className="text-[10px] text-muted-foreground">{index === 0 ? 'Primary' : `Photo ${index + 1}`}</span>
+                          </button>
+                        )}
+                        <input
+                          type="file"
+                          ref={fileInputRefs[index]}
+                          onChange={handleImageSelect(index)}
+                          accept="image/*"
+                          disabled={uploading || addingItem}
+                          className="hidden"
+                        />
+                      </div>
+                    ))}
+                  </div>
                 </div>
 
                 {/* Is Available toggle */}
                 <div className="flex items-center justify-between py-1">
-                  <label className="text-[#111111] text-sm font-medium">Is Available</label>
+                  <label className="text-foreground text-sm font-medium">Is Available</label>
                   <button
                     type="button"
                     onClick={() => setItemAvailable(!itemAvailable)}
                     className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                      itemAvailable ? 'bg-[#2A6FD6]' : 'bg-[#E0E0E0]'
+                      itemAvailable ? 'bg-primary' : 'bg-border'
                     }`}
                     role="switch"
                     aria-checked={itemAvailable}
@@ -559,12 +590,12 @@ export function MenuModal({ userId, businessId, menu, editItem, isOpen, onClose,
         </div>
 
         {/* Footer — always visible */}
-        <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-[#E0E0E0] bg-white rounded-b-lg shrink-0">
+        <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-border bg-card rounded-b-[4px] shrink-0">
           <button
             type="button"
             onClick={onClose}
             disabled={loading}
-            className="px-5 py-2.5 text-[#777] hover:bg-[#F5F5F5] disabled:opacity-50 rounded font-medium text-sm transition-colors border border-[#E0E0E0]"
+            className="px-5 py-2.5 text-muted-foreground hover:bg-surface disabled:opacity-50 rounded-[4px] font-medium text-sm transition-colors border border-border"
           >
             {t('common.cancel') || 'Cancel'}
           </button>
@@ -572,7 +603,7 @@ export function MenuModal({ userId, businessId, menu, editItem, isOpen, onClose,
             <button
               onClick={handleAddItem}
               disabled={addingItem || uploading || !itemName.trim() || !itemPrice}
-              className="px-5 py-2.5 bg-[#2A6FD6] hover:bg-[#245FCC] disabled:bg-[#2A6FD6]/40 disabled:cursor-not-allowed text-white rounded font-medium text-sm transition-colors"
+              className="px-5 py-2.5 bg-primary hover:bg-primary/90 disabled:bg-primary/40 disabled:cursor-not-allowed text-primary-foreground rounded-[4px] font-medium text-sm transition-colors"
             >
               {addingItem || uploading ? (uploading ? 'Uploading...' : (editItem ? 'Saving...' : 'Adding...')) : (editItem ? 'Save Changes' : 'Add Item')}
             </button>
@@ -580,7 +611,7 @@ export function MenuModal({ userId, businessId, menu, editItem, isOpen, onClose,
             <button
               onClick={handleSubmit}
               disabled={loading || !menuName.trim()}
-              className="px-5 py-2.5 bg-[#2A6FD6] hover:bg-[#245FCC] disabled:bg-[#2A6FD6]/40 disabled:cursor-not-allowed text-white rounded font-medium text-sm transition-colors"
+              className="px-5 py-2.5 bg-primary hover:bg-primary/90 disabled:bg-primary/40 disabled:cursor-not-allowed text-primary-foreground rounded-[4px] font-medium text-sm transition-colors"
             >
               {loading ? (
                 <span className="flex items-center gap-2">

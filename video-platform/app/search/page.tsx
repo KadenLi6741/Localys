@@ -1,13 +1,17 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { searchVideos, searchBusinesses, SearchFilters, SearchMode } from '@/lib/supabase/search';
+import { supabase } from '@/lib/supabase/client';
 import { haversineDistance } from '@/lib/utils/geo';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { Toast } from '@/components/Toast';
+import { SearchOverlay } from '@/components/explore/SearchOverlay';
+import { saveSearchHistory } from '@/lib/supabase/searchHistory';
+import { useAuth } from '@/contexts/AuthContext';
 
 const DISTANCE_OPTIONS = [
   { label: 'Nearby', km: 5 },
@@ -35,6 +39,7 @@ export default function SearchPage() {
 }
 
 function SearchContent() {
+  const { user } = useAuth();
   const [query, setQuery] = useState('');
   const [searchMode, setSearchMode] = useState<SearchMode>('businesses');
   const [category, setCategory] = useState<string>('');
@@ -43,6 +48,9 @@ function SearchContent() {
   const [results, setResults] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
+
+  const [searchOverlayOpen, setSearchOverlayOpen] = useState(false);
+  const searchBarRef = useRef<HTMLDivElement>(null);
 
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [cuisineType, setCuisineType] = useState('');
@@ -62,6 +70,76 @@ function SearchContent() {
   const [hoveredBusiness, setHoveredBusiness] = useState<any>(null);
   const [distanceFilter, setDistanceFilter] = useState<number>(Infinity);
   const [toastMessage, setToastMessage] = useState('');
+
+  // Stores Near You
+  const [nearbyStores, setNearbyStores] = useState<any[]>([]);
+  const [nearbyLoading, setNearbyLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchNearbyStores = async () => {
+      setNearbyLoading(true);
+      try {
+        // Fetch business profiles that have videos
+        const { data: businessProfiles } = await supabase
+          .from('profiles')
+          .select('id, full_name, username, profile_picture_url, type, latitude, longitude')
+          .in('type', ['food', 'retail', 'service'])
+          .limit(50);
+
+        if (!businessProfiles || businessProfiles.length === 0) {
+          setNearbyStores([]);
+          setNearbyLoading(false);
+          return;
+        }
+
+        // Check which businesses have videos
+        const ids = businessProfiles.map(p => p.id);
+        const { data: videoCounts } = await supabase
+          .from('videos')
+          .select('user_id')
+          .in('user_id', ids);
+
+        const businessesWithVideos = new Set((videoCounts || []).map(v => v.user_id));
+        const filtered = businessProfiles.filter(p => businessesWithVideos.has(p.id));
+
+        if (filtered.length === 0) {
+          setNearbyStores([]);
+          setNearbyLoading(false);
+          return;
+        }
+
+        if (userLat && userLng) {
+          // Sort by distance and take top 3
+          const withDistance = filtered
+            .filter(p => p.latitude && p.longitude)
+            .map(p => ({
+              ...p,
+              distance: haversineDistance(userLat, userLng, p.latitude, p.longitude),
+            }))
+            .sort((a, b) => a.distance - b.distance)
+            .slice(0, 3);
+
+          if (withDistance.length > 0) {
+            setNearbyStores(withDistance);
+          } else {
+            // No stores with location data, pick random
+            const shuffled = filtered.sort(() => 0.5 - Math.random()).slice(0, 3);
+            setNearbyStores(shuffled);
+          }
+        } else {
+          // No user location, pick random businesses with videos
+          const shuffled = filtered.sort(() => 0.5 - Math.random()).slice(0, 3);
+          setNearbyStores(shuffled);
+        }
+      } catch {
+        setNearbyStores([]);
+      } finally {
+        setNearbyLoading(false);
+      }
+    };
+
+    fetchNearbyStores();
+  }, [userLat, userLng]);
 
   const toggleArrayFilter = (arr: string[], setArr: (v: string[]) => void, value: string) => {
     setArr(arr.includes(value) ? arr.filter((v) => v !== value) : [...arr, value]);
@@ -120,7 +198,12 @@ function SearchContent() {
   const handleSearch = useCallback(() => {
     const filters = buildFilters();
     executeSearch(filters, searchMode);
-  }, [query, category, minRating, priceRange, cuisineType, formality, specialType, dietary, features, amenities, payment, tags, nearMe, radius, userLat, userLng, searchMode, executeSearch]);
+    setSearchOverlayOpen(false);
+    // Save to search history
+    if (user && query.trim()) {
+      saveSearchHistory(user.id, query.trim(), searchMode).catch(() => {});
+    }
+  }, [query, category, minRating, priceRange, cuisineType, formality, specialType, dietary, features, amenities, payment, tags, nearMe, radius, userLat, userLng, searchMode, executeSearch, user]);
 
   const handleCategoryChange = (cat: string) => {
     setCategory(cat);
@@ -249,27 +332,45 @@ function SearchContent() {
             </div>
 
             {/* Search Bar */}
-            <div className="mx-1 flex gap-2 rounded-xl border border-[#E8E8E4] bg-white px-4 py-4 transition-all duration-200 hover:border-[#1B5EA8] focus-within:border-[#1B5EA8] focus-within:ring-2 focus-within:ring-[#1B5EA8]/20">
-              <svg className="mt-0.5 h-5 w-5 flex-shrink-0 text-[#6B6B65]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-              <input
-                type="text"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                placeholder={searchMode === 'businesses' ? 'Search businesses, cuisine, keywords...' : 'Search videos by keywords, business name...'}
-                className="min-w-0 flex-1 bg-transparent text-[#1A1A1A] text-lg placeholder-[#9E9A90] outline-none"
-                aria-label="Search"
-                autoFocus
+            <div ref={searchBarRef} className="relative mx-1">
+              <div className="flex gap-2 rounded-xl border border-[#E8E8E4] bg-white px-4 py-4 transition-all duration-200 hover:border-[#1B5EA8] focus-within:border-[#1B5EA8] focus-within:ring-2 focus-within:ring-[#1B5EA8]/20">
+                <svg className="mt-0.5 h-5 w-5 flex-shrink-0 text-[#6B6B65]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                <input
+                  type="text"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  onFocus={() => setSearchOverlayOpen(true)}
+                  onKeyDown={(e) => { if (e.key === 'Enter') handleSearch(); }}
+                  placeholder={searchMode === 'businesses' ? 'Search businesses, cuisine, keywords...' : 'Search videos by keywords, business name...'}
+                  className="min-w-0 flex-1 bg-transparent text-[#1A1A1A] text-lg placeholder-[#9E9A90] outline-none"
+                  aria-label="Search"
+                  autoFocus
+                />
+                <button
+                  onClick={handleSearch}
+                  disabled={loading}
+                  className="flex-shrink-0 rounded-lg bg-[#1B5EA8] px-5 py-2 font-semibold text-white transition-all duration-200 hover:bg-[#1B5EA8]/90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1B5EA8]"
+                >
+                  {loading ? '...' : 'Search'}
+                </button>
+              </div>
+              <SearchOverlay
+                query={query}
+                searchMode={searchMode}
+                isOpen={searchOverlayOpen}
+                onSelect={(value, type) => {
+                  setQuery(value);
+                  if (type === 'category') {
+                    setCuisineType(value);
+                  }
+                  setSearchOverlayOpen(false);
+                  // Auto-search after selecting
+                  setTimeout(() => handleSearch(), 100);
+                }}
+                onClose={() => setSearchOverlayOpen(false)}
               />
-              <button
-                onClick={handleSearch}
-                disabled={loading}
-                className="flex-shrink-0 rounded-lg bg-[#1B5EA8] px-5 py-2 font-semibold text-white transition-all duration-200 hover:bg-[#1B5EA8]/90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1B5EA8]"
-              >
-                {loading ? '...' : 'Search'}
-              </button>
             </div>
 
             {/* Filters */}
@@ -581,42 +682,54 @@ function SearchContent() {
               </div>
             )}
             
-            {/* Popular Categories / Suggested Businesses Section */}
+            {/* Stores Near You Section */}
             {(!hasSearched || results.length === 0) && (
               <div className="mt-12 pt-8 border-t border-[var(--border-color)]">
-                <h3 className="mb-6 text-lg font-semibold">
-                  {searchMode === 'businesses' ? 'Popular Categories' : 'Popular Videos'}
-                </h3>
-                <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
-                  {searchMode === 'businesses' ? (
-                    <>
-                      {['Food', 'Retail', 'Services', 'Cafes', 'Pizza', 'Mexican', 'Asian', 'Bakery'].map((cat) => (
-                        <button
-                          key={cat}
-                          onClick={() => {
-                            setQuery(cat);
-                            setCuisineType(cat);
-                          }}
-                          className="rounded-lg border border-[var(--border-color)] bg-gradient-to-br from-[var(--surface-1)] to-[var(--surface-2)] p-4 text-center transition-all duration-200 hover:border-[#1B5EA8] hover:shadow-md hover:shadow-[#1B5EA8]/20 active:scale-95"
-                        >
-                          <p className="text-sm font-medium text-[#1B5EA8]">{cat}</p>
-                        </button>
-                      ))}
-                    </>
-                  ) : (
-                    <>
-                      {['Trending', 'Cooking', 'Food Reviews', 'Business', 'Travel', 'Creative', 'Music', 'Shopping'].map((cat) => (
-                        <button
-                          key={cat}
-                          onClick={() => setQuery(cat)}
-                          className="rounded-lg border border-[var(--border-color)] bg-gradient-to-br from-[var(--surface-1)] to-[var(--surface-2)] p-4 text-center transition-all duration-200 hover:border-[#1B5EA8] hover:shadow-md hover:shadow-[#1B5EA8]/20 active:scale-95"
-                        >
-                          <p className="text-sm font-medium text-[#1B5EA8]">{cat}</p>
-                        </button>
-                      ))}
-                    </>
-                  )}
-                </div>
+                <h3 className="mb-6 text-lg font-semibold">Stores Near You</h3>
+                {nearbyLoading ? (
+                  <div className="space-y-3">
+                    {[1, 2, 3].map(i => (
+                      <div key={i} className="flex items-center gap-4 p-4 rounded-lg bg-[var(--surface-1)] animate-pulse">
+                        <div className="w-12 h-12 rounded-full bg-[var(--surface-2)]" />
+                        <div className="flex-1 space-y-2">
+                          <div className="h-4 w-32 bg-[var(--surface-2)] rounded" />
+                          <div className="h-3 w-20 bg-[var(--surface-2)] rounded" />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : nearbyStores.length > 0 ? (
+                  <div className="space-y-3">
+                    {nearbyStores.map((store) => (
+                      <Link
+                        key={store.id}
+                        href={`/profile/${store.username}`}
+                        className="flex items-center gap-4 p-4 rounded-lg border border-[var(--border-color)] bg-gradient-to-br from-[var(--surface-1)] to-[var(--surface-2)] transition-all duration-200 hover:border-[#1B5EA8] hover:shadow-md hover:shadow-[#1B5EA8]/20"
+                      >
+                        <div className="w-12 h-12 rounded-full overflow-hidden bg-[var(--surface-2)] flex-shrink-0 ring-2 ring-[#1B5EA8]/20">
+                          {store.profile_picture_url ? (
+                            <img src={store.profile_picture_url} alt={store.full_name} className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-lg font-bold text-[#1B5EA8]">
+                              {(store.full_name || store.username)?.[0]?.toUpperCase() || '?'}
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-semibold text-[var(--text-primary)] truncate">{store.full_name || store.username}</p>
+                          <p className="text-xs text-[var(--muted-foreground)] capitalize">{store.type}</p>
+                        </div>
+                        {store.distance !== undefined && (
+                          <span className="text-xs font-medium text-[#1B5EA8] flex-shrink-0">
+                            {store.distance < 1 ? `${Math.round(store.distance * 1000)}m` : `${store.distance.toFixed(1)}km`}
+                          </span>
+                        )}
+                      </Link>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-[var(--muted-foreground)] text-sm text-center py-4">No stores found nearby</p>
+                )}
               </div>
             )}
           </section>

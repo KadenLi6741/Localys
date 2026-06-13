@@ -25,18 +25,18 @@ function ChatsContent() {
   const [showNewChatModal, setShowNewChatModal] = useState(false);
 
   return (
-    <div className="min-h-screen bg-white text-[#1A1A1A] pb-24 lg:pb-8">
+    <div className="min-h-screen bg-background text-foreground pb-24 lg:pb-8">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-[var(--color-charcoal)]/80 backdrop-blur-md border-b border-[var(--color-charcoal-lighter-plus)]">
+      <div className="sticky top-0 z-10 bg-card/80 backdrop-blur-md border-b border-border">
         <div className="w-full px-4 lg:px-12 py-4 flex items-center justify-between">
-          <h1 className="entrance-slide text-2xl font-bold text-[var(--color-cream)]" style={{ animation: 'slideInLeft 0.4s ease-out forwards', opacity: 0 }}>Messages</h1>
+          <h1 className="entrance-slide text-2xl font-bold text-foreground" style={{ animation: 'slideInLeft 0.4s ease-out forwards', opacity: 0 }}>Messages</h1>
           <button
             onClick={() => setShowNewChatModal(true)}
-            className="entrance-scale w-11 h-11 rounded-full bg-[var(--color-charcoal-light)] hover:bg-[var(--color-charcoal-lighter)] border border-[var(--color-charcoal-lighter-plus)] flex items-center justify-center transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1B5EA8] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-charcoal)]"
+            className="entrance-scale w-11 h-11 rounded-full bg-surface hover:bg-surface-2 border border-border flex items-center justify-center transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             style={{ animation: 'scaleIn 0.3s ease-out 0.15s forwards', opacity: 0 }}
             aria-label="New chat"
           >
-            <svg className="w-6 h-6 text-[var(--color-cream)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-6 h-6 text-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
           </button>
@@ -46,12 +46,12 @@ function ChatsContent() {
       {/* Chats Content */}
       <div className="w-full px-4 lg:px-12 py-8">
         {error && (
-          <div className="entrance-fade mb-6 p-4 bg-[#E05C3A]/10 border border-[#E05C3A]/50 rounded-xl" style={{ animation: 'fadeInUp 0.4s ease-out forwards', opacity: 0 }}>
-            <p className="text-[#E05C3A] font-semibold mb-2">Error loading chats</p>
-            <p className="text-[#E05C3A]/80 text-sm mb-3">{error.message}</p>
+          <div className="entrance-fade mb-6 p-4 bg-destructive/10 border border-destructive/50 rounded-[4px]" style={{ animation: 'fadeInUp 0.4s ease-out forwards', opacity: 0 }}>
+            <p className="text-destructive font-semibold mb-2">Error loading chats</p>
+            <p className="text-destructive/80 text-sm mb-3">{error.message}</p>
             <button
               onClick={refresh}
-              className="px-4 py-2 text-sm font-medium rounded-lg bg-[#E05C3A]/20 hover:bg-[#E05C3A]/30 text-[#E05C3A] border border-[#E05C3A]/40 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E05C3A]"
+              className="px-4 py-2 text-sm font-medium rounded-[4px] bg-destructive/20 hover:bg-destructive/30 text-destructive border border-destructive/40 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-destructive"
             >
               Retry
             </button>

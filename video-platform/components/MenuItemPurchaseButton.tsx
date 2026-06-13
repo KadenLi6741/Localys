@@ -55,7 +55,7 @@ export function MenuItemPurchaseButton({
     <div className="flex gap-2">
       <button
         onClick={handleBuyNow}
-        className="flex-1 bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+        className="btn-shine flex-1 bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
       >
         <span>Buy Now</span>
         <span className="text-sm">${itemPrice.toFixed(2)}</span>

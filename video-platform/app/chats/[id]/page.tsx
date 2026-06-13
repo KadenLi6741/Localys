@@ -53,11 +53,11 @@ function ChatContent() {
   };
 
   return (
-    <div className="fixed inset-0 z-40 bg-white text-[#1A1A1A] flex flex-col">
+    <div className="fixed inset-0 z-40 bg-background text-foreground flex flex-col">
       {/* Header */}
-      <div className="shrink-0 z-10 bg-white/80 backdrop-blur-md border-b border-[#E8E8E4] px-4 py-4">
+      <div className="shrink-0 z-10 bg-card/80 backdrop-blur-md border-b border-border px-4 py-4">
         <div className="flex items-center gap-4">
-          <button onClick={() => router.back()} className="text-[#1A1A1A]">
+          <button onClick={() => router.back()} className="text-foreground">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
@@ -77,7 +77,7 @@ function ChatContent() {
       </div>
 
       {/* Message Input */}
-      <form onSubmit={handleSendMessage} className="shrink-0 bg-white/80 backdrop-blur-md border-t border-[#E8E8E4] p-4">
+      <form onSubmit={handleSendMessage} className="shrink-0 bg-card/80 backdrop-blur-md border-t border-border p-4">
         <div className="flex gap-2">
           <input
             type="text"
@@ -85,12 +85,12 @@ function ChatContent() {
             onChange={(e) => setNewMessage(e.target.value)}
             placeholder="Type a message..."
             disabled={sending}
-            className="flex-1 bg-[#F8F8F6] border border-[#E8E8E4] rounded-lg px-4 py-3 text-[#1A1A1A] placeholder-[#9E9A90] focus:outline-none focus:border-[#1A1A1A]/30 disabled:opacity-50"
+            className="flex-1 bg-surface border border-border rounded-[4px] px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary disabled:opacity-50"
           />
           <button
             type="submit"
             disabled={!newMessage.trim() || sending}
-            className="bg-[#1A1A1A] text-white px-6 py-3 rounded-lg font-semibold disabled:bg-[#E8E8E4] disabled:text-[#9E9A90] disabled:cursor-not-allowed hover:bg-[#1A1A1A]/90 transition-all duration-200 active:scale-95"
+            className="bg-primary text-primary-foreground px-6 py-3 rounded-[4px] font-semibold disabled:bg-surface disabled:text-muted-foreground disabled:cursor-not-allowed hover:bg-primary/90 transition-all duration-200 active:scale-95"
           >
             {sending ? 'Sending...' : 'Send'}
           </button>

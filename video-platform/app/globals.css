@@ -1,96 +1,145 @@
-@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;500;600;700;800&display=swap');
 @import "tailwindcss";
+@custom-variant dark (&:is(.dark *));
+
+/* ============================================================
+   LOCALY DESIGN TOKENS — SoundCloud-inspired, orange accent.
+   Flat & almost shadowless: definition comes from 1px hairlines
+   and grayscale shifts, never drop shadows. Content supplies the
+   color; chrome stays neutral.
+     Light  = white canvas      (#ffffff)
+     Dark   = near-black canvas (#121212)
+   Single accent: orange #f97316. Squared 4px corners.
+   ------------------------------------------------------------
+   The ~2,700-line component layer below + inline styles in TSX
+   reference legacy variable names (--color-*, --accent-blue,
+   --bg-main, --dark-text, …). We DO NOT rewrite those consumers;
+   instead every legacy name is re-pointed at a token here, so the
+   whole app inherits the new system — and dark mode — for free.
+   ============================================================ */
 
 :root {
-  /* ========== COLOR PALETTE ========== */
-  --primary-blue: #2C5E95;
-  --accent-blue: #2A6FD6;
-  --dark-text: #111111;
+  --radius: 4px;
+
+  /* ---- shadcn-compatible surface + accent tokens (LIGHT) ---- */
+  --background: #ffffff;
+  --foreground: #121212;
+  --card: #ffffff;
+  --card-foreground: #121212;
+  --popover: #ffffff;
+  --popover-foreground: #121212;
+  --primary: #f97316;
+  --primary-foreground: #ffffff;
+  --secondary: #f2f2f2;
+  --secondary-foreground: #121212;
+  --muted: #f2f2f2;
+  --muted-foreground: #666666;
+  --accent: #f97316;
+  --accent-foreground: #ffffff;
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+  --border: #cccccc;
+  --input: #cccccc;
+  --ring: #f97316;
+  --surface: #f2f2f2;     /* filled inputs / panels */
+  --surface-2: #e6e6e6;   /* hover / nested        */
+  --success: #16a34a;
+  --warning: #d97706;
+
+  /* ---- Typography (Inter, loaded via next/font as --font-inter) ---- */
+  --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-serif: var(--font-sans);
+  --font-outfit: var(--font-sans);
+  --font-cormorant: var(--font-sans);
+  --font-mono: var(--font-jetbrains-mono), 'JetBrains Mono', ui-monospace, monospace;
+
+  /* ============================================================
+     LEGACY ALIASES → tokens (remap, don't rewrite consumers).
+     These read the base tokens above via var(), so flipping the
+     base tokens in .dark cascades through the entire app.
+     ============================================================ */
+
+  /* raw palette helpers */
+  --white: #ffffff;
   --pure-black: #000000;
-  --medium-gray: #777777;
-  --light-gray: #F5F5F5;
-  --white: #FFFFFF;
+  --medium-gray: var(--muted-foreground);
+  --light-gray: var(--secondary);
 
-  --bg-main: #FFFFFF;
-  --bg-section: #F5F5F5;
-  --bg-banner: #2C5E95;
-  --text-banner: #FFFFFF;
-  --text-navbar: #111111;
-  --text-category: #222222;
-  --text-heading: #000000;
-  --text-product: #1A1A1A;
-  --text-label: #777777;
-  --text-price: #2A6FD6;
-  --text-subheading: #333333;
+  /* canvases / surfaces */
+  --bg-main: var(--background);
+  --bg-section: var(--secondary);
+  --bg-banner: var(--primary);
+  --text-banner: var(--primary-foreground);
+  --color-bg: var(--background);
+  --color-bg-secondary: var(--secondary);
+  --color-card: var(--card);
+  --surface-1: var(--surface);
+  --surface-overlay: var(--popover);
+  --glass-bg: color-mix(in srgb, var(--card) 80%, transparent);
+  --glass-bg-strong: color-mix(in srgb, var(--card) 92%, transparent);
+  --glass-bg-subtle: color-mix(in srgb, var(--card) 60%, transparent);
+  --glass-border: var(--border);
+  --glass-border-focus: var(--primary);
 
-  /* Legacy aliases — keeps existing component classes working */
-  --color-bg: #FFFFFF;
-  --color-bg-secondary: #F5F5F5;
-  --color-card: #FFFFFF;
-  --color-card-shadow: 0 2px 20px rgba(0,0,0,0.06);
-  --color-text-primary: #111111;
-  --color-text-secondary: #777777;
-  --color-text-muted: #999999;
-  --color-border: #E0E0E0;
-  --color-border-hover: #CCCCCC;
-  --color-accent: #2A6FD6;
-  --color-accent-hover: #245FCC;
-  --color-accent-subtle: rgba(42,111,214,0.08);
+  /* text levels */
+  --dark-text: var(--foreground);
+  --text-navbar: var(--foreground);
+  --text-category: var(--foreground);
+  --text-heading: var(--foreground);
+  --text-product: var(--foreground);
+  --text-subheading: var(--foreground);
+  --text-label: var(--muted-foreground);
+  --text-primary: var(--foreground);
+  --text-secondary: var(--muted-foreground);
+  --text-tertiary: var(--muted-foreground);
+  --text-muted: var(--muted-foreground);
+  --text-faint: var(--muted-foreground);
+  --placeholder: var(--muted-foreground);
+  --color-text-primary: var(--foreground);
+  --color-text-secondary: var(--muted-foreground);
+  --color-text-muted: var(--muted-foreground);
 
-  /* Status */
-  --color-success: #2D8A4E;
-  --color-success-light: rgba(45,138,78,0.08);
-  --color-error: #D64045;
-  --color-error-light: rgba(214,64,69,0.08);
-  --color-warning: #E2A03F;
-  --color-warning-light: rgba(226,160,63,0.08);
+  /* borders */
+  --border-color: var(--border);
+  --color-border: var(--border);
+  --color-border-hover: var(--surface-2);
 
-  /* Legacy mapping */
-  --color-charcoal: #FFFFFF;
-  --color-charcoal-light: #F5F5F5;
-  --color-charcoal-lighter: #EEEEEE;
-  --color-charcoal-lighter-plus: #E0E0E0;
-  --color-amber: #2A6FD6;
-  --color-amber-light: rgba(42,111,214,0.08);
-  --color-amber-lighter: rgba(42,111,214,0.04);
-  --color-cream: #111111;
-  --color-body-text: #777777;
-  --color-sage: #2D8A4E;
-  --color-sage-light: rgba(45,138,78,0.08);
-  --color-warm-red: #D64045;
-  --color-warm-red-light: rgba(214,64,69,0.08);
+  /* accent (was blue → now orange) */
+  --primary-blue: var(--primary);
+  --accent-blue: var(--primary);
+  --text-price: var(--primary);
+  --color-accent: var(--primary);
+  --color-accent-hover: color-mix(in srgb, var(--primary), #000 8%);
+  --color-accent-subtle: color-mix(in srgb, var(--primary) 12%, transparent);
 
-  /* ========== TYPOGRAPHY ========== */
-  --font-sans: 'Nunito Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  --font-serif: 'Nunito Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  --font-outfit: 'Nunito Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
+  /* status */
+  --color-success: var(--success);
+  --color-success-light: color-mix(in srgb, var(--success) 12%, transparent);
+  --color-error: var(--destructive);
+  --color-error-light: color-mix(in srgb, var(--destructive) 12%, transparent);
+  --color-warning: var(--warning);
+  --color-warning-light: color-mix(in srgb, var(--warning) 12%, transparent);
 
-  /* ========== THEME VARS ========== */
-  --background: #FFFFFF;
-  --foreground: #111111;
-  --surface-1: rgba(0, 0, 0, 0.03);
-  --surface-2: rgba(0, 0, 0, 0.06);
-  --surface-overlay: rgba(255, 255, 255, 0.92);
-  --border-color: #E0E0E0;
-  --card-shadow: 0 2px 20px rgba(0,0,0,0.06);
+  /* legacy "warm dark / amber" palette aliases (older components) */
+  --color-charcoal: var(--background);
+  --color-charcoal-light: var(--secondary);
+  --color-charcoal-lighter: var(--surface);
+  --color-charcoal-lighter-plus: var(--border);
+  --color-charcoal-border: var(--border);
+  --color-amber: var(--primary);
+  --color-amber-light: color-mix(in srgb, var(--primary) 12%, transparent);
+  --color-amber-lighter: color-mix(in srgb, var(--primary) 6%, transparent);
+  --color-cream: var(--foreground);
+  --color-body-text: var(--muted-foreground);
+  --color-sage: var(--success);
+  --color-sage-light: color-mix(in srgb, var(--success) 12%, transparent);
+  --color-warm-red: var(--destructive);
+  --color-warm-red-light: color-mix(in srgb, var(--destructive) 12%, transparent);
 
-  /* ========== TEXT LEVELS ========== */
-  --text-primary: #111111;
-  --text-secondary: #777777;
-  --text-tertiary: #999999;
-  --text-muted: #999999;
-  --text-faint: #BBBBBB;
+  /* card "shadow" → flat hairline (no drop shadows in this system) */
+  --color-card-shadow: inset 0 0 0 1px var(--border);
+  --card-shadow: inset 0 0 0 1px var(--border);
 
-  /* ========== GLASS / SURFACE ========== */
-  --glass-bg: rgba(255, 255, 255, 0.8);
-  --glass-bg-strong: rgba(255, 255, 255, 0.92);
-  --glass-bg-subtle: rgba(255, 255, 255, 0.6);
-  --glass-border: #E0E0E0;
-  --glass-border-focus: #2A6FD6;
-  --placeholder: #999999;
-
-  /* ========== SPACING SCALE ========== */
+  /* ---- Spacing scale (4px base, unchanged) ---- */
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -102,19 +151,86 @@
   --space-20: 80px;
   --space-24: 96px;
 
-  /* ========== BORDER RADIUS ========== */
-  --radius-btn: 4px;
-  --radius-card: 6px;
-  --radius-input: 4px;
+  /* ---- Border radius → squared 4px (avatars stay round via rounded-full) ---- */
+  --radius-btn: var(--radius);
+  --radius-card: var(--radius);
+  --radius-input: var(--radius);
 }
 
-/* No separate dark mode — single light theme */
+/* ============================================================
+   DARK THEME — flips only the base tokens; every legacy alias
+   above reads them through var(), so the whole app follows.
+   ============================================================ */
+.dark {
+  --background: #121212;
+  --foreground: #ffffff;
+  --card: #1a1a1a;
+  --card-foreground: #ffffff;
+  --popover: #1a1a1a;
+  --popover-foreground: #ffffff;
+  --primary: #f97316;
+  --primary-foreground: #ffffff;
+  --secondary: #303030;
+  --secondary-foreground: #ffffff;
+  --muted: #303030;
+  --muted-foreground: #999999;
+  --accent: #ff7a1a;
+  --accent-foreground: #121212;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --border: rgba(255, 255, 255, 0.12);
+  --input: rgba(255, 255, 255, 0.16);
+  --ring: #f97316;
+  --surface: #303030;
+  --surface-2: #666666;
+  --success: #22c55e;
+  --warning: #f59e0b;
+}
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+
+  /* Squared corners — neutralise Tailwind's larger radii too */
+  --radius-sm: var(--radius);
+  --radius-md: var(--radius);
+  --radius-lg: var(--radius);
+  --radius-xl: var(--radius);
+  --radius-2xl: var(--radius);
+  --radius-3xl: var(--radius);
+
   --font-sans: var(--font-sans);
   --font-mono: var(--font-mono);
+
+  /* Type scale (body never below 14px) */
+  --text-caption: 12px;
+  --text-body-sm: 14px;
+  --text-body: 17px;
+  --text-subheading: 22px;
+  --text-heading-sm: 28px;
+  --text-heading: 36px;
+  --text-display: 60px;
 }
 
 html, body {
@@ -447,13 +563,13 @@ code, pre {
 }
 
 @keyframes unreadPulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(26,26,26,0.4); }
-  50% { box-shadow: 0 0 0 6px rgba(26,26,26,0); }
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--primary) 45%, transparent); }
+  50% { box-shadow: 0 0 0 6px color-mix(in srgb, var(--primary) 0%, transparent); }
 }
 
 @keyframes onlineIndicatorPulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(45,138,78,0.7); }
-  50% { box-shadow: 0 0 0 4px rgba(45,138,78,0); }
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--success) 70%, transparent); }
+  50% { box-shadow: 0 0 0 4px color-mix(in srgb, var(--success) 0%, transparent); }
 }
 
 @keyframes tabSwitchIn {
@@ -517,14 +633,14 @@ button, a {
 .animate-fade-in-up:nth-child(10) { animation-delay: 450ms; }
 
 .animate-skeleton-shimmer {
-  background: linear-gradient(90deg, #F0F0EC 0%, #E8E8E4 50%, #F0F0EC 100%);
+  background: linear-gradient(90deg, var(--surface) 0%, var(--surface-2) 50%, var(--surface) 100%);
   background-size: 1000px 100%;
   animation: skeletonShimmer 2s infinite;
 }
 
 .animate-skeleton-pulse {
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  background-color: #F0F0EC;
+  background-color: var(--surface);
 }
 
 .animate-like-pop {
@@ -532,7 +648,7 @@ button, a {
 }
 
 .like-active {
-  color: #1A1A1A;
+  color: var(--primary);
 }
 
 .animate-subtle-pulse {
@@ -569,7 +685,7 @@ button, a {
 
 .animate-shimmer {
   animation: shimmer 2s infinite;
-  background: linear-gradient(90deg, #F0F0EC 0%, #E8E8E4 50%, #F0F0EC 100%);
+  background: linear-gradient(90deg, var(--surface) 0%, var(--surface-2) 50%, var(--surface) 100%);
   background-size: 1000px 100%;
 }
 
@@ -645,7 +761,7 @@ select:focus-visible,
 /* Primary Button — Blue */
 .btn-primary {
   background-color: var(--accent-blue);
-  color: #FFFFFF;
+  color: var(--primary-foreground);
   padding: 12px 24px;
   border-radius: var(--radius-btn);
   font-weight: 600;
@@ -658,7 +774,7 @@ select:focus-visible,
 }
 
 .btn-primary:hover {
-  background-color: #245FCC;
+  background-color: color-mix(in srgb, var(--primary), #000 12%);
 }
 
 .btn-primary:active {
@@ -687,7 +803,7 @@ select:focus-visible,
 
 .btn-secondary:hover {
   background-color: var(--accent-blue);
-  color: #FFFFFF;
+  color: var(--primary-foreground);
 }
 
 .btn-secondary:active {
@@ -757,11 +873,11 @@ select:focus-visible,
 }
 
 .card:hover {
-  box-shadow: 0 4px 30px rgba(0,0,0,0.1);
+  box-shadow: inset 0 0 0 1px var(--primary);
 }
 
 .card-glass {
-  background-color: rgba(255, 255, 255, 0.9);
+  background-color: var(--glass-bg-strong);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-card);
   padding: 16px;
@@ -803,7 +919,7 @@ select:focus-visible,
 /* ===================== */
 
 .input-field {
-  background-color: #FFFFFF;
+  background-color: var(--card);
   border: 1px solid var(--color-border);
   color: var(--color-text-primary);
   padding: 12px 16px;
@@ -828,7 +944,7 @@ select:focus-visible,
 }
 
 .form-input {
-  background-color: #FFFFFF;
+  background-color: var(--card);
   border: 1px solid var(--color-border);
   color: var(--color-text-primary);
   padding: 12px 16px;
@@ -853,7 +969,7 @@ select:focus-visible,
 }
 
 .form-textarea {
-  background-color: #FFFFFF;
+  background-color: var(--card);
   border: 1px solid var(--color-border);
   color: var(--color-text-primary);
   padding: 12px 16px;
@@ -968,14 +1084,14 @@ select:focus-visible,
 /* ===================== */
 
 .skeleton-card {
-  background: #F0F0EC;
+  background: var(--surface);
   animation: skeletonShimmer 2s infinite;
   background-size: 1000px 100%;
   border-radius: 0;
 }
 
 .skeleton-text {
-  background: #F0F0EC;
+  background: var(--surface);
   animation: skeletonShimmer 2s infinite;
   background-size: 1000px 100%;
   border-radius: 2px;
@@ -983,7 +1099,7 @@ select:focus-visible,
 }
 
 .skeleton-text-lg {
-  background: #F0F0EC;
+  background: var(--surface);
   animation: skeletonShimmer 2s infinite;
   background-size: 1000px 100%;
   border-radius: 2px;
@@ -991,7 +1107,7 @@ select:focus-visible,
 }
 
 .skeleton-image {
-  background: #F0F0EC;
+  background: var(--surface);
   animation: skeletonShimmer 2s infinite;
   background-size: 1000px 100%;
   border-radius: 0;
@@ -1062,7 +1178,7 @@ div#devtools-indicator.nextjs-toast {
 }
 
 .interactive-card:hover {
-  box-shadow: 0 4px 30px rgba(0,0,0,0.1);
+  box-shadow: inset 0 0 0 1px var(--primary);
 }
 
 .interactive-card:active {
@@ -1098,7 +1214,7 @@ div#devtools-indicator.nextjs-toast {
 
 /* Video overlay — white frosted glass */
 .video-overlay-glass {
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--glass-bg-strong);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
 }
@@ -1168,7 +1284,7 @@ div#devtools-indicator.nextjs-toast {
 
 .filter-chip {
   transition: all 0.2s ease;
-  background-color: #FFFFFF;
+  background-color: var(--card);
   border: 1px solid var(--color-border);
   color: var(--color-text-primary);
   border-radius: var(--radius-btn);
@@ -1186,7 +1302,7 @@ div#devtools-indicator.nextjs-toast {
 
 .filter-chip.active {
   background-color: var(--accent-blue);
-  color: #FFFFFF;
+  color: var(--primary-foreground);
   border-color: var(--accent-blue);
 }
 
@@ -1220,7 +1336,7 @@ div#devtools-indicator.nextjs-toast {
 }
 
 .search-result-card:hover {
-  box-shadow: 0 4px 30px rgba(0,0,0,0.1);
+  box-shadow: inset 0 0 0 1px var(--primary);
   border-color: var(--accent-blue);
 }
 
@@ -1380,7 +1496,7 @@ div#devtools-indicator.nextjs-toast {
   height: 20px;
   border-radius: 50%;
   background-color: var(--color-accent);
-  color: #FFFFFF;
+  color: var(--primary-foreground);
   font-size: 11px;
   font-weight: 700;
 }
@@ -1393,7 +1509,7 @@ div#devtools-indicator.nextjs-toast {
   position: absolute;
   bottom: 0;
   right: 0;
-  border: 2px solid #FFFFFF;
+  border: 2px solid var(--card);
   animation: onlineIndicatorPulse 2s infinite;
 }
 
@@ -1413,7 +1529,7 @@ div#devtools-indicator.nextjs-toast {
 
 .message-bubble-sent .bubble {
   background-color: var(--color-accent);
-  color: #FFFFFF;
+  color: var(--primary-foreground);
   padding: 12px 16px;
   border-radius: 16px 16px 4px 16px;
   max-width: 85%;
@@ -1449,7 +1565,7 @@ div#devtools-indicator.nextjs-toast {
   align-items: center;
   gap: 8px;
   padding: 12px 16px;
-  background-color: #FFFFFF;
+  background-color: var(--card);
   border-top: 1px solid var(--color-border);
 }
 
@@ -1538,7 +1654,7 @@ div#devtools-indicator.nextjs-toast {
 }
 
 .order-card:hover {
-  box-shadow: 0 4px 30px rgba(0,0,0,0.08);
+  box-shadow: inset 0 0 0 1px var(--primary);
   border-color: var(--color-border-hover);
 }
 
@@ -1650,7 +1766,7 @@ div#devtools-indicator.nextjs-toast {
   align-items: center;
   gap: 12px;
   padding: 12px;
-  background-color: #FFFFFF;
+  background-color: var(--card);
   border-radius: 0;
   border: 1px solid var(--color-border);
 }
@@ -1726,7 +1842,7 @@ div#devtools-indicator.nextjs-toast {
 
 .boost-button {
   background-color: var(--accent-blue);
-  color: #FFFFFF;
+  color: var(--primary-foreground);
   padding: 12px 24px;
   border-radius: var(--radius-btn);
   font-weight: 600;
@@ -1739,7 +1855,7 @@ div#devtools-indicator.nextjs-toast {
 }
 
 .boost-button:hover {
-  background-color: #245FCC;
+  background-color: color-mix(in srgb, var(--primary), #000 12%);
 }
 
 .boost-button:active {
@@ -1819,7 +1935,7 @@ div#devtools-indicator.nextjs-toast {
 }
 
 .service-card:hover {
-  box-shadow: 0 4px 30px rgba(0,0,0,0.08);
+  box-shadow: inset 0 0 0 1px var(--primary);
   border-color: var(--color-border-hover);
 }
 
@@ -1853,7 +1969,7 @@ div#devtools-indicator.nextjs-toast {
 }
 
 .profile-video-card:hover {
-  box-shadow: 0 4px 30px rgba(0,0,0,0.1);
+  box-shadow: inset 0 0 0 1px var(--primary);
 }
 
 .profile-video-image {
@@ -1877,7 +1993,7 @@ div#devtools-indicator.nextjs-toast {
 }
 
 .profile-video-play-icon {
-  color: #FFFFFF;
+  color: var(--primary-foreground);
   font-size: 32px;
   opacity: 0;
   transition: opacity 0.3s ease;
@@ -1942,7 +2058,7 @@ div#devtools-indicator.nextjs-toast {
 
 .top-navbar {
   width: 100%;
-  background-color: #FFFFFF;
+  background-color: var(--card);
   border-bottom: 1px solid var(--color-border);
   position: sticky;
   top: 0;
@@ -1953,7 +2069,7 @@ div#devtools-indicator.nextjs-toast {
 .top-navbar-inner {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 0 32px;
+  padding: 0 48px;
   height: 100%;
   display: flex;
   align-items: center;
@@ -1963,7 +2079,9 @@ div#devtools-indicator.nextjs-toast {
 .nav-links {
   display: flex;
   align-items: center;
-  gap: 40px;
+  gap: 48px;
+  margin-left: 64px;
+  margin-right: 64px;
 }
 
 .nav-link {
@@ -1991,7 +2109,7 @@ div#devtools-indicator.nextjs-toast {
   left: 0;
   width: 0%;
   height: 2px;
-  background: #111111;
+  background: var(--primary);
   transition: width 0.25s ease-out;
 }
 
@@ -2009,13 +2127,15 @@ div#devtools-indicator.nextjs-toast {
   to { width: 100%; }
 }
 
-/* Add to Cart shine animation */
-.btn-add-to-cart {
+/* Shared shine animation for action buttons */
+.btn-add-to-cart,
+.btn-shine {
   position: relative;
   overflow: hidden;
 }
 
-.btn-add-to-cart::after {
+.btn-add-to-cart::after,
+.btn-shine::after {
   content: '';
   position: absolute;
   top: 0;
@@ -2032,7 +2152,8 @@ div#devtools-indicator.nextjs-toast {
   pointer-events: none;
 }
 
-.btn-add-to-cart:disabled::after {
+.btn-add-to-cart:disabled::after,
+.btn-shine:disabled::after {
   animation: none;
 }
 
@@ -2074,7 +2195,7 @@ div#devtools-indicator.nextjs-toast {
   top: 100%;
   left: 0;
   right: 0;
-  background: #FFFFFF;
+  background: var(--card);
   border-bottom: 1px solid var(--color-border);
   padding: 16px 24px;
   animation: slideDown 0.3s ease-out;
@@ -2085,7 +2206,7 @@ div#devtools-indicator.nextjs-toast {
   width: 100%;
   padding: 12px 16px;
   border: 1px solid var(--color-border);
-  background: #FFFFFF;
+  background: var(--card);
   color: var(--color-text-primary);
   font-size: 14px;
   font-family: var(--font-sans);
@@ -2104,7 +2225,7 @@ div#devtools-indicator.nextjs-toast {
   direction: rtl;
   width: 6px;
   height: 80px;
-  background: #E8E8E4;
+  background: var(--surface-2);
   border-radius: 3px;
   outline: none;
   cursor: pointer;
@@ -2115,22 +2236,22 @@ div#devtools-indicator.nextjs-toast {
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  background: #1B5EA8;
+  background: var(--primary);
   cursor: pointer;
-  border: 2px solid #FFFFFF;
+  border: 2px solid var(--card);
   box-shadow: 0 1px 3px rgba(0,0,0,0.2);
 }
 .volume-slider-vertical::-moz-range-thumb {
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  background: #1B5EA8;
+  background: var(--primary);
   cursor: pointer;
-  border: 2px solid #FFFFFF;
+  border: 2px solid var(--card);
   box-shadow: 0 1px 3px rgba(0,0,0,0.2);
 }
 .volume-slider-vertical::-webkit-slider-runnable-track {
-  background: linear-gradient(to top, #1B5EA8 var(--fill, 50%), #E8E8E4 var(--fill, 50%));
+  background: linear-gradient(to top, var(--primary) var(--fill, 50%), var(--surface-2) var(--fill, 50%));
   border-radius: 3px;
 }
 
@@ -2140,9 +2261,9 @@ div#devtools-indicator.nextjs-toast {
   top: calc(100% + 4px);
   right: 0;
   width: 200px;
-  background: #FFFFFF;
+  background: var(--card);
   border: 1px solid var(--color-border);
-  box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+  box-shadow: none;
   z-index: 60;
   animation: dropdownExpand 0.2s ease-out;
   overflow: hidden;
@@ -2193,12 +2314,12 @@ div#devtools-indicator.nextjs-toast {
   height: 100vh;
   width: 420px;
   max-width: 100vw;
-  background: #FFFFFF;
+  background: var(--card);
   z-index: 101;
   display: flex;
   flex-direction: column;
   animation: drawerSlideIn 0.3s ease-out;
-  box-shadow: -4px 0 30px rgba(0,0,0,0.1);
+  box-shadow: none;
 }
 
 .cart-drawer.closing {
@@ -2256,7 +2377,7 @@ div#devtools-indicator.nextjs-toast {
   width: 100%;
   height: 60px;
   background-color: var(--bg-banner);
-  color: #FFFFFF;
+  color: var(--primary-foreground);
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -2335,7 +2456,7 @@ div#devtools-indicator.nextjs-toast {
 }
 
 .blog-card {
-  background: #FFFFFF;
+  background: var(--card);
   border: none;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -2424,7 +2545,7 @@ div#devtools-indicator.nextjs-toast {
 }
 
 .quick-view-modal {
-  background: #FFFFFF;
+  background: var(--card);
   width: 90vw;
   max-width: 1000px;
   max-height: 90vh;
@@ -2472,7 +2593,7 @@ div#devtools-indicator.nextjs-toast {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #FFFFFF;
+  background: var(--card);
   border: 1px solid var(--color-border);
   cursor: pointer;
   z-index: 10;
@@ -2531,7 +2652,7 @@ div#devtools-indicator.nextjs-toast {
   top: -40px;
   left: 0;
   background: var(--color-accent);
-  color: #FFFFFF;
+  color: var(--primary-foreground);
   padding: 8px 16px;
   text-decoration: none;
   z-index: 100;
@@ -2575,10 +2696,10 @@ body::before {
 /* ELEVATION SYSTEM */
 /* ===================== */
 
-.elevation-1 { box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
-.elevation-2 { box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
-.elevation-3 { box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
-.elevation-4 { box-shadow: 0 8px 30px rgba(0,0,0,0.12); }
+.elevation-1 { box-shadow: inset 0 0 0 1px var(--border); }
+.elevation-2 { box-shadow: inset 0 0 0 1px var(--border); }
+.elevation-3 { box-shadow: inset 0 0 0 1px var(--border); }
+.elevation-4 { box-shadow: inset 0 0 0 1px var(--border); }
 
 .card-hover-lift {
   transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -2586,7 +2707,7 @@ body::before {
 
 .card-hover-lift:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  box-shadow: inset 0 0 0 1px var(--primary);
 }
 
 /* ===================== */
@@ -2603,7 +2724,7 @@ body::before {
 }
 
 .section-alt:nth-child(even) { background-color: var(--color-bg-secondary); }
-.section-alt:nth-child(odd) { background-color: #FFFFFF; }
+.section-alt:nth-child(odd) { background-color: var(--background); }
 
 /* ===================== */
 /* MOTION UTILITIES */
@@ -2636,7 +2757,7 @@ body::before {
 }
 
 img[loading="lazy"] {
-  background: linear-gradient(90deg, #F0F0EC 0%, #E8E8E4 50%, #F0F0EC 100%);
+  background: linear-gradient(90deg, var(--surface) 0%, var(--surface-2) 50%, var(--surface) 100%);
   background-size: 1000px 100%;
   animation: shimmer 2s infinite;
 }
@@ -2669,7 +2790,7 @@ html { scroll-behavior: smooth; }
   width: 18px;
   border-radius: 50%;
   background: var(--color-accent);
-  border: 2px solid #fff;
+  border: 2px solid var(--card);
   cursor: pointer;
   pointer-events: all;
   box-shadow: 0 1px 4px rgba(0,0,0,0.2);
@@ -2680,7 +2801,7 @@ html { scroll-behavior: smooth; }
   width: 18px;
   border-radius: 50%;
   background: var(--color-accent);
-  border: 2px solid #fff;
+  border: 2px solid var(--card);
   cursor: pointer;
   pointer-events: all;
   box-shadow: 0 1px 4px rgba(0,0,0,0.2);

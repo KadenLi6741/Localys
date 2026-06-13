@@ -368,6 +368,7 @@ export interface MenuItem {
   price: number;
   category?: string;
   image_url?: string;
+  image_urls?: string[];
   key_info?: string;
   is_available: boolean;
   created_at: string;
@@ -407,6 +408,7 @@ export interface MenuItemCreateData {
   price: number;
   category?: string;
   image_url?: string;
+  image_urls?: string[];
   key_info?: string;
   is_available?: boolean;
 }
@@ -417,6 +419,7 @@ export interface MenuItemUpdateData {
   price?: number;
   category?: string;
   image_url?: string;
+  image_urls?: string[];
   key_info?: string;
   is_available?: boolean;
 }

@@ -1,33 +1,25 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono, Cormorant_Garamond } from "next/font/google";
+import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
-import { AuthProvider } from "@/contexts/AuthContext";
-import { LanguageProvider } from "@/contexts/LanguageContext";
-import { ThemeProvider } from "@/contexts/ThemeContext";
-import { CartProvider } from "@/contexts/CartContext";
-import { UnreadMessagesProvider } from "@/contexts/UnreadMessagesContext";
+import { Providers } from "./providers";
 import { AppBottomNav } from "@/components/AppBottomNav";
 import { ActivityPanel } from "@/components/ActivityPanel";
-import { ActivityProvider } from "@/contexts/ActivityContext";
 import { PersistentVideoFeed } from "@/components/PersistentVideoFeed";
 import { LayoutShell } from "@/components/LayoutShell";
 
+// Inter is the single UI typeface (Söhne substitute). Weight 100 is reserved
+// for display-scale hero text; 400 body, 600 subheads, 700 button labels.
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
+  weight: ["100", "400", "600", "700"],
 });
 
+// Monospace for codes / prices.
 const jetbrainsMono = JetBrains_Mono({
   variable: "--font-jetbrains-mono",
   subsets: ["latin"],
   weight: ["400", "500", "600"],
-});
-
-const cormorant = Cormorant_Garamond({
-  variable: "--font-cormorant",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -41,31 +33,26 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full">
-      <body
-        className={`${inter.variable} ${jetbrainsMono.variable} ${cormorant.variable} antialiased h-full`}
-      >
-        <ThemeProvider>
-          <AuthProvider>
-            <LanguageProvider>
-              <CartProvider>
-                <ActivityProvider>
-                <UnreadMessagesProvider>
-                <a href="#main-content" className="skip-to-main">Skip to main content</a>
-                <PersistentVideoFeed />
-                <LayoutShell>
-                  <main id="main-content" className="responsive-container">
-                    {children}
-                  </main>
-                </LayoutShell>
-                <AppBottomNav />
-                <ActivityPanel />
-                </UnreadMessagesProvider>
-                </ActivityProvider>
-              </CartProvider>
-            </LanguageProvider>
-          </AuthProvider>
-        </ThemeProvider>
+    // suppressHydrationWarning: next-themes sets the theme class on <html>
+    // before React hydrates, which would otherwise trip a mismatch warning.
+    <html
+      lang="en"
+      className={`h-full ${inter.variable} ${jetbrainsMono.variable}`}
+      data-scroll-behavior="smooth"
+      suppressHydrationWarning
+    >
+      <body className="antialiased h-full">
+        <Providers>
+          <a href="#main-content" className="skip-to-main">Skip to main content</a>
+          <PersistentVideoFeed />
+          <LayoutShell>
+            <main id="main-content" className="responsive-container">
+              {children}
+            </main>
+          </LayoutShell>
+          <AppBottomNav />
+          <ActivityPanel />
+        </Providers>
       </body>
     </html>
   );

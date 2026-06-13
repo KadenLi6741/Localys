@@ -9,8 +9,11 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase/client';
 import { getOrCreateOneToOneChat } from '@/lib/supabase/messaging';
 import { getUserBusiness, getBusinessLocations, Business, BusinessHours, BusinessLocation } from '@/lib/supabase/profiles';
-import { MenuList } from '@/components/MenuList';
-import { PostedVideos } from '@/components/PostedVideos';
+import { VideoFeed } from '@/components/profile/VideoFeed';
+import { ServicesPanel } from '@/components/profile/ServicesPanel';
+import { BusinessQASection } from '@/components/BusinessQASection';
+import { TrustMetricsBadge } from '@/components/TrustMetricsBadge';
+import { TrustScoreCard } from '@/components/analytics';
 
 const BusinessLocationMap = dynamic(
   () => import('@/components/BusinessLocationMap'),
@@ -71,6 +74,7 @@ function UserProfileContent() {
 
   // 3-dot menu state
   const [showMenu, setShowMenu] = useState(false);
+  const [activeMediaTab, setActiveMediaTab] = useState<'videos' | 'services'>('videos');
   const [showReportModal, setShowReportModal] = useState(false);
   const [reportReason, setReportReason] = useState('');
   const [reportDescription, setReportDescription] = useState('');
@@ -217,6 +221,12 @@ function UserProfileContent() {
     if (showMenu) document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [showMenu]);
+
+  useEffect(() => {
+    if (!profile?.type) {
+      setActiveMediaTab('videos');
+    }
+  }, [profile?.type]);
 
   // Toast auto-dismiss
   useEffect(() => {
@@ -485,7 +495,7 @@ function UserProfileContent() {
         console.error('No chat data returned:', data);
         alert('Failed to create or get chat');
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Unexpected error:', err);
       const errorMsg = err instanceof Error ? err.message : String(err);
       alert(`Error: ${errorMsg}`);
@@ -795,23 +805,103 @@ function UserProfileContent() {
           </div>
         )}
 
-        {/* Services Section (business only) */}
+        {/* Trust Metrics (business only) */}
         {profile.type && (
-          <div className="mt-8 -mx-4 sm:-mx-6 md:-mx-8">
-            <h3 className="text-xl font-semibold text-[var(--color-cream)] mb-4 px-4 sm:px-6 md:px-8">Services</h3>
-            <div className="bg-[var(--color-charcoal-light)] border border-[var(--color-charcoal-lighter-plus)] rounded-lg p-6">
-              <MenuList userId={profile.id} isOwnProfile={false} businessName={business?.business_name || undefined} />
-            </div>
+          <div className="mt-8">
+            <h3 className="text-xl font-semibold text-[var(--color-cream)] mb-4">Trust & Reliability</h3>
+            <TrustMetricsBadge userId={profile.id} />
           </div>
         )}
 
-        {/* Videos Section */}
-        <div className="mt-8">
-          <h3 className="text-xl font-semibold text-[var(--color-cream)] mb-4">Videos</h3>
-          <div className="bg-[var(--color-charcoal-light)] border border-[var(--color-charcoal-lighter-plus)] rounded-lg p-6">
-            <PostedVideos userId={profile.id} isOwnProfile={false} />
+        {/* Business Analytics (business only) */}
+        {profile.type && (
+          <div className="mt-8">
+            <h3 className="text-xl font-semibold text-[var(--color-cream)] mb-4">Business Analytics</h3>
+            <TrustScoreCard userId={profile.id} isBusinessProfile={true} />
           </div>
+        )}
+
+        {/* Media Layout: videos + services */}
+        <div className="mt-8">
+          {profile.type ? (
+            <>
+              <div className="lg:hidden mb-4">
+                <div className="inline-flex rounded-lg border border-[var(--color-charcoal-lighter-plus)] bg-[var(--color-charcoal-light)] p-1">
+                  <button
+                    onClick={() => setActiveMediaTab('videos')}
+                    className={`px-4 py-2 text-sm font-semibold rounded-md transition-colors ${
+                      activeMediaTab === 'videos'
+                        ? 'bg-[#1B5EA8] text-black'
+                        : 'text-[var(--color-cream)]/70 hover:text-[var(--color-cream)]'
+                    }`}
+                  >
+                    Videos
+                  </button>
+                  <button
+                    onClick={() => setActiveMediaTab('services')}
+                    className={`px-4 py-2 text-sm font-semibold rounded-md transition-colors ${
+                      activeMediaTab === 'services'
+                        ? 'bg-[#1B5EA8] text-black'
+                        : 'text-[var(--color-cream)]/70 hover:text-[var(--color-cream)]'
+                    }`}
+                  >
+                    Services
+                  </button>
+                </div>
+              </div>
+
+              <div className="hidden lg:grid lg:grid-cols-12 lg:gap-6">
+                <VideoFeed
+                  userId={profile.id}
+                  isOwnProfile={false}
+                  theme="dark"
+                  className="lg:col-span-8"
+                />
+                <ServicesPanel
+                  userId={profile.id}
+                  businessId={business?.id}
+                  businessName={business?.business_name || undefined}
+                  isOwnProfile={false}
+                  theme="dark"
+                  className="lg:col-span-4"
+                  stickyDesktop
+                />
+              </div>
+
+              <div className="lg:hidden">
+                {activeMediaTab === 'videos' ? (
+                  <VideoFeed
+                    userId={profile.id}
+                    isOwnProfile={false}
+                    theme="dark"
+                  />
+                ) : (
+                  <ServicesPanel
+                    userId={profile.id}
+                    businessId={business?.id}
+                    businessName={business?.business_name || undefined}
+                    isOwnProfile={false}
+                    theme="dark"
+                  />
+                )}
+              </div>
+            </>
+          ) : (
+            <VideoFeed
+              userId={profile.id}
+              isOwnProfile={false}
+              theme="dark"
+            />
+          )}
         </div>
+
+        {/* Questions & Answers (business only) */}
+        {profile.type && (
+          <div className="mt-8">
+            <h3 className="text-xl font-semibold text-[var(--color-cream)] mb-4">Questions & Answers</h3>
+            <BusinessQASection businessId={profile.id} isOwner={user?.id === profile.id} />
+          </div>
+        )}
       </div>
 
       {/* Bottom Navigation Hotbar */}

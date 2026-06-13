@@ -38,7 +38,7 @@ export function ProductQuickView({ isOpen, onClose, item, sellerId, businessName
       // Fetch review stats
       (async () => {
         const { data } = await supabase
-          .from('comments')
+          .from('reviews')
           .select('rating')
           .eq('item_id', item.id)
           .not('rating', 'is', null);
@@ -142,7 +142,7 @@ export function ProductQuickView({ isOpen, onClose, item, sellerId, businessName
             )}
 
             {/* Product Name */}
-            <h2 className="text-[28px] font-bold uppercase text-[#1A1A1A] mb-2" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
+            <h2 className="text-[28px] font-bold uppercase text-foreground mb-2">
               {item.item_name}
             </h2>
 

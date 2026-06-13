@@ -306,7 +306,7 @@ export default function BuyCoinsPage() {
                 <button
                   onClick={() => handleCheckout(pkg.id)}
                   disabled={processing || selectedPackage === pkg.id || !stripeConfigured}
-                  className={`w-full py-3 rounded-lg font-semibold transition-all ${
+                  className={`btn-shine w-full py-3 rounded-lg font-semibold transition-all ${
                     pkg.popular
                       ? 'bg-[#1B5EA8] text-white hover:bg-[#1B5EA8]/90 disabled:bg-[#1B5EA8]/50'
                       : 'bg-[var(--glass-bg)] text-[var(--text-primary)] hover:bg-[var(--glass-bg-strong)] disabled:bg-[var(--glass-bg-subtle)]'

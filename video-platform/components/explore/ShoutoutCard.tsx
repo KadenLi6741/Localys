@@ -174,7 +174,7 @@ export function ShoutoutCard({
 
   return (
     <article
-      className={`bg-white border border-[#E8E8E4] px-3 py-2.5 transition-all duration-300 ${fadingOut ? 'opacity-0 scale-95' : ''}`}
+      className={`bg-card border border-border px-3 py-2.5 rounded-[4px] transition-all duration-300 ${fadingOut ? 'opacity-0 scale-95' : ''}`}
       style={{ animation: `fadeInUp 0.4s ease-out ${index * 0.05}s both`, transition: 'opacity 200ms, transform 200ms' }}
     >
       {/* Author row */}
@@ -190,16 +190,16 @@ export function ShoutoutCard({
               className="w-8 h-8 rounded-full object-cover"
             />
           ) : (
-            <div className="w-8 h-8 rounded-full bg-[#F8F8F6] flex items-center justify-center">
-              <span className="text-xs text-[#6B6B65]">{shoutout.username?.charAt(0)?.toUpperCase() || '?'}</span>
+            <div className="w-8 h-8 rounded-full bg-surface flex items-center justify-center">
+              <span className="text-xs text-muted-foreground">{shoutout.username?.charAt(0)?.toUpperCase() || '?'}</span>
             </div>
           )}
         </Link>
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-1.5">
-            <p className="text-sm font-bold text-[#1A1A1A] truncate">{shoutout.username}</p>
-            <span className="text-[10px] text-[#6B6B65]">&middot;</span>
-            <p className="text-[11px] text-[#6B6B65]">{timeAgo(shoutout.created_at)}</p>
+            <p className="text-sm font-bold text-foreground truncate">{shoutout.username}</p>
+            <span className="text-[10px] text-muted-foreground">&middot;</span>
+            <p className="text-[11px] text-muted-foreground">{timeAgo(shoutout.created_at)}</p>
           </div>
         </div>
 
@@ -208,7 +208,7 @@ export function ShoutoutCard({
           <div className="relative" ref={menuRef}>
             <button
               onClick={() => { setShowMenu(!showMenu); setConfirmDelete(false); }}
-              className="p-1.5 text-[#6B6B65] hover:text-[#1A1A1A] hover:bg-[#F8F8F6] transition-colors"
+              className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-surface transition-colors rounded-[4px]"
             >
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
@@ -216,35 +216,35 @@ export function ShoutoutCard({
             </button>
 
             {showMenu && (
-              <div className="absolute right-0 top-full mt-1 w-44 bg-white border border-[#E8E8E4] overflow-hidden shadow-lg z-20">
+              <div className="absolute right-0 top-full mt-1 w-44 bg-popover border border-border rounded-[4px] overflow-hidden z-20">
                 {!confirmDelete ? (
                   <>
                     <button
                       onClick={() => { setShowMenu(false); onEdit?.(shoutout); }}
-                      className="w-full text-left px-4 py-2.5 text-sm text-[#1A1A1A] hover:bg-[#F8F8F6] transition-colors flex items-center gap-2"
+                      className="w-full text-left px-4 py-2.5 text-sm text-foreground hover:bg-surface transition-colors flex items-center gap-2"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg> Edit
                     </button>
                     <button
                       onClick={() => setConfirmDelete(true)}
-                      className="w-full text-left px-4 py-2.5 text-sm text-[#E05C3A] hover:bg-[#F8F8F6] transition-colors flex items-center gap-2"
+                      className="w-full text-left px-4 py-2.5 text-sm text-destructive hover:bg-surface transition-colors flex items-center gap-2"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg> Delete
                     </button>
                   </>
                 ) : (
                   <div className="p-3">
-                    <p className="text-sm text-[#1A1A1A] mb-2">Delete this shoutout?</p>
+                    <p className="text-sm text-foreground mb-2">Delete this shoutout?</p>
                     <div className="flex gap-2">
                       <button
                         onClick={handleDelete}
-                        className="flex-1 py-1.5 text-xs font-semibold bg-[#E05C3A] text-white hover:bg-[#E05C3A]/80 transition-colors"
+                        className="flex-1 py-1.5 text-xs font-semibold bg-destructive text-white hover:bg-destructive/80 transition-colors rounded-[4px]"
                       >
                         Confirm
                       </button>
                       <button
                         onClick={() => { setConfirmDelete(false); setShowMenu(false); }}
-                        className="flex-1 py-1.5 text-xs font-semibold border border-[#E8E8E4] text-[#6B6B65] hover:text-[#1A1A1A] transition-colors"
+                        className="flex-1 py-1.5 text-xs font-semibold border border-border text-muted-foreground hover:text-foreground transition-colors rounded-[4px]"
                       >
                         Cancel
                       </button>
@@ -262,12 +262,12 @@ export function ShoutoutCard({
         {shoutout.business_id ? (
           <Link
             href={`/profile/${shoutout.business_id}`}
-            className="inline-flex items-center gap-1 text-sm font-semibold text-[#1A1A1A] hover:underline"
+            className="inline-flex items-center gap-1 text-sm font-semibold text-foreground hover:underline"
           >
             @{shoutout.business_name}
           </Link>
         ) : (
-          <span className="inline-flex items-center gap-1 text-sm font-semibold text-[#1A1A1A]">
+          <span className="inline-flex items-center gap-1 text-sm font-semibold text-foreground">
             {shoutout.business_name}
           </span>
         )}
@@ -279,7 +279,7 @@ export function ShoutoutCard({
           {shoutout.tags.map((tag) => (
             <span
               key={tag}
-              className="inline-block px-2 py-0.5 text-xs font-semibold bg-[#F8F8F6] text-[#1A1A1A]"
+              className="inline-block px-2 py-0.5 text-xs font-semibold bg-surface text-foreground rounded-[4px]"
             >
               {TAG_LABELS[tag] || tag}
             </span>
@@ -291,14 +291,14 @@ export function ShoutoutCard({
       <div className="mb-2">
         <p
           ref={textRef}
-          className={`text-sm text-[#1A1A1A] leading-snug whitespace-pre-wrap ${!expanded ? 'line-clamp-3' : ''}`}
+          className={`text-sm text-foreground leading-snug whitespace-pre-wrap ${!expanded ? 'line-clamp-3' : ''}`}
         >
           {shoutout.text}
         </p>
         {shoutout.text.length > 200 && !expanded && (
           <button
             onClick={() => setExpanded(true)}
-            className="text-xs text-[#1A1A1A] font-medium hover:underline mt-1"
+            className="text-xs text-primary font-medium hover:underline mt-1"
           >
             Read more
           </button>
@@ -307,11 +307,11 @@ export function ShoutoutCard({
 
       {/* Video */}
       {shoutout.video_url && (
-        <div className="relative rounded-xl overflow-hidden mb-2">
+        <div className="relative rounded-[4px] overflow-hidden mb-2">
           <video
             ref={videoRef}
             src={shoutout.video_url}
-            className="w-full max-h-80 object-contain bg-black rounded-xl"
+            className="w-full max-h-80 object-contain bg-black rounded-[4px]"
             muted={videoMuted}
             autoPlay
             loop
@@ -344,7 +344,7 @@ export function ShoutoutCard({
             <button
               key={i}
               onClick={() => setPhotoPreview(photo)}
-              className="relative aspect-square overflow-hidden focus:outline-none focus:ring-2 focus:ring-[#1A1A1A]"
+              className="relative aspect-square overflow-hidden focus:outline-none focus:ring-2 focus:ring-primary/30 rounded-[4px]"
             >
               <Image src={photo} alt="" fill unoptimized className="object-cover" />
             </button>
@@ -358,7 +358,7 @@ export function ShoutoutCard({
           {[1, 2, 3, 4, 5].map((star) => (
             <svg
               key={star}
-              className={`w-4 h-4 ${star <= shoutout.star_rating! ? 'text-[#1A1A1A]' : 'text-[#E8E8E4]'}`}
+              className={`w-4 h-4 ${star <= shoutout.star_rating! ? 'text-warning' : 'text-border'}`}
               fill="currentColor"
               viewBox="0 0 20 20"
             >
@@ -369,10 +369,10 @@ export function ShoutoutCard({
       )}
 
       {/* Action bar */}
-      <div className="flex items-center gap-4 pt-1.5 border-t border-[var(--color-charcoal-lighter-plus)]">
+      <div className="flex items-center gap-4 pt-1.5 border-t border-border">
         <button
           onClick={handleLike}
-          className={`flex items-center gap-1.5 text-sm transition-colors ${liked ? 'text-[#E05C3A]' : 'text-[var(--color-body-text)] hover:text-[#E05C3A]'}`}
+          className={`flex items-center gap-1.5 text-sm transition-colors ${liked ? 'text-destructive' : 'text-muted-foreground hover:text-destructive'}`}
         >
           <span className={`text-base ${animateLike ? 'animate-[likeButtonPop_0.4s_ease-out]' : ''}`}>
             <svg className="w-5 h-5" fill={liked ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
@@ -382,7 +382,7 @@ export function ShoutoutCard({
 
         <button
           onClick={handleToggleComments}
-          className="flex items-center gap-1.5 text-sm text-[var(--color-body-text)] hover:text-[var(--color-cream)] transition-colors"
+          className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
           <span>{shoutout.comment_count}</span>
@@ -390,7 +390,7 @@ export function ShoutoutCard({
 
         <button
           onClick={handleShare}
-          className="flex items-center gap-1.5 text-sm text-[var(--color-body-text)] hover:text-[var(--color-cream)] transition-colors"
+          className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
           <span>Share</span>
@@ -399,7 +399,7 @@ export function ShoutoutCard({
 
       {/* Comments section */}
       {showComments && (
-        <div className="mt-3 pt-3 border-t border-[#E8E8E4]">
+        <div className="mt-3 pt-3 border-t border-border">
           {/* Comment input */}
           {currentUserId && (
             <div className="flex gap-2 mb-3">
@@ -409,12 +409,12 @@ export function ShoutoutCard({
                 onChange={(e) => setCommentText(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSubmitComment()}
                 placeholder="Add a comment..."
-                className="flex-1 bg-[#F8F8F6] border border-[#E8E8E4] px-3 py-2 text-sm text-[#1A1A1A] placeholder-[#6B6B65] focus:outline-none focus:border-[#1A1A1A]"
+                className="flex-1 bg-surface border border-border rounded-[4px] px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary"
               />
               <button
                 onClick={handleSubmitComment}
                 disabled={!commentText.trim()}
-                className="px-3 py-2 bg-[#1A1A1A] text-white text-sm font-semibold disabled:opacity-40 transition-opacity"
+                className="px-3 py-2 bg-primary text-primary-foreground text-sm font-semibold disabled:opacity-40 transition-opacity rounded-[4px] hover:bg-primary/90"
               >
                 Post
               </button>
@@ -422,7 +422,7 @@ export function ShoutoutCard({
           )}
 
           {loadingComments && (
-            <div className="py-4 text-center text-[#6B6B65] text-sm">Loading comments...</div>
+            <div className="py-4 text-center text-muted-foreground text-sm">Loading comments...</div>
           )}
 
           {/* Comment list */}
@@ -437,7 +437,7 @@ export function ShoutoutCard({
                 />
                 {/* Replies */}
                 {getReplies(comment.id).length > 0 && (
-                  <div className="ml-10 mt-2 space-y-2 border-l-2 border-[#E8E8E4] pl-3">
+                  <div className="ml-10 mt-2 space-y-2 border-l-2 border-border pl-3">
                     {getReplies(comment.id).map((reply) => (
                       <CommentRow
                         key={reply.id}
@@ -459,12 +459,12 @@ export function ShoutoutCard({
                       onKeyDown={(e) => e.key === 'Enter' && handleSubmitReply(comment.id)}
                       placeholder="Write a reply..."
                       autoFocus
-                      className="flex-1 bg-[#F8F8F6] border border-[#E8E8E4] px-3 py-1.5 text-sm text-[#1A1A1A] placeholder-[#6B6B65] focus:outline-none focus:border-[#1A1A1A]"
+                      className="flex-1 bg-surface border border-border rounded-[4px] px-3 py-1.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary"
                     />
                     <button
                       onClick={() => handleSubmitReply(comment.id)}
                       disabled={!replyText.trim()}
-                      className="px-2.5 py-1.5 bg-[#1A1A1A] text-white text-xs font-semibold disabled:opacity-40 transition-opacity"
+                      className="px-2.5 py-1.5 bg-primary text-primary-foreground text-xs font-semibold disabled:opacity-40 transition-opacity rounded-[4px] hover:bg-primary/90"
                     >
                       Reply
                     </button>
@@ -477,7 +477,7 @@ export function ShoutoutCard({
           {topLevelComments.length > 3 && !showAllComments && (
             <button
               onClick={() => setShowAllComments(true)}
-              className="mt-3 text-sm text-[#1A1A1A] font-medium hover:underline"
+              className="mt-3 text-sm text-primary font-medium hover:underline"
             >
               Load more comments ({topLevelComments.length - 3} more)
             </button>
@@ -497,7 +497,7 @@ export function ShoutoutCard({
             width={800}
             height={800}
             unoptimized
-            className="max-w-full max-h-[90vh] object-contain rounded-xl"
+            className="max-w-full max-h-[90vh] object-contain rounded-[4px]"
           />
         </div>
       )}
@@ -538,27 +538,27 @@ function CommentRow({
           className="w-7 h-7 rounded-full object-cover shrink-0 mt-0.5"
         />
       ) : (
-        <div className="w-7 h-7 rounded-full bg-[#F8F8F6] flex items-center justify-center shrink-0 mt-0.5">
-          <span className="text-[10px] text-[#6B6B65]">{comment.username?.charAt(0)?.toUpperCase() || '?'}</span>
+        <div className="w-7 h-7 rounded-full bg-surface flex items-center justify-center shrink-0 mt-0.5">
+          <span className="text-[10px] text-muted-foreground">{comment.username?.charAt(0)?.toUpperCase() || '?'}</span>
         </div>
       )}
       <div className="flex-1 min-w-0">
         <div className="flex items-baseline gap-2">
-          <span className="text-xs font-bold text-[#1A1A1A]">{comment.username}</span>
-          <span className="text-[10px] text-[#6B6B65]">{timeAgo(comment.created_at)}</span>
+          <span className="text-xs font-bold text-foreground">{comment.username}</span>
+          <span className="text-[10px] text-muted-foreground">{timeAgo(comment.created_at)}</span>
         </div>
-        <p className="text-sm text-[#1A1A1A] mt-0.5">{comment.text}</p>
+        <p className="text-sm text-foreground mt-0.5">{comment.text}</p>
         <div className="flex items-center gap-3 mt-1">
           <button
             onClick={handleLike}
-            className={`text-xs transition-colors ${liked ? 'text-[#E05C3A]' : 'text-[#6B6B65] hover:text-[#E05C3A]'}`}
+            className={`text-xs transition-colors ${liked ? 'text-destructive' : 'text-muted-foreground hover:text-destructive'}`}
           >
             {liked ? (<svg className="w-3 h-3 inline" fill="currentColor" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>) : (<svg className="w-3 h-3 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>)} {likeCount > 0 && likeCount}
           </button>
           {currentUserId && (
             <button
               onClick={() => onReply(comment.id)}
-              className="text-xs text-[#6B6B65] hover:text-[#1A1A1A] transition-colors"
+              className="text-xs text-muted-foreground hover:text-foreground transition-colors"
             >
               Reply
             </button>

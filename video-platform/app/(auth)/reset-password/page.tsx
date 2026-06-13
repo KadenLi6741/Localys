@@ -56,7 +56,7 @@ export default function ResetPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen bg-transparent text-[var(--text-primary)] flex items-center justify-center px-4">
+    <div className="min-h-screen bg-background text-foreground flex items-center justify-center px-4">
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
           <h1 className="text-4xl font-bold mb-2">Localy</h1>
@@ -65,20 +65,20 @@ export default function ResetPasswordPage() {
 
         {success ? (
           <div className="space-y-6">
-            <div className="bg-green-500/20 border border-green-500 text-green-200 px-4 py-3 rounded-lg">
+            <div className="bg-success/10 border border-success text-success px-4 py-3 rounded-[4px]">
               Password updated successfully. Redirecting to sign in...
             </div>
           </div>
         ) : !ready ? (
           <div className="space-y-6">
-            <div className="bg-[var(--glass-bg)] border border-[var(--glass-border)] text-[var(--text-tertiary)] px-4 py-3 rounded-lg text-center">
+            <div className="bg-surface border border-border text-muted-foreground px-4 py-3 rounded-[4px] text-center">
               Verifying your reset link...
             </div>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
-              <div className="bg-red-500/20 border border-red-500 text-red-200 px-4 py-3 rounded-lg">
+              <div className="bg-destructive/10 border border-destructive text-destructive px-4 py-3 rounded-[4px]">
                 {error}
               </div>
             )}
@@ -93,7 +93,7 @@ export default function ResetPasswordPage() {
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 required
-                className="w-full bg-[var(--glass-bg)] border border-[var(--glass-border)] rounded-lg px-4 py-3 text-[var(--text-primary)] placeholder-[var(--placeholder)] focus:outline-none focus:border-[var(--glass-border-focus)] focus:ring-2 focus:ring-white/20 transition-all duration-200"
+                className="w-full bg-surface border border-border rounded-[4px] px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary focus:bg-surface-2 focus:ring-2 focus:ring-primary/30 transition-all duration-200"
                 placeholder="••••••••"
               />
             </div>
@@ -108,7 +108,7 @@ export default function ResetPasswordPage() {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
-                className="w-full bg-[var(--glass-bg)] border border-[var(--glass-border)] rounded-lg px-4 py-3 text-[var(--text-primary)] placeholder-[var(--placeholder)] focus:outline-none focus:border-[var(--glass-border-focus)] focus:ring-2 focus:ring-white/20 transition-all duration-200"
+                className="w-full bg-surface border border-border rounded-[4px] px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary focus:bg-surface-2 focus:ring-2 focus:ring-primary/30 transition-all duration-200"
                 placeholder="••••••••"
               />
             </div>
@@ -116,7 +116,7 @@ export default function ResetPasswordPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-white text-black font-semibold py-3 rounded-lg disabled:bg-[var(--glass-bg-strong)] disabled:text-[var(--text-muted)] disabled:cursor-not-allowed hover:bg-white/90 active:scale-98 transition-all duration-200"
+              className="w-full bg-primary text-primary-foreground font-bold py-3 rounded-[4px] disabled:opacity-40 disabled:cursor-not-allowed hover:bg-primary/90 active:scale-[0.98] transition-colors"
             >
               {loading ? 'Updating...' : 'Update Password'}
             </button>
