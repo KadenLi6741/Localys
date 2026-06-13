@@ -72,6 +72,8 @@ export function HomeContent({ isActive }: HomeContentProps) {
   const [commentCounts, setCommentCounts] = useState<{ [key: string]: number }>({});
   const [commentModalOpen, setCommentModalOpen] = useState(false);
   const [commentPostId, setCommentPostId] = useState<string>('');
+  // Which video captions are expanded past the 2-line clamp.
+  const [expandedCaptions, setExpandedCaptions] = useState<Record<string, boolean>>({});
   const [toastMessage, setToastMessage] = useState<string>('');
   const [userCoins, setUserCoins] = useState(100);
   const [showCoinBadge, setShowCoinBadge] = useState(false);
@@ -1105,20 +1107,33 @@ export function HomeContent({ isActive }: HomeContentProps) {
             )}
             </div>
 
-            {/* Business Info - Stacked below video */}
-            <div className="flex-shrink-0 px-4 pt-3 pb-3 bg-card border-t border-border">
+            {/* Business Info - Stacked below video (compact) */}
+            <div className="flex-shrink-0 px-4 pt-2 pb-2 bg-card border-t border-border">
               <button
                 onClick={() => handleProfileClick(video.user_id, video.profiles?.username)}
                 onKeyDown={(e) => handleKeyDown(e, () => handleProfileClick(video.user_id, video.profiles?.username))}
                 className="text-left focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded"
                 aria-label={`View profile of ${feedBusiness?.business_name || video.profiles?.full_name || 'Business'}`}
               >
-                <h2 className="text-2xl font-semibold text-foreground mb-1 hover:underline">
+                <h2 className="text-body font-bold text-foreground leading-tight hover:underline">
                   {feedBusiness?.business_name || video.profiles?.full_name || 'Business'}
                 </h2>
               </button>
-              <p className="text-muted-foreground text-sm mb-1">{video.caption || ''}</p>
-              <div className="flex items-center gap-4 text-muted-foreground text-sm">
+              {video.caption && (
+                <p className={`text-muted-foreground text-caption leading-snug mt-0.5 ${expandedCaptions[video.id] ? '' : 'line-clamp-2'}`}>
+                  {video.caption}
+                </p>
+              )}
+              {(video.caption?.length || 0) > 70 && (
+                <button
+                  type="button"
+                  onClick={() => setExpandedCaptions((p) => ({ ...p, [video.id]: !p[video.id] }))}
+                  className="mt-0.5 text-caption font-semibold text-foreground hover:underline"
+                >
+                  {expandedCaptions[video.id] ? 'less' : 'more'}
+                </button>
+              )}
+              <div className="mt-1 flex items-center gap-3 text-muted-foreground text-caption">
                 {feedBusiness?.average_rating && (
                   <>
                     <span>{feedBusiness.average_rating.toFixed(1)}</span>
