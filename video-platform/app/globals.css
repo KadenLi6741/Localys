@@ -2814,7 +2814,7 @@ html { scroll-behavior: smooth; }
 
 @media print {
   body { background-color: white; color: black; }
-  a { color: blue; text-decoration: underline; }
+  a { color: #f97316; text-decoration: underline; }
   button { display: none; }
   .no-print { display: none !important; }
 }
