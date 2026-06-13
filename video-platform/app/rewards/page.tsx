@@ -56,17 +56,18 @@ const SHOP_ITEMS: CatalogItem[] = [
   { id: 'sh-doublecoins', kind: 'shop', title: 'Double-coins weekend pass', description: 'Earn 2× coins on everything for one weekend.', cost: 600, icon: Coins },
 ];
 
+// Easy/free actions are worth little; real local visits are worth a lot.
 const EARN_RATES = [
-  { label: 'Place an order', pts: '+50' },
-  { label: 'Leave a review', pts: '+30' },
-  { label: 'Refer a friend', pts: '+200' },
-  { label: 'Daily check-in', pts: '+10' },
+  { label: 'Daily check-in', pts: '5' },
+  { label: 'Leave a review', pts: '5' },
+  { label: 'First order at a new business', pts: '50' },
+  { label: 'Refer a friend', pts: '200' },
 ];
 
 const WEEKLY_CHALLENGES = [
-  { id: 'visit-3', label: 'Visit 3 small businesses this week', reward: 200, progress: 1, total: 3 },
-  { id: 'review-2', label: 'Leave 2 reviews', reward: 60, progress: 0, total: 2 },
-  { id: 'order-new', label: 'Order from a new business', reward: 100, progress: 0, total: 1 },
+  { id: 'visit-3', label: 'Visit 3 small businesses this week', reward: 150, progress: 1, total: 3 },
+  { id: 'review-2', label: 'Leave 2 honest reviews', reward: 10, progress: 0, total: 2 },
+  { id: 'watch-10', label: 'Watch 10 local videos', reward: 5, progress: 0, total: 10 },
 ];
 
 const KNICKS_CHALLENGE = {
@@ -81,7 +82,9 @@ const KNICKS_CHALLENGE = {
 
 const REDEEMED_KEY = 'localys.rewards.redeemed';
 const OPTIN_KEY = 'localys.rewards.optins';
+const CREDIT_KEY = 'localys.rewards.credit';
 const STORE_EVENT = 'localys:rewards-store';
+const COINS_PER_DOLLAR = 100; // conversion rate: 100 coins = $1 store credit
 
 interface RedeemedReward {
   id: string;
@@ -175,8 +178,8 @@ const TABS: { id: TabId; label: string; icon: LucideIcon }[] = [
 
 function CoinPrice({ cost }: { cost: number }) {
   return (
-    <span className="inline-flex items-center gap-1 rounded-[4px] bg-primary/15 px-2 py-1 text-caption font-bold text-primary">
-      <Coins className="h-3.5 w-3.5" aria-hidden="true" />
+    <span className="inline-flex items-center gap-1 rounded-full bg-surface px-2.5 py-1 text-caption font-bold text-foreground">
+      <Coins className="h-3.5 w-3.5 text-foreground" aria-hidden="true" />
       {cost.toLocaleString()} coins
     </span>
   );
@@ -198,9 +201,11 @@ function RewardsContent() {
 
   const [tab, setTab] = useState<TabId>('coupons');
   const [balance, setBalance] = useState<number | null>(null);
+  const [creditBalance, setCreditBalance] = useState(0);
   const [loading, setLoading] = useState(true);
   const [claimedCoupons, setClaimedCoupons] = useState<{ id: string; code: string; pct: number }[]>([]);
   const [confirmItem, setConfirmItem] = useState<CatalogItem | null>(null);
+  const [confirmConvert, setConfirmConvert] = useState<number | null>(null);
   const [confirmKnicks, setConfirmKnicks] = useState(false);
   const [toast, setToast] = useState('');
 
@@ -215,6 +220,7 @@ function RewardsContent() {
       ]);
       if (cancelled) return;
       setBalance(coins ?? 0);
+      setCreditBalance(readJSON<number>(CREDIT_KEY, 0));
       setClaimedCoupons(
         (coupons ?? []).map((uc: { id: string; coupon?: { code?: string; discount_percentage?: number } }) => ({
           id: uc.id,
@@ -257,6 +263,29 @@ function RewardsContent() {
     setToast(item.cost > 0 ? `Redeemed! ${item.cost.toLocaleString()} coins spent.` : 'Claimed! Added to My Rewards.');
   };
 
+  // Convert coins → Localys store credit (optimistic, rollback on error).
+  const handleConfirmConvert = async () => {
+    if (confirmConvert === null || !user || balance === null) return;
+    const coins = confirmConvert;
+    setConfirmConvert(null);
+    if (balance < coins) {
+      setToast('Not enough coins to convert.');
+      return;
+    }
+    const prev = balance;
+    setBalance(prev - coins);
+    const { error } = await deductCoins(user.id, coins);
+    if (error) {
+      setBalance(prev);
+      setToast('Conversion failed — your coins were not spent.');
+      return;
+    }
+    const next = creditBalance + coins / COINS_PER_DOLLAR;
+    window.localStorage.setItem(CREDIT_KEY, JSON.stringify(next));
+    setCreditBalance(next);
+    setToast(`Converted ${coins.toLocaleString()} coins to $${(coins / COINS_PER_DOLLAR).toFixed(2)} store credit.`);
+  };
+
   const handleKnicksOptIn = () => {
     setConfirmKnicks(false);
     optIn(KNICKS_CHALLENGE.id);
@@ -274,12 +303,17 @@ function RewardsContent() {
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Your balance</p>
               <p className="mt-1 flex items-center gap-2 text-display font-bold leading-none text-foreground">
-                <Coins className="h-9 w-9 text-primary" aria-hidden="true" />
-                <span className="tabular-nums">{balance === null ? '—' : balance.toLocaleString()}</span>
-                <span className="text-subheading font-semibold text-muted-foreground">coins</span>
+                <Coins className="h-9 w-9 text-foreground" aria-hidden="true" />
+                <span className="tabular-nums text-foreground">{balance === null ? '—' : balance.toLocaleString()}</span>
+                <span className="text-subheading font-semibold text-foreground">coins</span>
               </p>
-              <p className="mt-2 max-w-xl text-body-sm text-muted-foreground">
-                Earn coins by exploring local businesses — spend them on coupons and perks.
+              {creditBalance > 0 && (
+                <p className="mt-1 text-body-sm font-semibold text-foreground">
+                  Store credit: ${creditBalance.toFixed(2)}
+                </p>
+              )}
+              <p className="mt-2 max-w-xl text-body-sm text-foreground">
+                Earn coins by exploring local businesses — spend them on coupons, perks, or store credit.
               </p>
             </div>
             <button
@@ -320,7 +354,7 @@ function RewardsContent() {
         {loading ? (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} className="animate-pulse border border-border bg-surface p-4">
+              <div key={i} className="animate-pulse rounded-[12px] border border-border bg-card p-4">
                 <div className="mb-3 h-10 w-10 rounded-[4px] bg-surface-2" />
                 <div className="mb-2 h-4 w-3/4 rounded-[4px] bg-surface-2" />
                 <div className="h-3 w-1/2 rounded-[4px] bg-surface-2" />
@@ -337,7 +371,7 @@ function RewardsContent() {
                   const claimed = redeemedIds.has(c.title);
                   const afford = balance !== null && balance >= c.cost;
                   return (
-                    <div key={c.id} className="flex flex-col border border-border bg-surface p-4">
+                    <div key={c.id} className="flex flex-col rounded-[12px] border border-border bg-card p-4">
                       <div className="mb-3 flex items-start justify-between">
                         <span className="flex h-10 w-10 items-center justify-center rounded-[4px] bg-primary/15 text-primary">
                           <Icon className="h-5 w-5" aria-hidden="true" />
@@ -381,6 +415,43 @@ function RewardsContent() {
 
             {/* ===== COIN SHOP ===== */}
             {tab === 'shop' && (
+              <>
+              {/* Coins → store credit conversion (separate from coupons) */}
+              <div className="mb-6 rounded-[12px] border border-border bg-card p-5">
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                  <div>
+                    <p className="text-body font-bold text-foreground">Convert coins to store credit</p>
+                    <p className="mt-1 text-body-sm text-foreground">
+                      {COINS_PER_DOLLAR} coins = $1.00 · applies automatically at checkout
+                    </p>
+                    <p className="mt-1 text-caption text-muted-foreground">
+                      Current store credit: <span className="font-bold text-foreground">${creditBalance.toFixed(2)}</span>
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {[100, 500, 1000].map((coins) => {
+                      const afford = balance !== null && balance >= coins;
+                      return (
+                        <button
+                          key={coins}
+                          type="button"
+                          disabled={!afford}
+                          onClick={() => setConfirmConvert(coins)}
+                          className={cn(
+                            'rounded-full px-4 py-2 text-body-sm font-bold transition-colors',
+                            afford
+                              ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+                              : 'cursor-not-allowed bg-surface text-muted-foreground',
+                          )}
+                        >
+                          {coins.toLocaleString()} → ${(coins / COINS_PER_DOLLAR).toFixed(0)}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {SHOP_ITEMS.map((s) => {
                   const Icon = s.icon;
@@ -390,7 +461,7 @@ function RewardsContent() {
                   return (
                     <div
                       key={s.id}
-                      className={cn('flex flex-col border border-border bg-surface p-4', !afford && !owned && 'opacity-60')}
+                      className={cn('flex flex-col rounded-[12px] border border-border bg-card p-4', !afford && !owned && 'opacity-60')}
                     >
                       <span className="mb-3 flex h-10 w-10 items-center justify-center rounded-[4px] bg-primary/15 text-primary">
                         <Icon className="h-5 w-5" aria-hidden="true" />
@@ -420,6 +491,7 @@ function RewardsContent() {
                   );
                 })}
               </div>
+              </>
             )}
 
             {/* ===== CHALLENGES ===== */}
@@ -428,10 +500,10 @@ function RewardsContent() {
                 {/* Earn rates */}
                 <section>
                   <h2 className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">How you earn coins</h2>
-                  <ul className="grid grid-cols-2 gap-px overflow-hidden border border-border bg-border sm:grid-cols-4">
+                  <ul className="grid grid-cols-2 gap-px overflow-hidden rounded-[12px] border border-border bg-border sm:grid-cols-4">
                     {EARN_RATES.map((r) => (
-                      <li key={r.label} className="bg-surface p-4 text-center">
-                        <p className="text-subheading font-bold text-primary">{r.pts}</p>
+                      <li key={r.label} className="bg-card p-4 text-center">
+                        <p className="text-subheading font-bold text-foreground">{r.pts}</p>
                         <p className="mt-1 text-caption text-muted-foreground">{r.label}</p>
                       </li>
                     ))}
@@ -445,7 +517,7 @@ function RewardsContent() {
                     {WEEKLY_CHALLENGES.map((c) => {
                       const done = c.progress >= c.total;
                       return (
-                        <div key={c.id} className="border border-border bg-surface p-4">
+                        <div key={c.id} className="rounded-[12px] border border-border bg-card p-4">
                           <div className="flex items-start justify-between gap-3">
                             <div className="flex items-start gap-3">
                               <span className={cn('mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-[4px]', done ? 'bg-success/15 text-success' : 'bg-primary/15 text-primary')}>
@@ -456,7 +528,7 @@ function RewardsContent() {
                                 <p className="mt-0.5 text-caption text-muted-foreground">{c.progress}/{c.total} complete</p>
                               </div>
                             </div>
-                            <span className="shrink-0 rounded-[4px] bg-primary/15 px-2 py-1 text-caption font-bold text-primary">+{c.reward} coins</span>
+                            <span className="shrink-0 rounded-full bg-surface px-2.5 py-1 text-caption font-bold text-foreground">{c.reward} coins</span>
                           </div>
                           <div className="mt-3 h-1.5 w-full overflow-hidden rounded-[4px] bg-surface-2" role="progressbar" aria-valuenow={c.progress} aria-valuemin={0} aria-valuemax={c.total} aria-label={`${c.label}: ${c.progress} of ${c.total}`}>
                             <div className={cn('h-full', done ? 'bg-success' : 'bg-primary')} style={{ width: `${Math.min(100, (c.progress / c.total) * 100)}%` }} />
@@ -470,7 +542,7 @@ function RewardsContent() {
                 {/* Knicks prediction */}
                 <section>
                   <h2 className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Event prediction</h2>
-                  <div className="border border-border bg-surface p-4">
+                  <div className="rounded-[12px] border border-border bg-card p-4">
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex items-start gap-3">
                         <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-[4px] bg-primary/15 text-primary">
@@ -520,7 +592,7 @@ function RewardsContent() {
                 ) : (
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     {redeemed.map((r) => (
-                      <div key={r.id} className="flex flex-col border border-border bg-surface p-4">
+                      <div key={r.id} className="flex flex-col rounded-[12px] border border-border bg-card p-4">
                         <div className="mb-3 flex items-start justify-between">
                           <Ticket className="h-5 w-5 text-primary" aria-hidden="true" />
                           <span className="rounded-[4px] bg-success/15 px-2 py-0.5 text-caption font-semibold text-success">Active</span>
@@ -549,7 +621,7 @@ function RewardsContent() {
                       </div>
                     ))}
                     {claimedCoupons.map((c) => (
-                      <div key={c.id} className="flex flex-col border border-border bg-surface p-4">
+                      <div key={c.id} className="flex flex-col rounded-[12px] border border-border bg-card p-4">
                         <div className="mb-3 flex items-start justify-between">
                           <Ticket className="h-5 w-5 text-primary" aria-hidden="true" />
                           <span className="rounded-[4px] bg-success/15 px-2 py-0.5 text-caption font-semibold text-success">Active</span>
@@ -574,7 +646,7 @@ function RewardsContent() {
       {/* ===== Redeem confirm modal ===== */}
       {confirmItem && (
         <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/50 p-4" role="dialog" aria-modal="true" onClick={() => setConfirmItem(null)}>
-          <div className="w-full max-w-sm border border-border bg-card p-6 shadow-[inset_0_0_0_1px_var(--border)]" onClick={(e) => e.stopPropagation()}>
+          <div className="w-full max-w-sm rounded-[12px] border border-border bg-card p-6 shadow-[inset_0_0_0_1px_var(--border)]" onClick={(e) => e.stopPropagation()}>
             <div className="mb-3 flex items-center justify-between">
               <h3 className="text-subheading font-bold text-foreground">Confirm redemption</h3>
               <button type="button" onClick={() => setConfirmItem(null)} aria-label="Close" className="rounded-[4px] p-1 text-muted-foreground hover:bg-surface hover:text-foreground">
@@ -594,11 +666,35 @@ function RewardsContent() {
               )}
             </p>
             <div className="mt-5 flex justify-end gap-2">
-              <button type="button" onClick={() => setConfirmItem(null)} className="rounded-[4px] border border-border px-4 py-2 text-body-sm font-semibold text-muted-foreground hover:bg-surface hover:text-foreground">
+              <button type="button" onClick={() => setConfirmItem(null)} className="rounded-full border border-border px-4 py-2 text-body-sm font-semibold text-muted-foreground hover:bg-surface hover:text-foreground">
                 Cancel
               </button>
-              <button type="button" onClick={handleConfirmRedeem} className="rounded-[4px] bg-primary px-4 py-2 text-body-sm font-bold text-primary-foreground hover:bg-primary/90">
+              <button type="button" onClick={handleConfirmRedeem} className="rounded-full bg-primary px-4 py-2 text-body-sm font-bold text-primary-foreground hover:bg-primary/90">
                 Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ===== Convert coins → store credit confirm ===== */}
+      {confirmConvert !== null && (
+        <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/50 p-4" role="dialog" aria-modal="true" onClick={() => setConfirmConvert(null)}>
+          <div className="w-full max-w-sm rounded-[12px] border border-border bg-card p-6 shadow-[inset_0_0_0_1px_var(--border)]" onClick={(e) => e.stopPropagation()}>
+            <h3 className="mb-3 text-subheading font-bold text-foreground">Convert to store credit?</h3>
+            <p className="text-body-sm text-foreground">
+              Convert <span className="font-bold">{confirmConvert.toLocaleString()} coins</span> into{' '}
+              <span className="font-bold">${(confirmConvert / COINS_PER_DOLLAR).toFixed(2)} store credit</span>?
+              {balance !== null && (
+                <> Your balance will be <span className="font-bold">{(balance - confirmConvert).toLocaleString()}</span> coins.</>
+              )}
+            </p>
+            <div className="mt-5 flex justify-end gap-2">
+              <button type="button" onClick={() => setConfirmConvert(null)} className="rounded-full border border-border px-4 py-2 text-body-sm font-semibold text-muted-foreground hover:bg-surface hover:text-foreground">
+                Cancel
+              </button>
+              <button type="button" onClick={handleConfirmConvert} className="rounded-full bg-primary px-4 py-2 text-body-sm font-bold text-primary-foreground hover:bg-primary/90">
+                Convert
               </button>
             </div>
           </div>
@@ -608,7 +704,7 @@ function RewardsContent() {
       {/* ===== Knicks permanent opt-in confirm ===== */}
       {confirmKnicks && (
         <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/50 p-4" role="dialog" aria-modal="true" onClick={() => setConfirmKnicks(false)}>
-          <div className="w-full max-w-sm border border-border bg-card p-6 shadow-[inset_0_0_0_1px_var(--border)]" onClick={(e) => e.stopPropagation()}>
+          <div className="w-full max-w-sm rounded-[12px] border border-border bg-card p-6 shadow-[inset_0_0_0_1px_var(--border)]" onClick={(e) => e.stopPropagation()}>
             <h3 className="mb-3 text-subheading font-bold text-foreground">Opt in to the prediction?</h3>
             <p className="text-body-sm text-muted-foreground">
               Once you opt in you <span className="font-semibold text-foreground">cannot opt out</span> — your prediction
