@@ -7,6 +7,7 @@ import { useEffect, useState, useSyncExternalStore } from 'react';
 import {
   Home,
   Compass,
+  Store,
   MessageCircle,
   ShoppingCart,
   ChevronDown,
@@ -185,6 +186,7 @@ export function SidebarContent({
   const navItems: NavItem[] = [
     { href: '/', label: 'Home', icon: Home },
     { href: '/explore', label: 'Explore', icon: Compass },
+    { href: '/shop', label: 'Shop', icon: Store },
     { href: '/chats', label: 'Messages', icon: MessageCircle, badge: 'messages' },
     { href: '/cart', label: 'Cart', icon: ShoppingCart, badge: 'cart', onClick: onCartOpen },
   ];

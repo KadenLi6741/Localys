@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Compass, Upload, MessageCircle, ShoppingCart, type LucideIcon } from 'lucide-react';
+import { Home, Compass, Store, MessageCircle, ShoppingCart, type LucideIcon } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
 import { useUnreadMessages } from '@/contexts/UnreadMessagesContext';
 import { cn } from '@/lib/utils';
@@ -27,7 +27,7 @@ export function AppBottomNav() {
   const navItems: BottomNavItem[] = [
     { href: '/', label: 'Home', icon: Home },
     { href: '/explore', label: 'Explore', icon: Compass },
-    { href: '/upload', label: 'Upload', icon: Upload },
+    { href: '/shop', label: 'Shop', icon: Store },
     { href: '/chats', label: 'Messages', icon: MessageCircle, badge: 'messages' },
     { href: '/cart', label: 'Cart', icon: ShoppingCart, badge: 'cart' },
   ];
