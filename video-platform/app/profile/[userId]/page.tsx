@@ -74,7 +74,7 @@ function UserProfileContent() {
 
   // 3-dot menu state
   const [showMenu, setShowMenu] = useState(false);
-  const [activeMediaTab, setActiveMediaTab] = useState<'videos' | 'services'>('videos');
+  const [activeMediaTab, setActiveMediaTab] = useState<'videos' | 'services'>('services');
   const [showReportModal, setShowReportModal] = useState(false);
   const [reportReason, setReportReason] = useState('');
   const [reportDescription, setReportDescription] = useState('');
@@ -823,61 +823,40 @@ function UserProfileContent() {
           </div>
         )}
 
-        {/* Media Layout: videos + services */}
+        {/* Store / Media: full-width with a Services | Videos toggle on top.
+            Services is the default so the storefront is the main screen. */}
         <div className="mt-8">
           {profile.type ? (
             <>
-              <div className="lg:hidden mb-4">
-                <div className="inline-flex rounded-lg border border-[var(--color-charcoal-lighter-plus)] bg-[var(--color-charcoal-light)] p-1">
-                  <button
-                    onClick={() => setActiveMediaTab('videos')}
-                    className={`px-4 py-2 text-sm font-semibold rounded-md transition-colors ${
-                      activeMediaTab === 'videos'
-                        ? 'bg-[var(--primary)] text-primary-foreground'
-                        : 'text-[var(--color-cream)]/70 hover:text-[var(--color-cream)]'
-                    }`}
-                  >
-                    Videos
-                  </button>
-                  <button
-                    onClick={() => setActiveMediaTab('services')}
-                    className={`px-4 py-2 text-sm font-semibold rounded-md transition-colors ${
-                      activeMediaTab === 'services'
-                        ? 'bg-[var(--primary)] text-primary-foreground'
-                        : 'text-[var(--color-cream)]/70 hover:text-[var(--color-cream)]'
-                    }`}
-                  >
-                    Services
-                  </button>
-                </div>
+              {/* Segmented toggle */}
+              <div className="mb-5 inline-flex rounded-[4px] border border-[var(--color-charcoal-lighter-plus)] bg-[var(--color-charcoal-light)] p-1">
+                <button
+                  onClick={() => setActiveMediaTab('services')}
+                  className={`px-5 py-2 text-sm font-semibold rounded-[4px] transition-colors ${
+                    activeMediaTab === 'services'
+                      ? 'bg-[var(--primary)] text-primary-foreground'
+                      : 'text-[var(--color-cream)]/70 hover:text-[var(--color-cream)]'
+                  }`}
+                  aria-pressed={activeMediaTab === 'services'}
+                >
+                  Services
+                </button>
+                <button
+                  onClick={() => setActiveMediaTab('videos')}
+                  className={`px-5 py-2 text-sm font-semibold rounded-[4px] transition-colors ${
+                    activeMediaTab === 'videos'
+                      ? 'bg-[var(--primary)] text-primary-foreground'
+                      : 'text-[var(--color-cream)]/70 hover:text-[var(--color-cream)]'
+                  }`}
+                  aria-pressed={activeMediaTab === 'videos'}
+                >
+                  Videos
+                </button>
               </div>
 
-              <div className="hidden lg:grid lg:grid-cols-12 lg:gap-6">
-                <VideoFeed
-                  userId={profile.id}
-                  isOwnProfile={false}
-                  theme="dark"
-                  className="lg:col-span-8"
-                />
-                <ServicesPanel
-                  userId={profile.id}
-                  businessId={business?.id}
-                  businessName={business?.business_name || undefined}
-                  isOwnProfile={false}
-                  theme="dark"
-                  className="lg:col-span-4"
-                  stickyDesktop
-                />
-              </div>
-
-              <div className="lg:hidden">
-                {activeMediaTab === 'videos' ? (
-                  <VideoFeed
-                    userId={profile.id}
-                    isOwnProfile={false}
-                    theme="dark"
-                  />
-                ) : (
+              {/* Selected mode uses the full content width */}
+              <div className="w-full">
+                {activeMediaTab === 'services' ? (
                   <ServicesPanel
                     userId={profile.id}
                     businessId={business?.id}
@@ -885,15 +864,13 @@ function UserProfileContent() {
                     isOwnProfile={false}
                     theme="dark"
                   />
+                ) : (
+                  <VideoFeed userId={profile.id} isOwnProfile={false} theme="dark" />
                 )}
               </div>
             </>
           ) : (
-            <VideoFeed
-              userId={profile.id}
-              isOwnProfile={false}
-              theme="dark"
-            />
+            <VideoFeed userId={profile.id} isOwnProfile={false} theme="dark" />
           )}
         </div>
 

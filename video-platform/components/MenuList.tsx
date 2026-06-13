@@ -176,7 +176,7 @@ export function MenuList({ userId, businessId, businessName, isOwnProfile, onMen
 
   if (loading) {
     return (
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
         {Array.from({ length: 6 }).map((_, index) => (
           <div
             key={index}
@@ -220,7 +220,7 @@ export function MenuList({ userId, businessId, businessName, isOwnProfile, onMen
 
       {/* Menu Items Grid */}
       {menus.length > 0 && menus[0]?.menu_items && menus[0].menu_items.length > 0 ? (
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
           {menus[0].menu_items.map((item, index) => (
             <div
               key={item.id}
