@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect, useRef, Suspense } from 'react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { searchVideos, searchBusinesses, SearchFilters, SearchMode } from '@/lib/supabase/search';
 import { supabase } from '@/lib/supabase/client';
@@ -33,14 +33,17 @@ const MODERN_TAGS = ['Locally Owned', 'Eco-Friendly', 'Black-Owned', 'Women-Owne
 export default function SearchPage() {
   return (
     <ProtectedRoute>
-      <SearchContent />
+      <Suspense fallback={null}>
+        <SearchContent />
+      </Suspense>
     </ProtectedRoute>
   );
 }
 
 function SearchContent() {
   const { user } = useAuth();
-  const [query, setQuery] = useState('');
+  const searchParams = useSearchParams();
+  const [query, setQuery] = useState(() => searchParams.get('q') ?? '');
   const [searchMode, setSearchMode] = useState<SearchMode>('businesses');
   const [category, setCategory] = useState<string>('');
   const [minRating, setMinRating] = useState<number | undefined>();
@@ -204,6 +207,17 @@ function SearchContent() {
       saveSearchHistory(user.id, query.trim(), searchMode).catch(() => {});
     }
   }, [query, category, minRating, priceRange, cuisineType, formality, specialType, dietary, features, amenities, payment, tags, nearMe, radius, userLat, userLng, searchMode, executeSearch, user]);
+
+  // Arriving from the top bar with ?q=… → run the search immediately.
+  const ranInitialSearch = useRef(false);
+  useEffect(() => {
+    if (ranInitialSearch.current) return;
+    const urlQ = searchParams.get('q');
+    if (urlQ !== null) {
+      ranInitialSearch.current = true;
+      Promise.resolve().then(() => executeSearch({ query: urlQ.trim() || undefined }, searchMode));
+    }
+  }, [searchParams, executeSearch, searchMode]);
 
   const handleCategoryChange = (cat: string) => {
     setCategory(cat);

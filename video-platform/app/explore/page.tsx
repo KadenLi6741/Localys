@@ -14,7 +14,6 @@ import {
   ArrowBigDown,
   MessageSquare,
   Share2,
-  Bookmark,
   MoreHorizontal,
   ChevronDown,
   Check,
@@ -79,7 +78,6 @@ export default function ExplorePage() {
 
   // Per-post local UI state (downvotes and saves are visual-only for now)
   const [downvoted, setDownvoted] = useState<Record<string, boolean>>({});
-  const [saved, setSaved] = useState<Record<string, boolean>>({});
   const [menuOpenFor, setMenuOpenFor] = useState<string | null>(null);
 
   // User profile for avatar
@@ -619,53 +617,16 @@ export default function ExplorePage() {
                 const photoUrl = shoutout.photos?.[0] || null;
                 const isAuthor = user?.id === shoutout.user_id;
                 const isDown = !!downvoted[shoutout.id];
-                const isSaved = !!saved[shoutout.id];
                 const score = shoutout.likes - (isDown ? 1 : 0);
                 const community = shoutout.tags[0] ? `b/${shoutout.tags[0].replace(/-/g, '')}` : 'b/local';
 
                 return (
                   <article
                     key={shoutout.id}
-                    className="flex overflow-hidden border border-border bg-card transition-colors hover:border-primary/40"
+                    className="overflow-hidden rounded-[8px] border border-border bg-card transition-colors hover:border-primary/40"
                   >
-                    {/* Vote column */}
-                    <div className="flex w-11 shrink-0 flex-col items-center gap-0.5 bg-surface/50 py-3">
-                      <button
-                        type="button"
-                        onClick={() => handleUpvote(shoutout.id)}
-                        className={cn(
-                          'rounded-[4px] p-0.5 transition-colors hover:bg-surface',
-                          shoutout.liked_by_me ? 'text-primary' : 'text-muted-foreground hover:text-primary'
-                        )}
-                        aria-label="Upvote"
-                        aria-pressed={shoutout.liked_by_me}
-                      >
-                        <ArrowBigUp className={cn('h-6 w-6', shoutout.liked_by_me && 'fill-primary')} />
-                      </button>
-                      <span
-                        className={cn(
-                          'text-caption font-bold tabular-nums',
-                          shoutout.liked_by_me ? 'text-primary' : isDown ? 'text-primary' : 'text-foreground'
-                        )}
-                      >
-                        {score}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => handleDownvote(shoutout.id)}
-                        className={cn(
-                          'rounded-[4px] p-0.5 transition-colors hover:bg-surface',
-                          isDown ? 'text-primary' : 'text-muted-foreground hover:text-primary'
-                        )}
-                        aria-label="Downvote"
-                        aria-pressed={isDown}
-                      >
-                        <ArrowBigDown className={cn('h-6 w-6', isDown && 'fill-primary')} />
-                      </button>
-                    </div>
-
                     {/* Post body */}
-                    <div className="min-w-0 flex-1 p-3">
+                    <div className="min-w-0 p-3">
                       {/* Meta row */}
                       <div className="mb-1.5 flex items-center gap-1.5 text-caption text-muted-foreground">
                         <span className="font-bold text-foreground">{community}</span>
@@ -737,11 +698,46 @@ export default function ExplorePage() {
                         </div>
                       ) : null}
 
-                      {/* Footer actions */}
-                      <div className="mt-2 flex items-center gap-1">
+                      {/* Footer actions — votes + comments + share (Reddit-style bottom row) */}
+                      <div className="mt-2 flex items-center gap-1.5">
+                        {/* Vote pill */}
+                        <div className="flex items-center gap-0.5 rounded-full bg-surface/50 px-1 py-0.5">
+                          <button
+                            type="button"
+                            onClick={() => handleUpvote(shoutout.id)}
+                            className={cn(
+                              'rounded-full p-1 transition-colors hover:bg-surface/70',
+                              shoutout.liked_by_me ? 'text-primary' : 'text-muted-foreground hover:text-primary'
+                            )}
+                            aria-label="Upvote"
+                            aria-pressed={shoutout.liked_by_me}
+                          >
+                            <ArrowBigUp className={cn('h-4 w-4', shoutout.liked_by_me && 'fill-primary')} />
+                          </button>
+                          <span
+                            className={cn(
+                              'min-w-[1.5ch] text-center text-caption font-bold tabular-nums',
+                              shoutout.liked_by_me || isDown ? 'text-primary' : 'text-foreground'
+                            )}
+                          >
+                            {score}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => handleDownvote(shoutout.id)}
+                            className={cn(
+                              'rounded-full p-1 transition-colors hover:bg-surface/70',
+                              isDown ? 'text-primary' : 'text-muted-foreground hover:text-primary'
+                            )}
+                            aria-label="Downvote"
+                            aria-pressed={isDown}
+                          >
+                            <ArrowBigDown className={cn('h-4 w-4', isDown && 'fill-primary')} />
+                          </button>
+                        </div>
                         <Link
                           href={`/explore/${shoutout.id}`}
-                          className="flex items-center gap-1.5 rounded-[4px] px-2 py-1.5 text-caption font-semibold text-muted-foreground transition-colors hover:bg-surface hover:text-foreground"
+                          className="flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-caption font-semibold text-muted-foreground transition-colors hover:bg-surface/60 hover:text-foreground"
                         >
                           <MessageSquare className="h-4 w-4" aria-hidden="true" />
                           {shoutout.comment_count} comments
@@ -749,22 +745,10 @@ export default function ExplorePage() {
                         <button
                           type="button"
                           onClick={() => handleShare(shoutout.id)}
-                          className="flex items-center gap-1.5 rounded-[4px] px-2 py-1.5 text-caption font-semibold text-muted-foreground transition-colors hover:bg-surface hover:text-foreground"
+                          className="flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-caption font-semibold text-muted-foreground transition-colors hover:bg-surface/60 hover:text-foreground"
                         >
                           <Share2 className="h-4 w-4" aria-hidden="true" />
                           Share
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setSaved((prev) => ({ ...prev, [shoutout.id]: !prev[shoutout.id] }))}
-                          className={cn(
-                            'flex items-center gap-1.5 rounded-[4px] px-2 py-1.5 text-caption font-semibold transition-colors hover:bg-surface',
-                            isSaved ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
-                          )}
-                          aria-pressed={isSaved}
-                        >
-                          <Bookmark className={cn('h-4 w-4', isSaved && 'fill-primary')} aria-hidden="true" />
-                          {isSaved ? 'Saved' : 'Save'}
                         </button>
                       </div>
                     </div>
