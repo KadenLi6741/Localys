@@ -20,9 +20,15 @@ import {
   LogOut,
   Star,
   Store,
+  Check,
 } from 'lucide-react';
+
+/** A few languages surfaced in the header switcher (full list on the profile page). */
+const HEADER_LANGS: Language[] = ['en', 'es', 'fr', 'de', 'zh'];
 import { useAuth } from '@/contexts/AuthContext';
 import { useActivity } from '@/contexts/ActivityContext';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { LANGUAGES, type Language } from '@/lib/translations';
 import { getUserCoins } from '@/lib/supabase/profiles';
 import { searchBusinesses } from '@/lib/supabase/search';
 import { supabase } from '@/lib/supabase/client';
@@ -69,6 +75,7 @@ export function AppHeader({ onMenuOpen }: { onMenuOpen?: () => void }) {
   const { user, signOut } = useAuth();
   const { togglePanel, unreadCount } = useActivity();
   const { resolvedTheme, setTheme } = useTheme();
+  const { language, setLanguage } = useLanguage();
   const [coins, setCoins] = useState<number | null>(null);
   const [profile, setProfile] = useState<HeaderProfile | null>(null);
   const [avatarError, setAvatarError] = useState(false);
@@ -576,10 +583,23 @@ export function AppHeader({ onMenuOpen }: { onMenuOpen?: () => void }) {
                 {resolvedTheme === 'dark' ? 'Dark' : 'Light'}
               </span>
             </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Globe className="mr-2 h-4 w-4" aria-hidden="true" /> Language
-              <span className="ml-auto text-caption text-muted-foreground">English</span>
-            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuLabel className="flex items-center gap-2 normal-case text-foreground">
+              <Globe className="h-4 w-4" aria-hidden="true" /> Language
+            </DropdownMenuLabel>
+            {HEADER_LANGS.map((code) => (
+              <DropdownMenuItem
+                key={code}
+                onSelect={(e) => {
+                  e.preventDefault();
+                  setLanguage(code);
+                }}
+                className={cn(language === code && 'text-primary')}
+              >
+                {LANGUAGES[code].nativeName}
+                {language === code && <Check className="ml-auto h-4 w-4 text-primary" aria-hidden="true" />}
+              </DropdownMenuItem>
+            ))}
             <DropdownMenuSeparator />
             <DropdownMenuItem onSelect={() => router.push('/analytics')}>
               <BarChart3 className="mr-2 h-4 w-4" aria-hidden="true" /> Analytics
