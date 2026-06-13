@@ -227,7 +227,7 @@ function CheckoutContent() {
       <div className="min-h-screen bg-transparent text-[var(--text-primary)] p-4">
         <div className="w-full px-4 lg:px-12 text-center py-16">
           <p className="text-[var(--text-tertiary)] mb-4">No items to checkout</p>
-          <Link href="/" className="inline-block bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg px-6 py-2 transition-colors">
+          <Link href="/" className="inline-block bg-primary hover:bg-primary text-white font-semibold rounded-lg px-6 py-2 transition-colors">
             Browse Services
           </Link>
         </div>

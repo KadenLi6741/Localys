@@ -50,11 +50,11 @@ export function FinancialOverview({ userId }: FinancialOverviewProps) {
     <div className="mb-8">
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full flex items-center justify-between bg-white border border-[#E8E8E4] rounded-2xl px-5 py-4 transition-all duration-200 hover:border-[#1B5EA8] hover:scale-[1.02] shadow-sm"
+        className="w-full flex items-center justify-between bg-white border border-[#E8E8E4] rounded-2xl px-5 py-4 transition-all duration-200 hover:border-[var(--primary)] hover:scale-[1.02] shadow-sm"
       >
         <span className="text-[18px] font-semibold text-[#1A1A1A]">Financial Overview</span>
         <svg
-          className={`w-5 h-5 text-[#1B5EA8] transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}
+          className={`w-5 h-5 text-[var(--primary)] transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"

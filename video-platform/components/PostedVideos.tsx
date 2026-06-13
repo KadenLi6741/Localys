@@ -308,7 +308,7 @@ export function PostedVideos({ userId, isOwnProfile = true }: PostedVideosProps)
                         setSelectedVideoId(null);
                         router.push('/analytics');
                       }}
-                      className="w-full bg-blue-500/20 hover:bg-blue-500/30 text-blue-200 text-sm font-medium py-2.5 rounded-lg transition-colors"
+                      className="w-full bg-primary/20 hover:bg-primary/30 text-primary/20 text-sm font-medium py-2.5 rounded-lg transition-colors"
                     >
                       View Analytics
                     </button>

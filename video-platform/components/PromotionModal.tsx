@@ -142,9 +142,9 @@ export function PromotionModal({ isOpen, onClose, videoId, userCoins, onSuccess,
         </div>
 
         {/* Estimated Boost */}
-        <div className="mb-6 p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+        <div className="mb-6 p-4 bg-primary/10 border border-primary/30 rounded-lg">
           <div className="text-sm text-[var(--text-secondary)] mb-1">Estimated Boost Increase</div>
-          <div className="text-3xl font-bold text-blue-400">+{estimatedBoost}</div>
+          <div className="text-3xl font-bold text-primary">+{estimatedBoost}</div>
           <div className="text-xs text-[var(--text-tertiary)] mt-2">
             Videos with higher boost appear more often in the feed
           </div>

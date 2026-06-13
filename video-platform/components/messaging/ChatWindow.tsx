@@ -447,7 +447,7 @@ export default function ChatWindow({ conversationId, onBack }: ChatWindowProps) 
                                 handleEditStart(message);
                                 setMenuOpenId(null);
                               }}
-                              className="w-full text-left px-4 py-2 text-sm text-[var(--text-primary)] hover:bg-[var(--glass-bg-strong)] flex items-center gap-2 hover:text-blue-400 transition-colors"
+                              className="w-full text-left px-4 py-2 text-sm text-[var(--text-primary)] hover:bg-[var(--glass-bg-strong)] flex items-center gap-2 hover:text-primary transition-colors"
                             >
                               Edit
                             </button>

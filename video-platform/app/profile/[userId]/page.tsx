@@ -13,7 +13,6 @@ import { VideoFeed } from '@/components/profile/VideoFeed';
 import { ServicesPanel } from '@/components/profile/ServicesPanel';
 import { BusinessQASection } from '@/components/BusinessQASection';
 import { TrustMetricsBadge } from '@/components/TrustMetricsBadge';
-import { TrustScoreCard } from '@/components/analytics';
 
 const BusinessLocationMap = dynamic(
   () => import('@/components/BusinessLocationMap'),
@@ -545,7 +544,7 @@ function UserProfileContent() {
           <p className="text-[var(--color-cream)]/60 mb-6">{error || 'This profile does not exist.'}</p>
           <Link
             href="/"
-            className="bg-[var(--primary)] text-black font-semibold px-6 py-3 rounded-lg hover:bg-[var(--primary)]/90 transition-all duration-200"
+            className="bg-[var(--primary)] text-primary-foreground font-semibold px-6 py-3 rounded-lg hover:bg-[var(--primary)]/90 transition-all duration-200"
           >
             Back to Home
           </Link>
@@ -561,7 +560,7 @@ function UserProfileContent() {
         <div className={`fixed top-6 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-lg text-sm font-medium shadow-lg transition-all duration-300 ${
           toastColor === 'sage' ? 'bg-[#6BAF7A] text-white' :
           toastColor === 'red' ? 'bg-[#E05C3A] text-white' :
-          'bg-[var(--primary)] text-black'
+          'bg-[var(--primary)] text-primary-foreground'
         }`}>
           {toastMessage}
         </div>
@@ -681,14 +680,13 @@ function UserProfileContent() {
             <div className="flex items-center gap-2 flex-wrap justify-center mb-2">
               <p className="text-[var(--primary)] text-sm">{business.business_name}</p>
               {business.business_type && (
-                <span className="bg-[#1A1A1A] text-white text-xs px-2 py-1 rounded-full capitalize">
+                <span className="bg-primary/15 text-primary text-xs px-2 py-1 rounded-[4px] capitalize">
                   {business.business_type === 'hybrid' ? 'Pickup & Delivery' : business.business_type}
                 </span>
               )}
               <button
                 onClick={() => setShowBusinessHours(!showBusinessHours)}
-                className="text-xs transition-colors"
-                style={{ border: '1px solid #1A1A1A', color: '#1A1A1A', background: '#FFFFFF', borderRadius: 50, padding: '6px 16px' }}
+                className="text-xs rounded-[4px] border border-border bg-surface px-4 py-1.5 text-foreground transition-colors hover:bg-surface-2"
               >
                 {showBusinessHours ? 'Hide Hours' : 'Show Hours'}
               </button>
@@ -735,7 +733,7 @@ function UserProfileContent() {
             <button
               onClick={handleMessageClick}
               disabled={messagingLoading}
-              className="bg-[var(--primary)] text-black font-semibold px-5 py-2 rounded-lg hover:bg-[var(--primary)]/90 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 text-sm"
+              className="bg-[var(--primary)] text-primary-foreground font-semibold px-5 py-2 rounded-lg hover:bg-[var(--primary)]/90 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 text-sm"
             >
               {messagingLoading ? (
                 <>
@@ -813,14 +811,6 @@ function UserProfileContent() {
           </div>
         )}
 
-        {/* Business Analytics (business only) */}
-        {profile.type && (
-          <div className="mt-8">
-            <h3 className="text-xl font-semibold text-[var(--color-cream)] mb-4">Business Analytics</h3>
-            <TrustScoreCard userId={profile.id} isBusinessProfile={true} />
-          </div>
-        )}
-
         {/* Media Layout: videos + services */}
         <div className="mt-8">
           {profile.type ? (
@@ -831,7 +821,7 @@ function UserProfileContent() {
                     onClick={() => setActiveMediaTab('videos')}
                     className={`px-4 py-2 text-sm font-semibold rounded-md transition-colors ${
                       activeMediaTab === 'videos'
-                        ? 'bg-[var(--primary)] text-black'
+                        ? 'bg-[var(--primary)] text-primary-foreground'
                         : 'text-[var(--color-cream)]/70 hover:text-[var(--color-cream)]'
                     }`}
                   >
@@ -841,7 +831,7 @@ function UserProfileContent() {
                     onClick={() => setActiveMediaTab('services')}
                     className={`px-4 py-2 text-sm font-semibold rounded-md transition-colors ${
                       activeMediaTab === 'services'
-                        ? 'bg-[var(--primary)] text-black'
+                        ? 'bg-[var(--primary)] text-primary-foreground'
                         : 'text-[var(--color-cream)]/70 hover:text-[var(--color-cream)]'
                     }`}
                   >
@@ -921,7 +911,7 @@ function UserProfileContent() {
           </Link>
           <Link href="/upload" className="flex flex-col items-center gap-1 transition-transform duration-200 hover:scale-110 active:scale-95">
             <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-200 ${pathname === '/upload' ? 'bg-[var(--primary)]' : 'bg-[var(--primary)]/20'}`}>
-              <svg className={`w-6 h-6 ${pathname === '/upload' ? 'text-black' : 'text-[var(--color-cream)]'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className={`w-6 h-6 ${pathname === '/upload' ? 'text-primary' : 'text-[var(--color-cream)]'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
             </div>

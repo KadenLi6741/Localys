@@ -41,7 +41,7 @@ export function VideoPerformanceTable({ videos }: VideoPerformanceTableProps) {
                 <h4 className="text-sm font-semibold text-[var(--text-primary)] truncate">{video.title}</h4>
                 <div className="flex gap-3 mt-2 text-xs flex-wrap">
                   <span className="text-yellow-400">{video.totalCoinsSpent} spent</span>
-                  <span className="text-blue-400">{video.totalViews.toLocaleString()} views</span>
+                  <span className="text-primary">{video.totalViews.toLocaleString()} views</span>
                   <span className="text-green-400">{video.viewsPerCoin} views/coin</span>
                 </div>
                 <div className="mt-2 inline-flex items-center gap-1 bg-yellow-500/20 border border-yellow-500/50 rounded px-2 py-0.5">

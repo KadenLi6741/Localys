@@ -98,12 +98,12 @@ function PurchaseSuccessContent() {
           {/* QR Codes for pickup */}
           {loading ? (
             <div className="bg-[var(--glass-bg-subtle)] border border-[var(--glass-border)] rounded-lg p-6 mb-6">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-400 mx-auto" />
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto" />
               <p className="text-[var(--text-muted)] text-sm mt-3">Generating pickup QR code...</p>
             </div>
           ) : orders.length > 0 ? (
-            <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-6 mb-6">
-              <p className="text-blue-400 font-semibold mb-1">Show this QR code at pickup</p>
+            <div className="bg-primary/10 border border-primary/30 rounded-lg p-6 mb-6">
+              <p className="text-primary font-semibold mb-1">Show this QR code at pickup</p>
               <p className="text-[var(--text-muted)] text-xs mb-4">
                 The business will scan this to confirm your order
               </p>
@@ -129,7 +129,7 @@ function PurchaseSuccessContent() {
           <div className="space-y-3">
             <Link
               href="/profile"
-              className="block w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 rounded-lg transition-colors"
+              className="block w-full bg-primary hover:bg-primary text-white font-semibold py-3 rounded-lg transition-colors"
             >
               View Order History
             </Link>

@@ -69,7 +69,7 @@ function VerifyContent() {
         <div className="max-w-md w-full text-center">
           <h1 className="text-2xl font-bold mb-4">Sign in required</h1>
           <p className="text-[var(--text-tertiary)] mb-6">You need to be signed in as the business owner to verify this order.</p>
-          <Link href="/login" className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-6 py-3 rounded-lg">
+          <Link href="/login" className="bg-primary hover:bg-primary text-white font-semibold px-6 py-3 rounded-lg">
             Sign In
           </Link>
         </div>
@@ -95,7 +95,7 @@ function VerifyContent() {
               </div>
             )}
             <div className="space-y-3">
-              <Link href="/dashboard" className="block w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 rounded-lg transition-colors">
+              <Link href="/dashboard" className="block w-full bg-primary hover:bg-primary text-white font-semibold py-3 rounded-lg transition-colors">
                 Back to Dashboard
               </Link>
               <Link href="/" className="block w-full bg-[var(--glass-bg)] hover:bg-[var(--glass-bg-strong)] text-[var(--text-primary)] font-semibold py-3 rounded-lg transition-colors">

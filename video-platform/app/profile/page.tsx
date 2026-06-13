@@ -54,9 +54,9 @@ function OrderHistoryCollapsible({ userId, isBusiness }: { userId: string; isBus
         onClick={() => setExpanded(e => !e)}
         className="w-full flex items-center justify-between px-6 py-4 hover:bg-[var(--glass-bg)] transition-colors"
       >
-        <h3 className="text-xl font-semibold text-[#1A1A1A]">Order History</h3>
+        <h3 className="text-xl font-semibold text-foreground">Order History</h3>
         <svg
-          className={`w-5 h-5 text-[#6B6B65] transition-transform duration-300 ${expanded ? 'rotate-180' : ''}`}
+          className={`w-5 h-5 text-muted-foreground transition-transform duration-300 ${expanded ? 'rotate-180' : ''}`}
           fill="none" stroke="currentColor" viewBox="0 0 24 24"
         >
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -72,10 +72,10 @@ function OrderHistoryCollapsible({ userId, isBusiness }: { userId: string; isBus
       </div>
       {!expanded && (
         <div className="relative">
-          <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white to-transparent pointer-events-none" />
+          <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-card to-transparent pointer-events-none" />
           <button
             onClick={() => setExpanded(true)}
-            className="relative w-full py-3 text-center text-sm font-semibold text-[#1A1A1A] hover:text-[#1A1A1A]/80 transition-colors"
+            className="relative w-full py-3 text-center text-sm font-semibold text-primary hover:text-primary/80 transition-colors"
           >
             Show all orders
           </button>
@@ -94,9 +94,9 @@ function CollapsibleSection({ title, defaultOpen = false, children }: { title: s
         onClick={() => setExpanded(e => !e)}
         className="w-full flex items-center justify-between px-6 py-4 hover:bg-[var(--glass-bg)] transition-colors"
       >
-        <h3 className="text-xl font-semibold text-[#1A1A1A]">{title}</h3>
+        <h3 className="text-xl font-semibold text-foreground">{title}</h3>
         <svg
-          className={`w-5 h-5 text-[#6B6B65] transition-transform duration-300 ${expanded ? 'rotate-180' : ''}`}
+          className={`w-5 h-5 text-muted-foreground transition-transform duration-300 ${expanded ? 'rotate-180' : ''}`}
           fill="none" stroke="currentColor" viewBox="0 0 24 24"
         >
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -177,9 +177,9 @@ function ProfileContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white text-[#1A1A1A] pb-24 lg:pb-8 flex items-center justify-center">
+      <div className="min-h-screen bg-background text-foreground pb-24 lg:pb-8 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
           <p>{t('common.loading')}</p>
         </div>
       </div>
@@ -189,9 +189,9 @@ function ProfileContent() {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen bg-white text-[#1A1A1A] pb-24 lg:pb-8">
+    <div className="min-h-screen bg-background text-foreground pb-24 lg:pb-8">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-white/90 backdrop-blur-md border-b border-[var(--glass-border)]">
+      <div className="sticky top-0 z-10 bg-card/90 backdrop-blur-md border-b border-border">
         <div className="w-full px-4 lg:px-12 py-4 flex items-center justify-between">
           <h1 className="entrance-slide text-2xl font-bold" style={{ animation: 'slideInLeft 0.4s ease-out forwards', opacity: 0 }}>{t('profile.title')}</h1>
           <LanguageSettings />
@@ -340,23 +340,22 @@ function ProfileView({ profile, business, user, onEditClick, onSignOut, onProfil
             className="w-24 h-24"
           />
           <div className="flex-1 min-w-0">
-            <h2 className="text-2xl font-bold mb-2">{profile?.full_name || <span className="text-[#9E9A90] italic">No name set</span>}</h2>
-            <p className="text-[var(--text-tertiary)] mb-2">@{profile?.username || <span className="italic">no username</span>}</p>
+            <h2 className="text-2xl font-bold mb-2 text-foreground">{profile?.full_name || <span className="text-muted-foreground italic">No name set</span>}</h2>
+            <p className="text-muted-foreground mb-2">@{profile?.username || <span className="italic">no username</span>}</p>
             {profile?.bio && (
-              <p className="text-[var(--text-secondary)] text-sm mb-2">{profile.bio}</p>
+              <p className="text-muted-foreground text-sm mb-2">{profile.bio}</p>
             )}
             {business && (
               <div className="flex items-center gap-2 flex-wrap">
-                <p className="text-blue-400 text-sm">{business.business_name}</p>
+                <p className="text-primary text-sm font-semibold">{business.business_name}</p>
                 {business.business_type && (
-                  <span className="bg-[#1A1A1A] text-white text-xs px-2 py-1 rounded-full capitalize">
+                  <span className="bg-primary/15 text-primary text-xs px-2 py-1 rounded-[4px] capitalize">
                     {business.business_type === 'hybrid' ? 'Pickup & Delivery' : business.business_type}
                   </span>
                 )}
                 <button
                   onClick={() => setShowBusinessHours(!showBusinessHours)}
-                  className="text-xs transition-colors"
-                  style={{ border: '1px solid #1A1A1A', color: '#1A1A1A', background: '#FFFFFF', borderRadius: 50, padding: '6px 16px' }}
+                  className="text-xs rounded-[4px] border border-border bg-surface px-4 py-1.5 text-foreground transition-colors hover:bg-surface-2"
                 >
                   {showBusinessHours ? 'Hide Hours' : 'Show Hours'}
                 </button>
@@ -440,8 +439,8 @@ function ProfileView({ profile, business, user, onEditClick, onSignOut, onProfil
                     onClick={() => setActiveMediaTab('videos')}
                     className={`py-3 text-base font-semibold text-center transition-colors ${
                       activeMediaTab === 'videos'
-                        ? 'text-[#1A1A1A]'
-                        : 'text-[#6B6B65] hover:text-[#1A1A1A]'
+                        ? 'text-primary'
+                        : 'text-muted-foreground hover:text-foreground'
                     }`}
                   >
                     Videos
@@ -450,15 +449,15 @@ function ProfileView({ profile, business, user, onEditClick, onSignOut, onProfil
                     onClick={() => setActiveMediaTab('services')}
                     className={`py-3 text-base font-semibold text-center transition-colors ${
                       activeMediaTab === 'services'
-                        ? 'text-[#1A1A1A]'
-                        : 'text-[#6B6B65] hover:text-[#1A1A1A]'
+                        ? 'text-primary'
+                        : 'text-muted-foreground hover:text-foreground'
                     }`}
                   >
                     Services
                   </button>
                 </div>
                 <span
-                  className="absolute bottom-0 left-0 h-[2px] w-1/2 bg-[#1A1A1A] transition-transform duration-300 ease-out"
+                  className="absolute bottom-0 left-0 h-[2px] w-1/2 bg-primary transition-transform duration-300 ease-out"
                   style={{
                     transform: activeMediaTab === 'videos' ? 'translateX(0%)' : 'translateX(100%)',
                   }}
@@ -507,23 +506,23 @@ function ProfileView({ profile, business, user, onEditClick, onSignOut, onProfil
                   onClick={() => navRouter.push(`/profile/${f.username}`)}
                   className="flex flex-col items-center gap-1.5 min-w-[64px] hover:opacity-80 transition-opacity"
                 >
-                  <div className={`w-12 h-12 rounded-full overflow-hidden ${f.type ? 'ring-2 ring-[#1A1A1A]' : 'ring-1 ring-[#E8E8E4]'}`}>
+                  <div className={`w-12 h-12 rounded-full overflow-hidden ${f.type ? 'ring-2 ring-primary' : 'ring-1 ring-border'}`}>
                     {f.profile_picture_url ? (
                       <img src={f.profile_picture_url} alt={f.full_name} className="w-full h-full object-cover" />
                     ) : (
-                      <div className="w-full h-full bg-[var(--glass-bg-strong)] flex items-center justify-center text-sm text-[var(--text-tertiary)]">
+                      <div className="w-full h-full bg-surface flex items-center justify-center text-sm text-muted-foreground">
                         {f.full_name?.[0] || '?'}
                       </div>
                     )}
                   </div>
-                  <span className="text-[10px] text-[var(--text-tertiary)] truncate max-w-[64px]">{f.username}</span>
+                  <span className="text-[10px] text-muted-foreground truncate max-w-[64px]">{f.username}</span>
                 </button>
               ))}
             </div>
           ) : (
             <div className="bg-[var(--glass-bg-subtle)] border border-[var(--glass-border)] rounded-lg p-6 text-center">
-              <p className="text-[var(--text-muted)] text-sm mb-3">You are not following anyone yet</p>
-              <Link href="/search" className="text-[#1A1A1A] text-sm font-medium hover:underline">Discover People</Link>
+              <p className="text-muted-foreground text-sm mb-3">You are not following anyone yet</p>
+              <Link href="/search" className="text-primary text-sm font-medium hover:underline">Discover People</Link>
             </div>
           )}
         </div>
@@ -537,13 +536,13 @@ function ProfileView({ profile, business, user, onEditClick, onSignOut, onProfil
         </button>
 
         {/* Footer */}
-        <div className="border-t border-[#E8E8E4] pt-6 pb-8">
+        <div className="border-t border-border pt-6 pb-8">
           <div className="flex items-center justify-center gap-6 mb-3">
-            <a href="#" className="text-[#6B6B65] text-xs hover:text-[#1A1A1A] transition-colors">Company</a>
-            <a href="#" className="text-[#6B6B65] text-xs hover:text-[#1A1A1A] transition-colors">Program</a>
-            <a href="#" className="text-[#6B6B65] text-xs hover:text-[#1A1A1A] transition-colors">Terms & Policies</a>
+            <a href="#" className="text-muted-foreground text-xs hover:text-foreground transition-colors">Company</a>
+            <a href="#" className="text-muted-foreground text-xs hover:text-foreground transition-colors">Program</a>
+            <a href="#" className="text-muted-foreground text-xs hover:text-foreground transition-colors">Terms & Policies</a>
           </div>
-          <p className="text-[#6B6B65] text-xs text-center">© 2026 Localys</p>
+          <p className="text-muted-foreground text-xs text-center">© 2026 Localys</p>
         </div>
       </div>
     </>
@@ -733,9 +732,9 @@ function ProfileEditForm({ profile, business, user, onSave, onCancel }: ProfileE
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="absolute bottom-0 right-0 bg-blue-500 hover:bg-blue-600 rounded-full p-2 transition-colors"
+              className="absolute bottom-0 right-0 bg-primary hover:bg-primary/90 rounded-full p-2 transition-colors"
             >
-              <svg className="w-4 h-4 text-[var(--text-primary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 text-primary-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
@@ -758,7 +757,7 @@ function ProfileEditForm({ profile, business, user, onSave, onCancel }: ProfileE
             type="text"
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
-            className="w-full bg-[var(--glass-bg)] border border-[var(--glass-border)] rounded-lg px-4 py-3 text-[var(--text-primary)] placeholder-[var(--placeholder)] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full bg-[var(--glass-bg)] border border-[var(--glass-border)] rounded-lg px-4 py-3 text-[var(--text-primary)] placeholder-[var(--placeholder)] focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
             placeholder="Enter your full name"
             required
           />
@@ -771,7 +770,7 @@ function ProfileEditForm({ profile, business, user, onSave, onCancel }: ProfileE
             type="text"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            className="w-full bg-[var(--glass-bg)] border border-[var(--glass-border)] rounded-lg px-4 py-3 text-[var(--text-primary)] placeholder-[var(--placeholder)] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full bg-[var(--glass-bg)] border border-[var(--glass-border)] rounded-lg px-4 py-3 text-[var(--text-primary)] placeholder-[var(--placeholder)] focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
             placeholder="Enter your username"
             required
           />
@@ -783,7 +782,7 @@ function ProfileEditForm({ profile, business, user, onSave, onCancel }: ProfileE
           <textarea
             value={bio}
             onChange={(e) => setBio(e.target.value)}
-            className="w-full bg-[var(--glass-bg)] border border-[var(--glass-border)] rounded-lg px-4 py-3 text-[var(--text-primary)] placeholder-[var(--placeholder)] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+            className="w-full bg-[var(--glass-bg)] border border-[var(--glass-border)] rounded-lg px-4 py-3 text-[var(--text-primary)] placeholder-[var(--placeholder)] focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent resize-none"
             placeholder="Tell us about yourself or your restaurant"
             rows={4}
           />
@@ -798,7 +797,7 @@ function ProfileEditForm({ profile, business, user, onSave, onCancel }: ProfileE
                 type="text"
                 value={businessName}
                 onChange={(e) => setBusinessName(e.target.value)}
-                className="w-full bg-[var(--glass-bg)] border border-[var(--glass-border)] rounded-lg px-4 py-3 text-[var(--text-primary)] placeholder-[var(--placeholder)] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full bg-[var(--glass-bg)] border border-[var(--glass-border)] rounded-lg px-4 py-3 text-[var(--text-primary)] placeholder-[var(--placeholder)] focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
                 placeholder="Enter your business name"
               />
               <p className="text-[var(--text-muted)] text-xs mt-1">
@@ -812,7 +811,7 @@ function ProfileEditForm({ profile, business, user, onSave, onCancel }: ProfileE
               <select
                 value={businessType}
                 onChange={(e) => setBusinessType(e.target.value)}
-                className="w-full bg-white text-black border border-[var(--glass-border)] rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full bg-surface text-foreground border border-border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
               >
                 <option value="general">General</option>
                 <option value="pickup">Pickup</option>
@@ -859,7 +858,7 @@ function ProfileEditForm({ profile, business, user, onSave, onCancel }: ProfileE
                                 [day]: { ...businessHours[day], open: e.target.value },
                               });
                             }}
-                            className="flex-1 bg-[var(--glass-bg)] border border-[var(--glass-border)] rounded px-2 py-1 text-[var(--text-primary)] text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="flex-1 bg-[var(--glass-bg)] border border-[var(--glass-border)] rounded px-2 py-1 text-[var(--text-primary)] text-sm focus:outline-none focus:ring-2 focus:ring-ring"
                           />
                           <span className="text-[var(--text-muted)]">to</span>
                           <input
@@ -871,7 +870,7 @@ function ProfileEditForm({ profile, business, user, onSave, onCancel }: ProfileE
                                 [day]: { ...businessHours[day], close: e.target.value },
                               });
                             }}
-                            className="flex-1 bg-[var(--glass-bg)] border border-[var(--glass-border)] rounded px-2 py-1 text-[var(--text-primary)] text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="flex-1 bg-[var(--glass-bg)] border border-[var(--glass-border)] rounded px-2 py-1 text-[var(--text-primary)] text-sm focus:outline-none focus:ring-2 focus:ring-ring"
                           />
                         </>
                       ) : (
@@ -900,7 +899,7 @@ function ProfileEditForm({ profile, business, user, onSave, onCancel }: ProfileE
                         newMessages[index] = e.target.value;
                         setCustomMessages(newMessages);
                       }}
-                      className="flex-1 bg-[var(--glass-bg)] border border-[var(--glass-border)] rounded-lg px-4 py-2 text-[var(--text-primary)] placeholder-[var(--placeholder)] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                      className="flex-1 bg-[var(--glass-bg)] border border-[var(--glass-border)] rounded-lg px-4 py-2 text-[var(--text-primary)] placeholder-[var(--placeholder)] focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent text-sm"
                       placeholder="e.g., Hi, interested in this!"
                       maxLength={100}
                     />
@@ -919,7 +918,7 @@ function ProfileEditForm({ profile, business, user, onSave, onCancel }: ProfileE
               <button
                 type="button"
                 onClick={() => setCustomMessages([...customMessages, 'Hi, interested in this!'])}
-                className="mt-3 w-full px-4 py-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-lg transition-colors border border-blue-500/50"
+                className="mt-3 w-full px-4 py-2 bg-primary/15 hover:bg-primary/25 text-primary rounded-lg transition-colors border border-primary/40"
               >
                 + Add Message
               </button>
@@ -966,7 +965,7 @@ function ProfileEditForm({ profile, business, user, onSave, onCancel }: ProfileE
           <button
             type="submit"
             disabled={loading}
-            className="flex-1 bg-blue-500 hover:bg-blue-600 border border-blue-500 rounded-lg py-3 transition-all duration-200 hover:scale-[1.02] active:scale-98 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="flex-1 bg-primary hover:bg-primary/90 border border-primary text-primary-foreground rounded-lg py-3 transition-all duration-200 hover:scale-[1.02] active:scale-98 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {loading ? (
               <>

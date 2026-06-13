@@ -22,7 +22,7 @@ const makeBusinessIcon = (label: string, index: number) =>
 const userIcon = L.divIcon({
   className: '',
   html: `<div style="width:24px;height:24px;display:flex;align-items:center;justify-content:center;">
-    <div style="width:16px;height:16px;background:#3b82f6;border:3px solid white;border-radius:50%;box-shadow:0 0 0 4px rgba(59,130,246,0.3)"></div>
+    <div style="width:16px;height:16px;background:#f97316;border:3px solid white;border-radius:50%;box-shadow:0 0 0 4px rgba(249,115,22,0.3)"></div>
   </div>`,
   iconSize: [24, 24],
   iconAnchor: [12, 12],
@@ -208,7 +208,7 @@ export default function BusinessLocationMap({ locations, businessName }: Busines
           {gpsState === 'idle' && (
             <button
               onClick={requestLocation}
-              className="flex items-center gap-2 text-sm text-blue-400 hover:text-blue-300 transition-colors"
+              className="flex items-center gap-2 text-sm text-primary hover:text-primary/30 transition-colors"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />

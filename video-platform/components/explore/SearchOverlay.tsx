@@ -126,7 +126,7 @@ export function SearchOverlay({ query, searchMode, isOpen, onSelect, onClose }: 
                 <img src={s.imageUrl} alt="" className="w-8 h-8 rounded-full object-cover flex-shrink-0" />
               ) : (
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                  s.type === 'business' ? 'bg-blue-500/20 text-blue-500' :
+                  s.type === 'business' ? 'bg-primary/20 text-primary' :
                   s.type === 'category' ? 'bg-green-500/20 text-green-500' :
                   'bg-yellow-500/20 text-yellow-500'
                 }`}>

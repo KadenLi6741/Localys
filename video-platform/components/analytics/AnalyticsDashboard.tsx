@@ -51,11 +51,11 @@ export function AnalyticsDashboard({ userId }: AnalyticsDashboardProps) {
     <div className="mb-8">
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full flex items-center justify-between bg-white border border-[#E8E8E4] rounded-2xl px-5 py-4 transition-all duration-200 hover:border-[#1B5EA8] hover:scale-[1.02] shadow-sm"
+        className="w-full flex items-center justify-between bg-white border border-[#E8E8E4] rounded-2xl px-5 py-4 transition-all duration-200 hover:border-[var(--primary)] hover:scale-[1.02] shadow-sm"
       >
         <span className="text-[18px] font-semibold text-[#1A1A1A]">Promotion Analytics</span>
         <svg
-          className={`w-5 h-5 text-[#1B5EA8] transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}
+          className={`w-5 h-5 text-[var(--primary)] transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -71,7 +71,7 @@ export function AnalyticsDashboard({ userId }: AnalyticsDashboardProps) {
         <div ref={contentRef} className="bg-white border border-t-0 border-[#E8E8E4] rounded-b-2xl p-6 -mt-2">
           {loading ? (
             <div className="flex items-center justify-center py-12">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-400" />
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
             </div>
           ) : !data || data.summary.totalPromotions === 0 ? (
             <EmptyAnalytics />

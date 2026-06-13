@@ -16,8 +16,8 @@ interface CoinDistributionChartProps {
 }
 
 const PIE_COLORS = [
-  '#eab308', '#3b82f6', '#22c55e', '#a855f7', '#ef4444', '#f97316',
-  '#14b8a6', '#f43f5e', '#8b5cf6', '#06b6d4',
+  '#eab308', '#ec4899', '#22c55e', '#a855f7', '#ef4444', '#f97316',
+  '#14b8a6', '#f43f5e', '#8b5cf6', '#84cc16',
 ];
 
 function CustomTooltip({ active, payload }: { active?: boolean; payload?: { payload: CoinDistribution }[] }) {

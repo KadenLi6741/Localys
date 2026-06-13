@@ -52,7 +52,7 @@ export function PromotionActivityFeed({ history }: PromotionActivityFeedProps) {
             <div className="flex-1 min-w-0">
               <p className="text-sm text-[var(--text-primary)]">
                 Spent <span className="text-yellow-400 font-semibold">{entry.coinsSpent} coins</span> on{' '}
-                <span className="text-blue-400">&quot;{entry.videoTitle}&quot;</span>
+                <span className="text-primary">&quot;{entry.videoTitle}&quot;</span>
               </p>
               <p className="text-xs text-[var(--text-muted)] mt-1">
                 Boost: {entry.previousBoost.toFixed(1)} → {entry.newBoost.toFixed(1)}
@@ -65,7 +65,7 @@ export function PromotionActivityFeed({ history }: PromotionActivityFeedProps) {
       {history.length > 5 && (
         <button
           onClick={() => setShowAll(!showAll)}
-          className="w-full text-center text-blue-400 text-sm mt-3 py-2 hover:text-blue-300 transition-colors"
+          className="w-full text-center text-primary text-sm mt-3 py-2 hover:text-primary/30 transition-colors"
         >
           {showAll ? 'Show less' : `Show all (${history.length})`}
         </button>

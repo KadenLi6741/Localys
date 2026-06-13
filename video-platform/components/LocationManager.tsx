@@ -174,7 +174,7 @@ export default function LocationManager({ profileId }: LocationManagerProps) {
               onChange={(e) => setLabel(e.target.value)}
               placeholder='Location label, e.g. "Downtown Branch"'
               maxLength={60}
-              className="w-full bg-[var(--glass-bg)] border border-[var(--glass-border)] rounded-lg px-3 py-2 text-[var(--text-primary)] placeholder-[var(--placeholder)] text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full bg-[var(--glass-bg)] border border-[var(--glass-border)] rounded-lg px-3 py-2 text-[var(--text-primary)] placeholder-[var(--placeholder)] text-sm focus:outline-none focus:ring-2 focus:ring-primary"
             />
             {error && <p className="text-red-400 text-xs">{error}</p>}
             <div className="flex gap-2">
@@ -187,7 +187,7 @@ export default function LocationManager({ profileId }: LocationManagerProps) {
               <button
                 onClick={handleSave}
                 disabled={!pending || saving}
-                className="flex-1 bg-blue-500 hover:bg-blue-600 disabled:opacity-40 disabled:cursor-not-allowed rounded-lg py-2 text-sm font-medium transition-colors"
+                className="flex-1 bg-primary hover:bg-primary disabled:opacity-40 disabled:cursor-not-allowed rounded-lg py-2 text-sm font-medium transition-colors"
               >
                 {saving ? 'Saving...' : 'Save Location'}
               </button>
@@ -197,7 +197,7 @@ export default function LocationManager({ profileId }: LocationManagerProps) {
       ) : (
         <button
           onClick={() => setAdding(true)}
-          className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-lg transition-colors border border-blue-500/50 text-sm"
+          className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-primary/20 hover:bg-primary/30 text-primary rounded-lg transition-colors border border-primary/50 text-sm"
         >
           + Add Location
         </button>

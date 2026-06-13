@@ -309,7 +309,7 @@ export default function VideoDetailPage() {
           <p className="text-[var(--text-primary)] text-xl mb-4">{error || 'Video not found'}</p>
           <button
             onClick={() => router.back()}
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+            className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary"
           >
             Go Back
           </button>
@@ -355,7 +355,7 @@ export default function VideoDetailPage() {
                   <button
                     key={index}
                     onClick={() => handleSendQuickMessage(message)}
-                    className="px-3 py-2 bg-blue-500/70 hover:bg-blue-600/70 text-white text-sm rounded-lg backdrop-blur-sm transition-all hover:scale-105"
+                    className="px-3 py-2 bg-primary/70 hover:bg-primary/70 text-white text-sm rounded-lg backdrop-blur-sm transition-all hover:scale-105"
                   >
                     {message}
                   </button>
@@ -430,7 +430,7 @@ export default function VideoDetailPage() {
                     href={directionsUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-3 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm rounded-lg transition"
+                    className="px-3 py-2 bg-primary hover:bg-primary text-white text-sm rounded-lg transition"
                   >
                     {t('video.info.get_directions')}
                   </a>

@@ -27,12 +27,12 @@ export function TopSellingItemsChart({ data }: TopSellingItemsChartProps) {
                   className="h-full rounded-full transition-all duration-700"
                   style={{
                     width: `${pct}%`,
-                    background: 'linear-gradient(90deg, #1B5EA8, #1B5EA8cc)',
+                    background: 'linear-gradient(90deg, var(--primary), var(--primary))',
                     animationDelay: `${i * 0.1}s`,
                   }}
                 />
               </div>
-              <span className="text-[#1B5EA8] text-sm font-semibold w-8 text-right flex-shrink-0">
+              <span className="text-[var(--primary)] text-sm font-semibold w-8 text-right flex-shrink-0">
                 {item.unitsSold}
               </span>
             </div>

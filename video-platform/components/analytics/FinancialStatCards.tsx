@@ -34,7 +34,7 @@ export function FinancialStatCards({ summary }: FinancialStatCardsProps) {
             <p className="text-[12px] text-[#6B6B65] mb-1">
               {card.label}
             </p>
-            <p className="text-[24px] font-bold text-[#1B5EA8]">{formatted}</p>
+            <p className="text-[24px] font-bold text-[var(--primary)]">{formatted}</p>
           </div>
         );
       })}

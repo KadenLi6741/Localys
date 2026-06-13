@@ -15,7 +15,7 @@ export function QuickStatsRow({ stats }: QuickStatsRowProps) {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <div className="bg-[#F8F8F6] rounded-xl p-3">
           <p className="text-[11px] text-[#6B6B65] mb-1">Avg Order Value</p>
-          <p className="text-lg font-bold text-[#1B5EA8]">
+          <p className="text-lg font-bold text-[var(--primary)]">
             ${stats.averageOrderValue.toFixed(2)}
           </p>
         </div>

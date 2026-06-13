@@ -236,8 +236,8 @@ export default function BuyCoinsPage() {
 
         {/* Coupon Applied Not */}
         {selectedCoupon && (
-          <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 mb-8">
-            <p className="text-blue-400 text-sm">
+          <div className="bg-primary/10 border border-primary/30 rounded-lg p-4 mb-8">
+            <p className="text-primary text-sm">
               ✓ Coupon applied! You'll save ${discountAmount} on your purchase.
             </p>
           </div>

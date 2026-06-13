@@ -63,7 +63,7 @@ export function MenuItemPurchaseButton({
       <button
         onClick={handleAddToCart}
         disabled={added}
-        className="bg-blue-500 hover:bg-blue-600 disabled:bg-blue-400 text-white font-semibold py-2 px-3 rounded-lg transition-colors disabled:cursor-default flex items-center justify-center gap-1"
+        className="bg-primary hover:bg-primary disabled:bg-primary text-white font-semibold py-2 px-3 rounded-lg transition-colors disabled:cursor-default flex items-center justify-center gap-1"
       >
         {added ? (
           <span className="text-sm">Added!</span>

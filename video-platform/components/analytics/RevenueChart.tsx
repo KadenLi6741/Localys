@@ -33,7 +33,7 @@ function RevenueTooltip({ active, payload, label }: { active?: boolean; payload?
   return (
     <div className="bg-[#1A1A1A]/90 border border-[#3A3A34] rounded-lg p-3 shadow-lg">
       <p className="text-white/70 text-xs mb-1">{label}</p>
-      <p className="text-[#1B5EA8] font-semibold">${payload[0].value.toFixed(2)}</p>
+      <p className="text-[var(--primary)] font-semibold">${payload[0].value.toFixed(2)}</p>
     </div>
   );
 }
@@ -53,7 +53,7 @@ export function RevenueChart({ data }: RevenueChartProps) {
               onClick={() => setRange(r)}
               className={`px-3 py-1 rounded-lg text-xs font-medium transition-all ${
                 range === r
-                  ? 'bg-[#1B5EA8] text-white'
+                  ? 'bg-[var(--primary)] text-white'
                   : 'bg-[#F8F8F6] text-[#6B6B65] hover:text-[#1A1A1A]'
               }`}
             >
@@ -72,8 +72,8 @@ export function RevenueChart({ data }: RevenueChartProps) {
           <AreaChart data={filtered} margin={{ top: 5, right: 10, left: -10, bottom: 5 }}>
             <defs>
               <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#1B5EA8" stopOpacity={0.3} />
-                <stop offset="95%" stopColor="#1B5EA8" stopOpacity={0} />
+                <stop offset="5%" stopColor="#f97316" stopOpacity={0.3} />
+                <stop offset="95%" stopColor="#f97316" stopOpacity={0} />
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="#E8E8E4" />
@@ -92,7 +92,7 @@ export function RevenueChart({ data }: RevenueChartProps) {
             <Area
               type="monotone"
               dataKey="revenue"
-              stroke="#1B5EA8"
+              stroke="#f97316"
               strokeWidth={2}
               fill="url(#revenueGradient)"
             />
