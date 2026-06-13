@@ -29,11 +29,10 @@ function ChatsContent() {
       {/* Header */}
       <div className="sticky top-0 z-10 bg-card/80 backdrop-blur-md border-b border-border">
         <div className="w-full px-4 lg:px-12 py-4 flex items-center justify-between">
-          <h1 className="entrance-slide text-2xl font-bold text-foreground" style={{ animation: 'slideInLeft 0.4s ease-out forwards', opacity: 0 }}>Messages</h1>
+          <h1 className="text-2xl font-bold text-foreground">Messages</h1>
           <button
             onClick={() => setShowNewChatModal(true)}
-            className="entrance-scale w-11 h-11 rounded-full bg-surface hover:bg-surface-2 border border-border flex items-center justify-center transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-            style={{ animation: 'scaleIn 0.3s ease-out 0.15s forwards', opacity: 0 }}
+            className="w-11 h-11 rounded-full bg-surface hover:bg-surface-2 border border-border flex items-center justify-center transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             aria-label="New chat"
           >
             <svg className="w-6 h-6 text-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -46,7 +45,7 @@ function ChatsContent() {
       {/* Chats Content */}
       <div className="w-full px-4 lg:px-12 py-8">
         {error && (
-          <div className="entrance-fade mb-6 p-4 bg-destructive/10 border border-destructive/50 rounded-[4px]" style={{ animation: 'fadeInUp 0.4s ease-out forwards', opacity: 0 }}>
+          <div className="mb-6 p-4 bg-destructive/10 border border-destructive/50 rounded-[4px]">
             <p className="text-destructive font-semibold mb-2">Error loading chats</p>
             <p className="text-destructive/80 text-sm mb-3">{error.message}</p>
             <button
@@ -58,9 +57,7 @@ function ChatsContent() {
           </div>
         )}
         {!error && (
-        <div className="entrance-fade" style={{ animation: 'fadeInUp 0.4s ease-out 0.1s forwards', opacity: 0 }}>
           <ChatList chats={chats} currentUserId={user?.id || ''} loading={loading} />
-        </div>
         )}
       </div>
 

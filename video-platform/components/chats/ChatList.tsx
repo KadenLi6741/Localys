@@ -48,17 +48,13 @@ export function ChatList({ chats, currentUserId, loading }: ChatListProps) {
   }
 
   return (
-    <div className="divide-y divide-[var(--color-charcoal-lighter-plus)]">
-      {chats.map((chat, index) => (
-        <div
+    <div className="divide-y divide-border">
+      {chats.map((chat) => (
+        <ChatListItem
           key={chat.id}
-          style={{ animation: `slideDown 0.4s ease-out ${index * 0.05}s forwards`, opacity: 0 }}
-        >
-          <ChatListItem
-            chat={chat}
-            onClick={() => chat.id && handleChatClick(chat.id)}
-          />
-        </div>
+          chat={chat}
+          onClick={() => chat.id && handleChatClick(chat.id)}
+        />
       ))}
     </div>
   );
