@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -244,6 +244,19 @@ export default function ShopPage() {
 
   const activeFilters = priceMax < PRICE_CEIL || minRating > 0 || maxDistanceKm < 50;
 
+  // Close the filters popover on click-away.
+  const filtersRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!filtersOpen) return;
+    const handler = (e: MouseEvent) => {
+      if (filtersRef.current && !filtersRef.current.contains(e.target as Node)) {
+        setFiltersOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [filtersOpen]);
+
   return (
     <div className="min-h-screen bg-background pb-24 lg:pb-12">
       {/* ===== Storefront header ===== */}
@@ -283,19 +296,73 @@ export default function ShopPage() {
                 ))}
               </DropdownMenuContent>
             </DropdownMenu>
-            {/* Filter toggle */}
-            <button
-              type="button"
-              onClick={() => setFiltersOpen((o) => !o)}
-              className={cn(
-                'inline-flex h-10 items-center gap-1.5 rounded-[4px] border px-3 text-body-sm font-semibold transition-colors',
-                activeFilters ? 'border-primary text-primary' : 'border-border text-foreground hover:bg-surface',
+            {/* Filters — popover anchored to this button (no left rail) */}
+            <div ref={filtersRef} className="relative">
+              <button
+                type="button"
+                onClick={() => setFiltersOpen((o) => !o)}
+                className={cn(
+                  'inline-flex h-10 items-center gap-1.5 rounded-[4px] border px-3 text-body-sm font-semibold transition-colors',
+                  activeFilters ? 'border-primary text-primary' : 'border-border text-foreground hover:bg-surface/60',
+                )}
+                aria-expanded={filtersOpen}
+              >
+                <SlidersHorizontal className="h-4 w-4" aria-hidden="true" />
+                Filters
+              </button>
+              {filtersOpen && (
+                <div className="absolute right-0 top-full z-50 mt-2 w-72 space-y-4 rounded-[4px] border border-border bg-popover p-4 shadow-[inset_0_0_0_1px_var(--border)]">
+                  {/* Max price */}
+                  <div>
+                    <div className="mb-2 flex items-center justify-between">
+                      <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Max price</span>
+                      <span className="text-caption font-bold text-foreground tabular-nums">{priceMax >= PRICE_CEIL ? 'Any' : `$${priceMax}`}</span>
+                    </div>
+                    <input type="range" min={5} max={PRICE_CEIL} step={5} value={priceMax} onChange={(e) => setPriceMax(Number(e.target.value))} className="h-1.5 w-full cursor-pointer appearance-none rounded-[4px] bg-surface-2 accent-primary" aria-label="Maximum price" />
+                  </div>
+                  {/* Min rating */}
+                  <div>
+                    <div className="mb-2 flex items-center justify-between">
+                      <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Min rating</span>
+                      <button type="button" onClick={() => setMinRating(0)} className="text-caption font-semibold text-muted-foreground hover:text-foreground">{minRating > 0 ? 'Clear' : 'Any'}</button>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <button key={star} type="button" onClick={() => setMinRating(star === minRating ? 0 : star)} aria-label={`At least ${star} stars`} aria-pressed={minRating >= star}>
+                          <Star className={cn('h-6 w-6', minRating >= star ? 'fill-primary text-primary' : 'text-muted-foreground')} />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  {/* Distance */}
+                  <div>
+                    <div className="mb-2 flex items-center justify-between">
+                      <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Distance</span>
+                      <span className="text-caption font-bold text-foreground tabular-nums">{maxDistanceKm >= 50 ? 'Any' : `${maxDistanceKm} km`}</span>
+                    </div>
+                    <input type="range" min={1} max={50} step={1} value={maxDistanceKm} onChange={(e) => setMaxDistanceKm(Number(e.target.value))} disabled={!coords} className="h-1.5 w-full cursor-pointer appearance-none rounded-[4px] bg-surface-2 accent-primary disabled:opacity-40" aria-label="Maximum distance" />
+                    {!coords && <p className="mt-1 text-[10px] text-muted-foreground">Enable location to filter by distance</p>}
+                  </div>
+                  {/* Apply */}
+                  <div className="flex justify-between gap-2 border-t border-border pt-3">
+                    <button
+                      type="button"
+                      onClick={() => { setPriceMax(PRICE_CEIL); setMinRating(0); setMaxDistanceKm(50); }}
+                      className="rounded-[4px] px-3 py-1.5 text-caption font-semibold text-muted-foreground transition-colors hover:bg-surface/60 hover:text-foreground"
+                    >
+                      Reset
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setFiltersOpen(false)}
+                      className="rounded-[4px] bg-primary px-4 py-1.5 text-caption font-bold text-primary-foreground transition-colors hover:bg-primary/90"
+                    >
+                      Apply
+                    </button>
+                  </div>
+                </div>
               )}
-              aria-pressed={filtersOpen}
-            >
-              <SlidersHorizontal className="h-4 w-4" aria-hidden="true" />
-              Filters
-            </button>
+            </div>
           </div>
 
           {/* Category chips */}
@@ -319,46 +386,10 @@ export default function ShopPage() {
         </div>
       </div>
 
-      {/* ===== Body: filter rail + product grid ===== */}
-      <div className="mx-auto flex max-w-[1400px] gap-6 px-4 py-6 lg:px-8">
-        {/* Filter rail */}
-        {filtersOpen && (
-          <aside className="hidden w-60 shrink-0 lg:block">
-            <div className="sticky top-20 space-y-6 border border-border bg-surface p-4">
-              <div>
-                <div className="mb-2 flex items-center justify-between">
-                  <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Max price</span>
-                  <span className="text-caption font-bold text-foreground tabular-nums">{priceMax >= PRICE_CEIL ? 'Any' : `$${priceMax}`}</span>
-                </div>
-                <input type="range" min={5} max={PRICE_CEIL} step={5} value={priceMax} onChange={(e) => setPriceMax(Number(e.target.value))} className="h-1.5 w-full cursor-pointer appearance-none rounded-[4px] bg-surface-2 accent-primary" aria-label="Maximum price" />
-              </div>
-              <div>
-                <div className="mb-2 flex items-center justify-between">
-                  <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Min rating</span>
-                  <button type="button" onClick={() => setMinRating(0)} className="text-caption font-semibold text-muted-foreground hover:text-foreground">{minRating > 0 ? 'Clear' : 'Any'}</button>
-                </div>
-                <div className="flex items-center gap-0.5">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <button key={star} type="button" onClick={() => setMinRating(star === minRating ? 0 : star)} aria-label={`At least ${star} stars`} aria-pressed={minRating >= star}>
-                      <Star className={cn('h-5 w-5', minRating >= star ? 'fill-primary text-primary' : 'text-muted-foreground')} />
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <div className="mb-2 flex items-center justify-between">
-                  <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Distance</span>
-                  <span className="text-caption font-bold text-foreground tabular-nums">{maxDistanceKm >= 50 ? 'Any' : `${maxDistanceKm} km`}</span>
-                </div>
-                <input type="range" min={1} max={50} step={1} value={maxDistanceKm} onChange={(e) => setMaxDistanceKm(Number(e.target.value))} disabled={!coords} className="h-1.5 w-full cursor-pointer appearance-none rounded-[4px] bg-surface-2 accent-primary disabled:opacity-40" aria-label="Maximum distance" />
-                {!coords && <p className="mt-1 text-[10px] text-muted-foreground">Enable location to filter by distance</p>}
-              </div>
-            </div>
-          </aside>
-        )}
-
+      {/* ===== Body: full-width product grid (filters live in the popover) ===== */}
+      <div className="mx-auto max-w-[1400px] px-4 py-6 lg:px-8">
         {/* Product grid */}
-        <div className="min-w-0 flex-1">
+        <div className="min-w-0">
           {loading ? (
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
               {Array.from({ length: 10 }).map((_, i) => (
