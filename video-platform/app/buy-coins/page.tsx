@@ -193,8 +193,8 @@ export default function BuyCoinsPage() {
 
         {/* Stripe Configuration Warning */}
         {!stripeConfigured && (
-          <div className="bg-[#1B5EA8]/10 border border-[#1B5EA8]/30 rounded-lg p-4 mb-8">
-            <p className="text-[#1B5EA8] text-sm">
+          <div className="bg-[var(--primary)]/10 border border-[var(--primary)]/30 rounded-lg p-4 mb-8">
+            <p className="text-[var(--primary)] text-sm">
               <strong>Payment system not configured.</strong> The administrator needs to set up Stripe API keys.
             </p>
           </div>
@@ -267,13 +267,13 @@ export default function BuyCoinsPage() {
               key={pkg.id}
               className={`relative rounded-lg border transition-all ${
                 pkg.popular
-                  ? 'border-[#1B5EA8] bg-[#1B5EA8]/5 ring-2 ring-[#1B5EA8]/30'
+                  ? 'border-[var(--primary)] bg-[var(--primary)]/5 ring-2 ring-[var(--primary)]/30'
                   : 'border-[var(--glass-border)] bg-[var(--glass-bg-subtle)] hover:border-[var(--glass-border)]'
               }`}
             >
               {pkg.popular && (
                 <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                  <span className="bg-[#1B5EA8] text-white px-3 py-1 rounded-full text-xs font-bold">
+                  <span className="bg-[var(--primary)] text-white px-3 py-1 rounded-full text-xs font-bold">
                     MOST POPULAR
                   </span>
                 </div>
@@ -282,8 +282,8 @@ export default function BuyCoinsPage() {
               <div className="p-8 pt-10">
                 {/* Coins */}
                 <div className="text-center mb-4">
-                  <div className="text-5xl font-bold mb-2 text-[#1B5EA8]">C</div>
-                  <p className="text-3xl font-bold text-[#1B5EA8]">{pkg.coins.toLocaleString()}</p>
+                  <div className="text-5xl font-bold mb-2 text-[var(--primary)]">C</div>
+                  <p className="text-3xl font-bold text-[var(--primary)]">{pkg.coins.toLocaleString()}</p>
                   <p className="text-[var(--text-tertiary)] text-sm mt-2">{pkg.description}</p>
                 </div>
 
@@ -308,7 +308,7 @@ export default function BuyCoinsPage() {
                   disabled={processing || selectedPackage === pkg.id || !stripeConfigured}
                   className={`btn-shine w-full py-3 rounded-lg font-semibold transition-all ${
                     pkg.popular
-                      ? 'bg-[#1B5EA8] text-white hover:bg-[#1B5EA8]/90 disabled:bg-[#1B5EA8]/50'
+                      ? 'bg-[var(--primary)] text-white hover:bg-[var(--primary)]/90 disabled:bg-[var(--primary)]/50'
                       : 'bg-[var(--glass-bg)] text-[var(--text-primary)] hover:bg-[var(--glass-bg-strong)] disabled:bg-[var(--glass-bg-subtle)]'
                   } disabled:cursor-not-allowed`}
                 >

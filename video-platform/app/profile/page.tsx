@@ -400,15 +400,15 @@ function ProfileView({ profile, business, user, onEditClick, onSignOut, onProfil
         {/* Coin Balance & Buy Coins Buttons */}
         {profile?.type !== null && (
           <div className="flex gap-4 mb-6">
-            <div className="flex-1 bg-[#1B5EA8]/10 border border-[#1B5EA8]/30 rounded-lg py-3 px-4 text-center">
-              <p className="text-[#1B5EA8]/80 text-xs mb-1">Coin Balance</p>
-              <p className="text-[#1B5EA8] text-2xl font-bold">
+            <div className="flex-1 bg-[var(--primary)]/10 border border-[var(--primary)]/30 rounded-lg py-3 px-4 text-center">
+              <p className="text-[var(--primary)]/80 text-xs mb-1">Coin Balance</p>
+              <p className="text-[var(--primary)] text-2xl font-bold">
                 {profile?.coin_balance || 0}
               </p>
             </div>
             <Link
               href="/buy-coins"
-              className="flex-1 bg-[#1B5EA8] hover:bg-[#1B5EA8]/90 text-white font-semibold rounded-lg py-3 px-4 transition-all duration-200 hover:scale-[1.02] active:scale-98 text-center"
+              className="flex-1 bg-[var(--primary)] hover:bg-[var(--primary)]/90 text-white font-semibold rounded-lg py-3 px-4 transition-all duration-200 hover:scale-[1.02] active:scale-98 text-center"
             >
               {t('nav.buy_coins')}
             </Link>

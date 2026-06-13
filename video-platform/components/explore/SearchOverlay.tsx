@@ -161,7 +161,7 @@ export function SearchOverlay({ query, searchMode, isOpen, onSelect, onClose }: 
       {/* Loading indicator for suggestions */}
       {query.trim().length >= 2 && loadingSuggestions && (
         <div className="flex items-center gap-2 px-4 py-3">
-          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#1B5EA8]" />
+          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[var(--primary)]" />
           <span className="text-xs text-[var(--muted-foreground)]">Searching...</span>
         </div>
       )}
@@ -175,7 +175,7 @@ export function SearchOverlay({ query, searchMode, isOpen, onSelect, onClose }: 
             </p>
             <button
               onClick={handleClearAll}
-              className="text-xs text-[#1B5EA8] hover:underline"
+              className="text-xs text-[var(--primary)] hover:underline"
             >
               Clear all
             </button>

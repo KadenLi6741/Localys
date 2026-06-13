@@ -296,7 +296,7 @@ function UploadContent() {
               <p className="text-[var(--color-body-text)]">Your video is now live and boosted in the feed</p>
             </div>
 
-            <div className="bg-gradient-to-r from-[#6BAF7A]/10 to-[#1B5EA8]/10 border border-[#6BAF7A]/30 rounded-2xl p-6 my-6">
+            <div className="bg-gradient-to-r from-[#6BAF7A]/10 to-[var(--primary)]/10 border border-[#6BAF7A]/30 rounded-2xl p-6 my-6">
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
                   <span className="text-[var(--color-body-text)]">Boost Applied</span>
@@ -305,12 +305,12 @@ function UploadContent() {
                 <div className="h-px bg-[var(--color-charcoal-lighter-plus)]"></div>
                 <div className="flex justify-between items-center">
                   <span className="text-[var(--color-body-text)]">Coins Spent</span>
-                  <span className="text-2xl font-bold text-[#1B5EA8]">{boostCoinsSpent}</span>
+                  <span className="text-2xl font-bold text-[var(--primary)]">{boostCoinsSpent}</span>
                 </div>
                 <div className="h-px bg-[var(--color-charcoal-lighter-plus)]"></div>
                 <div className="flex justify-between items-center">
                   <span className="text-[var(--color-body-text)]">Remaining Coins</span>
-                  <span className="text-2xl font-bold text-[#1B5EA8]">{userCoins}</span>
+                  <span className="text-2xl font-bold text-[var(--primary)]">{userCoins}</span>
                 </div>
               </div>
             </div>
@@ -333,7 +333,7 @@ function UploadContent() {
                   router.push('/');
                   router.refresh();
                 }}
-                className="px-6 py-3 bg-[#1B5EA8] hover:bg-[#1B5EA8]/90 text-black rounded-xl font-semibold transition-all flex items-center gap-2 min-h-[48px] active:scale-[0.98]"
+                className="px-6 py-3 bg-[var(--primary)] hover:bg-[var(--primary)]/90 text-black rounded-xl font-semibold transition-all flex items-center gap-2 min-h-[48px] active:scale-[0.98]"
               >
                 <span>View Feed</span>
               </button>
@@ -363,9 +363,9 @@ function UploadContent() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-[var(--color-body-text)] text-sm">Your Coins</p>
-                  <p className="text-3xl font-bold text-[#1B5EA8]">{userCoins}</p>
+                  <p className="text-3xl font-bold text-[var(--primary)]">{userCoins}</p>
                 </div>
-                <svg className="w-12 h-12 text-[#1B5EA8]/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-12 h-12 text-[var(--primary)]/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 10h-2m0 0h-2m2 0v-2m0 2v2m0-6h4v4m0 0h-2m2 0v-2m0 2v2" />
                 </svg>
               </div>
@@ -382,7 +382,7 @@ function UploadContent() {
               </button>
               <button
                 onClick={() => setShowPromotionModal(true)}
-                className="px-6 py-3 bg-[#1B5EA8] hover:bg-[#1B5EA8]/90 text-black rounded-xl font-semibold transition-all flex items-center gap-2 min-h-[48px] active:scale-[0.98] shadow-lg shadow-[#1B5EA8]/20"
+                className="px-6 py-3 bg-[var(--primary)] hover:bg-[var(--primary)]/90 text-black rounded-xl font-semibold transition-all flex items-center gap-2 min-h-[48px] active:scale-[0.98] shadow-lg shadow-[var(--primary)]/20"
               >
                 <span>Boost Video</span>
               </button>
@@ -411,7 +411,7 @@ function UploadContent() {
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="w-full border-2 border-dashed border-[var(--color-charcoal-lighter-plus)] bg-[var(--color-charcoal-light)] rounded-xl p-8 text-center cursor-pointer transition-all duration-300 hover:border-[#1B5EA8] hover:bg-[var(--color-charcoal-lighter)] hover:shadow-md hover:shadow-[#1B5EA8]/10 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1B5EA8]"
+                className="w-full border-2 border-dashed border-[var(--color-charcoal-lighter-plus)] bg-[var(--color-charcoal-light)] rounded-xl p-8 text-center cursor-pointer transition-all duration-300 hover:border-[var(--primary)] hover:bg-[var(--color-charcoal-lighter)] hover:shadow-md hover:shadow-[var(--primary)]/10 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)]"
               >
                 <svg
                   className="w-16 h-16 mx-auto mb-4 text-[#6BAF7A] transition-transform duration-300 hover:scale-110"
@@ -470,9 +470,9 @@ function UploadContent() {
               placeholder="Describe your business or service..."
               rows={4}
               maxLength={500}
-              className="w-full bg-[var(--color-charcoal-light)] border border-[var(--color-charcoal-lighter-plus)] rounded-xl px-4 py-3 text-[var(--color-cream)] placeholder-[#9E9A90]/50 focus:outline-none focus:border-[#1B5EA8] focus:ring-1 focus:ring-[#1B5EA8]/30 transition-all duration-200"
+              className="w-full bg-[var(--color-charcoal-light)] border border-[var(--color-charcoal-lighter-plus)] rounded-xl px-4 py-3 text-[var(--color-cream)] placeholder-[#9E9A90]/50 focus:outline-none focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/30 transition-all duration-200"
             />
-            <p className={`text-xs ${caption.length >= 450 ? 'text-[#1B5EA8]' : 'text-[var(--color-body-text)]'}`}>
+            <p className={`text-xs ${caption.length >= 450 ? 'text-[var(--primary)]' : 'text-[var(--color-body-text)]'}`}>
               {caption.length}/500 characters
             </p>
           </div>
@@ -489,7 +489,7 @@ function UploadContent() {
                 value={businessName}
                 onChange={(e) => setBusinessName(e.target.value)}
                 placeholder="Enter business name"
-                className="w-full bg-[var(--color-charcoal-light)] border border-[var(--color-charcoal-lighter-plus)] rounded-xl px-4 py-3 text-[var(--color-cream)] placeholder-[#9E9A90]/50 focus:outline-none focus:border-[#1B5EA8] focus:ring-1 focus:ring-[#1B5EA8]/30 transition-all duration-200"
+                className="w-full bg-[var(--color-charcoal-light)] border border-[var(--color-charcoal-lighter-plus)] rounded-xl px-4 py-3 text-[var(--color-cream)] placeholder-[#9E9A90]/50 focus:outline-none focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/30 transition-all duration-200"
               />
             </div>
 
@@ -503,7 +503,7 @@ function UploadContent() {
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
                   required={!!businessName}
-                  className="w-full bg-[var(--color-charcoal-light)] border border-[var(--color-charcoal-lighter-plus)] rounded-xl px-4 py-3 text-[var(--color-cream)] focus:outline-none focus:border-[#1B5EA8] focus:ring-1 focus:ring-[#1B5EA8]/30 transition-all duration-200"
+                  className="w-full bg-[var(--color-charcoal-light)] border border-[var(--color-charcoal-lighter-plus)] rounded-xl px-4 py-3 text-[var(--color-cream)] focus:outline-none focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/30 transition-all duration-200"
                 >
                   <option value="" style={{ color: '#000', backgroundColor: '#f3f4f6' }}>Select category</option>
                   <option value="food" style={{ color: '#000', backgroundColor: '#f3f4f6' }}>Food</option>
@@ -522,7 +522,7 @@ function UploadContent() {
                 setBoostCoinsSpent(0);
                 setShowPromotionModal(true);
               }}
-              className="w-full mt-4 bg-[#1B5EA8]/20 hover:bg-[#1B5EA8]/30 border border-[#1B5EA8]/50 text-[#1B5EA8] font-semibold py-3 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 min-h-[48px]"
+              className="w-full mt-4 bg-[var(--primary)]/20 hover:bg-[var(--primary)]/30 border border-[var(--primary)]/50 text-[var(--primary)] font-semibold py-3 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 min-h-[48px]"
             >
               <span>Learn About Boosting</span>
             </button>
@@ -537,7 +537,7 @@ function UploadContent() {
               </div>
               <div className="relative h-2 bg-[var(--color-charcoal-lighter-plus)] rounded-full overflow-hidden">
                 <div 
-                  className="absolute inset-y-0 left-0 bg-gradient-to-r from-[#1B5EA8] via-[#1B5EA8] to-[#1B5EA8]/70 rounded-full transition-all duration-300 ease-out shadow-lg shadow-[#1B5EA8]/40"
+                  className="absolute inset-y-0 left-0 bg-gradient-to-r from-[var(--primary)] via-[var(--primary)] to-[var(--primary)]/70 rounded-full transition-all duration-300 ease-out shadow-lg shadow-[var(--primary)]/40"
                   style={{ width: `${uploadProgress}%` }}
                 />
               </div>
@@ -548,7 +548,7 @@ function UploadContent() {
           <button
             type="submit"
             disabled={!selectedVideo || isUploading}
-            className="w-full bg-[#1B5EA8] text-black font-semibold py-4 rounded-xl disabled:bg-[var(--color-charcoal-light)] disabled:text-[var(--color-body-text)]/40 disabled:cursor-not-allowed hover:bg-[#1B5EA8]/90 active:scale-[0.98] transition-all duration-200 min-h-[48px] shadow-lg shadow-[#1B5EA8]/20"
+            className="w-full bg-[var(--primary)] text-black font-semibold py-4 rounded-xl disabled:bg-[var(--color-charcoal-light)] disabled:text-[var(--color-body-text)]/40 disabled:cursor-not-allowed hover:bg-[var(--primary)]/90 active:scale-[0.98] transition-all duration-200 min-h-[48px] shadow-lg shadow-[var(--primary)]/20"
           >
             {isUploading ? (
               <span className="flex items-center justify-center gap-2">

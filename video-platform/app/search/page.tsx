@@ -313,7 +313,7 @@ function SearchContent() {
                 onClick={() => setSearchMode('businesses')}
                 className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all ${
                   searchMode === 'businesses'
-                    ? 'bg-[#1B5EA8] text-white shadow-sm'
+                    ? 'bg-[var(--primary)] text-white shadow-sm'
                     : 'text-[#6B6B65] hover:text-[#1A1A1A]'
                 }`}
               >
@@ -323,7 +323,7 @@ function SearchContent() {
                 onClick={() => setSearchMode('videos')}
                 className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all ${
                   searchMode === 'videos'
-                    ? 'bg-[#1B5EA8] text-white shadow-sm'
+                    ? 'bg-[var(--primary)] text-white shadow-sm'
                     : 'text-[#6B6B65] hover:text-[#1A1A1A]'
                 }`}
               >
@@ -333,7 +333,7 @@ function SearchContent() {
 
             {/* Search Bar */}
             <div ref={searchBarRef} className="relative mx-1">
-              <div className="flex gap-2 rounded-xl border border-[#E8E8E4] bg-white px-4 py-4 transition-all duration-200 hover:border-[#1B5EA8] focus-within:border-[#1B5EA8] focus-within:ring-2 focus-within:ring-[#1B5EA8]/20">
+              <div className="flex gap-2 rounded-xl border border-[#E8E8E4] bg-white px-4 py-4 transition-all duration-200 hover:border-[var(--primary)] focus-within:border-[var(--primary)] focus-within:ring-2 focus-within:ring-[var(--primary)]/20">
                 <svg className="mt-0.5 h-5 w-5 flex-shrink-0 text-[#6B6B65]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
@@ -351,7 +351,7 @@ function SearchContent() {
                 <button
                   onClick={handleSearch}
                   disabled={loading}
-                  className="flex-shrink-0 rounded-lg bg-[#1B5EA8] px-5 py-2 font-semibold text-white transition-all duration-200 hover:bg-[#1B5EA8]/90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1B5EA8]"
+                  className="flex-shrink-0 rounded-lg bg-[var(--primary)] px-5 py-2 font-semibold text-white transition-all duration-200 hover:bg-[var(--primary)]/90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)]"
                 >
                   {loading ? '...' : 'Search'}
                 </button>
@@ -379,7 +379,7 @@ function SearchContent() {
                 <h2 className="text-lg font-semibold">Filters</h2>
                 <div className="flex gap-3 items-center">
                   {hasActiveFilters && (
-                    <button onClick={clearAllFilters} className="text-sm text-[#1B5EA8] hover:text-[#1B5EA8]/80">
+                    <button onClick={clearAllFilters} className="text-sm text-[var(--primary)] hover:text-[var(--primary)]/80">
                       Clear All
                     </button>
                   )}
@@ -406,7 +406,7 @@ function SearchContent() {
                         onClick={() => handleCategoryChange(cat)}
                         className={`py-2 px-3 rounded-lg text-sm font-medium transition-all ${
                           category === cat
-                            ? 'bg-[#1B5EA8] text-white'
+                            ? 'bg-[var(--primary)] text-white'
                             : 'bg-white text-[#6B6B65] hover:text-[#1A1A1A] border border-[#E8E8E4]'
                         }`}
                       >
@@ -437,7 +437,7 @@ function SearchContent() {
                     <button
                       type="button"
                       onClick={() => setMinRating(undefined)}
-                      className="ml-2 text-xs text-[#1B5EA8] hover:text-[#1B5EA8]/80"
+                      className="ml-2 text-xs text-[var(--primary)] hover:text-[var(--primary)]/80"
                     >
                       Any
                     </button>
@@ -457,7 +457,7 @@ function SearchContent() {
                     <div className="absolute left-0 right-0 h-1.5 rounded-full bg-[var(--glass-bg)]" />
                     {/* Active range highlight */}
                     <div
-                      className="absolute h-1.5 rounded-full bg-[#1B5EA8]"
+                      className="absolute h-1.5 rounded-full bg-[var(--primary)]"
                       style={{
                         left: `${(priceRange[0] / 1000) * 100}%`,
                         right: `${100 - (priceRange[1] / 1000) * 100}%`,
@@ -506,8 +506,8 @@ function SearchContent() {
                         onClick={() => handleDistanceFilter(opt.km)}
                         className={`px-4 py-2 rounded-full text-xs font-semibold transition-all duration-200 transform hover:scale-105 active:scale-95 ${
                           distanceFilter === opt.km
-                            ? 'bg-[#1B5EA8] text-white shadow-md shadow-[#1B5EA8]/40'
-                            : 'bg-white border border-[#E8E8E4] text-[#6B6B65] hover:border-[#1B5EA8] hover:shadow-md hover:shadow-[#1B5EA8]/20'
+                            ? 'bg-[var(--primary)] text-white shadow-md shadow-[var(--primary)]/40'
+                            : 'bg-white border border-[#E8E8E4] text-[#6B6B65] hover:border-[var(--primary)] hover:shadow-md hover:shadow-[var(--primary)]/20'
                         }`}
                       >
                         {opt.label}
@@ -561,7 +561,7 @@ function SearchContent() {
                       <button
                         onClick={handleNearMe}
                         className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                          nearMe ? 'bg-[#1B5EA8] text-white' : 'bg-white text-[#6B6B65] border border-[#E8E8E4] hover:text-[#1A1A1A]'
+                          nearMe ? 'bg-[var(--primary)] text-white' : 'bg-white text-[#6B6B65] border border-[#E8E8E4] hover:text-[#1A1A1A]'
                         }`}
                       >
                         Near Me
@@ -571,7 +571,7 @@ function SearchContent() {
                           <label className="mb-1 block text-sm text-[var(--muted-foreground)]">Radius: {radius} km</label>
                           <input type="range" min="1" max="50" value={radius}
                             onChange={(e) => setRadius(Number(e.target.value))}
-                            className="w-full accent-[#1B5EA8]" />
+                            className="w-full accent-[var(--primary)]" />
                         </div>
                       )}
                     </div>
@@ -632,7 +632,7 @@ function SearchContent() {
                 {loading ? 'Searching...' : hasSearched ? `Results (${filteredResults.length})` : 'Search Results'}
               </h2>
               {category && (
-                <p className="text-sm text-[#1B5EA8]">
+                <p className="text-sm text-[var(--primary)]">
                   Filtering by: <span className="font-semibold capitalize">{category}</span>
                 </p>
               )}
@@ -704,13 +704,13 @@ function SearchContent() {
                       <Link
                         key={store.id}
                         href={`/profile/${store.username}`}
-                        className="flex items-center gap-4 p-4 rounded-lg border border-[var(--border-color)] bg-gradient-to-br from-[var(--surface-1)] to-[var(--surface-2)] transition-all duration-200 hover:border-[#1B5EA8] hover:shadow-md hover:shadow-[#1B5EA8]/20"
+                        className="flex items-center gap-4 p-4 rounded-lg border border-[var(--border-color)] bg-gradient-to-br from-[var(--surface-1)] to-[var(--surface-2)] transition-all duration-200 hover:border-[var(--primary)] hover:shadow-md hover:shadow-[var(--primary)]/20"
                       >
-                        <div className="w-12 h-12 rounded-full overflow-hidden bg-[var(--surface-2)] flex-shrink-0 ring-2 ring-[#1B5EA8]/20">
+                        <div className="w-12 h-12 rounded-full overflow-hidden bg-[var(--surface-2)] flex-shrink-0 ring-2 ring-[var(--primary)]/20">
                           {store.profile_picture_url ? (
                             <img src={store.profile_picture_url} alt={store.full_name} className="w-full h-full object-cover" />
                           ) : (
-                            <div className="w-full h-full flex items-center justify-center text-lg font-bold text-[#1B5EA8]">
+                            <div className="w-full h-full flex items-center justify-center text-lg font-bold text-[var(--primary)]">
                               {(store.full_name || store.username)?.[0]?.toUpperCase() || '?'}
                             </div>
                           )}
@@ -720,7 +720,7 @@ function SearchContent() {
                           <p className="text-xs text-[var(--muted-foreground)] capitalize">{store.type}</p>
                         </div>
                         {store.distance !== undefined && (
-                          <span className="text-xs font-medium text-[#1B5EA8] flex-shrink-0">
+                          <span className="text-xs font-medium text-[var(--primary)] flex-shrink-0">
                             {store.distance < 1 ? `${Math.round(store.distance * 1000)}m` : `${store.distance.toFixed(1)}km`}
                           </span>
                         )}
@@ -760,8 +760,8 @@ function ChipButton({ label, active, onClick }: { label: string; active: boolean
       onClick={onClick}
       className={`px-4 py-2 rounded-full text-xs font-semibold transition-all duration-200 transform hover:scale-105 active:scale-95 ${
         active
-          ? 'bg-[#1B5EA8] text-white shadow-md shadow-[#1B5EA8]/40 hover:shadow-lg hover:shadow-[#1B5EA8]/50'
-          : 'bg-white border border-[#E8E8E4] text-[#6B6B65] hover:border-[#1B5EA8] hover:shadow-md hover:shadow-[#1B5EA8]/20 active:scale-95'
+          ? 'bg-[var(--primary)] text-white shadow-md shadow-[var(--primary)]/40 hover:shadow-lg hover:shadow-[var(--primary)]/50'
+          : 'bg-white border border-[#E8E8E4] text-[#6B6B65] hover:border-[var(--primary)] hover:shadow-md hover:shadow-[var(--primary)]/20 active:scale-95'
       }`}
     >
       {label}
@@ -842,7 +842,7 @@ function BusinessResultCard({
 
   return (
     <div
-      className="search-result-card group relative block cursor-pointer rounded-xl border border-[#E8E8E4] bg-white p-4 transition-all duration-200 hover:bg-[#F8F8F6] hover:border-[#1B5EA8] hover:shadow-lg hover:shadow-[#1B5EA8]/20"
+      className="search-result-card group relative block cursor-pointer rounded-xl border border-[#E8E8E4] bg-white p-4 transition-all duration-200 hover:bg-[#F8F8F6] hover:border-[var(--primary)] hover:shadow-lg hover:shadow-[var(--primary)]/20"
       onMouseEnter={() => onHover(business)}
       onMouseLeave={() => onHover(null)}
       onClick={handleClick}
@@ -878,7 +878,7 @@ function BusinessResultCard({
           </div>
 
           {avgPrice && (
-            <p className="text-xs text-[#1B5EA8] mt-1">{avgPrice}</p>
+            <p className="text-xs text-[var(--primary)] mt-1">{avgPrice}</p>
           )}
         </div>
       </div>
@@ -930,7 +930,7 @@ function VideoResultCard({ result, query }: { result: any; query: string }) {
   return (
     <Link
       href={`/video/${result.id}`}
-      className="search-result-card group block rounded-xl border border-[#E8E8E4] bg-white p-4 transition-all duration-200 hover:bg-[#F8F8F6] hover:border-[#1B5EA8] hover:shadow-lg hover:shadow-[#1B5EA8]/20"
+      className="search-result-card group block rounded-xl border border-[#E8E8E4] bg-white p-4 transition-all duration-200 hover:bg-[#F8F8F6] hover:border-[var(--primary)] hover:shadow-lg hover:shadow-[var(--primary)]/20"
     >
       <div className="flex gap-4">
         <div className="relative w-32 h-24 rounded-lg overflow-hidden flex-shrink-0">
@@ -976,7 +976,7 @@ function VideoResultCard({ result, query }: { result: any; query: string }) {
             )}
           </div>
           {query && (
-            <p className="text-xs text-[#1B5EA8]">
+            <p className="text-xs text-[var(--primary)]">
               ✓ Matched: {result.caption?.toLowerCase().includes(query.toLowerCase()) ? 'Caption' : ''}{' '}
               {result.businesses?.business_name?.toLowerCase().includes(query.toLowerCase()) ? 'Business Name' : ''}
             </p>

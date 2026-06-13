@@ -409,7 +409,7 @@ export function MenuList({ userId, businessId, businessName, isOwnProfile, onMen
                 setSelectedMenu(null);
                 setIsModalOpen(true);
               }}
-              className="inline-block bg-[#1B5EA8] hover:bg-[#1B5EA8]/90 text-black font-semibold rounded-lg px-6 py-2 transition-colors"
+              className="inline-block bg-[var(--primary)] hover:bg-[var(--primary)]/90 text-black font-semibold rounded-lg px-6 py-2 transition-colors"
             >
               {t('menu.create_menu')}
             </button>

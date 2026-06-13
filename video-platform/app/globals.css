@@ -2032,7 +2032,8 @@ div#devtools-indicator.nextjs-toast {
   align-items: center;
   justify-content: center;
   position: relative;
-  z-index: 51;
+  /* Below the top bar (z-40) so the search dropdown panel can float over it. */
+  z-index: 10;
 }
 
 .announcement-bar-text {

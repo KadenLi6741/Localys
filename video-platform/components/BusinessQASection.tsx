@@ -94,7 +94,7 @@ export function BusinessQASection({ businessId, isOwner }: BusinessQASectionProp
             placeholder="Ask a question about this business..."
             rows={2}
             maxLength={1000}
-            className="w-full bg-transparent border border-[var(--color-charcoal-lighter-plus)] rounded-lg px-3 py-2 text-sm text-[var(--color-cream)] placeholder-[#9E9A90] focus:outline-none focus:border-[#1B5EA8]/50 resize-none"
+            className="w-full bg-transparent border border-[var(--color-charcoal-lighter-plus)] rounded-lg px-3 py-2 text-sm text-[var(--color-cream)] placeholder-[#9E9A90] focus:outline-none focus:border-[var(--primary)]/50 resize-none"
           />
           <div className="flex items-center justify-between mt-2">
             <span className="text-xs text-[var(--color-cream)]/40">
@@ -103,7 +103,7 @@ export function BusinessQASection({ businessId, isOwner }: BusinessQASectionProp
             <button
               onClick={handleAskQuestion}
               disabled={posting || questionText.trim().length < 5}
-              className="bg-[#1B5EA8] text-white text-sm font-medium px-4 py-1.5 rounded-lg hover:bg-[#1B5EA8]/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-[var(--primary)] text-white text-sm font-medium px-4 py-1.5 rounded-lg hover:bg-[var(--primary)]/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {posting ? 'Posting...' : 'Ask Question'}
             </button>
@@ -215,11 +215,11 @@ function QuestionCard({ question, isOwner, isAsker, businessId, onDeleted, onAns
     <div className="bg-[var(--color-charcoal-light)] border border-[var(--color-charcoal-lighter-plus)] rounded-lg p-4">
       {/* Question */}
       <div className="flex items-start gap-3">
-        <div className="w-8 h-8 rounded-full bg-[#1B5EA8]/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+        <div className="w-8 h-8 rounded-full bg-[var(--primary)]/20 flex items-center justify-center flex-shrink-0 mt-0.5">
           {question.user?.profile_picture_url ? (
             <img src={question.user.profile_picture_url} alt="" className="w-full h-full rounded-full object-cover" />
           ) : (
-            <span className="text-xs font-bold text-[#1B5EA8]">
+            <span className="text-xs font-bold text-[var(--primary)]">
               {(question.user?.full_name || 'U')[0].toUpperCase()}
             </span>
           )}
@@ -245,9 +245,9 @@ function QuestionCard({ question, isOwner, isAsker, businessId, onDeleted, onAns
 
       {/* Answer */}
       {question.answer && !editing && (
-        <div className="mt-3 ml-11 bg-[#1B5EA8]/10 border border-[#1B5EA8]/20 rounded-lg p-3">
+        <div className="mt-3 ml-11 bg-[var(--primary)]/10 border border-[var(--primary)]/20 rounded-lg p-3">
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-xs font-semibold text-[#1B5EA8]">Business Response</span>
+            <span className="text-xs font-semibold text-[var(--primary)]">Business Response</span>
             <span className="text-xs text-[var(--color-cream)]/40">
               {formatTimeAgo(question.answer.created_at)}
             </span>
@@ -260,7 +260,7 @@ function QuestionCard({ question, isOwner, isAsker, businessId, onDeleted, onAns
                   setEditing(true);
                   setEditText(question.answer!.answer_text);
                 }}
-                className="text-xs text-[#1B5EA8] hover:underline"
+                className="text-xs text-[var(--primary)] hover:underline"
               >
                 Edit
               </button>
@@ -283,13 +283,13 @@ function QuestionCard({ question, isOwner, isAsker, businessId, onDeleted, onAns
             onChange={(e) => setEditText(e.target.value)}
             rows={2}
             maxLength={2000}
-            className="w-full bg-transparent border border-[#1B5EA8]/30 rounded-lg px-3 py-2 text-sm text-[var(--color-cream)] placeholder-[#9E9A90] focus:outline-none focus:border-[#1B5EA8]/50 resize-none"
+            className="w-full bg-transparent border border-[var(--primary)]/30 rounded-lg px-3 py-2 text-sm text-[var(--color-cream)] placeholder-[#9E9A90] focus:outline-none focus:border-[var(--primary)]/50 resize-none"
           />
           <div className="flex gap-2 mt-1">
             <button
               onClick={handleEditAnswer}
               disabled={submitting || !editText.trim()}
-              className="text-xs bg-[#1B5EA8] text-white px-3 py-1 rounded-lg disabled:opacity-50"
+              className="text-xs bg-[var(--primary)] text-white px-3 py-1 rounded-lg disabled:opacity-50"
             >
               {submitting ? 'Saving...' : 'Save'}
             </button>
@@ -312,12 +312,12 @@ function QuestionCard({ question, isOwner, isAsker, businessId, onDeleted, onAns
             placeholder="Write your response..."
             rows={2}
             maxLength={2000}
-            className="w-full bg-transparent border border-[var(--color-charcoal-lighter-plus)] rounded-lg px-3 py-2 text-sm text-[var(--color-cream)] placeholder-[#9E9A90] focus:outline-none focus:border-[#1B5EA8]/50 resize-none"
+            className="w-full bg-transparent border border-[var(--color-charcoal-lighter-plus)] rounded-lg px-3 py-2 text-sm text-[var(--color-cream)] placeholder-[#9E9A90] focus:outline-none focus:border-[var(--primary)]/50 resize-none"
           />
           <button
             onClick={handleSubmitAnswer}
             disabled={submitting || !answerText.trim()}
-            className="mt-1 text-xs bg-[#1B5EA8] text-white px-3 py-1.5 rounded-lg disabled:opacity-50"
+            className="mt-1 text-xs bg-[var(--primary)] text-white px-3 py-1.5 rounded-lg disabled:opacity-50"
           >
             {submitting ? 'Posting...' : 'Reply'}
           </button>

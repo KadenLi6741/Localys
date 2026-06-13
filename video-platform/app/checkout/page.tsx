@@ -325,7 +325,7 @@ function CheckoutContent() {
                 onChange={(e) => setSpecialRequests(e.target.value)}
                 placeholder="Any special requests? (allergies, customizations...)"
                 rows={3}
-                className="w-full bg-transparent border border-[var(--glass-border)] rounded-lg px-3 py-2 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[#2A6FD6]/30 focus:border-[#2A6FD6] resize-none"
+                className="w-full bg-transparent border border-[var(--glass-border)] rounded-lg px-3 py-2 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/30 focus:border-[var(--primary)] resize-none"
               />
             </div>
 
@@ -368,7 +368,7 @@ function CheckoutContent() {
                         disabled={!day.available}
                         className={`flex flex-col items-center min-w-[60px] px-3 py-2 rounded-lg transition-all ${
                           selectedDate === day.date
-                            ? 'bg-[#2A6FD6] text-white'
+                            ? 'bg-[var(--primary)] text-white'
                             : day.available
                               ? 'bg-[var(--glass-bg)] text-[var(--text-primary)] hover:bg-[var(--glass-bg-strong)]'
                               : 'bg-[var(--glass-bg)] text-[var(--text-muted)] opacity-40 cursor-not-allowed'
@@ -393,7 +393,7 @@ function CheckoutContent() {
                           onClick={() => setSelectedTime(slot)}
                           className={`w-full px-4 py-3 text-left rounded-lg text-sm font-medium transition-all ${
                             selectedTime === slot
-                              ? 'bg-[#2A6FD6] text-white'
+                              ? 'bg-[var(--primary)] text-white'
                               : 'bg-[var(--glass-bg)] text-[var(--text-primary)] hover:bg-[var(--glass-bg-strong)]'
                           }`}
                         >
@@ -420,22 +420,22 @@ function CheckoutContent() {
                       value={contactName}
                       onChange={(e) => setContactName(e.target.value)}
                       placeholder="Your name"
-                      className="w-full bg-transparent border border-[var(--glass-border)] rounded-lg px-3 py-2 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[#2A6FD6]/30 focus:border-[#2A6FD6]"
+                      className="w-full bg-transparent border border-[var(--glass-border)] rounded-lg px-3 py-2 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/30 focus:border-[var(--primary)]"
                     />
                     <input
                       type="tel"
                       value={contactPhone}
                       onChange={(e) => setContactPhone(e.target.value)}
                       placeholder="Phone number"
-                      className="w-full bg-transparent border border-[var(--glass-border)] rounded-lg px-3 py-2 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[#2A6FD6]/30 focus:border-[#2A6FD6]"
+                      className="w-full bg-transparent border border-[var(--glass-border)] rounded-lg px-3 py-2 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/30 focus:border-[var(--primary)]"
                     />
                   </div>
                 </div>
 
                 {/* Selected summary */}
                 {selectedDate && selectedTime && (
-                  <div className="bg-[#2A6FD6]/10 border border-[#2A6FD6]/30 rounded-lg p-4 mb-6">
-                    <p className="text-sm font-semibold text-[#2A6FD6]">
+                  <div className="bg-[var(--primary)]/10 border border-[var(--primary)]/30 rounded-lg p-4 mb-6">
+                    <p className="text-sm font-semibold text-[var(--primary)]">
                       Pickup: {new Date(selectedDate + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })} at {selectedTime}
                     </p>
                   </div>
@@ -453,7 +453,7 @@ function CheckoutContent() {
             <button
               onClick={handleProceedToPayment}
               disabled={processing || (hasBusinessHours && (!selectedDate || !selectedTime))}
-              className="w-full bg-[#2A6FD6] hover:bg-[#245FCC] disabled:bg-gray-600 text-white font-semibold py-3 rounded-lg transition-colors disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="w-full bg-[var(--primary)] hover:bg-[var(--primary)] disabled:bg-gray-600 text-white font-semibold py-3 rounded-lg transition-colors disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {processing ? (
                 <>

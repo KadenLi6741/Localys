@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState, useSyncExternalStore } from 'react';
 import Link from 'next/link';
 import { Coins, Trophy, CalendarClock, Check } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
@@ -22,12 +22,12 @@ const WEEKLY_CHALLENGES = [
  */
 const EVENT_CHALLENGES = [
   {
-    id: 'nba-finals',
-    title: 'NBA Finals Prediction',
+    id: 'knicks-prediction',
+    title: 'Knicks Prediction',
     description:
-      'Opt in before the NBA Finals tip off: if the Spurs win, you unlock a bonus coupon at participating local shops.',
+      'Opt in now: if the New York Knicks win their next game, you permanently unlock a bonus coupon redeemable at participating local shops. One-time opt-in — once you are in, you stay in.',
     reward: '500 pts + bonus coupon',
-    deadline: 'Opt in before June 19',
+    deadline: 'Permanent opt-in',
   },
   {
     id: 'summer-fest',
@@ -38,6 +38,45 @@ const EVENT_CHALLENGES = [
     deadline: 'Opt in before July 4',
   },
 ];
+
+const OPT_IN_STORAGE_KEY = 'localys.challenge.optins';
+const OPT_IN_EVENT = 'localys:challenge-optins';
+
+/**
+ * Event-bonus opt-ins, persisted in localStorage. Opting in is permanent —
+ * there is no opt-out path, so once a user is in they stay in across reloads.
+ * useSyncExternalStore keeps the SSR/hydration snapshot stable.
+ */
+function useOptIns() {
+  const json = useSyncExternalStore(
+    (cb) => {
+      window.addEventListener(OPT_IN_EVENT, cb);
+      window.addEventListener('storage', cb);
+      return () => {
+        window.removeEventListener(OPT_IN_EVENT, cb);
+        window.removeEventListener('storage', cb);
+      };
+    },
+    () => window.localStorage.getItem(OPT_IN_STORAGE_KEY) || '{}',
+    () => '{}',
+  );
+
+  const optIns = useMemo<Record<string, boolean>>(() => {
+    try {
+      return JSON.parse(json) as Record<string, boolean>;
+    } catch {
+      return {};
+    }
+  }, [json]);
+
+  const optIn = (id: string) => {
+    const next = { ...optIns, [id]: true };
+    window.localStorage.setItem(OPT_IN_STORAGE_KEY, JSON.stringify(next));
+    window.dispatchEvent(new Event(OPT_IN_EVENT));
+  };
+
+  return { optIns, optIn };
+}
 
 /** How points are earned (static explainer list). */
 const EARN_RULES = [
@@ -50,7 +89,7 @@ const EARN_RULES = [
 export default function ChallengesPage() {
   const { user } = useAuth();
   const [coins, setCoins] = useState<number | null>(null);
-  const [optIns, setOptIns] = useState<Record<string, boolean>>({});
+  const { optIns, optIn } = useOptIns();
 
   useEffect(() => {
     if (!user) return;
@@ -184,12 +223,13 @@ export default function ChallengesPage() {
                     </div>
                     <button
                       type="button"
-                      onClick={() => setOptIns((prev) => ({ ...prev, [e.id]: !prev[e.id] }))}
+                      onClick={() => optIn(e.id)}
+                      disabled={optedIn}
                       aria-pressed={optedIn}
                       className={cn(
                         'shrink-0 rounded-[4px] px-4 py-2 text-body-sm font-bold transition-colors',
                         optedIn
-                          ? 'border border-success bg-success/10 text-success'
+                          ? 'cursor-default border border-success bg-success/10 text-success'
                           : 'bg-primary text-primary-foreground hover:bg-primary/90'
                       )}
                     >

@@ -202,7 +202,7 @@ export function ProductQuickView({ isOpen, onClose, item, sellerId, businessName
               className={`btn-add-to-cart w-full py-3.5 text-sm font-semibold uppercase tracking-[0.1em] transition-all duration-300 ${
                 added
                   ? 'bg-green-600 text-white'
-                  : 'bg-[#1B5EA8] text-white hover:bg-[#1B5EA8]/90'
+                  : 'bg-[var(--primary)] text-white hover:bg-[var(--primary)]/90'
               } disabled:opacity-40 disabled:cursor-not-allowed`}
             >
               {added ? 'Added to Cart' : `Add to Cart — $${subtotal.toFixed(2)}`}
@@ -221,7 +221,7 @@ export function ProductQuickView({ isOpen, onClose, item, sellerId, businessName
             {/* View Full Details */}
             <Link
               href={`/product/${item.id}`}
-              className="block text-center text-sm text-[#1B5EA8] hover:text-[#1B5EA8]/80 mt-4 underline underline-offset-2"
+              className="block text-center text-sm text-[var(--primary)] hover:text-[var(--primary)]/80 mt-4 underline underline-offset-2"
               onClick={handleClose}
             >
               View Full Details
