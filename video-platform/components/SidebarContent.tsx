@@ -27,7 +27,7 @@ type NavItem = {
   onClick?: () => void;
 };
 
-/** Seeded daily challenges shown in the sidebar; the full list lives on /challenges. */
+/** Seeded daily challenges shown in the sidebar; the full list lives on /rewards. */
 const DAILY_CHALLENGES = [
   { id: 'visit-3', label: 'Visit 3 small businesses this week', progress: 1, total: 3 },
   { id: 'review-2', label: 'Leave 2 reviews', progress: 0, total: 2 },
@@ -262,7 +262,7 @@ export function SidebarContent({
         {DAILY_CHALLENGES.map((c) => (
           <Link
             key={c.id}
-            href="/challenges"
+            href="/rewards"
             onClick={onNavigate}
             className="group rounded-[4px] px-4 py-2 transition-colors hover:bg-surface"
           >

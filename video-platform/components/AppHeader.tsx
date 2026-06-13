@@ -72,6 +72,7 @@ export function AppHeader({ onMenuOpen }: { onMenuOpen?: () => void }) {
   const { resolvedTheme, setTheme } = useTheme();
   const [coins, setCoins] = useState<number | null>(null);
   const [profile, setProfile] = useState<HeaderProfile | null>(null);
+  const [avatarError, setAvatarError] = useState(false);
 
   // Expanding search state
   const [query, setQuery] = useState('');
@@ -98,7 +99,10 @@ export function AppHeader({ onMenuOpen }: { onMenuOpen?: () => void }) {
       .eq('id', user.id)
       .single()
       .then(({ data }) => {
-        if (!cancelled) setProfile(data as HeaderProfile | null);
+        if (!cancelled) {
+          setProfile(data as HeaderProfile | null);
+          setAvatarError(false);
+        }
       });
     return () => {
       cancelled = true;
@@ -190,9 +194,10 @@ export function AppHeader({ onMenuOpen }: { onMenuOpen?: () => void }) {
     setSearchOpen(false);
   };
 
-  // Reddit-style circular hover highlight for icon-only actions.
+  // Icon-only actions: full-contrast foreground icon, orange on hover, with a
+  // circular surface highlight (Reddit-style).
   const iconBtn =
-    'inline-flex h-10 w-10 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-surface hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring';
+    'inline-flex h-10 w-10 items-center justify-center rounded-full text-foreground transition-colors hover:bg-surface hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring';
 
   return (
     <header className="fixed inset-x-0 top-0 z-40 flex h-14 items-center gap-2 border-b border-border bg-card px-3 md:gap-4 md:px-4">
@@ -377,11 +382,11 @@ export function AppHeader({ onMenuOpen }: { onMenuOpen?: () => void }) {
 
       {/* Right cluster */}
       <div className="flex shrink-0 items-center gap-1">
-        {/* Points pill → Challenges & Rewards */}
+        {/* Points pill → Rewards (coupons + coin shop) */}
         <Link
-          href="/challenges"
+          href="/rewards"
           className="inline-flex h-10 items-center gap-1.5 rounded-full px-3 text-body-sm font-bold text-foreground transition-colors hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          aria-label={`${coins ?? 0} points — open challenges and rewards`}
+          aria-label={`${coins ?? 0} coins — open rewards`}
         >
           <Coins className="h-4 w-4 text-primary" aria-hidden="true" />
           <span className="tabular-nums">{coins ?? '—'}</span>
@@ -425,16 +430,17 @@ export function AppHeader({ onMenuOpen }: { onMenuOpen?: () => void }) {
         {/* Profile */}
         <DropdownMenu>
           <DropdownMenuTrigger
-            className="ml-0.5 inline-flex h-9 w-9 items-center justify-center overflow-hidden rounded-full border border-border bg-surface text-body-sm font-bold text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="ml-0.5 inline-flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border border-border bg-surface text-body-sm font-bold text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             aria-label="Open profile menu"
           >
-            {profile?.profile_picture_url ? (
+            {profile?.profile_picture_url && !avatarError ? (
               <Image
                 src={profile.profile_picture_url}
                 alt=""
-                width={36}
-                height={36}
+                width={40}
+                height={40}
                 className="h-full w-full object-cover"
+                onError={() => setAvatarError(true)}
                 unoptimized
               />
             ) : (
@@ -450,8 +456,8 @@ export function AppHeader({ onMenuOpen }: { onMenuOpen?: () => void }) {
             <DropdownMenuItem onSelect={() => router.push('/profile')}>
               <Settings className="mr-2 h-4 w-4" aria-hidden="true" /> Settings
             </DropdownMenuItem>
-            <DropdownMenuItem onSelect={() => router.push('/challenges')}>
-              <Trophy className="mr-2 h-4 w-4" aria-hidden="true" /> Achievements
+            <DropdownMenuItem onSelect={() => router.push('/rewards')}>
+              <Trophy className="mr-2 h-4 w-4" aria-hidden="true" /> Rewards &amp; Achievements
             </DropdownMenuItem>
             <DropdownMenuItem
               onSelect={(e) => {
