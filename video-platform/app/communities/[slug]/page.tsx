@@ -50,14 +50,15 @@ export default function CommunityPage() {
         {community.description && (
           <p className="mt-2 text-body-sm text-muted-foreground">{community.description}</p>
         )}
-        <div className="mt-8 rounded-[4px] border border-border bg-surface py-12 text-center">
+        <div className="mt-8 rounded-[12px] border border-border bg-card py-12 text-center">
           <p className="font-semibold text-foreground">No posts yet</p>
-          <p className="mt-1 text-body-sm text-muted-foreground">Be the first to post in this community.</p>
+          <p className="mt-1 text-body-sm text-muted-foreground">Be the first to post a thread in this community.</p>
+          {/* Threads are composed in the Communities feed (text post, not a video). */}
           <Link
-            href="/upload"
-            className="mt-4 inline-block rounded-[4px] bg-primary px-5 py-2.5 text-body-sm font-bold text-primary-foreground transition-colors hover:bg-primary/90"
+            href="/communities"
+            className="mt-4 inline-block rounded-full bg-primary px-5 py-2.5 text-body-sm font-bold text-primary-foreground transition-colors hover:bg-primary/90"
           >
-            Create a post
+            Create a thread
           </Link>
         </div>
       </div>

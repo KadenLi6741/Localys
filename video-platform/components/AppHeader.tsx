@@ -604,7 +604,7 @@ export function AppHeader({ onMenuOpen }: { onMenuOpen?: () => void }) {
             <DropdownMenuItem onSelect={() => router.push('/analytics')}>
               <BarChart3 className="mr-2 h-4 w-4" aria-hidden="true" /> Analytics
             </DropdownMenuItem>
-            <DropdownMenuItem onSelect={() => router.push('/profile#orders')}>Order history</DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => router.push('/orders')}>Order history</DropdownMenuItem>
             <DropdownMenuSeparator />
             {user ? (
               <DropdownMenuItem onSelect={handleSignOut} className="text-destructive focus:text-destructive">
