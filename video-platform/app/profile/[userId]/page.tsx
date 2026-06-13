@@ -13,6 +13,7 @@ import { VideoFeed } from '@/components/profile/VideoFeed';
 import { ServicesPanel } from '@/components/profile/ServicesPanel';
 import { BusinessQASection } from '@/components/BusinessQASection';
 import { TrustMetricsBadge } from '@/components/TrustMetricsBadge';
+import { recordRecentBusiness } from '@/lib/utils/recentlyViewed';
 
 const BusinessLocationMap = dynamic(
   () => import('@/components/BusinessLocationMap'),
@@ -115,6 +116,17 @@ function UserProfileContent() {
         if (cancelled) return;
 
         setProfile(profileData);
+
+        // Track this profile visit so the sidebar "Recent" section works.
+        if (profileData?.id) {
+          recordRecentBusiness({
+            id: profileData.id,
+            username: profileData.username ?? null,
+            full_name: profileData.full_name ?? null,
+            profile_picture_url: profileData.profile_picture_url ?? null,
+            type: profileData.type ?? null,
+          });
+        }
 
         // Redirect UUID URLs to username URLs
         if (isUUID && profileData?.username) {

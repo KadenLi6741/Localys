@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { useEffect, useState, useSyncExternalStore } from 'react';
+import { useEffect, useMemo, useState, useSyncExternalStore } from 'react';
 import {
   Home,
   Compass,
@@ -18,6 +18,7 @@ import {
 import { useCart } from '@/contexts/CartContext';
 import { useUnreadMessages } from '@/contexts/UnreadMessagesContext';
 import { supabase } from '@/lib/supabase/client';
+import { RECENTLY_VIEWED_EVENT, RECENTLY_VIEWED_KEY } from '@/lib/utils/recentlyViewed';
 import { cn } from '@/lib/utils';
 
 type NavItem = {
@@ -162,10 +163,32 @@ export function SidebarContent({
   const { unreadMessages } = useUnreadMessages();
   const cartCount = getCartCount();
 
-  const [recents, setRecents] = useState<RecentBusiness[]>([]);
+  const [discoverRecents, setDiscoverRecents] = useState<RecentBusiness[]>([]);
   const [favorites, setFavorites] = useState<Record<string, boolean>>({});
 
-  // "Recent / businesses near you" — a few business profiles with avatars.
+  // Recently-viewed profiles (live via localStorage); used as the primary
+  // "Recent" source so the section reflects profiles the user actually visited.
+  const viewedJson = useSyncExternalStore(
+    (cb) => {
+      window.addEventListener(RECENTLY_VIEWED_EVENT, cb);
+      window.addEventListener('storage', cb);
+      return () => {
+        window.removeEventListener(RECENTLY_VIEWED_EVENT, cb);
+        window.removeEventListener('storage', cb);
+      };
+    },
+    () => window.localStorage.getItem(RECENTLY_VIEWED_KEY) || '[]',
+    () => '[]',
+  );
+  const viewed = useMemo<RecentBusiness[]>(() => {
+    try {
+      return JSON.parse(viewedJson) as RecentBusiness[];
+    } catch {
+      return [];
+    }
+  }, [viewedJson]);
+
+  // Discovery fallback for when the user hasn't viewed any profiles yet.
   useEffect(() => {
     let cancelled = false;
     supabase
@@ -174,12 +197,15 @@ export function SidebarContent({
       .in('type', ['food', 'retail', 'service'])
       .limit(5)
       .then(({ data }) => {
-        if (!cancelled && data) setRecents(data as RecentBusiness[]);
+        if (!cancelled && data) setDiscoverRecents(data as RecentBusiness[]);
       });
     return () => {
       cancelled = true;
     };
   }, []);
+
+  // Prefer recently-viewed; fall back to discovery when the user is new.
+  const recents = viewed.length > 0 ? viewed : discoverRecents;
 
   const isActive = (href: string) => (href === '/' ? pathname === '/' : pathname?.startsWith(href));
 
