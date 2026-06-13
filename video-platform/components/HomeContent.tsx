@@ -978,7 +978,9 @@ export function HomeContent({ isActive }: HomeContentProps) {
           100% { transform: translate(-50%, 0) scale(1); }
         }
       `}</style>
-      <div className="home-content-root fixed inset-0 z-10 overflow-hidden overscroll-none bg-black text-white">
+      {/* Offset by the sidebar width on lg+ so the video, description and
+          business info are never covered by the fixed left sidebar. */}
+      <div className="home-content-root fixed inset-0 z-10 overflow-hidden overscroll-none bg-black text-white lg:left-[250px]">
       {/* Ambient Particle Background - CSS shimmer effect */}
       <div className="home-feed-particles" aria-hidden="true" />
 
@@ -1291,7 +1293,7 @@ export function HomeContent({ isActive }: HomeContentProps) {
             >
               <div className={`h-[25px] w-[25px] rounded-full flex items-center justify-center text-[11px] font-bold transition-all duration-300 ${
                 followedUsers.has(currentVideo.user_id!)
-                  ? 'bg-[#1A1A1A] text-white'
+                  ? 'bg-[var(--primary)] text-white'
                   : 'border border-white bg-white/80 text-[#1A1A1A]'
               }`}>
                 {followedUsers.has(currentVideo.user_id!) ? '✓' : '+'}
@@ -1308,10 +1310,10 @@ export function HomeContent({ isActive }: HomeContentProps) {
           aria-label={isLiked ? 'Unlike video' : 'Like video'}
         >
           <div className={`w-9 h-9 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center transition-all duration-300 ${
-            isLiked ? 'border-2 border-[#1A1A1A] bg-transparent shadow-lg' : 'border-2 border-[#9E9A90] bg-transparent hover:border-[#1A1A1A]'
+            isLiked ? 'border-2 border-[var(--primary)] bg-[var(--primary)]/15' : 'border-2 border-white/70 bg-black/25 backdrop-blur-sm hover:border-white'
           } ${likeAnimating === currentVideo.id ? 'like-icon-pop' : ''}`}>
             <svg
-              className={`w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-[#1A1A1A] transition-all duration-300 ${
+              className={`w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 transition-all duration-300 ${isLiked ? 'text-[var(--primary)]' : 'text-white'} ${
                 likeAnimating === currentVideo.id ? 'scale-150' : ''
               }`}
               fill={isLiked ? 'currentColor' : 'none'}
@@ -1321,7 +1323,7 @@ export function HomeContent({ isActive }: HomeContentProps) {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
             </svg>
           </div>
-          <span className="text-[#1A1A1A] text-[10px] sm:text-xs font-semibold drop-shadow">
+          <span className="text-white text-[10px] sm:text-xs font-semibold [text-shadow:0_1px_3px_rgba(0,0,0,0.85)]">
             {likeCounts[likeKey] || 0}
           </span>
         </button>
@@ -1333,24 +1335,24 @@ export function HomeContent({ isActive }: HomeContentProps) {
           className="action-button-animate flex flex-col items-center gap-1 transition-transform duration-200 hover:scale-110 active:scale-95"
           aria-label="Add a review or comment"
         >
-          <div className="flex h-9 w-9 sm:h-10 sm:w-10 md:h-12 md:w-12 items-center justify-center rounded-full border-2 border-[#9E9A90] bg-transparent transition-all duration-300 hover:border-[#1A1A1A] active:scale-95">
-            <svg className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-[#1A1A1A] transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="flex h-9 w-9 sm:h-10 sm:w-10 md:h-12 md:w-12 items-center justify-center rounded-full border-2 border-white/70 bg-black/25 backdrop-blur-sm transition-all duration-300 hover:border-white active:scale-95">
+            <svg className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
             </svg>
           </div>
-          <span className="text-[#1A1A1A] text-[10px] sm:text-xs font-semibold drop-shadow">{commentCounts[currentVideo.id] || 0}</span>
+          <span className="text-white text-[10px] sm:text-xs font-semibold [text-shadow:0_1px_3px_rgba(0,0,0,0.85)]">{commentCounts[currentVideo.id] || 0}</span>
         </button>
 
         {/* Location Button */}
         {distance && (
           <button className="action-button-animate flex flex-col items-center gap-1 transition-transform duration-200 hover:scale-110 active:scale-95" aria-label={`Distance: ${distance}`}>
-            <div className="flex h-9 w-9 sm:h-10 sm:w-10 md:h-12 md:w-12 items-center justify-center rounded-full border-2 border-[#9E9A90] bg-transparent transition-all duration-300 hover:border-[#1A1A1A] active:scale-95">
-              <svg className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-[#1A1A1A] transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="flex h-9 w-9 sm:h-10 sm:w-10 md:h-12 md:w-12 items-center justify-center rounded-full border-2 border-white/70 bg-black/25 backdrop-blur-sm transition-all duration-300 hover:border-white active:scale-95">
+              <svg className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
             </div>
-            <span className="text-[#1A1A1A] text-[10px] sm:text-xs font-semibold drop-shadow">{distance}</span>
+            <span className="text-white text-[10px] sm:text-xs font-semibold [text-shadow:0_1px_3px_rgba(0,0,0,0.85)]">{distance}</span>
           </button>
         )}
 
@@ -1361,10 +1363,10 @@ export function HomeContent({ isActive }: HomeContentProps) {
           aria-label={isBookmarked ? 'Remove bookmark' : 'Bookmark video'}
         >
           <div className={`w-9 h-9 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center transition-all duration-300 ${
-            isBookmarked ? 'border-2 border-[#1A1A1A] bg-transparent shadow-lg' : 'border-2 border-[#9E9A90] bg-transparent hover:border-[#1A1A1A]'
+            isBookmarked ? 'border-2 border-[var(--primary)] bg-[var(--primary)]/15' : 'border-2 border-white/70 bg-black/25 backdrop-blur-sm hover:border-white'
           } ${bookmarkAnimating === currentVideo.id ? 'bookmark-icon-pop' : ''}`}>
             <svg
-              className={`w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-[#1A1A1A] transition-all duration-300 ${
+              className={`w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 transition-all duration-300 ${isBookmarked ? 'text-[var(--primary)]' : 'text-white'} ${
                 bookmarkAnimating === currentVideo.id ? 'scale-150' : ''
               }`}
               fill={isBookmarked ? 'currentColor' : 'none'}
@@ -1383,8 +1385,8 @@ export function HomeContent({ isActive }: HomeContentProps) {
           className="action-button-animate flex flex-col items-center gap-1 transition-transform duration-200 hover:scale-110 active:scale-95"
           aria-label="Share this video"
         >
-          <div className="flex h-9 w-9 sm:h-10 sm:w-10 md:h-12 md:w-12 items-center justify-center rounded-full border-2 border-[#9E9A90] bg-transparent transition-all duration-300 hover:border-[#1A1A1A] active:scale-95">
-            <svg className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-[#1A1A1A] transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="flex h-9 w-9 sm:h-10 sm:w-10 md:h-12 md:w-12 items-center justify-center rounded-full border-2 border-white/70 bg-black/25 backdrop-blur-sm transition-all duration-300 hover:border-white active:scale-95">
+            <svg className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
             </svg>
           </div>
@@ -1396,14 +1398,14 @@ export function HomeContent({ isActive }: HomeContentProps) {
           className="action-button-animate flex flex-col items-center gap-1 transition-transform duration-200 hover:scale-110 active:scale-95"
           aria-label={volume === 0 ? 'Unmute' : 'Mute'}
         >
-          <div className="flex h-9 w-9 sm:h-10 sm:w-10 md:h-12 md:w-12 items-center justify-center rounded-full border-2 border-[#9E9A90] bg-transparent transition-all duration-300 hover:border-[#1A1A1A] active:scale-95">
+          <div className="flex h-9 w-9 sm:h-10 sm:w-10 md:h-12 md:w-12 items-center justify-center rounded-full border-2 border-white/70 bg-black/25 backdrop-blur-sm transition-all duration-300 hover:border-white active:scale-95">
             {volume === 0 ? (
-              <svg className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-[#1A1A1A]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+              <svg className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
                 <path strokeLinecap="round" strokeLinejoin="round" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
               </svg>
             ) : (
-              <svg className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-[#1A1A1A]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+              <svg className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15.536 8.464a5 5 0 010 7.072M18.364 5.636a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
               </svg>
             )}
