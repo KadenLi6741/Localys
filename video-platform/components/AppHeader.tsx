@@ -9,6 +9,8 @@ import {
   Search,
   Coins,
   Plus,
+  Bell,
+  Megaphone,
   Menu,
   Settings,
   Trophy,
@@ -486,15 +488,13 @@ export function AppHeader({ onMenuOpen }: { onMenuOpen?: () => void }) {
           <span className="tabular-nums text-foreground">{coins ?? '—'}</span>
         </Link>
 
-        {/* Advertise — inline SVG, exact structure of the working video-feed icons */}
+        {/* Advertise — lucide icon, exact same approach as the working Create button */}
         <button
           type="button"
           className={cn(iconBtn, 'group relative')}
           aria-label="Advertise on Locally"
         >
-          <svg width={20} height={20} className="h-5 w-5 text-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
-          </svg>
+          <Megaphone className="h-5 w-5" aria-hidden="true" />
           <span
             className="pointer-events-none absolute right-0 top-full mt-1.5 whitespace-nowrap rounded-[4px] border border-border bg-popover px-2 py-1 text-caption text-foreground opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
             role="tooltip"
@@ -522,11 +522,9 @@ export function AppHeader({ onMenuOpen }: { onMenuOpen?: () => void }) {
           </DropdownMenuContent>
         </DropdownMenu>
 
-        {/* Notifications — inline SVG bell, exact structure of the video-feed icons */}
+        {/* Notifications — lucide bell, exact same approach as the working Create button */}
         <button type="button" onClick={togglePanel} className={cn(iconBtn, 'relative')} aria-label="Notifications">
-          <svg width={20} height={20} className="h-5 w-5 text-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-          </svg>
+          <Bell className="h-5 w-5" aria-hidden="true" />
           {unreadCount > 0 && (
             <span className="absolute right-0.5 top-0.5 inline-flex h-4 min-w-[16px] items-center justify-center rounded-[4px] bg-primary px-1 text-[10px] font-bold text-primary-foreground">
               {unreadCount > 9 ? '9+' : unreadCount}
