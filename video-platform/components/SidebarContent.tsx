@@ -6,8 +6,8 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useMemo, useState, useSyncExternalStore } from 'react';
 import {
   Home,
-  Compass,
-  Store,
+  Video,
+  Users,
   MessageCircle,
   ShoppingCart,
   ChevronDown,
@@ -224,8 +224,8 @@ export function SidebarContent({
 
   const navItems: NavItem[] = [
     { href: '/', label: 'Home', icon: Home },
-    { href: '/explore', label: 'Explore', icon: Compass },
-    { href: '/shop', label: 'Shop', icon: Store },
+    { href: '/explore', label: 'Explore', icon: Video },
+    { href: '/communities', label: 'Communities', icon: Users },
     { href: '/chats', label: 'Messages', icon: MessageCircle, badge: 'messages' },
     { href: '/cart', label: 'Cart', icon: ShoppingCart, badge: 'cart', onClick: onCartOpen },
   ];

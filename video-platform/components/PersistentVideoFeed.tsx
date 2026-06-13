@@ -8,7 +8,8 @@ export function PersistentVideoFeed() {
   const pathname = usePathname();
   const { user, loading } = useAuth();
 
-  const isHome = pathname === '/';
+  // Explore is now the TikTok-style video feed (Home became the storefront).
+  const isFeed = pathname === '/explore';
 
   // Do not render the feed until auth has resolved.
   // Once the user is authenticated and the feed mounts, it stays mounted.
@@ -16,10 +17,10 @@ export function PersistentVideoFeed() {
 
   return (
     <div
-      style={{ display: isHome ? 'contents' : 'none' }}
-      aria-hidden={!isHome}
+      style={{ display: isFeed ? 'contents' : 'none' }}
+      aria-hidden={!isFeed}
     >
-      <HomeContent isActive={isHome} />
+      <HomeContent isActive={isFeed} />
     </div>
   );
 }
