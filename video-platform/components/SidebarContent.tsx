@@ -110,7 +110,9 @@ function SidebarSection({
   id,
   title,
   children,
-  defaultOpen = true,
+  // All sidebar sections start CLOSED on first load (per-section state is then
+  // remembered in localStorage once the user opens one).
+  defaultOpen = false,
 }: {
   id: string;
   title: string;
@@ -233,7 +235,7 @@ export function SidebarContent({
   const rowClasses = (active: boolean) =>
     cn(
       'group relative flex items-center gap-3 rounded-[4px] px-4 py-2.5 text-body-sm font-semibold transition-colors',
-      active ? 'bg-surface text-primary' : 'text-foreground hover:bg-surface'
+      active ? 'bg-surface text-foreground' : 'text-foreground hover:bg-surface'
     );
 
   return (
@@ -250,14 +252,14 @@ export function SidebarContent({
             <>
               {active && (
                 <span
-                  className="absolute left-0 top-1/2 h-6 w-0.5 -translate-y-1/2 bg-primary"
+                  className="absolute left-0 top-1/2 h-6 w-0.5 -translate-y-1/2 bg-foreground"
                   aria-hidden="true"
                 />
               )}
               <Icon className="h-5 w-5 shrink-0" aria-hidden="true" />
               <span>{item.label}</span>
               {count > 0 && (
-                <span className="ml-auto inline-flex h-5 min-w-[20px] items-center justify-center rounded-[4px] bg-primary px-1 text-caption font-bold text-primary-foreground">
+                <span className="ml-auto inline-flex h-5 min-w-[20px] items-center justify-center rounded-[4px] bg-foreground px-1 text-caption font-bold text-background">
                   {count > 9 ? '9+' : count}
                 </span>
               )}
@@ -296,7 +298,6 @@ export function SidebarContent({
         })}
       </nav>
 
-      <hr className="my-2 border-border" />
 
       {/* Daily challenges */}
       <SidebarSection id="daily-challenges" title="Daily Challenges">
@@ -313,7 +314,7 @@ export function SidebarContent({
                 <span className="block text-body-sm text-foreground">{c.label}</span>
                 <span className="mt-1.5 block h-1 w-full overflow-hidden rounded-[4px] bg-surface-2">
                   <span
-                    className="block h-full bg-primary"
+                    className="block h-full bg-foreground"
                     style={{ width: `${(c.progress / c.total) * 100}%` }}
                   />
                 </span>
@@ -326,7 +327,6 @@ export function SidebarContent({
         ))}
       </SidebarSection>
 
-      <hr className="my-2 border-border" />
 
       {/* Recent businesses */}
       <SidebarSection id="recent" title="Recent">
@@ -370,7 +370,6 @@ export function SidebarContent({
       {/* Communities — only shown when the user has actually created some */}
       {communities.length > 0 && (
         <>
-          <hr className="my-2 border-border" />
           <SidebarSection id="communities" title="Communities">
             {communities.map((c) => {
               const fav = !!favorites[c.slug];
@@ -405,7 +404,6 @@ export function SidebarContent({
         </>
       )}
 
-      <hr className="my-2 border-border" />
 
       {/* Resources — collapsible, links into the /info page */}
       <SidebarSection id="resources" title="Resources">

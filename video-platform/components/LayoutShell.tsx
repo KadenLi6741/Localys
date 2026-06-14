@@ -50,10 +50,16 @@ export function LayoutShell({ children }: { children: React.ReactNode }) {
         </SheetContent>
       </Sheet>
 
-      <div className="pt-14 lg:pl-[250px]">
+      {/* Full-width promo strip fixed directly under the header (above the
+          sidebar) — the first thing the user sees, spanning the whole width. */}
+      <div className="fixed inset-x-0 top-14 z-30">
         <AnnouncementBar />
-        {children}
-        <Footer />
+      </div>
+      <div className="pt-[5.75rem]">
+        <div className="lg:pl-[208px]">
+          {children}
+          <Footer />
+        </div>
       </div>
       <CartDrawer isOpen={cartOpen} onClose={() => setCartOpen(false)} />
     </>

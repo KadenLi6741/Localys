@@ -14,7 +14,7 @@ export function DesktopSidebar({ onCartOpen }: { onCartOpen?: () => void }) {
   if (pathname === '/login' || pathname === '/signup' || pathname === '/reset-password') return null;
 
   return (
-    <aside className="fixed bottom-0 left-0 top-14 z-20 hidden w-[250px] border-r border-border bg-card lg:block">
+    <aside className="fixed bottom-0 left-0 top-[5.75rem] z-20 hidden w-[208px] bg-card lg:block">
       <SidebarContent onCartOpen={onCartOpen} />
     </aside>
   );

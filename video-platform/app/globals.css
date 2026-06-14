@@ -68,8 +68,10 @@
   /* canvases / surfaces */
   --bg-main: var(--background);
   --bg-section: var(--secondary);
-  --bg-banner: var(--primary);
-  --text-banner: var(--primary-foreground);
+  /* Promo strip — neutral high-contrast (black bar/white text in light; inverts
+     in dark) to keep the minimal B&W direction instead of a big orange fill. */
+  --bg-banner: var(--foreground);
+  --text-banner: var(--background);
   --color-bg: var(--background);
   --color-bg-secondary: var(--secondary);
   --color-card: var(--card);
@@ -2319,6 +2321,22 @@ div#devtools-indicator.nextjs-toast {
 }
 .dark .hover-elevate:hover {
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.55);
+}
+
+/* Soft RESTING shadow (depth at rest) that lifts a touch more on hover. Used on
+   Home cards/containers so layering reads clearly. Soft = small blur, low alpha. */
+.shadow-soft {
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05), 0 4px 14px rgba(0, 0, 0, 0.08);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+.shadow-soft:hover {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.09), 0 10px 26px rgba(0, 0, 0, 0.14);
+}
+.dark .shadow-soft {
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 4px 14px rgba(0, 0, 0, 0.5);
+}
+.dark .shadow-soft:hover {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5), 0 12px 28px rgba(0, 0, 0, 0.65);
 }
 
 /* Profile dropdown */

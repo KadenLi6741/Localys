@@ -274,9 +274,12 @@ export function AppHeader({ onMenuOpen }: { onMenuOpen?: () => void }) {
         >
           <Menu className="h-5 w-5" />
         </button>
-        <Link href="/" className="flex items-center gap-2 px-1" aria-label="Locally home">
+        <Link href="/" className="flex items-center gap-2 px-1" aria-label="Localys home">
           <Image src="/logo.png" alt="" width={30} height={30} className="rounded-[4px]" />
-          <span className="hidden text-subheading font-bold text-foreground sm:inline">Locally</span>
+          {/* Bold black wordmark with a single small orange accent (the dot). */}
+          <span className="hidden text-subheading font-extrabold tracking-tight text-foreground sm:inline">
+            Localys<span className="text-primary">.</span>
+          </span>
         </Link>
       </div>
 
@@ -518,7 +521,7 @@ export function AppHeader({ onMenuOpen }: { onMenuOpen?: () => void }) {
           className={cn(iconBtn, 'group relative')}
           aria-label="Advertise on Locally"
         >
-          <MegaphoneIcon className="h-5 w-5" />
+          <MegaphoneIcon className="h-5 w-5 text-foreground group-hover:text-primary" />
           <span
             className="pointer-events-none absolute right-0 top-full mt-1.5 whitespace-nowrap rounded-[4px] border border-border bg-popover px-2 py-1 text-caption text-foreground opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
             role="tooltip"
@@ -548,7 +551,7 @@ export function AppHeader({ onMenuOpen }: { onMenuOpen?: () => void }) {
 
         {/* Notifications — hardcoded inline SVG (guaranteed to render) + unread badge */}
         <button type="button" onClick={togglePanel} className={cn(iconBtn, 'relative')} aria-label="Notifications">
-          <BellIcon className="h-5 w-5" />
+          <BellIcon className="h-5 w-5 text-foreground" />
           {unreadCount > 0 && (
             // Small orange dot — the single sanctioned accent on the bell.
             <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-primary ring-2 ring-card" aria-hidden="true" />
