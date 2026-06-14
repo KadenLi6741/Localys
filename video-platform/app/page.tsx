@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ChevronRight, ChevronDown, ChevronLeft, Star, MapPin, Store as StoreIcon } from 'lucide-react';
+import { ChevronRight, ChevronDown, ChevronLeft, Star, MapPin, Store as StoreIcon, Heart, Clock } from 'lucide-react';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { supabase } from '@/lib/supabase/client';
 import { cn } from '@/lib/utils';
@@ -39,6 +39,21 @@ interface Biz {
   full_name: string | null;
   profile_picture_url: string | null;
   type: string | null;
+}
+
+/* ============================ Display meta ============================ */
+// No live geo/ratings yet, so derive stable demo values from the id. Deterministic
+// (same id → same numbers) so cards don't reshuffle between renders. Display-only —
+// not persisted and never sent back to Supabase.
+function storeMeta(id: string) {
+  let h = 0;
+  for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) >>> 0;
+  return {
+    rating: (3.8 + ((h >> 3) % 13) / 10).toFixed(1), // 3.8–5.0
+    reviews: 40 + ((h >> 5) % 960), // 40–999
+    distanceKm: (0.3 + (h % 47) / 10).toFixed(1), // 0.3–5.0 km
+    pickupMin: 5 + (h % 16), // 5–20 min
+  };
 }
 
 /* ============================ Category icon (PNG → emoji fallback) ============================ */
@@ -80,6 +95,21 @@ function HomeStorefront() {
   const [businesses, setBusinesses] = useState<Biz[]>([]);
   const [loading, setLoading] = useState(true);
   const catRowRef = useRef<HTMLDivElement>(null);
+
+  // Filter-chip UI state (presentational — does not alter the Supabase query).
+  const [openFilter, setOpenFilter] = useState<'distance' | ''>('');
+  const [distance, setDistance] = useState(5); // km, shown in the Distance slider
+  const [offersOnly, setOffersOnly] = useState(false);
+
+  // Session favourites (heart). Frontend-only; toggling never touches the backend.
+  const [favorites, setFavorites] = useState<Set<string>>(new Set());
+  const toggleFav = (id: string) =>
+    setFavorites((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
 
   useEffect(() => {
     let cancelled = false;
@@ -182,18 +212,75 @@ function HomeStorefront() {
           </button>
         </div>
 
-        {/* ===== Chip filters ===== */}
-        <div className="mb-6 flex flex-wrap gap-2">
-          {['Offers', 'Distance', 'Rating', 'Sort'].map((chip) => (
+        {/* ===== Chip filters (oval, slightly elevated, horizontal scroll) ===== */}
+        <div className="relative mb-6">
+          <div className="flex gap-3 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {/* Offers — visual toggle */}
             <button
-              key={chip}
               type="button"
-              className="inline-flex items-center gap-1 rounded-full border border-border px-3.5 py-1.5 text-caption font-semibold text-foreground transition-colors hover:bg-surface/60"
+              onClick={() => setOffersOnly((v) => !v)}
+              aria-pressed={offersOnly}
+              className={cn(
+                'inline-flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-body-sm font-semibold transition-colors',
+                offersOnly ? 'bg-primary text-primary-foreground' : 'bg-surface text-foreground hover:bg-secondary',
+              )}
             >
-              {chip}
-              {(chip === 'Distance' || chip === 'Rating' || chip === 'Sort') && <ChevronDown className="h-3.5 w-3.5" aria-hidden="true" />}
+              Offers
             </button>
-          ))}
+
+            {/* Distance — opens a slider dropdown */}
+            <button
+              type="button"
+              onClick={() => setOpenFilter(openFilter === 'distance' ? '' : 'distance')}
+              aria-expanded={openFilter === 'distance'}
+              className={cn(
+                'inline-flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-body-sm font-semibold transition-colors',
+                openFilter === 'distance' ? 'bg-secondary text-foreground' : 'bg-surface text-foreground hover:bg-secondary',
+              )}
+            >
+              Within {distance} km
+              <ChevronDown className="h-4 w-4" aria-hidden="true" />
+            </button>
+
+            {/* Rating / Sort — visual chips */}
+            {['Rating', 'Sort'].map((chip) => (
+              <button
+                key={chip}
+                type="button"
+                className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-surface px-4 py-2 text-body-sm font-semibold text-foreground transition-colors hover:bg-secondary"
+              >
+                {chip}
+                <ChevronDown className="h-4 w-4" aria-hidden="true" />
+              </button>
+            ))}
+          </div>
+
+          {/* Distance slider popover */}
+          {openFilter === 'distance' && (
+            <>
+              <div className="fixed inset-0 z-30" onClick={() => setOpenFilter('')} aria-hidden="true" />
+              <div className="absolute left-0 top-12 z-40 w-72 rounded-[12px] border border-border bg-card p-4 shadow-[inset_0_0_0_1px_var(--border)]">
+                <div className="mb-3 flex items-center justify-between">
+                  <span className="text-body-sm font-bold text-foreground">Distance</span>
+                  <span className="text-body-sm font-bold text-primary">{distance} km</span>
+                </div>
+                <input
+                  type="range"
+                  min={1}
+                  max={25}
+                  step={1}
+                  value={distance}
+                  onChange={(e) => setDistance(Number(e.target.value))}
+                  className="w-full accent-[var(--primary)]"
+                  aria-label="Maximum distance in kilometres"
+                />
+                <div className="mt-1 flex justify-between text-caption text-muted-foreground">
+                  <span>1 km</span>
+                  <span>25 km</span>
+                </div>
+              </div>
+            </>
+          )}
         </div>
 
         {/* ===== Deals carousel ===== */}
@@ -226,8 +313,13 @@ function HomeStorefront() {
           </div>
         ) : (
           <>
-            <StoreSection title="Featured on Localys" items={featured} mode={mode} onOpen={(b) => router.push(`/profile/${b.username || b.id}`)} />
-            <StoreSection title="Today's offers" items={offers} mode={mode} offer onOpen={(b) => router.push(`/profile/${b.username || b.id}`)} />
+            <FeaturedSection
+              items={featured}
+              favorites={favorites}
+              onToggleFav={toggleFav}
+              onOpen={(b) => router.push(`/profile/${b.username || b.id}`)}
+            />
+            <StoreSection title="Today's offers" items={offers} offer onOpen={(b) => router.push(`/profile/${b.username || b.id}`)} />
 
             {/* Stores near you — circular logos */}
             <section className="mt-8">
@@ -235,18 +327,22 @@ function HomeStorefront() {
                 <h2 className="text-subheading font-bold text-foreground">Stores near you</h2>
               </div>
               <div className="flex gap-5 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                {near.map((b) => (
-                  <Link key={b.id} href={`/profile/${b.username || b.id}`} className="flex w-20 shrink-0 flex-col items-center gap-1.5 text-center">
-                    <span className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full border border-border bg-surface">
-                      {b.profile_picture_url ? (
-                        <Image src={b.profile_picture_url} alt="" width={64} height={64} className="h-full w-full object-cover" unoptimized />
-                      ) : (
-                        <StoreIcon className="h-6 w-6 text-muted-foreground" aria-hidden="true" />
-                      )}
-                    </span>
-                    <span className="line-clamp-2 text-caption font-semibold text-foreground">{b.full_name || b.username}</span>
-                  </Link>
-                ))}
+                {near.map((b) => {
+                  const m = storeMeta(b.id);
+                  return (
+                    <Link key={b.id} href={`/profile/${b.username || b.id}`} className="flex w-24 shrink-0 flex-col items-center gap-1.5 text-center">
+                      <span className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full border border-border bg-surface">
+                        {b.profile_picture_url ? (
+                          <Image src={b.profile_picture_url} alt="" width={64} height={64} className="h-full w-full object-cover" unoptimized />
+                        ) : (
+                          <StoreIcon className="h-6 w-6 text-muted-foreground" aria-hidden="true" />
+                        )}
+                      </span>
+                      <span className="line-clamp-2 text-caption font-semibold text-foreground">{b.full_name || b.username}</span>
+                      <span className="text-caption text-foreground">{m.distanceKm} km · {m.pickupMin} min</span>
+                    </Link>
+                  );
+                })}
                 {near.length === 0 && <p className="py-6 text-body-sm text-muted-foreground">No businesses yet.</p>}
               </div>
             </section>
@@ -261,13 +357,11 @@ function HomeStorefront() {
 function StoreSection({
   title,
   items,
-  mode,
   offer,
   onOpen,
 }: {
   title: string;
   items: Biz[];
-  mode: 'pickup' | 'service';
   offer?: boolean;
   onOpen: (b: Biz) => void;
 }) {
@@ -291,7 +385,9 @@ function StoreSection({
         </div>
       </div>
       <div ref={rowRef} className="flex gap-4 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        {items.map((b) => (
+        {items.map((b) => {
+          const meta = storeMeta(b.id);
+          return (
           <button
             key={b.id}
             type="button"
@@ -314,23 +410,114 @@ function StoreSection({
             </div>
             <div className="p-3">
               <p className="truncate text-body-sm font-bold text-foreground">{b.full_name || b.username}</p>
-              <div className="mt-1 flex items-center gap-2 text-caption text-foreground">
+              <div className="mt-1 flex items-center gap-1.5 text-caption text-foreground">
                 <span className="inline-flex items-center gap-0.5">
                   <Star className="h-3.5 w-3.5 fill-primary text-primary" aria-hidden="true" />
-                  New
+                  {meta.rating}
                 </span>
-                <span>·</span>
-                <span>{mode === 'service' ? 'On-site service' : 'Pickup'}</span>
-                {b.type && (
-                  <>
-                    <span>·</span>
-                    <span className="capitalize">{b.type}</span>
-                  </>
-                )}
+                <span className="text-muted-foreground">({meta.reviews})</span>
+                <span aria-hidden="true">·</span>
+                <span>{meta.distanceKm} km</span>
+                <span aria-hidden="true">·</span>
+                <span className="inline-flex items-center gap-0.5">
+                  <Clock className="h-3 w-3" aria-hidden="true" />
+                  {meta.pickupMin} min
+                </span>
               </div>
             </div>
           </button>
-        ))}
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+/* ============================ Featured section (oval logo + heart + rating) ============================ */
+function FeaturedSection({
+  items,
+  favorites,
+  onToggleFav,
+  onOpen,
+}: {
+  items: Biz[];
+  favorites: Set<string>;
+  onToggleFav: (id: string) => void;
+  onOpen: (b: Biz) => void;
+}) {
+  const rowRef = useRef<HTMLDivElement>(null);
+  const scroll = (dir: 1 | -1) => rowRef.current?.scrollBy({ left: dir * 320, behavior: 'smooth' });
+
+  if (items.length === 0) return null;
+
+  return (
+    <section className="mt-8">
+      <div className="mb-3 flex items-center justify-between">
+        <h2 className="text-subheading font-bold text-foreground">Featured on Localys</h2>
+        <div className="flex items-center gap-2">
+          <button type="button" className="text-body-sm font-semibold text-foreground hover:underline">See all</button>
+          <button type="button" onClick={() => scroll(-1)} aria-label="Scroll left" className="hidden h-8 w-8 items-center justify-center rounded-full border border-border bg-card text-foreground transition-colors hover:bg-surface/60 lg:flex">
+            <ChevronLeft className="h-4 w-4" aria-hidden="true" />
+          </button>
+          <button type="button" onClick={() => scroll(1)} aria-label="Scroll right" className="hidden h-8 w-8 items-center justify-center rounded-full border border-border bg-card text-foreground transition-colors hover:bg-surface/60 lg:flex">
+            <ChevronRight className="h-4 w-4" aria-hidden="true" />
+          </button>
+        </div>
+      </div>
+      <div ref={rowRef} className="flex gap-4 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        {items.map((b) => {
+          const meta = storeMeta(b.id);
+          const name = b.full_name || b.username || 'Store';
+          const fav = favorites.has(b.id);
+          return (
+            <div key={b.id} className="w-64 shrink-0">
+              {/* Rounded store logo (tap → store) */}
+              <button
+                type="button"
+                onClick={() => onOpen(b)}
+                aria-label={`Open ${name}`}
+                className="block w-full overflow-hidden rounded-[16px] border border-border bg-card transition-colors hover:border-primary"
+              >
+                <div className="relative aspect-[4/3] bg-surface">
+                  {b.profile_picture_url ? (
+                    <Image src={b.profile_picture_url} alt="" fill className="object-cover" unoptimized />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center">
+                      <StoreIcon className="h-10 w-10 text-muted-foreground" aria-hidden="true" />
+                    </div>
+                  )}
+                </div>
+              </button>
+              {/* Name + heart */}
+              <div className="mt-2 flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => onOpen(b)}
+                  className="truncate text-body-sm font-bold text-foreground hover:underline"
+                >
+                  {name}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onToggleFav(b.id)}
+                  aria-label={fav ? `Remove ${name} from favourites` : `Add ${name} to favourites`}
+                  aria-pressed={fav}
+                  className="ml-auto shrink-0 rounded-full p-1 text-muted-foreground transition-colors hover:text-primary"
+                >
+                  <Heart className={cn('h-4 w-4', fav && 'fill-primary text-primary')} aria-hidden="true" />
+                </button>
+              </div>
+              {/* Rating · reviews · distance */}
+              <p className="mt-0.5 flex items-center gap-1 text-caption text-foreground">
+                <Star className="h-3.5 w-3.5 fill-primary text-primary" aria-hidden="true" />
+                {meta.rating}
+                <span className="text-muted-foreground">({meta.reviews})</span>
+                <span aria-hidden="true">·</span>
+                {meta.distanceKm} km
+              </p>
+            </div>
+          );
+        })}
       </div>
     </section>
   );
