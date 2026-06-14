@@ -27,10 +27,14 @@ const CATEGORIES: { id: string; label: string; file: string; emoji: string; type
   { id: 'health', label: 'Health', file: 'health.png', emoji: '🩺', type: 'service' },
 ];
 
+// Promo deals — the ONE place colour is allowed (intentional exception to the
+// otherwise black/white minimal UI). Per-card colours are hardcoded on purpose;
+// each has a label, a deadline subline, a CTA label, and bg/fg colours.
 const DEALS = [
-  { id: 'd1', title: '40% off your first pickup order', sub: 'Ends 06/29 · Terms apply' },
-  { id: 'd2', title: 'BOGO coffee at local cafés', sub: 'Ends 07/19 · Terms apply' },
-  { id: 'd3', title: 'Free add-on at participating shops', sub: 'Ends 06/29 · Terms apply' },
+  { id: 'd1', title: 'BOGO at The Carbon Bar BBQ', sub: 'Ends 07/19 · Terms apply', cta: 'Score the Deal', bg: '#1f8f4e', fg: '#ffffff' },
+  { id: 'd2', title: '40% off at Nomè Izakaya', sub: 'Ends 07/19 · Terms apply', cta: 'Order Now', bg: '#efe1c2', fg: '#1a1a1a' },
+  { id: 'd3', title: 'Malatang Combo at Haidilao Hot Pot', sub: 'Ends 06/29 · Terms apply', cta: 'See details', bg: '#d9472f', fg: '#ffffff' },
+  { id: 'd4', title: 'Feed the crew for less this week', sub: 'Ends 07/05 · Terms apply', cta: 'Feed the Crew', bg: '#2563a8', fg: '#ffffff' },
 ];
 
 interface Biz {
@@ -76,6 +80,95 @@ function CategoryIcon({ file, emoji, label }: { file: string; emoji: string; lab
       )}
       <span className="sr-only">{label}</span>
     </span>
+  );
+}
+
+/* ============================ Deals carousel ============================ */
+// Colourful deal cards (image on the right), a white pill CTA, auto-advancing
+// right→left on a gentle loop, pausing on hover, with manual white circular
+// arrows. The only place colour is used heavily.
+function DealsCarousel({ images }: { images: string[] }) {
+  const rowRef = useRef<HTMLDivElement>(null);
+  const [paused, setPaused] = useState(false);
+
+  const CARD_STEP = 360; // px advanced per tick / arrow click
+
+  const scrollByCard = (dir: 1 | -1) => {
+    rowRef.current?.scrollBy({ left: dir * CARD_STEP, behavior: 'smooth' });
+  };
+
+  // Gentle auto-advance; loops back to the start at the end. Paused on hover.
+  useEffect(() => {
+    if (paused) return;
+    const el = rowRef.current;
+    if (!el) return;
+    const id = window.setInterval(() => {
+      if (el.scrollLeft + el.clientWidth >= el.scrollWidth - 8) {
+        el.scrollTo({ left: 0, behavior: 'smooth' });
+      } else {
+        el.scrollBy({ left: CARD_STEP, behavior: 'smooth' });
+      }
+    }, 3200);
+    return () => window.clearInterval(id);
+  }, [paused]);
+
+  return (
+    <div className="relative mb-8">
+      <div
+        ref={rowRef}
+        onMouseEnter={() => setPaused(true)}
+        onMouseLeave={() => setPaused(false)}
+        className="flex gap-4 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      >
+        {DEALS.map((d, i) => (
+          <div
+            key={d.id}
+            style={{ backgroundColor: d.bg, color: d.fg }}
+            className="hover-elevate relative flex h-40 w-[320px] shrink-0 overflow-hidden rounded-[16px] sm:w-[380px]"
+          >
+            {/* Left: title + subline + white pill CTA */}
+            <div className="flex w-3/5 flex-col justify-between p-4">
+              <div>
+                <p className="text-body font-bold leading-snug">{d.title}</p>
+                <p className="mt-1 text-caption opacity-80">{d.sub}</p>
+              </div>
+              <button
+                type="button"
+                className="w-fit rounded-full bg-white px-4 py-1.5 text-caption font-bold text-black transition-transform hover:scale-[1.03]"
+              >
+                {d.cta}
+              </button>
+            </div>
+            {/* Right: food / business image filling the panel */}
+            <div className="relative w-2/5">
+              {images[i % Math.max(images.length, 1)] ? (
+                <Image src={images[i % images.length]} alt="" fill className="object-cover" unoptimized />
+              ) : (
+                <div className="h-full w-full bg-black/10" aria-hidden="true" />
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Manual white circular arrows */}
+      <button
+        type="button"
+        onClick={() => scrollByCard(-1)}
+        aria-label="Previous deals"
+        className="absolute left-1 top-1/2 hidden h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white text-black shadow-[0_2px_8px_rgba(0,0,0,0.25)] transition-transform hover:scale-105 sm:flex"
+      >
+        <ChevronLeft className="h-5 w-5" aria-hidden="true" />
+      </button>
+      <button
+        type="button"
+        onClick={() => scrollByCard(1)}
+        aria-label="Next deals"
+        className="absolute right-1 top-1/2 hidden h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white text-black shadow-[0_2px_8px_rgba(0,0,0,0.25)] transition-transform hover:scale-105 sm:flex"
+      >
+        <ChevronRight className="h-5 w-5" aria-hidden="true" />
+      </button>
+    </div>
   );
 }
 
@@ -151,27 +244,25 @@ function HomeStorefront() {
       <div className="mx-auto max-w-[1200px] px-4 pt-5 lg:px-8">
         {/* ===== Top row: Pickup|Service toggle + location ===== */}
         <div className="mb-4 flex flex-wrap items-center gap-3">
-          <div className="inline-flex rounded-full border border-border bg-surface p-1">
-            <button
-              type="button"
-              onClick={() => setMode('pickup')}
-              className={cn(
-                'rounded-full px-5 py-1.5 text-body-sm font-bold transition-colors',
-                mode === 'pickup' ? 'bg-primary text-primary-foreground' : 'text-foreground hover:bg-surface/60',
-              )}
-            >
-              Pickup
-            </button>
-            <button
-              type="button"
-              onClick={() => setMode('service')}
-              className={cn(
-                'rounded-full px-5 py-1.5 text-body-sm font-bold transition-colors',
-                mode === 'service' ? 'bg-primary text-primary-foreground' : 'text-foreground hover:bg-surface/60',
-              )}
-            >
-              Service
-            </button>
+          {/* Rounded pill toggle — neutral active fill (soft card pill on a grey
+              track), never orange. Styled like the rounded search bar. */}
+          <div className="inline-flex items-center rounded-full border border-border bg-surface p-1">
+            {(['pickup', 'service'] as const).map((m) => (
+              <button
+                key={m}
+                type="button"
+                onClick={() => setMode(m)}
+                aria-pressed={mode === m}
+                className={cn(
+                  'rounded-full px-5 py-1.5 text-body-sm font-bold transition-colors',
+                  mode === m
+                    ? 'bg-card text-foreground shadow-[0_1px_3px_rgba(0,0,0,0.12)]'
+                    : 'text-muted-foreground hover:text-foreground',
+                )}
+              >
+                {m === 'pickup' ? 'Pickup' : 'Service'}
+              </button>
+            ))}
           </div>
           <button
             type="button"
@@ -193,10 +284,10 @@ function HomeStorefront() {
                 onClick={() => setActiveCategory(activeCategory === c.id ? '' : c.id)}
                 className="flex shrink-0 flex-col items-center gap-1.5"
               >
-                <span className={cn('rounded-full', activeCategory === c.id && 'ring-2 ring-primary')}>
+                <span className={cn('rounded-full', activeCategory === c.id && 'ring-2 ring-foreground')}>
                   <CategoryIcon file={c.file} emoji={c.emoji} label={c.label} />
                 </span>
-                <span className={cn('text-caption font-semibold', activeCategory === c.id ? 'text-primary' : 'text-foreground')}>
+                <span className={cn('text-caption', activeCategory === c.id ? 'font-bold text-foreground' : 'font-semibold text-foreground')}>
                   {c.label}
                 </span>
               </button>
@@ -222,7 +313,7 @@ function HomeStorefront() {
               aria-pressed={offersOnly}
               className={cn(
                 'inline-flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-body-sm font-semibold transition-colors',
-                offersOnly ? 'bg-primary text-primary-foreground' : 'bg-surface text-foreground hover:bg-secondary',
+                offersOnly ? 'bg-foreground text-background' : 'bg-surface text-foreground hover:bg-secondary',
               )}
             >
               Offers
@@ -283,35 +374,14 @@ function HomeStorefront() {
           )}
         </div>
 
-        {/* ===== Deals carousel (neutral cards; orange only as a small tag + CTA) ===== */}
-        <div className="mb-8 flex gap-4 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {DEALS.map((d) => (
-            <div
-              key={d.id}
-              className="flex min-w-[280px] flex-1 flex-col justify-between gap-3 rounded-[12px] border border-border bg-card p-4"
-            >
-              <div>
-                <span className="inline-flex w-fit rounded-full bg-primary px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-primary-foreground">
-                  Deal
-                </span>
-                <p className="mt-2 text-body font-bold leading-snug text-foreground">{d.title}</p>
-                <p className="mt-1 text-caption text-muted-foreground">{d.sub}</p>
-              </div>
-              <button
-                type="button"
-                className="w-fit rounded-full bg-primary px-3.5 py-1.5 text-caption font-bold text-primary-foreground transition-colors hover:bg-primary/90"
-              >
-                Score the Deal
-              </button>
-            </div>
-          ))}
-        </div>
+        {/* ===== Deals carousel (the one colourful area) ===== */}
+        <DealsCarousel images={businesses.map((b) => b.profile_picture_url ?? '').filter(Boolean)} />
 
         {loading ? (
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
             {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="animate-pulse rounded-[12px] border border-border bg-card">
-                <div className="aspect-[4/3] rounded-t-[12px] bg-surface" />
+              <div key={i} className="animate-pulse rounded-[16px] border border-border bg-card">
+                <div className="aspect-[4/3] rounded-t-[16px] bg-surface" />
                 <div className="space-y-2 p-3">
                   <div className="h-4 w-3/4 rounded bg-surface" />
                   <div className="h-3 w-1/2 rounded bg-surface" />
@@ -400,7 +470,7 @@ function StoreSection({
             key={b.id}
             type="button"
             onClick={() => onOpen(b)}
-            className="w-64 shrink-0 overflow-hidden rounded-[12px] border border-border bg-card text-left transition-colors hover:border-primary"
+            className="hover-elevate w-64 shrink-0 overflow-hidden rounded-[16px] border border-border bg-card text-left transition-colors hover:border-foreground/30"
           >
             <div className="relative aspect-[4/3] bg-surface">
               {b.profile_picture_url ? (
@@ -411,7 +481,7 @@ function StoreSection({
                 </div>
               )}
               {offer && (
-                <span className="absolute left-2 top-2 rounded-full bg-primary px-2 py-0.5 text-[10px] font-bold text-primary-foreground">
+                <span className="absolute left-2 top-2 rounded-full bg-foreground px-2 py-0.5 text-[10px] font-bold text-background">
                   Offer
                 </span>
               )}
@@ -484,7 +554,7 @@ function FeaturedSection({
                 type="button"
                 onClick={() => onOpen(b)}
                 aria-label={`Open ${name}`}
-                className="block w-full overflow-hidden rounded-[16px] border border-border bg-card transition-colors hover:border-primary"
+                className="hover-elevate block w-full overflow-hidden rounded-[16px] border border-border bg-card transition-colors hover:border-foreground/30"
               >
                 <div className="relative aspect-[4/3] bg-surface">
                   {b.profile_picture_url ? (
