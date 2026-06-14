@@ -265,7 +265,7 @@ export default function ShopPage() {
           <h1 className="mb-3 text-heading-sm font-bold text-foreground">Shop local</h1>
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
             {/* Search within shop */}
-            <div className="flex h-10 flex-1 items-center gap-2 rounded-[4px] border border-border bg-surface px-3 focus-within:border-primary">
+            <div className="flex h-10 flex-1 items-center gap-2 rounded-[4px] border border-border bg-surface px-3 focus-within:border-foreground">
               <Search className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden="true" />
               <input
                 value={query}
@@ -303,7 +303,7 @@ export default function ShopPage() {
                 onClick={() => setFiltersOpen((o) => !o)}
                 className={cn(
                   'inline-flex h-10 items-center gap-1.5 rounded-[4px] border px-3 text-body-sm font-semibold transition-colors',
-                  activeFilters ? 'border-primary text-primary' : 'border-border text-foreground hover:bg-surface/60',
+                  activeFilters ? 'border-foreground text-foreground' : 'border-border text-foreground hover:bg-surface/60',
                 )}
                 aria-expanded={filtersOpen}
               >
@@ -362,7 +362,7 @@ export default function ShopPage() {
                     <button
                       type="button"
                       onClick={() => setFiltersOpen(false)}
-                      className="rounded-[4px] bg-primary px-4 py-1.5 text-caption font-bold text-primary-foreground transition-colors hover:bg-primary/90"
+                      className="rounded-[4px] bg-foreground px-4 py-1.5 text-caption font-bold text-background transition-colors hover:bg-foreground/90"
                     >
                       Apply
                     </button>
@@ -382,7 +382,7 @@ export default function ShopPage() {
                 className={cn(
                   'rounded-[4px] border px-3 py-1.5 text-caption font-semibold transition-colors',
                   category === c.id
-                    ? 'border-primary bg-primary text-primary-foreground'
+                    ? 'border-foreground bg-foreground text-background'
                     : 'border-border text-muted-foreground hover:bg-surface hover:text-foreground',
                 )}
               >
@@ -421,7 +421,7 @@ export default function ShopPage() {
                 {filtered.map((p) => {
                   const justAdded = !!added[p.id];
                   return (
-                    <div key={p.id} className="group flex flex-col border border-border bg-surface transition-colors hover:border-primary">
+                    <div key={p.id} className="hover-elevate group flex flex-col border border-border bg-surface transition-colors hover:border-foreground/30">
                       {/* Large image */}
                       <Link href={`/product/${p.id}`} className="block">
                         <div className="relative aspect-square overflow-hidden rounded-[4px] bg-background">
@@ -433,7 +433,7 @@ export default function ShopPage() {
                             </div>
                           )}
                           {isDeal(p) && (
-                            <span className="absolute left-2 top-2 rounded-[4px] bg-primary px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-primary-foreground">Deal</span>
+                            <span className="absolute left-2 top-2 rounded-[4px] bg-foreground px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-background">Deal</span>
                           )}
                         </div>
                       </Link>
@@ -441,7 +441,7 @@ export default function ShopPage() {
                       {/* Details */}
                       <div className="flex flex-1 flex-col p-3">
                         <Link href={`/product/${p.id}`} className="block">
-                          <p className="line-clamp-2 text-body-sm font-semibold leading-snug text-foreground hover:text-primary">{p.item_name}</p>
+                          <p className="line-clamp-2 text-body-sm font-semibold leading-snug text-foreground group-hover:underline">{p.item_name}</p>
                         </Link>
                         <p className="mt-0.5 truncate text-caption text-muted-foreground">{p.businessName}</p>
                         <div className="mt-1 flex items-center gap-1 text-caption text-muted-foreground">
@@ -461,7 +461,7 @@ export default function ShopPage() {
                           onClick={() => handleAdd(p)}
                           className={cn(
                             'mt-2 inline-flex items-center justify-center gap-1.5 rounded-[4px] px-3 py-2 text-body-sm font-bold transition-colors',
-                            justAdded ? 'border border-success bg-success/10 text-success' : 'bg-primary text-primary-foreground hover:bg-primary/90',
+                            justAdded ? 'border border-success bg-success/10 text-success' : 'bg-foreground text-background hover:bg-foreground/90',
                           )}
                         >
                           {justAdded ? (<><Check className="h-4 w-4" aria-hidden="true" /> Added</>) : (<><Plus className="h-4 w-4" aria-hidden="true" /> Add to cart</>)}

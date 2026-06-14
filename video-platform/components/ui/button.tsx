@@ -4,15 +4,17 @@ import { cn } from '@/lib/utils';
 
 /**
  * shadcn-style Button, aligned to the Localy token system:
- * squared 4px corners, flat (no drop shadow), orange primary CTA,
- * 700-weight label, hairline borders for secondary/outline.
+ * squared 4px corners, flat, 700-weight label, hairline borders for
+ * secondary/outline. Minimal black/white identity: the primary CTA is a solid
+ * FOREGROUND fill (black in light mode, white in dark) — NOT orange. Orange is
+ * reserved for tiny accents elsewhere.
  */
 const buttonVariants = cva(
   'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-[4px] text-body-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-40 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
   {
     variants: {
       variant: {
-        default: 'bg-primary text-primary-foreground hover:bg-primary/90',
+        default: 'bg-foreground text-background hover:bg-foreground/90',
         secondary: 'border border-border bg-transparent text-foreground hover:bg-surface',
         outline: 'border border-border bg-transparent text-foreground hover:bg-surface',
         ghost: 'text-muted-foreground hover:bg-surface hover:text-foreground',

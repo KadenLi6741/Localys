@@ -2307,6 +2307,20 @@ div#devtools-indicator.nextjs-toast {
 .range-orange:disabled::-webkit-slider-thumb { background: var(--muted-foreground); }
 .range-orange:disabled::-moz-range-thumb { background: var(--muted-foreground); }
 
+/* ------------------------------------------------------------------ */
+/* Hover elevation — a small soft shadow on hover only (flat at rest).  */
+/* Applied to cards / hoverable tiles for subtle lift.                  */
+/* ------------------------------------------------------------------ */
+.hover-elevate {
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+.hover-elevate:hover {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.14);
+}
+.dark .hover-elevate:hover {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.55);
+}
+
 /* Profile dropdown */
 .profile-dropdown {
   position: absolute;

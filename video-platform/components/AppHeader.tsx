@@ -28,9 +28,11 @@ import {
    undefined / fail to paint), so they are GUARANTEED to show in both themes.
    Both use currentColor, so the button's text colour (foreground → primary on
    hover) drives them. */
+// Explicit width/height attributes (not just CSS classes) so the glyph has an
+// intrinsic 20px size even if a class fails to apply — guarantees it paints.
 function MegaphoneIcon({ className }: { className?: string }) {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
       <path d="m3 11 18-5v12L3 14v-3z" />
       <path d="M11.6 16.8a3 3 0 1 1-5.8-1.6" />
     </svg>
@@ -38,7 +40,7 @@ function MegaphoneIcon({ className }: { className?: string }) {
 }
 function BellIcon({ className }: { className?: string }) {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
       <path d="M10.268 21a2 2 0 0 0 3.464 0" />
       <path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326" />
     </svg>
@@ -274,7 +276,7 @@ export function AppHeader({ onMenuOpen }: { onMenuOpen?: () => void }) {
         </button>
         <Link href="/" className="flex items-center gap-2 px-1" aria-label="Locally home">
           <Image src="/logo.png" alt="" width={30} height={30} className="rounded-[4px]" />
-          <span className="hidden text-subheading font-bold text-primary sm:inline">Locally</span>
+          <span className="hidden text-subheading font-bold text-foreground sm:inline">Locally</span>
         </Link>
       </div>
 
@@ -283,7 +285,7 @@ export function AppHeader({ onMenuOpen }: { onMenuOpen?: () => void }) {
         <div
           className={cn(
             'relative flex h-10 items-center rounded-full border bg-surface transition-colors',
-            searchOpen ? 'border-primary' : 'border-border hover:border-primary/50'
+            searchOpen ? 'border-foreground' : 'border-border hover:border-foreground/40'
           )}
         >
           <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
@@ -306,7 +308,7 @@ export function AppHeader({ onMenuOpen }: { onMenuOpen?: () => void }) {
             type="button"
             onMouseDown={(e) => e.preventDefault()}
             onClick={submitSearch}
-            className="absolute right-1 top-1/2 inline-flex -translate-y-1/2 items-center gap-1 rounded-full bg-primary px-3.5 py-1.5 text-caption font-bold text-primary-foreground transition-colors hover:bg-primary/90"
+            className="absolute right-1 top-1/2 inline-flex -translate-y-1/2 items-center gap-1 rounded-full bg-foreground px-3.5 py-1.5 text-caption font-bold text-background transition-colors hover:bg-foreground/90"
           >
             <Search className="h-3.5 w-3.5" aria-hidden="true" />
             Search
@@ -332,7 +334,7 @@ export function AppHeader({ onMenuOpen }: { onMenuOpen?: () => void }) {
                       className={cn(
                         'rounded-[4px] border px-2.5 py-1 text-caption font-semibold transition-colors',
                         category === val
-                          ? 'border-primary bg-primary text-primary-foreground'
+                          ? 'border-foreground bg-foreground text-background'
                           : 'border-border text-muted-foreground hover:bg-surface hover:text-foreground',
                       )}
                     >
@@ -354,7 +356,7 @@ export function AppHeader({ onMenuOpen }: { onMenuOpen?: () => void }) {
                       className={cn(
                         'rounded-[4px] border px-2.5 py-1 text-caption font-semibold transition-colors',
                         accountType === val
-                          ? 'border-primary bg-primary text-primary-foreground'
+                          ? 'border-foreground bg-foreground text-background'
                           : 'border-border text-muted-foreground hover:bg-surface hover:text-foreground',
                       )}
                     >
@@ -548,9 +550,8 @@ export function AppHeader({ onMenuOpen }: { onMenuOpen?: () => void }) {
         <button type="button" onClick={togglePanel} className={cn(iconBtn, 'relative')} aria-label="Notifications">
           <BellIcon className="h-5 w-5" />
           {unreadCount > 0 && (
-            <span className="absolute right-0.5 top-0.5 inline-flex h-4 min-w-[16px] items-center justify-center rounded-[4px] bg-primary px-1 text-[10px] font-bold text-primary-foreground">
-              {unreadCount > 9 ? '9+' : unreadCount}
-            </span>
+            // Small orange dot — the single sanctioned accent on the bell.
+            <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-primary ring-2 ring-card" aria-hidden="true" />
           )}
         </button>
 
