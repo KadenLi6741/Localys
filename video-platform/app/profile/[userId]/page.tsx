@@ -892,11 +892,11 @@ function UserProfileContent() {
             </svg>
             <span className={`text-xs ${pathname === '/' ? 'text-[var(--color-cream)]' : 'text-[var(--color-cream)]/60'}`}>Home</span>
           </Link>
-          <Link href="/search" className="flex flex-col items-center gap-1 transition-transform duration-200 hover:scale-110 active:scale-95">
-            <svg className={`w-6 h-6 ${pathname === '/search' ? 'text-[var(--color-cream)]' : 'text-[var(--color-cream)]/60'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <Link href="/explore" className="flex flex-col items-center gap-1 transition-transform duration-200 hover:scale-110 active:scale-95">
+            <svg className={`w-6 h-6 ${pathname === '/explore' ? 'text-[var(--color-cream)]' : 'text-[var(--color-cream)]/60'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
-            <span className={`text-xs ${pathname === '/search' ? 'text-[var(--color-cream)]' : 'text-[var(--color-cream)]/60'}`}>Search</span>
+            <span className={`text-xs ${pathname === '/explore' ? 'text-[var(--color-cream)]' : 'text-[var(--color-cream)]/60'}`}>Explore</span>
           </Link>
           <Link href="/upload" className="flex flex-col items-center gap-1 transition-transform duration-200 hover:scale-110 active:scale-95">
             <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-200 ${pathname === '/upload' ? 'bg-[var(--primary)]' : 'bg-[var(--primary)]/20'}`}>

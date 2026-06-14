@@ -226,11 +226,13 @@ export function AppHeader({ onMenuOpen }: { onMenuOpen?: () => void }) {
     router.push(`/profile/${b.username || b.id}`);
   };
 
-  // Enter / Search → full results page (lists every match).
+  // Inline-only search — never navigates to a separate page. Enter / the Search
+  // pill opens the top live result if there is one; otherwise the live results
+  // dropdown stays open as you type.
   const submitSearch = () => {
-    const q = query.trim();
-    setSearchOpen(false);
-    router.push(q ? `/search?q=${encodeURIComponent(q)}` : '/search');
+    if (results.length > 0) {
+      goToBusiness(results[0]);
+    }
   };
 
   // Icon-only actions: full-contrast foreground icon, orange on hover, with a

@@ -5,7 +5,7 @@ import Link from 'next/link';
 const NAV_LINKS = [
   { label: 'Home', href: '/' },
   { label: 'Explore', href: '/explore' },
-  { label: 'Search', href: '/search' },
+  { label: 'Communities', href: '/communities' },
   { label: 'Upload', href: '/upload' },
   { label: 'Profile', href: '/profile' },
 ];

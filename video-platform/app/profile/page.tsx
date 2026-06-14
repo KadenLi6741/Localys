@@ -522,7 +522,7 @@ function ProfileView({ profile, business, user, onEditClick, onSignOut, onProfil
           ) : (
             <div className="bg-[var(--glass-bg-subtle)] border border-[var(--glass-border)] rounded-lg p-6 text-center">
               <p className="text-muted-foreground text-sm mb-3">You are not following anyone yet</p>
-              <Link href="/search" className="text-primary text-sm font-medium hover:underline">Discover People</Link>
+              <Link href="/explore" className="text-primary text-sm font-medium hover:underline">Discover People</Link>
             </div>
           )}
         </div>
