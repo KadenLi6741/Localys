@@ -271,7 +271,7 @@ function HomeStorefront() {
                   step={1}
                   value={distance}
                   onChange={(e) => setDistance(Number(e.target.value))}
-                  className="w-full accent-[var(--primary)]"
+                  className="range-orange"
                   aria-label="Maximum distance in kilometres"
                 />
                 <div className="mt-1 flex justify-between text-caption text-muted-foreground">
@@ -283,18 +283,26 @@ function HomeStorefront() {
           )}
         </div>
 
-        {/* ===== Deals carousel ===== */}
+        {/* ===== Deals carousel (neutral cards; orange only as a small tag + CTA) ===== */}
         <div className="mb-8 flex gap-4 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {DEALS.map((d) => (
             <div
               key={d.id}
-              className="flex min-w-[280px] flex-1 flex-col justify-between rounded-[12px] bg-primary p-4 text-primary-foreground"
+              className="flex min-w-[280px] flex-1 flex-col justify-between gap-3 rounded-[12px] border border-border bg-card p-4"
             >
-              <p className="text-body font-bold leading-snug">{d.title}</p>
-              <p className="mt-1 text-caption opacity-90">{d.sub}</p>
-              <span className="mt-3 w-fit rounded-full bg-primary-foreground/15 px-3 py-1 text-caption font-bold">
+              <div>
+                <span className="inline-flex w-fit rounded-full bg-primary px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-primary-foreground">
+                  Deal
+                </span>
+                <p className="mt-2 text-body font-bold leading-snug text-foreground">{d.title}</p>
+                <p className="mt-1 text-caption text-muted-foreground">{d.sub}</p>
+              </div>
+              <button
+                type="button"
+                className="w-fit rounded-full bg-primary px-3.5 py-1.5 text-caption font-bold text-primary-foreground transition-colors hover:bg-primary/90"
+              >
                 Score the Deal
-              </span>
+              </button>
             </div>
           ))}
         </div>

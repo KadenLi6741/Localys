@@ -193,39 +193,39 @@ export default function BuyCoinsPage() {
 
         {/* Stripe Configuration Warning */}
         {!stripeConfigured && (
-          <div className="bg-[var(--primary)]/10 border border-[var(--primary)]/30 rounded-lg p-4 mb-8">
-            <p className="text-[var(--primary)] text-sm">
+          <div className="mb-8 rounded-[8px] border border-border bg-surface p-4">
+            <p className="text-sm text-foreground">
               <strong>Payment system not configured.</strong> The administrator needs to set up Stripe API keys.
             </p>
           </div>
         )}
 
-        {/* Available Coupons */}
+        {/* Available Coupons — neutral cards; orange only on the selected one (white text on orange) */}
         {availableCoupons.length > 0 && (
-          <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-6 mb-8">
-            <h3 className="text-lg font-semibold mb-4">Available Coupons</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div className="mb-8 rounded-[12px] border border-border bg-card p-6">
+            <h3 className="mb-4 text-lg font-semibold text-foreground">Available Coupons</h3>
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
               {availableCoupons.map((coupon) => {
-                const couponData = (coupon.coupon as any);
+                const couponData = coupon.coupon as { code: string; discount_percentage: number };
                 const isSelected = selectedCoupon?.id === coupon.id;
                 return (
                   <button
                     key={coupon.id}
                     onClick={() => handleApplyCoupon(coupon)}
-                    className={`p-4 rounded-lg border-2 transition-all text-left ${
+                    className={`rounded-[8px] border p-4 text-left transition-colors ${
                       isSelected
-                        ? 'border-green-500 bg-green-500/20'
-                        : 'border-green-500/30 bg-green-500/5 hover:border-green-500/50'
+                        ? 'border-primary bg-primary text-primary-foreground'
+                        : 'border-border bg-surface text-foreground hover:border-primary/50'
                     }`}
                   >
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="font-semibold text-green-400">{couponData.code}</p>
-                        <p className="text-[var(--text-tertiary)] text-sm">{couponData.discount_percentage}% Off</p>
+                        <p className="font-semibold">{couponData.code}</p>
+                        <p className={`text-sm ${isSelected ? 'text-primary-foreground/90' : 'text-muted-foreground'}`}>
+                          {couponData.discount_percentage}% Off
+                        </p>
                       </div>
-                      {isSelected && (
-                        <span className="text-green-400 text-lg">✓</span>
-                      )}
+                      {isSelected && <span className="text-lg font-bold">✓</span>}
                     </div>
                   </button>
                 );
@@ -234,11 +234,11 @@ export default function BuyCoinsPage() {
           </div>
         )}
 
-        {/* Coupon Applied Not */}
+        {/* Coupon Applied */}
         {selectedCoupon && (
-          <div className="bg-primary/10 border border-primary/30 rounded-lg p-4 mb-8">
-            <p className="text-primary text-sm">
-              ✓ Coupon applied! You'll save ${discountAmount} on your purchase.
+          <div className="mb-8 rounded-[8px] border border-border bg-surface p-4">
+            <p className="text-sm font-medium text-foreground">
+              ✓ Coupon applied — you&apos;ll save ${discountAmount} on your purchase.
             </p>
           </div>
         )}
