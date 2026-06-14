@@ -44,3 +44,23 @@ Decisions: category icons = PNG files in `/public/categories/` (emoji fallback);
 - [x] P6 Deleted /search page/route entirely; header search is inline-only (Enter opens top live result, never navigates); stray /search links repointed (footer→Communities, profile→Explore).
 - [x] P7 Advertise + Notifications top-bar icons switched to lucide (Megaphone/Bell) matching the working Create (Plus); bell keeps orange unread badge. ⚠️ if still missing, it's a stale build → delete .next and rebuild.
 - [x] Verify: tsc clean (app), build 35/35 routes (/search gone), changed files lint-clean (0 errors).
+
+---
+
+# HOME SCREEN OVERHAUL PASS (minimal B&W + structural)
+- [x] 1 Orange pulled back: Button default → foreground; sidebar active/badges/progress neutral; promo strip neutral; header search pill/logo/active chips neutral. (Home + chrome + Shop + shared Button done; deep secondary pages e.g. rewards/product/challenges still have inline bg-primary — pending full sweep.)
+- [x] 2 Category PNGs wired (exact filenames), EMOJI REMOVED entirely; neutral letter fallback. ⚠️ PNG files still NOT in repo (only README.txt) → letter tiles show until added/pulled.
+- [x] 3 Category row: white circular L + R arrows. File: app/page.tsx
+- [x] 4 Advertise + Notifications = hardcoded inline SVG, explicit text-foreground; bell unread = small orange dot. File: components/AppHeader.tsx. ⚠️ if still blank → stale .next (rebuild).
+- [x] 5 "Find anything" search is rounded-full (oval); inline-only (no /search nav — already deleted). File: components/AppHeader.tsx
+- [x] 6 AnnouncementBar ("Up to 20% off…") fixed full-width directly under header (z-30, above sidebar), keeps slide animation; recoloured neutral (was orange fill). Files: components/LayoutShell.tsx, DesktopSidebar.tsx, globals.css (--bg-banner→foreground)
+- [x] 7 Deals bigger (h-52/56, w 360/460, rounded-20) + longer white oval CTAs (min-w-180, px-7 py-3); auto-slide R→L + white circular arrows + hover shadow. File: app/page.tsx
+- [x] 8 Filters oval/airier (px-5 py-2.5); Distance = slider; Rating = working dropdown (slider) that FILTERS; Sort = working dropdown (radios) that SORTS; both styled like shop popovers w/ title + X + Reset/Apply (FilterPopover). File: app/page.tsx
+- [x] 9 Order Featured → Today's offers → Stores near you; REMOVED boxes around all three sections; store cards rounded-24 + heart + ★rating (reviews) · distance + soft shadow; "Show more" pill below Stores near you. File: app/page.tsx
+- [x] 10 Pickup|Service toggle = rounded pill, neutral active fill (done prior pass; verified). File: app/page.tsx
+- [x] 11 Text black: --muted-foreground near-black (light #3a3a3a); deal cards use per-card contrast fg. (Token-level; deep per-component grey sweep ongoing.)
+- [x] 12 "Localys" wordmark: bold black, tracking-tight, orange "." accent. File: components/AppHeader.tsx
+- [x] 13 Sidebar sections (Daily Challenges/Recent/Communities/Resources) collapse individually, ALL CLOSED on first load (defaultOpen=false), persisted in localStorage. File: components/SidebarContent.tsx
+- [x] Extra: sidebar narrowed 250→208px; removed border between sidebar↔content; removed hr dividers between sections.
+- [x] Verify: tsc clean, build all routes, changed files lint-clean.
+- ⚠️ PENDING (flagged to user): app-wide orange sweep on deep pages (rewards/product/challenges/communities/chats/profile); full per-component grey→black text sweep.
