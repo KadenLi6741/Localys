@@ -9,8 +9,6 @@ import {
   Search,
   Coins,
   Plus,
-  Bell,
-  Megaphone,
   Menu,
   Settings,
   Trophy,
@@ -24,6 +22,28 @@ import {
   Store,
   Check,
 } from 'lucide-react';
+
+/* Hardcoded inline icons for the two icon-only header actions. These are
+   rendered as literal <svg> (not a library import that could resolve to
+   undefined / fail to paint), so they are GUARANTEED to show in both themes.
+   Both use currentColor, so the button's text colour (foreground → primary on
+   hover) drives them. */
+function MegaphoneIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
+      <path d="m3 11 18-5v12L3 14v-3z" />
+      <path d="M11.6 16.8a3 3 0 1 1-5.8-1.6" />
+    </svg>
+  );
+}
+function BellIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
+      <path d="M10.268 21a2 2 0 0 0 3.464 0" />
+      <path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326" />
+    </svg>
+  );
+}
 
 /** A few languages surfaced in the header switcher (full list on the profile page). */
 const HEADER_LANGS: Language[] = ['en', 'es', 'fr', 'de', 'zh'];
@@ -359,7 +379,7 @@ export function AppHeader({ onMenuOpen }: { onMenuOpen?: () => void }) {
                   step={5}
                   value={priceMax}
                   onChange={(e) => setPriceMax(Number(e.target.value))}
-                  className="h-1.5 w-full cursor-pointer appearance-none rounded-[4px] bg-surface-2 accent-primary"
+                  className="range-orange"
                   aria-label="Maximum price filter"
                 />
               </div>
@@ -411,7 +431,7 @@ export function AppHeader({ onMenuOpen }: { onMenuOpen?: () => void }) {
                   step={1}
                   value={maxDistanceKm}
                   onChange={(e) => setMaxDistanceKm(Number(e.target.value))}
-                  className="h-1.5 w-full cursor-pointer appearance-none rounded-[4px] bg-surface-2 accent-primary disabled:opacity-40"
+                  className="range-orange"
                   aria-label="Maximum distance filter"
                   disabled={!coords}
                 />
@@ -490,13 +510,13 @@ export function AppHeader({ onMenuOpen }: { onMenuOpen?: () => void }) {
           <span className="tabular-nums text-foreground">{coins ?? '—'}</span>
         </Link>
 
-        {/* Advertise — lucide icon, exact same approach as the working Create button */}
+        {/* Advertise — hardcoded inline SVG (guaranteed to render) */}
         <button
           type="button"
           className={cn(iconBtn, 'group relative')}
           aria-label="Advertise on Locally"
         >
-          <Megaphone className="h-5 w-5" aria-hidden="true" />
+          <MegaphoneIcon className="h-5 w-5" />
           <span
             className="pointer-events-none absolute right-0 top-full mt-1.5 whitespace-nowrap rounded-[4px] border border-border bg-popover px-2 py-1 text-caption text-foreground opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
             role="tooltip"
@@ -524,9 +544,9 @@ export function AppHeader({ onMenuOpen }: { onMenuOpen?: () => void }) {
           </DropdownMenuContent>
         </DropdownMenu>
 
-        {/* Notifications — lucide bell, exact same approach as the working Create button */}
+        {/* Notifications — hardcoded inline SVG (guaranteed to render) + unread badge */}
         <button type="button" onClick={togglePanel} className={cn(iconBtn, 'relative')} aria-label="Notifications">
-          <Bell className="h-5 w-5" aria-hidden="true" />
+          <BellIcon className="h-5 w-5" />
           {unreadCount > 0 && (
             <span className="absolute right-0.5 top-0.5 inline-flex h-4 min-w-[16px] items-center justify-center rounded-[4px] bg-primary px-1 text-[10px] font-bold text-primary-foreground">
               {unreadCount > 9 ? '9+' : unreadCount}

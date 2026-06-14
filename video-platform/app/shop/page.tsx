@@ -318,7 +318,7 @@ export default function ShopPage() {
                       <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Max price</span>
                       <span className="text-caption font-bold text-foreground tabular-nums">{priceMax >= PRICE_CEIL ? 'Any' : `$${priceMax}`}</span>
                     </div>
-                    <input type="range" min={5} max={PRICE_CEIL} step={5} value={priceMax} onChange={(e) => setPriceMax(Number(e.target.value))} className="h-1.5 w-full cursor-pointer appearance-none rounded-[4px] bg-surface-2 accent-primary" aria-label="Maximum price" />
+                    <input type="range" min={5} max={PRICE_CEIL} step={5} value={priceMax} onChange={(e) => setPriceMax(Number(e.target.value))} className="range-orange" aria-label="Maximum price" />
                   </div>
                   {/* Min rating */}
                   <div>
@@ -347,7 +347,7 @@ export default function ShopPage() {
                       <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Distance</span>
                       <span className="text-caption font-bold text-foreground tabular-nums">{maxDistanceKm >= 50 ? 'Any' : `${maxDistanceKm} km`}</span>
                     </div>
-                    <input type="range" min={1} max={50} step={1} value={maxDistanceKm} onChange={(e) => setMaxDistanceKm(Number(e.target.value))} disabled={!coords} className="h-1.5 w-full cursor-pointer appearance-none rounded-[4px] bg-surface-2 accent-primary disabled:opacity-40" aria-label="Maximum distance" />
+                    <input type="range" min={1} max={50} step={1} value={maxDistanceKm} onChange={(e) => setMaxDistanceKm(Number(e.target.value))} disabled={!coords} className="range-orange" aria-label="Maximum distance" />
                     {!coords && <p className="mt-1 text-[10px] text-muted-foreground">Enable location to filter by distance</p>}
                   </div>
                   {/* Apply */}
