@@ -85,6 +85,35 @@ function CategoryIcon({ file, label }: { file: string; label: string }) {
   );
 }
 
+/* ============================ Scroll reveal ============================ */
+// Reference motion (ANIMATIONS.md): each block fades + rises into view once.
+// Toggles a CSS class via IntersectionObserver (no React state) — cheap + lint-clean.
+function Reveal({ children, className }: { children: React.ReactNode; className?: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.classList.add('reveal-visible');
+            io.unobserve(e.target);
+          }
+        });
+      },
+      { threshold: 0.08, rootMargin: '0px 0px -40px 0px' },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  return (
+    <div ref={ref} className={cn('reveal', className)}>
+      {children}
+    </div>
+  );
+}
+
 /* ============================ Filter popover ============================ */
 // Shared dropdown shell for the Distance / Rating / Sort filters: white rounded
 // card, bold title + X close, content, and a Reset / black Apply footer.
@@ -101,7 +130,7 @@ function FilterPopover({
 }) {
   return (
     <div className="shadow-soft absolute left-0 top-14 z-40 w-80 max-w-[calc(100vw-2rem)] rounded-[16px] border border-border bg-card p-5">
-      <div className="mb-3 flex items-center justify-between">
+      <div className="mb-4 flex items-center justify-between">
         <h3 className="text-subheading font-bold text-foreground">{title}</h3>
         <button type="button" onClick={onClose} aria-label="Close" className="rounded-full p-1 text-foreground transition-colors hover:bg-surface">
           <X className="h-5 w-5" aria-hidden="true" />
@@ -456,7 +485,9 @@ function HomeStorefront() {
         </div>
 
         {/* ===== Deals carousel (the one colourful area) ===== */}
-        <DealsCarousel images={businesses.map((b) => b.profile_picture_url ?? '').filter(Boolean)} />
+        <Reveal>
+          <DealsCarousel images={businesses.map((b) => b.profile_picture_url ?? '').filter(Boolean)} />
+        </Reveal>
 
         {loading ? (
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
@@ -472,18 +503,23 @@ function HomeStorefront() {
           </div>
         ) : (
           <>
-            <FeaturedSection
-              items={featured}
-              favorites={favorites}
-              onToggleFav={toggleFav}
-              onOpen={(b) => router.push(`/profile/${b.username || b.id}`)}
-            />
-            <StoreSection title="Today's offers" items={offers} offer onOpen={(b) => router.push(`/profile/${b.username || b.id}`)} />
+            <Reveal>
+              <FeaturedSection
+                items={featured}
+                favorites={favorites}
+                onToggleFav={toggleFav}
+                onOpen={(b) => router.push(`/profile/${b.username || b.id}`)}
+              />
+            </Reveal>
+            <Reveal>
+              <StoreSection title="Today's offers" items={offers} offer onOpen={(b) => router.push(`/profile/${b.username || b.id}`)} />
+            </Reveal>
 
             {/* Stores near you — circular logos */}
-            <section className="mt-8">
-              <div className="mb-3 flex items-center justify-between">
-                <h2 className="text-subheading font-bold text-foreground">Stores near you</h2>
+            <Reveal>
+            <section className="mt-12">
+              <div className="mb-4 flex items-center justify-between">
+                <h2 className="text-heading-sm font-bold text-foreground">Stores near you</h2>
               </div>
               <div className="flex gap-5 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 {near.map((b) => {
@@ -516,6 +552,7 @@ function HomeStorefront() {
                 </div>
               )}
             </section>
+            </Reveal>
           </>
         )}
       </div>
@@ -541,9 +578,9 @@ function StoreSection({
   if (items.length === 0) return null;
 
   return (
-    <section className="mt-8">
-      <div className="mb-3 flex items-center justify-between">
-        <h2 className="text-subheading font-bold text-foreground">{title}</h2>
+    <section className="mt-12">
+      <div className="mb-4 flex items-center justify-between">
+        <h2 className="text-heading-sm font-bold text-foreground">{title}</h2>
         <div className="flex items-center gap-2">
           <button type="button" className="text-body-sm font-semibold text-foreground hover:underline">See all</button>
           <button type="button" onClick={() => scroll(-1)} aria-label="Scroll left" className="hidden h-8 w-8 items-center justify-center rounded-full border border-border bg-card text-foreground transition-colors hover:bg-surface/60 lg:flex">
@@ -621,9 +658,9 @@ function FeaturedSection({
   if (items.length === 0) return null;
 
   return (
-    <section className="mt-8">
-      <div className="mb-3 flex items-center justify-between">
-        <h2 className="text-subheading font-bold text-foreground">Featured on Localys</h2>
+    <section className="mt-12">
+      <div className="mb-4 flex items-center justify-between">
+        <h2 className="text-heading-sm font-bold text-foreground">Featured on Localys</h2>
         <div className="flex items-center gap-2">
           <button type="button" className="text-body-sm font-semibold text-foreground hover:underline">See all</button>
           <button type="button" onClick={() => scroll(-1)} aria-label="Scroll left" className="hidden h-8 w-8 items-center justify-center rounded-full border border-border bg-card text-foreground transition-colors hover:bg-surface/60 lg:flex">
