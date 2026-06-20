@@ -102,5 +102,10 @@ Decisions: vibrant CONTENT on white/neutral chrome · primary CTAs + active stat
 - [x] 4 Promo banner keeps slide-in message cycle + prefers-reduced-motion guard. File: app/globals.css
 - [x] 5 Cleanup: removed old stepped-interval carousel + hardcoded-hex DEALS. File: app/page.tsx
 - [x] Verify: tsc clean, lint clean, build green.
+
+### Phase 4 fixes (post-review)
+- [x] Fix 1: deal cards cycle EXACTLY #06C167/#9F6402/#FFCF70/#FFF2D9 via `--deal-*` tokens (same in light+dark); white text on green/brown, dark text on amber/cream; white CTA has border+shadow to stay visible on cream. Files: globals.css, app/page.tsx
+- [x] Fix 2: CTA = true horizontal oval (h-11 rounded-full px-8 min-w-180). File: app/page.tsx
+- [x] Fix 3: sidebar section titles single-line (truncate/nowrap + shrink-0 chevron) so "Daily Challenges" aligns flush. File: components/SidebarContent.tsx
 ## Phase 5 — Business account + Localys Manager (separate /manager app) + backend
 ## Phase 6 — Communities / Profile / Order History / Coins-Rewards
