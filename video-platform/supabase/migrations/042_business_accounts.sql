@@ -109,14 +109,18 @@ WHERE id IN (SELECT owner_id FROM public.businesses)
 -- Guarded + idempotent: re-running won't create duplicates.
 DO $$
 DECLARE
-  v_owner    UUID := 'OWNER_USER_ID';   -- <-- EDIT THIS
+  v_owner_text TEXT := 'OWNER_USER_ID';   -- <-- EDIT THIS (paste your auth user id)
+  v_owner    UUID;
   v_business UUID;
   v_menu     UUID;
 BEGIN
-  IF v_owner IS NULL OR v_owner = 'OWNER_USER_ID'::text::uuid THEN
+  -- Guard runs BEFORE any uuid cast, so forgetting to edit skips cleanly
+  -- instead of erroring with "invalid input syntax for type uuid".
+  IF v_owner_text IS NULL OR v_owner_text = 'OWNER_USER_ID' THEN
     RAISE NOTICE 'Skipping demo seed: set OWNER_USER_ID first.';
     RETURN;
   END IF;
+  v_owner := v_owner_text::uuid;
 
   -- demo business
   SELECT id INTO v_business FROM public.businesses
