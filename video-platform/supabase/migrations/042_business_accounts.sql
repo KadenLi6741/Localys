@@ -55,6 +55,14 @@ ALTER TABLE public.businesses ADD COLUMN IF NOT EXISTS average_rating NUMERIC DE
 ALTER TABLE public.businesses ADD COLUMN IF NOT EXISTS total_reviews INTEGER DEFAULT 0;
 ALTER TABLE public.businesses ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ DEFAULT now();
 
+-- Drop legacy CHECK constraints that restrict category/business_type to a tiny
+-- fixed set (e.g. food/retail/service). The app is now the source of truth for
+-- categories (it ships a fixed select list of ids like 'cafes', 'grocery', ...),
+-- so these old constraints would reject valid app values on both seed AND the
+-- onboarding form. IF EXISTS makes this safe + idempotent.
+ALTER TABLE public.businesses DROP CONSTRAINT IF EXISTS businesses_category_check;
+ALTER TABLE public.businesses DROP CONSTRAINT IF EXISTS businesses_business_type_check;
+
 CREATE INDEX IF NOT EXISTS idx_businesses_owner_id ON public.businesses(owner_id);
 CREATE INDEX IF NOT EXISTS idx_businesses_category ON public.businesses(category);
 
@@ -109,7 +117,7 @@ WHERE id IN (SELECT owner_id FROM public.businesses)
 -- Guarded + idempotent: re-running won't create duplicates.
 DO $$
 DECLARE
-  v_owner_text TEXT := 'OWNER_USER_ID';   -- <-- EDIT THIS (paste your auth user id)
+  v_owner_text TEXT := 'cc0f8539-c58a-48c1-ba49-42f846a608b3';   -- <-- EDIT THIS (paste your auth user id)
   v_owner    UUID;
   v_business UUID;
   v_menu     UUID;
