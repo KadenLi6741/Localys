@@ -28,12 +28,14 @@ const CATEGORIES: { id: string; label: string; icon: string; color: string; type
   { id: 'health', label: 'Health', icon: '❤️', color: 'red', type: 'service' },
 ];
 
-// Promo deals — colourful cards (Phase 4 adds the auto-slide/motion polish).
+// Promo deals — each a different vibrant palette hue (theme-aware via tokens),
+// with its own thematic emoji used when no distinct business image is available.
 const DEALS = [
-  { id: 'd1', title: 'BOGO at The Carbon Bar BBQ', sub: 'Ends 07/19 · Terms apply', cta: 'Score the Deal', bg: '#1f8f4e', fg: '#ffffff' },
-  { id: 'd2', title: '40% off at Nomè Izakaya', sub: 'Ends 07/19 · Terms apply', cta: 'Order Now', bg: '#efe1c2', fg: '#1a1a1a' },
-  { id: 'd3', title: 'Malatang Combo at Haidilao Hot Pot', sub: 'Ends 06/29 · Terms apply', cta: 'See details', bg: '#d9472f', fg: '#ffffff' },
-  { id: 'd4', title: 'Feed the crew for less this week', sub: 'Ends 07/05 · Terms apply', cta: 'Feed the Crew', bg: '#2563a8', fg: '#ffffff' },
+  { id: 'd1', title: 'BOGO at The Carbon Bar BBQ', sub: 'Ends 07/19 · Terms apply', cta: 'Score the Deal', color: 'green', emoji: '🍖' },
+  { id: 'd2', title: '40% off at Nomè Izakaya', sub: 'Ends 07/19 · Terms apply', cta: 'Order Now', color: 'amber', emoji: '🍶' },
+  { id: 'd3', title: 'Malatang Combo at Haidilao Hot Pot', sub: 'Ends 06/29 · Terms apply', cta: 'See details', color: 'red', emoji: '🍲' },
+  { id: 'd4', title: 'Feed the crew for less this week', sub: 'Ends 07/05 · Terms apply', cta: 'Feed the Crew', color: 'blue', emoji: '🍱' },
+  { id: 'd5', title: 'Sweet treats, 25% off at local cafés', sub: 'Ends 07/12 · Terms apply', cta: 'See details', color: 'pink', emoji: '🧁' },
 ];
 
 interface Biz {
@@ -135,69 +137,85 @@ function FilterPopover({
 }
 
 /* ============================ Deals carousel ============================ */
-// Colourful deal cards with a white pill CTA + auto-advance. (Phase 4 refines the
-// motion + per-card imagery; the structure lives here.)
+// Big colourful deal cards (vibrant palette hue per card) with a white oval CTA.
+// Continuous right→left marquee via requestAnimationFrame on a duplicated track
+// (seamless wrap); pauses on hover; white circular arrows nudge it manually;
+// respects prefers-reduced-motion. Each card gets its OWN image (by deal index)
+// or a thematic emoji fallback — clipped to the card, never bleeding/duplicated.
 function DealsCarousel({ images }: { images: string[] }) {
   const rowRef = useRef<HTMLDivElement>(null);
-  const [paused, setPaused] = useState(false);
-
-  const CARD_STEP = 480;
-  const scrollByCard = (dir: 1 | -1) => rowRef.current?.scrollBy({ left: dir * CARD_STEP, behavior: 'smooth' });
+  const pausedRef = useRef(false);
+  const loop = [...DEALS, ...DEALS]; // duplicate the track for a seamless loop
 
   useEffect(() => {
-    if (paused) return;
     const el = rowRef.current;
     if (!el) return;
-    const id = window.setInterval(() => {
-      if (el.scrollLeft + el.clientWidth >= el.scrollWidth - 8) {
-        el.scrollTo({ left: 0, behavior: 'smooth' });
-      } else {
-        el.scrollBy({ left: CARD_STEP, behavior: 'smooth' });
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return; // no auto-scroll
+    let raf = 0;
+    const tick = () => {
+      if (!pausedRef.current) {
+        el.scrollLeft += 0.5; // gentle continuous drift (content moves left)
+        const half = el.scrollWidth / 2;
+        if (half > 0 && el.scrollLeft >= half) el.scrollLeft -= half; // wrap seamlessly
       }
-    }, 3200);
-    return () => window.clearInterval(id);
-  }, [paused]);
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
+  const nudge = (dir: 1 | -1) => rowRef.current?.scrollBy({ left: dir * 380, behavior: 'smooth' });
 
   return (
-    <div className="relative">
-      <div
-        ref={rowRef}
-        onMouseEnter={() => setPaused(true)}
-        onMouseLeave={() => setPaused(false)}
-        className="flex gap-4 overflow-x-auto px-0.5 py-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-      >
-        {DEALS.map((d, i) => (
-          <div
-            key={d.id}
-            style={{ backgroundColor: d.bg, color: d.fg }}
-            className="shadow-soft relative flex h-52 w-[360px] shrink-0 overflow-hidden rounded-[20px] sm:h-56 sm:w-[460px]"
-          >
-            <div className="flex w-3/5 flex-col justify-between p-5">
-              <div>
-                <p className="text-subheading font-bold leading-tight">{d.title}</p>
-                <p className="mt-1.5 text-body-sm opacity-80">{d.sub}</p>
+    <div
+      className="relative"
+      onMouseEnter={() => {
+        pausedRef.current = true;
+      }}
+      onMouseLeave={() => {
+        pausedRef.current = false;
+      }}
+    >
+      <div ref={rowRef} className="flex gap-4 overflow-x-auto px-0.5 py-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        {loop.map((d, i) => {
+          const img = images[i % DEALS.length]; // each distinct deal → its own image slot
+          return (
+            <div
+              key={`${d.id}-${i}`}
+              style={{ backgroundColor: `var(--v-${d.color}-bg)`, color: `var(--v-${d.color}-fg)` }}
+              className="shadow-soft relative flex h-56 w-[380px] shrink-0 overflow-hidden rounded-[24px] transition-transform duration-300 hover:-translate-y-1 sm:h-60 sm:w-[480px]"
+            >
+              {/* Left: title + subline + white oval CTA */}
+              <div className="flex w-3/5 flex-col justify-between p-5">
+                <div>
+                  <p className="text-subheading font-bold leading-tight">{d.title}</p>
+                  <p className="mt-1.5 text-body-sm opacity-80">{d.sub}</p>
+                </div>
+                <button
+                  type="button"
+                  className="inline-flex min-w-[180px] items-center justify-center rounded-full bg-white px-7 py-3 text-body-sm font-bold text-black shadow-sm transition-transform hover:scale-[1.03]"
+                >
+                  {d.cta}
+                </button>
               </div>
-              <button
-                type="button"
-                className="inline-flex min-w-[180px] items-center justify-center rounded-full bg-white px-7 py-3 text-body-sm font-bold text-black shadow-sm transition-transform hover:scale-[1.03]"
-              >
-                {d.cta}
-              </button>
+              {/* Right: own image (contained/clipped) or thematic emoji */}
+              <div className="relative w-2/5 overflow-hidden">
+                {img ? (
+                  <Image src={img} alt="" fill className="object-cover" unoptimized />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center bg-black/5 text-6xl" aria-hidden="true">
+                    {d.emoji}
+                  </div>
+                )}
+              </div>
             </div>
-            <div className="relative w-2/5">
-              {images[i % Math.max(images.length, 1)] ? (
-                <Image src={images[i % images.length]} alt="" fill className="object-cover" unoptimized />
-              ) : (
-                <div className="h-full w-full bg-black/10" aria-hidden="true" />
-              )}
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       <button
         type="button"
-        onClick={() => scrollByCard(-1)}
+        onClick={() => nudge(-1)}
         aria-label="Previous deals"
         className="absolute left-1 top-1/2 hidden h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white text-black shadow-[0_2px_8px_rgba(0,0,0,0.25)] transition-transform hover:scale-105 sm:flex"
       >
@@ -205,7 +223,7 @@ function DealsCarousel({ images }: { images: string[] }) {
       </button>
       <button
         type="button"
-        onClick={() => scrollByCard(1)}
+        onClick={() => nudge(1)}
         aria-label="Next deals"
         className="absolute right-1 top-1/2 hidden h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white text-black shadow-[0_2px_8px_rgba(0,0,0,0.25)] transition-transform hover:scale-105 sm:flex"
       >
