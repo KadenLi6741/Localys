@@ -105,12 +105,12 @@ function SidebarSection({
       <button
         type="button"
         onClick={toggle}
-        className="flex w-full items-center justify-between px-4 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground transition-colors hover:text-foreground"
+        className="flex w-full items-center justify-between gap-2 px-4 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground transition-colors hover:text-foreground"
         aria-expanded={open}
       >
-        {title}
+        <span className="truncate whitespace-nowrap">{title}</span>
         <ChevronDown
-          className={cn('h-4 w-4 transition-transform', open ? '' : '-rotate-90')}
+          className={cn('h-4 w-4 shrink-0 transition-transform', open ? '' : '-rotate-90')}
           aria-hidden="true"
         />
       </button>
