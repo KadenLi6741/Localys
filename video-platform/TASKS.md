@@ -77,7 +77,13 @@ Decisions: vibrant CONTENT on white/neutral chrome · primary CTAs + active stat
 - [x] Container/spacing conventions confirmed (max-w-1280, 4px grid, 48px section breaks already on Home); rounding scale documented as tokens.
 - [ ] Verify build + STOP for user review before Phase 2.
 
-## Phase 2 — Header + hamburger account drawer (NEXT, after approval)
+## Phase 2 — Header + hamburger account drawer — DONE (pending icon verify)
+- [x] Item 1: wordmark uses distinct display font (Outfit 800) + orange dot, dark-safe; search already oval/inline-only (no /search route); coins already black/no "+". Files: app/layout.tsx, components/AppHeader.tsx
+- [~] Item 2: **DEBUG-mount treatment shipped** — Advertise+Notifications are inline-styled red "ADV"/"BELL" boxes (bypass Tailwind) so the user can confirm they mount on a hard refresh. (Build-grep already proved they're in the bundle.) → finalize to clean icons after user confirms. File: components/AppHeader.tsx
+- [x] Item 3: hamburger → new AccountDrawer (coexists w/ rail; mobile nav = AppBottomNav). Header + items + customer/business account-type row + Sign out; slide-in + backdrop/Esc/close. Files: components/AccountDrawer.tsx (new), AppHeader.tsx, LayoutShell.tsx, globals.css (drawerInLeft keyframe). NOTE: account-type links point at /dashboard for now; Phase 5 reroutes to /manager.
+- [x] Item 4: left-rail active nav = orange (text + left bar). File: components/SidebarContent.tsx
+- [x] Verify: tsc clean, changed files lint-clean, build green.
+- ⚠️ Removed the redundant mobile nav Sheet (SidebarContent still powers the desktop rail; mobile nav = AppBottomNav).
 ## Phase 3 — Home storefront (emoji categories, balance, circular logos)
 ## Phase 4 — Deals carousel + motion (fix image mapping)
 ## Phase 5 — Business account + Localys Manager (separate /manager app) + backend
