@@ -28,14 +28,14 @@ const CATEGORIES: { id: string; label: string; icon: string; color: string; type
   { id: 'health', label: 'Health', icon: '❤️', color: 'red', type: 'service' },
 ];
 
-// Promo deals — each a different vibrant palette hue (theme-aware via tokens),
-// with its own thematic emoji used when no distinct business image is available.
+// Promo deals — cycle through EXACTLY four deal colours (green/brown/amber/cream),
+// each with its own thematic emoji used when no distinct business image exists.
 const DEALS = [
   { id: 'd1', title: 'BOGO at The Carbon Bar BBQ', sub: 'Ends 07/19 · Terms apply', cta: 'Score the Deal', color: 'green', emoji: '🍖' },
-  { id: 'd2', title: '40% off at Nomè Izakaya', sub: 'Ends 07/19 · Terms apply', cta: 'Order Now', color: 'amber', emoji: '🍶' },
-  { id: 'd3', title: 'Malatang Combo at Haidilao Hot Pot', sub: 'Ends 06/29 · Terms apply', cta: 'See details', color: 'red', emoji: '🍲' },
-  { id: 'd4', title: 'Feed the crew for less this week', sub: 'Ends 07/05 · Terms apply', cta: 'Feed the Crew', color: 'blue', emoji: '🍱' },
-  { id: 'd5', title: 'Sweet treats, 25% off at local cafés', sub: 'Ends 07/12 · Terms apply', cta: 'See details', color: 'pink', emoji: '🧁' },
+  { id: 'd2', title: '40% off at Nomè Izakaya', sub: 'Ends 07/19 · Terms apply', cta: 'Order Now', color: 'brown', emoji: '🍶' },
+  { id: 'd3', title: 'Malatang Combo at Haidilao Hot Pot', sub: 'Ends 06/29 · Terms apply', cta: 'See details', color: 'amber', emoji: '🍲' },
+  { id: 'd4', title: 'Feed the crew for less this week', sub: 'Ends 07/05 · Terms apply', cta: 'Feed the Crew', color: 'cream', emoji: '🍱' },
+  { id: 'd5', title: 'Sweet treats, 25% off at local cafés', sub: 'Ends 07/12 · Terms apply', cta: 'See details', color: 'green', emoji: '🧁' },
 ];
 
 interface Biz {
@@ -182,18 +182,19 @@ function DealsCarousel({ images }: { images: string[] }) {
           return (
             <div
               key={`${d.id}-${i}`}
-              style={{ backgroundColor: `var(--v-${d.color}-bg)`, color: `var(--v-${d.color}-fg)` }}
+              style={{ backgroundColor: `var(--deal-${d.color})`, color: `var(--deal-${d.color}-fg)` }}
               className="shadow-soft relative flex h-56 w-[380px] shrink-0 overflow-hidden rounded-[24px] transition-transform duration-300 hover:-translate-y-1 sm:h-60 sm:w-[480px]"
             >
-              {/* Left: title + subline + white oval CTA */}
+              {/* Left: title + subline + white OVAL CTA */}
               <div className="flex w-3/5 flex-col justify-between p-5">
                 <div>
                   <p className="text-subheading font-bold leading-tight">{d.title}</p>
                   <p className="mt-1.5 text-body-sm opacity-80">{d.sub}</p>
                 </div>
+                {/* True horizontal oval pill; border+shadow keep it visible on the cream card */}
                 <button
                   type="button"
-                  className="inline-flex min-w-[180px] items-center justify-center rounded-full bg-white px-7 py-3 text-body-sm font-bold text-black shadow-sm transition-transform hover:scale-[1.03]"
+                  className="inline-flex h-11 min-w-[180px] items-center justify-center rounded-full border border-black/10 bg-white px-8 text-body-sm font-bold text-black shadow-sm transition-transform hover:scale-[1.03]"
                 >
                   {d.cta}
                 </button>

@@ -2344,6 +2344,14 @@ div#devtools-indicator.nextjs-toast {
   --radius-lg: 16px;
   --radius-xl: 24px;
   --radius-pill: 9999px;
+
+  /* Deal-card palette (Phase 4 fix) — EXACTLY four colours, cycled across the
+     deal cards. Defined only here (not in .dark) so they stay the true colour in
+     both themes (no wash-out). fg = readable text colour per card. */
+  --deal-green: #06c167;  --deal-green-fg: #ffffff;
+  --deal-brown: #9f6402;  --deal-brown-fg: #ffffff;
+  --deal-amber: #ffcf70;  --deal-amber-fg: #1a1a1a;
+  --deal-cream: #fff2d9;  --deal-cream-fg: #1a1a1a;
 }
 .dark {
   --v-red-bg: #4a201b;     --v-red-fg: #ffb4a8;
