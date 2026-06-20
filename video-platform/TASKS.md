@@ -79,7 +79,7 @@ Decisions: vibrant CONTENT on white/neutral chrome · primary CTAs + active stat
 
 ## Phase 2 — Header + hamburger account drawer — DONE (pending icon verify)
 - [x] Item 1: wordmark uses distinct display font (Outfit 800) + orange dot, dark-safe; search already oval/inline-only (no /search route); coins already black/no "+". Files: app/layout.tsx, components/AppHeader.tsx
-- [~] Item 2: **DEBUG-mount treatment shipped** — Advertise+Notifications are inline-styled red "ADV"/"BELL" boxes (bypass Tailwind) so the user can confirm they mount on a hard refresh. (Build-grep already proved they're in the bundle.) → finalize to clean icons after user confirms. File: components/AppHeader.tsx
+- [x] Item 2: user confirmed the red ADV/BELL boxes mounted → **finalized to clean icons**: Advertise = megaphone, Notifications = bell + small orange unread dot; both `text-foreground` (black on white / light in dark) → orange on hover; all debug styling removed. File: components/AppHeader.tsx
 - [x] Item 3: hamburger → new AccountDrawer (coexists w/ rail; mobile nav = AppBottomNav). Header + items + customer/business account-type row + Sign out; slide-in + backdrop/Esc/close. Files: components/AccountDrawer.tsx (new), AppHeader.tsx, LayoutShell.tsx, globals.css (drawerInLeft keyframe). NOTE: account-type links point at /dashboard for now; Phase 5 reroutes to /manager.
 - [x] Item 4: left-rail active nav = orange (text + left bar). File: components/SidebarContent.tsx
 - [x] Verify: tsc clean, changed files lint-clean, build green.

@@ -519,27 +519,9 @@ export function AppHeader({ onAccountOpen }: { onAccountOpen?: () => void }) {
           <span className="tabular-nums text-foreground">{coins ?? '—'}</span>
         </Link>
 
-        {/* Advertise — DEBUG MOUNT CHECK (temporary): inline-styled red box +
-            label that bypasses Tailwind. If you can SEE "ADV" the button mounts;
-            then we swap back to the clean icon. */}
-        <button
-          type="button"
-          aria-label="Advertise on Localys"
-          style={{
-            minWidth: 44,
-            height: 44,
-            background: 'red',
-            border: '2px solid black',
-            borderRadius: 8,
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 4,
-            padding: '0 6px',
-          }}
-        >
+        {/* Advertise — clean megaphone icon (foreground colour → orange on hover) */}
+        <button type="button" className={iconBtn} aria-label="Advertise on Localys">
           <MegaphoneIcon className="h-5 w-5" />
-          <span style={{ color: '#000', fontWeight: 700, fontSize: 11 }}>ADV</span>
         </button>
 
         {/* Create — choose Post or Community */}
@@ -561,28 +543,12 @@ export function AppHeader({ onAccountOpen }: { onAccountOpen?: () => void }) {
           </DropdownMenuContent>
         </DropdownMenu>
 
-        {/* Notifications — DEBUG MOUNT CHECK (temporary): inline-styled red box +
-            label. If you can SEE "BELL" the button mounts; then we swap back. */}
-        <button
-          type="button"
-          onClick={togglePanel}
-          aria-label="Notifications"
-          style={{
-            minWidth: 44,
-            height: 44,
-            background: 'red',
-            border: '2px solid black',
-            borderRadius: 8,
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 4,
-            padding: '0 6px',
-            position: 'relative',
-          }}
-        >
+        {/* Notifications — clean bell + small orange unread dot */}
+        <button type="button" onClick={togglePanel} className={cn(iconBtn, 'relative')} aria-label="Notifications">
           <BellIcon className="h-5 w-5" />
-          <span style={{ color: '#000', fontWeight: 700, fontSize: 11 }}>BELL {unreadCount}</span>
+          {unreadCount > 0 && (
+            <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-primary ring-2 ring-card" aria-hidden="true" />
+          )}
         </button>
 
         {/* Profile */}
