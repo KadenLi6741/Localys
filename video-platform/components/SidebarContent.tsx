@@ -235,7 +235,7 @@ export function SidebarContent({
   const rowClasses = (active: boolean) =>
     cn(
       'group relative flex items-center gap-3 rounded-[4px] px-4 py-2.5 text-body-sm font-semibold transition-colors',
-      active ? 'bg-surface text-foreground' : 'text-foreground hover:bg-surface'
+      active ? 'bg-surface text-primary' : 'text-foreground hover:bg-surface'
     );
 
   return (
@@ -252,7 +252,7 @@ export function SidebarContent({
             <>
               {active && (
                 <span
-                  className="absolute left-0 top-1/2 h-6 w-0.5 -translate-y-1/2 bg-foreground"
+                  className="absolute left-0 top-1/2 h-6 w-0.5 -translate-y-1/2 bg-primary"
                   aria-hidden="true"
                 />
               )}
