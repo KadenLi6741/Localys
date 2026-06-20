@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
+import { Inter, JetBrains_Mono, Outfit } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 import { AppBottomNav } from "@/components/AppBottomNav";
@@ -22,6 +22,14 @@ const jetbrainsMono = JetBrains_Mono({
   weight: ["400", "500", "600"],
 });
 
+// Distinct display face for the "Localys" wordmark only (stronger than Inter's
+// 700 cap) — geometric + brandy, so the logo doesn't read as plain body text.
+const outfit = Outfit({
+  variable: "--font-wordmark",
+  subsets: ["latin"],
+  weight: ["700", "800"],
+});
+
 export const metadata: Metadata = {
   title: "Localy - Small Business Discovery",
   description: "Discover local small businesses through TikTok-style video scrolling",
@@ -37,7 +45,7 @@ export default function RootLayout({
     // before React hydrates, which would otherwise trip a mismatch warning.
     <html
       lang="en"
-      className={`h-full ${inter.variable} ${jetbrainsMono.variable}`}
+      className={`h-full ${inter.variable} ${jetbrainsMono.variable} ${outfit.variable}`}
       data-scroll-behavior="smooth"
       suppressHydrationWarning
     >

@@ -276,8 +276,12 @@ export function AppHeader({ onMenuOpen }: { onMenuOpen?: () => void }) {
         </button>
         <Link href="/" className="flex items-center gap-2 px-1" aria-label="Localys home">
           <Image src="/logo.png" alt="" width={30} height={30} className="rounded-[4px]" />
-          {/* Bold black wordmark with a single small orange accent (the dot). */}
-          <span className="hidden text-subheading font-extrabold tracking-tight text-foreground sm:inline">
+          {/* Distinct display wordmark — bold black + single small orange accent
+              (the dot). Dark mode inverts to white via text-foreground. */}
+          <span
+            className="hidden text-subheading font-extrabold tracking-tight text-foreground sm:inline"
+            style={{ fontFamily: 'var(--font-wordmark)' }}
+          >
             Localys<span className="text-primary">.</span>
           </span>
         </Link>
