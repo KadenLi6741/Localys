@@ -84,7 +84,17 @@ Decisions: vibrant CONTENT on white/neutral chrome · primary CTAs + active stat
 - [x] Item 4: left-rail active nav = orange (text + left bar). File: components/SidebarContent.tsx
 - [x] Verify: tsc clean, changed files lint-clean, build green.
 - ⚠️ Removed the redundant mobile nav Sheet (SidebarContent still powers the desktop rail; mobile nav = AppBottomNav).
-## Phase 3 — Home storefront (emoji categories, balance, circular logos)
+## Phase 3 — Home storefront (emoji categories, balance, circular logos) — DONE
+- [x] 1 Promo banner = vibrant rounded pill (amber palette token, theme-aware), side gaps. Files: globals.css, LayoutShell.tsx, DesktopSidebar.tsx
+- [x] 2 Pickup|Service = rounded pill, neutral active fill. File: app/page.tsx
+- [x] 3 Category row = colourful EMOJI on vibrant tiles + label; `icon` field kept (1-line PNG swap later); white circular L/R arrows. File: app/page.tsx
+- [x] 4 Filters = oval pills; Distance slider + Rating dropdown (actually filters) + Sort dropdown (actually sorts). File: app/page.tsx
+- [x] 5 Order Featured → Today's offers → Stores near you; no section boxes; centered max-w-1280 + balanced 4px-grid spacing. File: app/page.tsx
+- [x] 6 Store cards = circular logo, name under image, heart beside name, ★rating·(reviews)·distance·min, soft hover shadow; "Show more" under Stores near you. File: app/page.tsx
+- [x] 7 Resources moved from left rail → bottom nav (BookOpen → /info); unused RESOURCE consts + section deleted. Files: SidebarContent.tsx, AppBottomNav.tsx
+- [x] 8 Cleanup: consolidated duplicate FeaturedSection+StoreSection into one StoreCard/StoreRow; removed dead PNG/letter CategoryIcon logic, `file` field, Clock import. File: app/page.tsx
+- [x] Verify: tsc clean, changed files lint-clean, build green.
+- NOTE: deals carousel left as-is (already has motion); Phase 4 refines the carousel + per-card imagery.
 ## Phase 4 — Deals carousel + motion (fix image mapping)
 ## Phase 5 — Business account + Localys Manager (separate /manager app) + backend
 ## Phase 6 — Communities / Profile / Order History / Coins-Rewards
