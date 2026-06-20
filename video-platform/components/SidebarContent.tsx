@@ -37,27 +37,6 @@ const DAILY_CHALLENGES = [
   { id: 'watch-10', label: 'Watch 10 local videos', progress: 6, total: 10 },
 ];
 
-/** RESOURCES list — each entry links to a section on the /info page. */
-const RESOURCE_LINKS: { label: string; href: string; beta?: boolean }[] = [
-  { label: 'About Localys', href: '/info#about' },
-  { label: 'Advertise', href: '/info#advertise' },
-  { label: 'Developer Platform', href: '/info#developer-platform' },
-  { label: 'Localys Pro', href: '/info#localys-pro', beta: true },
-  { label: 'Help', href: '/info#help' },
-  { label: 'Blog', href: '/info#blog' },
-  { label: 'Careers', href: '/info#careers' },
-  { label: 'Press', href: '/info#press' },
-];
-
-const RESOURCE_BEST = { label: 'Best of Localys', href: '/info#best-of' };
-
-const RESOURCE_LEGAL: { label: string; href: string }[] = [
-  { label: 'Localys Rules', href: '/info#rules' },
-  { label: 'Privacy Policy', href: '/info#privacy-policy' },
-  { label: 'User Agreement', href: '/info#user-agreement' },
-  { label: 'Accessibility', href: '/info#accessibility' },
-];
-
 interface RecentBusiness {
   id: string;
   username: string | null;
@@ -404,48 +383,7 @@ export function SidebarContent({
         </>
       )}
 
-
-      {/* Resources — collapsible, links into the /info page */}
-      <SidebarSection id="resources" title="Resources">
-        {RESOURCE_LINKS.map((r) => (
-          <Link
-            key={r.label}
-            href={r.href}
-            onClick={onNavigate}
-            className="flex items-center gap-1.5 rounded-[4px] px-4 py-1.5 text-body-sm text-foreground transition-colors hover:bg-surface"
-          >
-            {r.label}
-            {r.beta && (
-              <span className="rounded-[4px] bg-primary/15 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-primary">
-                Beta
-              </span>
-            )}
-          </Link>
-        ))}
-
-        <hr className="mx-4 my-1.5 border-border" />
-
-        <Link
-          href={RESOURCE_BEST.href}
-          onClick={onNavigate}
-          className="rounded-[4px] px-4 py-1.5 text-body-sm text-foreground transition-colors hover:bg-surface"
-        >
-          {RESOURCE_BEST.label}
-        </Link>
-
-        <hr className="mx-4 my-1.5 border-border" />
-
-        {RESOURCE_LEGAL.map((r) => (
-          <Link
-            key={r.label}
-            href={r.href}
-            onClick={onNavigate}
-            className="rounded-[4px] px-4 py-1.5 text-body-sm text-foreground transition-colors hover:bg-surface"
-          >
-            {r.label}
-          </Link>
-        ))}
-      </SidebarSection>
+      {/* Resources moved to the bottom nav (AppBottomNav). */}
 
       {/* Copyright */}
       <p className="mt-auto px-4 py-4 text-caption text-muted-foreground">

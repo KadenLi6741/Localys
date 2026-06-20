@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Video, Users, MessageCircle, ShoppingCart, type LucideIcon } from 'lucide-react';
+import { Home, Video, Users, MessageCircle, ShoppingCart, BookOpen, type LucideIcon } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
 import { useUnreadMessages } from '@/contexts/UnreadMessagesContext';
 import { cn } from '@/lib/utils';
@@ -30,6 +30,7 @@ export function AppBottomNav() {
     { href: '/communities', label: 'Communities', icon: Users },
     { href: '/chats', label: 'Messages', icon: MessageCircle, badge: 'messages' },
     { href: '/cart', label: 'Cart', icon: ShoppingCart, badge: 'cart' },
+    { href: '/info', label: 'Resources', icon: BookOpen },
   ];
 
   return (
