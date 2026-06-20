@@ -2345,6 +2345,12 @@ div#devtools-indicator.nextjs-toast {
   --v-pink-bg: #401628;    --v-pink-fg: #ffa6cf;
 }
 
+/* Account drawer slide-in (Phase 2) */
+@keyframes drawerInLeft {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
 /* ------------------------------------------------------------------ */
 /* Hover elevation — a small soft shadow on hover only (flat at rest).  */
 /* Applied to cards / hoverable tiles for subtle lift.                  */

@@ -93,7 +93,7 @@ const DISTANCE_MAX_KM = 50; // slider ceiling; max = "Any distance"
  * filter panel on focus (center), and the right cluster — points pill,
  * Advertise, Create, Notifications, Profile dropdown.
  */
-export function AppHeader({ onMenuOpen }: { onMenuOpen?: () => void }) {
+export function AppHeader({ onAccountOpen }: { onAccountOpen?: () => void }) {
   const router = useRouter();
   const pathname = usePathname();
   const { user, signOut } = useAuth();
@@ -264,13 +264,13 @@ export function AppHeader({ onMenuOpen }: { onMenuOpen?: () => void }) {
 
   return (
     <header className="fixed inset-x-0 top-0 z-40 flex h-14 items-center gap-2 border-b border-border bg-card px-3 md:gap-4 md:px-4">
-      {/* Left: menu (mobile) + logo */}
+      {/* Left: hamburger (opens the account drawer; coexists with the nav rail) + logo */}
       <div className="flex shrink-0 items-center gap-1">
         <button
           type="button"
-          onClick={onMenuOpen}
-          className={cn(iconBtn, 'lg:hidden')}
-          aria-label="Open navigation menu"
+          onClick={onAccountOpen}
+          className={iconBtn}
+          aria-label="Open account menu"
         >
           <Menu className="h-5 w-5" />
         </button>
@@ -519,19 +519,27 @@ export function AppHeader({ onMenuOpen }: { onMenuOpen?: () => void }) {
           <span className="tabular-nums text-foreground">{coins ?? '—'}</span>
         </Link>
 
-        {/* Advertise — hardcoded inline SVG (guaranteed to render) */}
+        {/* Advertise — DEBUG MOUNT CHECK (temporary): inline-styled red box +
+            label that bypasses Tailwind. If you can SEE "ADV" the button mounts;
+            then we swap back to the clean icon. */}
         <button
           type="button"
-          className={cn(iconBtn, 'group relative')}
-          aria-label="Advertise on Locally"
+          aria-label="Advertise on Localys"
+          style={{
+            minWidth: 44,
+            height: 44,
+            background: 'red',
+            border: '2px solid black',
+            borderRadius: 8,
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 4,
+            padding: '0 6px',
+          }}
         >
-          <MegaphoneIcon className="h-5 w-5 text-foreground group-hover:text-primary" />
-          <span
-            className="pointer-events-none absolute right-0 top-full mt-1.5 whitespace-nowrap rounded-[4px] border border-border bg-popover px-2 py-1 text-caption text-foreground opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
-            role="tooltip"
-          >
-            Advertise on Locally
-          </span>
+          <MegaphoneIcon className="h-5 w-5" />
+          <span style={{ color: '#000', fontWeight: 700, fontSize: 11 }}>ADV</span>
         </button>
 
         {/* Create — choose Post or Community */}
@@ -553,13 +561,28 @@ export function AppHeader({ onMenuOpen }: { onMenuOpen?: () => void }) {
           </DropdownMenuContent>
         </DropdownMenu>
 
-        {/* Notifications — hardcoded inline SVG (guaranteed to render) + unread badge */}
-        <button type="button" onClick={togglePanel} className={cn(iconBtn, 'relative')} aria-label="Notifications">
-          <BellIcon className="h-5 w-5 text-foreground" />
-          {unreadCount > 0 && (
-            // Small orange dot — the single sanctioned accent on the bell.
-            <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-primary ring-2 ring-card" aria-hidden="true" />
-          )}
+        {/* Notifications — DEBUG MOUNT CHECK (temporary): inline-styled red box +
+            label. If you can SEE "BELL" the button mounts; then we swap back. */}
+        <button
+          type="button"
+          onClick={togglePanel}
+          aria-label="Notifications"
+          style={{
+            minWidth: 44,
+            height: 44,
+            background: 'red',
+            border: '2px solid black',
+            borderRadius: 8,
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 4,
+            padding: '0 6px',
+            position: 'relative',
+          }}
+        >
+          <BellIcon className="h-5 w-5" />
+          <span style={{ color: '#000', fontWeight: 700, fontSize: 11 }}>BELL {unreadCount}</span>
         </button>
 
         {/* Profile */}

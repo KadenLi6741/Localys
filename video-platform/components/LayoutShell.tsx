@@ -5,10 +5,9 @@ import { usePathname } from 'next/navigation';
 import { AnnouncementBar } from '@/components/AnnouncementBar';
 import { AppHeader } from '@/components/AppHeader';
 import { DesktopSidebar } from '@/components/DesktopSidebar';
-import { SidebarContent } from '@/components/SidebarContent';
+import { AccountDrawer } from '@/components/AccountDrawer';
 import { CartDrawer } from '@/components/CartDrawer';
 import { Footer } from '@/components/Footer';
-import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 
 const AUTH_ROUTES = new Set(['/login', '/signup', '/reset-password']);
 
@@ -22,7 +21,7 @@ const AUTH_ROUTES = new Set(['/login', '/signup', '/reset-password']);
  */
 export function LayoutShell({ children }: { children: React.ReactNode }) {
   const [cartOpen, setCartOpen] = useState(false);
-  const [navOpen, setNavOpen] = useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
   const pathname = usePathname();
 
   // Auth screens are full-screen and standalone — render them without the
@@ -33,22 +32,12 @@ export function LayoutShell({ children }: { children: React.ReactNode }) {
 
   return (
     <>
-      <AppHeader onMenuOpen={() => setNavOpen(true)} />
+      <AppHeader onAccountOpen={() => setAccountOpen(true)} />
       <DesktopSidebar onCartOpen={() => setCartOpen(true)} />
 
-      {/* Tablet/mobile: sidebar collapses into a drawer */}
-      <Sheet open={navOpen} onOpenChange={setNavOpen}>
-        <SheetContent side="left" className="w-[280px] p-0">
-          <SheetTitle className="sr-only">Navigation</SheetTitle>
-          <SidebarContent
-            onCartOpen={() => {
-              setNavOpen(false);
-              setCartOpen(true);
-            }}
-            onNavigate={() => setNavOpen(false)}
-          />
-        </SheetContent>
-      </Sheet>
+      {/* Hamburger account drawer (coexists with the nav rail; mobile primary
+          navigation is the AppBottomNav). */}
+      <AccountDrawer open={accountOpen} onOpenChange={setAccountOpen} />
 
       {/* Full-width promo strip fixed directly under the header (above the
           sidebar) — the first thing the user sees, spanning the whole width. */}
