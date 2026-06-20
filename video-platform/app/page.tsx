@@ -38,12 +38,14 @@ const DEALS = [
   { id: 'd5', title: 'Sweet treats, 25% off at local cafés', sub: 'Ends 07/12 · Terms apply', cta: 'See details', color: 'green', emoji: '🧁' },
 ];
 
+// A storefront row from the unified `businesses` table (Phase 5A reconcile).
 interface Biz {
   id: string;
-  username: string | null;
-  full_name: string | null;
+  owner_id: string | null;
+  business_name: string | null;
   profile_picture_url: string | null;
-  type: string | null;
+  business_type: string | null;
+  category: string | null;
 }
 
 /* ============================ Display meta ============================ */
@@ -251,7 +253,7 @@ function StoreCard({
   onOpen: (b: Biz) => void;
 }) {
   const meta = storeMeta(b.id);
-  const name = b.full_name || b.username || 'Store';
+  const name = b.business_name || 'Store';
   return (
     <div className="shadow-soft w-56 shrink-0 rounded-[20px] border border-border bg-card p-4 text-center">
       <div className="relative mx-auto w-fit">
@@ -388,9 +390,8 @@ function HomeStorefront() {
   useEffect(() => {
     let cancelled = false;
     supabase
-      .from('profiles')
-      .select('id, username, full_name, profile_picture_url, type')
-      .in('type', ['food', 'retail', 'service'])
+      .from('businesses')
+      .select('id, owner_id, business_name, profile_picture_url, business_type, category')
       .limit(40)
       .then(({ data }) => {
         if (!cancelled) {
@@ -406,9 +407,9 @@ function HomeStorefront() {
   // Category type + Pickup/Service mode + the Rating filter, then sort.
   const filtered = useMemo(() => {
     let list = businesses;
-    if (mode === 'service') list = list.filter((b) => b.type === 'service');
+    if (mode === 'service') list = list.filter((b) => b.business_type === 'service');
     const cat = CATEGORIES.find((c) => c.id === activeCategory);
-    if (cat?.type) list = list.filter((b) => b.type === cat.type);
+    if (cat?.type) list = list.filter((b) => b.business_type === cat.type);
     if (minRating > 0) list = list.filter((b) => Number(storeMeta(b.id).rating) >= minRating);
 
     if (sortBy === 'rating') {
@@ -424,7 +425,7 @@ function HomeStorefront() {
   const near = filtered.slice(0, nearCount);
   const hasMoreNear = filtered.length > nearCount;
 
-  const open = (b: Biz) => router.push(`/profile/${b.username || b.id}`);
+  const open = (b: Biz) => router.push(`/profile/${b.owner_id || b.id}`);
   const scrollCats = (dir: 1 | -1) => catRowRef.current?.scrollBy({ left: dir * 280, behavior: 'smooth' });
 
   return (
@@ -622,7 +623,7 @@ function HomeStorefront() {
                   {near.map((b) => {
                     const m = storeMeta(b.id);
                     return (
-                      <Link key={b.id} href={`/profile/${b.username || b.id}`} className="flex w-24 shrink-0 flex-col items-center gap-1.5 text-center">
+                      <Link key={b.id} href={`/profile/${b.owner_id || b.id}`} className="flex w-24 shrink-0 flex-col items-center gap-1.5 text-center">
                         <span className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full border border-border bg-surface">
                           {b.profile_picture_url ? (
                             <Image src={b.profile_picture_url} alt="" width={64} height={64} className="h-full w-full object-cover" unoptimized />
@@ -630,7 +631,7 @@ function HomeStorefront() {
                             <StoreIcon className="h-6 w-6 text-muted-foreground" aria-hidden="true" />
                           )}
                         </span>
-                        <span className="line-clamp-2 text-caption font-semibold text-foreground">{b.full_name || b.username}</span>
+                        <span className="line-clamp-2 text-caption font-semibold text-foreground">{b.business_name}</span>
                         <span className="text-caption text-foreground">{m.distanceKm} km · {m.pickupMin} min</span>
                       </Link>
                     );
