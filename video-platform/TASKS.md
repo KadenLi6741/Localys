@@ -118,5 +118,22 @@ Decisions (user): FULL reconcile now (Home reads businesses); demo seed via SQL 
 - [x] Verify: clean build (all routes incl. /manager/* + /business/new), tsc clean, changed files lint-clean.
 - NOTE 5B: Manager data sections (dashboard metrics, reviews+replies, content, menu, orders, advertise) are stubs.
 
+### Phase 5A fixes (post-run, from user's Supabase errors)
+- [x] Demo seed guard reads OWNER_USER_ID as TEXT and checks it BEFORE the uuid cast (was: 22P02 invalid uuid at DECLARE). File: migration 042.
+- [x] Drop legacy `businesses_category_check` / `businesses_business_type_check` (IF EXISTS) — live table restricted category to food/retail/service and rejected app ids like 'cafes' on seed AND onboarding. File: migration 042.
+
+## Phase 5B — Localys Manager SECTIONS (real functionality) — DONE
+Data layer: `lib/supabase/manager.ts` (owner-scoped, RLS-enforced, degrades to empty). Shared UI: `app/manager/_components/ui.tsx`. Old Placeholder stub deleted.
+⚠️ USER MUST RUN migration `043_manager_phase5b.sql` in Supabase (OWNER_USER_ID already set to the 042 id) — creates review_replies (+RLS) and seeds demo orders/review/reply/threads so sections aren't empty.
+- [x] §1 Dashboard: live stat cards (views, orders, rating, revenue test, completed, awaiting pickup, awaiting replies, reviews) + merged recent activity (orders+reviews). Files: app/manager/page.tsx, lib/supabase/manager.ts.
+- [x] §2 Analytics: reuse TrustScoreCard + FinancialOverview (revenue/orders) + AnalyticsDashboard (views/advertise) scoped to owner; + dependency-free reviews-over-time bars + rating distribution. File: app/manager/analytics/page.tsx.
+- [x] §3 Feedback/Reviews: stats (total/awaiting/avg), filters (rating + reply status), per-review owner reply + remove (review_replies). Handles BOTH reviews schemas (008 business_id / 035 item_id). File: app/manager/feedback/page.tsx.
+- [x] §4 Content: Videos + Posts tabs; inline edit (caption/text), delete w/ confirm, create via /upload + /communities. Files: app/manager/content/page.tsx, manager.ts.
+- [x] §5 Menu/Products: full CRUD via reused MenuList/MenuModal (owner mode). File: app/manager/menu/page.tsx.
+- [x] §6 Orders: owner-scoped incoming orders (getBusinessItemSales) + stats + status filter + special-request notes; Stripe test mode. File: app/manager/orders/page.tsx.
+- [x] §7 Marketing/Advertise: coin balance + advertise stats; promote a video via reused PromotionModal; buy-coins/upload CTAs. Files: app/manager/marketing/page.tsx, manager.ts.
+- [x] §8 Settings (edit business profile → businesses update via RLS) + Payments (test-mode gross/fee/net + settled orders). Shared lib/businessCategories.ts now used by onboarding + settings. Files: app/manager/settings/page.tsx, app/manager/payments/page.tsx, lib/businessCategories.ts, app/business/new/page.tsx.
+- [x] Verify: clean build (all /manager/* routes), tsc clean, changed files lint-clean.
+
 ## Phase 5 — (superseded by 5A/5B split above)
 ## Phase 6 — Communities / Profile / Order History / Coins-Rewards
