@@ -2058,6 +2058,15 @@ div#devtools-indicator.nextjs-toast {
   100% { transform: translateX(-100%); opacity: 0; }
 }
 
+/* Respect reduced-motion: hold the promo message still instead of sliding. */
+@media (prefers-reduced-motion: reduce) {
+  .announcement-bar-text {
+    animation: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+}
+
 /* ===================== */
 /* TOP NAVBAR */
 /* ===================== */
