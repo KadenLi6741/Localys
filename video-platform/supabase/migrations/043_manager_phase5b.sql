@@ -166,14 +166,16 @@ BEGIN
   END IF;
 
   -- 4d) demo threads (shoutouts) for the Content section --------------------
+  -- NOTE: shoutouts.business_id FK -> profiles(id) (the legacy profile-as-business
+  -- model), NOT businesses(id). So use the owner's profile id (v_owner) here.
   INSERT INTO public.shoutouts (user_id, business_name, business_id, text, star_rating)
-  SELECT v_owner, 'Localys Demo Café', v_business, 'Fresh batch of almond croissants just came out of the oven!', 5
+  SELECT v_owner, 'Localys Demo Café', v_owner, 'Fresh batch of almond croissants just came out of the oven!', 5
   WHERE NOT EXISTS (
     SELECT 1 FROM public.shoutouts WHERE user_id = v_owner AND text LIKE 'Fresh batch of almond croissants%'
   );
 
   INSERT INTO public.shoutouts (user_id, business_name, business_id, text, star_rating)
-  SELECT v_owner, 'Localys Demo Café', v_business, 'New seasonal menu drops this weekend — come say hi!', 5
+  SELECT v_owner, 'Localys Demo Café', v_owner, 'New seasonal menu drops this weekend — come say hi!', 5
   WHERE NOT EXISTS (
     SELECT 1 FROM public.shoutouts WHERE user_id = v_owner AND text LIKE 'New seasonal menu drops%'
   );
