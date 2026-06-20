@@ -68,10 +68,10 @@
   /* canvases / surfaces */
   --bg-main: var(--background);
   --bg-section: var(--secondary);
-  /* Promo strip — neutral high-contrast (black bar/white text in light; inverts
-     in dark) to keep the minimal B&W direction instead of a big orange fill. */
-  --bg-banner: var(--foreground);
-  --text-banner: var(--background);
+  /* Promo strip — vibrant content colour (warm amber), theme-aware via the
+     Phase 1 palette tokens. Rounded pill (see .announcement-bar). */
+  --bg-banner: var(--v-amber-bg);
+  --text-banner: var(--v-amber-fg);
   --color-bg: var(--background);
   --color-bg-secondary: var(--secondary);
   --color-card: var(--card);
@@ -2035,6 +2035,8 @@ div#devtools-indicator.nextjs-toast {
   align-items: center;
   justify-content: center;
   position: relative;
+  /* Rounded pill promo banner (vibrant). */
+  border-radius: var(--radius-pill);
   /* Below the top bar (z-40) so the search dropdown panel can float over it. */
   z-index: 10;
 }

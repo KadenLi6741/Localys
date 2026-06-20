@@ -39,12 +39,12 @@ export function LayoutShell({ children }: { children: React.ReactNode }) {
           navigation is the AppBottomNav). */}
       <AccountDrawer open={accountOpen} onOpenChange={setAccountOpen} />
 
-      {/* Full-width promo strip fixed directly under the header (above the
-          sidebar) — the first thing the user sees, spanning the whole width. */}
-      <div className="fixed inset-x-0 top-14 z-30">
+      {/* Rounded vibrant promo banner fixed directly under the header (above the
+          sidebar) — the first thing the user sees. px gives the pill side gaps. */}
+      <div className="fixed inset-x-0 top-[3.75rem] z-30 px-3">
         <AnnouncementBar />
       </div>
-      <div className="pt-[5.75rem]">
+      <div className="pt-[6.25rem]">
         <div className="lg:pl-[208px]">
           {children}
           <Footer />
