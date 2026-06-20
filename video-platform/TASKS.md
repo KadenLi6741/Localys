@@ -95,6 +95,12 @@ Decisions: vibrant CONTENT on white/neutral chrome · primary CTAs + active stat
 - [x] 8 Cleanup: consolidated duplicate FeaturedSection+StoreSection into one StoreCard/StoreRow; removed dead PNG/letter CategoryIcon logic, `file` field, Clock import. File: app/page.tsx
 - [x] Verify: tsc clean, changed files lint-clean, build green.
 - NOTE: deals carousel left as-is (already has motion); Phase 4 refines the carousel + per-card imagery.
-## Phase 4 — Deals carousel + motion (fix image mapping)
+## Phase 4 — Deals carousel + animations — DONE
+- [x] 1 Deal cards colourful (vibrant palette hue per card, theme-aware), rounded-24, bigger/taller (h-56/60), title + subline + white OVAL CTA (min-w-180). File: app/page.tsx
+- [x] 2 Fixed deal images: each deal uses its own image slot by index OR a thematic emoji fallback; clipped via overflow-hidden + object-cover — no bleeding/overflow, no duplicate-across-distinct-cards. File: app/page.tsx
+- [x] 3 Continuous right→left rAF marquee on a duplicated seamless track; pause on hover; white circular arrows nudge manually; hover lift on cards. File: app/page.tsx
+- [x] 4 Promo banner keeps slide-in message cycle + prefers-reduced-motion guard. File: app/globals.css
+- [x] 5 Cleanup: removed old stepped-interval carousel + hardcoded-hex DEALS. File: app/page.tsx
+- [x] Verify: tsc clean, lint clean, build green.
 ## Phase 5 — Business account + Localys Manager (separate /manager app) + backend
 ## Phase 6 — Communities / Profile / Order History / Coins-Rewards
