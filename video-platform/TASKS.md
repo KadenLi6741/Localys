@@ -107,5 +107,16 @@ Decisions: vibrant CONTENT on white/neutral chrome · primary CTAs + active stat
 - [x] Fix 1: deal cards cycle EXACTLY #06C167/#9F6402/#FFCF70/#FFF2D9 via `--deal-*` tokens (same in light+dark); white text on green/brown, dark text on amber/cream; white CTA has border+shadow to stay visible on cream. Files: globals.css, app/page.tsx
 - [x] Fix 2: CTA = true horizontal oval (h-11 rounded-full px-8 min-w-180). File: app/page.tsx
 - [x] Fix 3: sidebar section titles single-line (truncate/nowrap + shrink-0 chevron) so "Daily Challenges" aligns flush. File: components/SidebarContent.tsx
-## Phase 5 — Business account + Localys Manager (separate /manager app) + backend
+## Phase 5A — Business account FOUNDATION — DONE (user must run migration)
+Decisions (user): FULL reconcile now (Home reads businesses); demo seed via SQL with OWNER_USER_ID placeholder.
+⚠️ FOUND: migrations folder is inconsistent with the live DB (no businesses CREATE; profiles.type not in repo; TWO conflicting `reviews` tables 008 vs 035). So migration 042 is additive/idempotent/guarded.
+- [x] 1 Migration `042_business_accounts.sql`: profiles.account_type; ensure businesses table + onboarding columns; RLS (public read, owner-only write); backfill profile-storefronts→businesses + mark owners business; guarded demo seed (business + 2 menu items + 1 review) w/ OWNER_USER_ID placeholder. **USER MUST RUN IT** in Supabase SQL editor (set OWNER_USER_ID first).
+- [x] 2 `/business/new` onboarding (name, category, address, description, hours, contact, logo URL) → validates → inserts businesses row → sets account_type=business → redirects /manager. File: app/business/new/page.tsx
+- [x] 3 `/manager` distinct shell (app/manager/layout.tsx: own fixed top bar + left nav rail + mobile scroll nav, Localys tokens) + 9 stub pages (dashboard/analytics/feedback/content/menu/orders/marketing/payments/settings).
+- [x] 4 Switching: drawer (account_type) → customer '/business/new' / owner '/manager'; Manager top bar 'Switch to Customer view' → '/'; business-less user hitting /manager is redirected to onboarding.
+- [x] 5 Reconcile/cleanup: Home + drawer now use businesses + account_type (single source of truth); LayoutShell renders /manager bare (responsive-container wrapper moved into LayoutShell); AppBottomNav hidden on /manager. (Remaining profiles.type usages are the profile storefront view — Phase 5B/later.)
+- [x] Verify: clean build (all routes incl. /manager/* + /business/new), tsc clean, changed files lint-clean.
+- NOTE 5B: Manager data sections (dashboard metrics, reviews+replies, content, menu, orders, advertise) are stubs.
+
+## Phase 5 — (superseded by 5A/5B split above)
 ## Phase 6 — Communities / Profile / Order History / Coins-Rewards
