@@ -319,6 +319,25 @@ export async function updateOwnerVideoCaption(videoId: string, caption: string) 
   return supabase.from('videos').update({ caption }).eq('id', videoId);
 }
 
+export interface PromotableVideo {
+  id: string;
+  caption: string | null;
+  view_count: number;
+  boost_value: number | null;
+  coins_spent_on_promotion: number | null;
+}
+
+/** The owner's videos with their advertising/boost state (for Marketing). */
+export async function getOwnerPromotableVideos(userId: string): Promise<PromotableVideo[]> {
+  const { data, error } = await supabase
+    .from('videos')
+    .select('id, caption, view_count, boost_value, coins_spent_on_promotion')
+    .eq('user_id', userId)
+    .order('coins_spent_on_promotion', { ascending: false });
+  if (error || !data) return [];
+  return data as PromotableVideo[];
+}
+
 export async function getOwnerThreads(userId: string): Promise<OwnerThread[]> {
   const { data, error } = await supabase
     .from('shoutouts')
