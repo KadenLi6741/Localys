@@ -64,3 +64,21 @@ Decisions: category icons = PNG files in `/public/categories/` (emoji fallback);
 - [x] Extra: sidebar narrowed 250→208px; removed border between sidebar↔content; removed hr dividers between sections.
 - [x] Verify: tsc clean, build all routes, changed files lint-clean.
 - ⚠️ PENDING (flagged to user): app-wide orange sweep on deep pages (rewards/product/challenges/communities/chats/profile); full per-component grey→black text sweep.
+
+---
+
+# UBER-EATS-INSPIRED REDESIGN (PLAN.md approved) — direction reversed to VIBRANT
+Decisions: vibrant CONTENT on white/neutral chrome · primary CTAs + active states = orange (#f97316), utility buttons neutral · explicit profiles.account_type (customer|business, switchable) · account drawer COEXISTS with left rail · Advertise in Manager + customer upsell · Localys Manager = distinct pro-dashboard, same tokens.
+
+## Phase 1 — Foundation (vibrant tokens, spacing, rounding) — IN PROGRESS
+- [x] Vibrant content palette tokens (8 hues × light/dark) + radius scale tokens in globals.css. (chrome stays neutral)
+- [x] Primary CTA Button → ORANGE again (`default` variant `bg-primary`); secondary/outline/ghost stay neutral; link orange. File: components/ui/button.tsx
+- [ ] (Per-screen) active-state orange accents + inline CTA buttons → orange happen in their phases (header/sidebar = Phase 2, Home = Phase 3); utility buttons (header Search) stay neutral.
+- [x] Container/spacing conventions confirmed (max-w-1280, 4px grid, 48px section breaks already on Home); rounding scale documented as tokens.
+- [ ] Verify build + STOP for user review before Phase 2.
+
+## Phase 2 — Header + hamburger account drawer (NEXT, after approval)
+## Phase 3 — Home storefront (emoji categories, balance, circular logos)
+## Phase 4 — Deals carousel + motion (fix image mapping)
+## Phase 5 — Business account + Localys Manager (separate /manager app) + backend
+## Phase 6 — Communities / Profile / Order History / Coins-Rewards

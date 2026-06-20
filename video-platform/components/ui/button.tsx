@@ -3,18 +3,18 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
 
 /**
- * shadcn-style Button, aligned to the Localy token system:
+ * shadcn-style Button, aligned to the Localys token system:
  * squared 4px corners, flat, 700-weight label, hairline borders for
- * secondary/outline. Minimal black/white identity: the primary CTA is a solid
- * FOREGROUND fill (black in light mode, white in dark) — NOT orange. Orange is
- * reserved for tiny accents elsewhere.
+ * secondary/outline. The primary CTA is ORANGE (brand pop); utility/secondary/
+ * outline/ghost stay neutral black/white so orange reads as an accent, not a
+ * default. (Neutral utility buttons like header Search set their own classes.)
  */
 const buttonVariants = cva(
   'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-[4px] text-body-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-40 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
   {
     variants: {
       variant: {
-        default: 'bg-foreground text-background hover:bg-foreground/90',
+        default: 'bg-primary text-primary-foreground hover:bg-primary/90',
         secondary: 'border border-border bg-transparent text-foreground hover:bg-surface',
         outline: 'border border-border bg-transparent text-foreground hover:bg-surface',
         ghost: 'text-muted-foreground hover:bg-surface hover:text-foreground',
