@@ -7,21 +7,7 @@ import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase/client';
 import { cn } from '@/lib/utils';
-
-// Category options reuse the storefront set; `type` maps to businesses.business_type.
-const CATEGORY_OPTIONS: { id: string; label: string; type: string }[] = [
-  { id: 'grocery', label: 'Grocery', type: 'retail' },
-  { id: 'fast-food', label: 'Fast Food', type: 'food' },
-  { id: 'bakery', label: 'Bakery', type: 'food' },
-  { id: 'restaurants', label: 'Restaurants', type: 'food' },
-  { id: 'flowers', label: 'Flower Shops', type: 'retail' },
-  { id: 'services', label: 'Services', type: 'service' },
-  { id: 'cafes', label: 'Cafés', type: 'food' },
-  { id: 'clothing', label: 'Clothing', type: 'retail' },
-  { id: 'toys', label: 'Toy Stores', type: 'retail' },
-  { id: 'pet', label: 'Pet', type: 'retail' },
-  { id: 'health', label: 'Health', type: 'service' },
-];
+import { CATEGORY_OPTIONS } from '@/lib/businessCategories';
 
 export default function CreateBusinessPage() {
   return (
