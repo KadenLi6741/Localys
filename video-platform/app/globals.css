@@ -2309,6 +2309,42 @@ div#devtools-indicator.nextjs-toast {
 .range-orange:disabled::-webkit-slider-thumb { background: var(--muted-foreground); }
 .range-orange:disabled::-moz-range-thumb { background: var(--muted-foreground); }
 
+/* ==================================================================
+   PHASE 1 FOUNDATION — VIBRANT CONTENT PALETTE + RADIUS TOKENS
+   Direction: chrome (header/sidebar/page background) stays WHITE/neutral;
+   COLOUR lives on CONTENT only — category tiles, deal banners, store/badge
+   accents. Each hue exposes a soft tile background (-bg) + a readable on-tile
+   foreground (-fg). Light = soft pastel tints so emoji/logos pop; dark =
+   deeper muted versions that aren't glaring. Phase 3/4 consume these.
+   ================================================================== */
+:root {
+  --v-red-bg: #ffe3dd;     --v-red-fg: #b42318;
+  --v-orange-bg: #ffe8d2;  --v-orange-fg: #b54708;
+  --v-amber-bg: #fdeeba;   --v-amber-fg: #8a5a00;
+  --v-green-bg: #d8f5df;   --v-green-fg: #157347;
+  --v-teal-bg: #d0f0ec;    --v-teal-fg: #0f766e;
+  --v-blue-bg: #dde9ff;    --v-blue-fg: #1d4ed8;
+  --v-purple-bg: #e9e0ff;  --v-purple-fg: #6d28d9;
+  --v-pink-bg: #ffe1f0;    --v-pink-fg: #be185d;
+
+  /* Radius scale (reference 4/8/12 + larger cards + pill) */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-pill: 9999px;
+}
+.dark {
+  --v-red-bg: #4a201b;     --v-red-fg: #ffb4a8;
+  --v-orange-bg: #4a2f17;  --v-orange-fg: #ffc690;
+  --v-amber-bg: #423613;   --v-amber-fg: #f5d27a;
+  --v-green-bg: #16331f;   --v-green-fg: #86e6a6;
+  --v-teal-bg: #133331;    --v-teal-fg: #7fdcd2;
+  --v-blue-bg: #1a2747;    --v-blue-fg: #a9c4ff;
+  --v-purple-bg: #281a47;  --v-purple-fg: #c9b3ff;
+  --v-pink-bg: #401628;    --v-pink-fg: #ffa6cf;
+}
+
 /* ------------------------------------------------------------------ */
 /* Hover elevation — a small soft shadow on hover only (flat at rest).  */
 /* Applied to cards / hoverable tiles for subtle lift.                  */
