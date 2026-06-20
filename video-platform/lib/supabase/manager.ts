@@ -315,6 +315,10 @@ export async function deleteOwnerVideo(videoId: string) {
   return supabase.from('videos').delete().eq('id', videoId);
 }
 
+export async function updateOwnerVideoCaption(videoId: string, caption: string) {
+  return supabase.from('videos').update({ caption }).eq('id', videoId);
+}
+
 export async function getOwnerThreads(userId: string): Promise<OwnerThread[]> {
   const { data, error } = await supabase
     .from('shoutouts')
@@ -327,4 +331,8 @@ export async function getOwnerThreads(userId: string): Promise<OwnerThread[]> {
 
 export async function deleteOwnerThread(threadId: string) {
   return supabase.from('shoutouts').delete().eq('id', threadId);
+}
+
+export async function updateOwnerThreadText(threadId: string, text: string) {
+  return supabase.from('shoutouts').update({ text }).eq('id', threadId);
 }
