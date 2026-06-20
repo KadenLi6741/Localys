@@ -4,33 +4,31 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ChevronRight, ChevronDown, ChevronLeft, Star, MapPin, Store as StoreIcon, Heart, Clock, X } from 'lucide-react';
+import { ChevronRight, ChevronDown, ChevronLeft, Star, MapPin, Store as StoreIcon, Heart, X } from 'lucide-react';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { supabase } from '@/lib/supabase/client';
 import { cn } from '@/lib/utils';
 
 /* ============================ Categories ============================ */
-// Icons are PNGs in /public/categories/ (case-sensitive filenames). No emoji —
-// if a file is missing the icon falls back to a neutral letter tile (never an
-// emoji), so the row stays on-brand. NOTE: as of this branch the PNGs are not
-// committed (only README.txt), so the letter fallback shows until they're added.
-const CATEGORIES: { id: string; label: string; file: string; type?: string }[] = [
-  { id: 'grocery', label: 'Grocery', file: 'grocery.png', type: 'retail' },
-  { id: 'fast-food', label: 'Fast Food', file: 'Fast-food.png', type: 'food' },
-  { id: 'bakery', label: 'Bakery', file: 'bakery.png', type: 'food' },
-  { id: 'restaurants', label: 'Restaurants', file: 'restaurants.png', type: 'food' },
-  { id: 'flowers', label: 'Flower Shops', file: 'flower.png', type: 'retail' },
-  { id: 'services', label: 'Services', file: 'service.png', type: 'service' },
-  { id: 'cafes', label: 'Cafés', file: 'cafe.png', type: 'food' },
-  { id: 'clothing', label: 'Clothing', file: 'clothing.png', type: 'retail' },
-  { id: 'toys', label: 'Toy Stores', file: 'toys.png', type: 'retail' },
-  { id: 'pet', label: 'Pet', file: 'pet.png', type: 'retail' },
-  { id: 'health', label: 'Health', file: 'health.png', type: 'service' },
+// Colourful EMOJI on soft vibrant-colour tiles (Phase 3). The `icon` field holds
+// the emoji for now; swapping to a PNG later is a one-line change per category
+// (add `iconSrc` and render an <Image> in CategoryIcon). `color` keys the vibrant
+// palette tokens in globals.css (--v-<color>-bg).
+const CATEGORIES: { id: string; label: string; icon: string; color: string; type?: string }[] = [
+  { id: 'grocery', label: 'Grocery', icon: '🛒', color: 'green', type: 'retail' },
+  { id: 'fast-food', label: 'Fast Food', icon: '🍔', color: 'red', type: 'food' },
+  { id: 'bakery', label: 'Bakery', icon: '🥐', color: 'amber', type: 'food' },
+  { id: 'restaurants', label: 'Restaurants', icon: '🍽️', color: 'orange', type: 'food' },
+  { id: 'flowers', label: 'Flower Shops', icon: '💐', color: 'pink', type: 'retail' },
+  { id: 'services', label: 'Services', icon: '🛠️', color: 'blue', type: 'service' },
+  { id: 'cafes', label: 'Cafés', icon: '☕', color: 'amber', type: 'food' },
+  { id: 'clothing', label: 'Clothing', icon: '👕', color: 'purple', type: 'retail' },
+  { id: 'toys', label: 'Toy Stores', icon: '🧸', color: 'pink', type: 'retail' },
+  { id: 'pet', label: 'Pet', icon: '🐾', color: 'teal', type: 'retail' },
+  { id: 'health', label: 'Health', icon: '❤️', color: 'red', type: 'service' },
 ];
 
-// Promo deals — the ONE place colour is allowed (intentional exception to the
-// otherwise black/white minimal UI). Per-card colours are hardcoded on purpose;
-// each has a label, a deadline subline, a CTA label, and bg/fg colours.
+// Promo deals — colourful cards (Phase 4 adds the auto-slide/motion polish).
 const DEALS = [
   { id: 'd1', title: 'BOGO at The Carbon Bar BBQ', sub: 'Ends 07/19 · Terms apply', cta: 'Score the Deal', bg: '#1f8f4e', fg: '#ffffff' },
   { id: 'd2', title: '40% off at Nomè Izakaya', sub: 'Ends 07/19 · Terms apply', cta: 'Order Now', bg: '#efe1c2', fg: '#1a1a1a' },
@@ -61,33 +59,21 @@ function storeMeta(id: string) {
   };
 }
 
-/* ============================ Category icon (PNG → neutral letter fallback) ============================ */
-function CategoryIcon({ file, label }: { file: string; label: string }) {
-  const [failed, setFailed] = useState(false);
+/* ============================ Category icon (emoji on vibrant tile) ============================ */
+function CategoryIcon({ icon, color, label }: { icon: string; color: string; label: string }) {
   return (
-    <span className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-full bg-surface">
-      {failed ? (
-        // Neutral fallback (no emoji) — shows the category initial if the PNG 404s.
-        <span className="text-body font-bold text-muted-foreground" aria-hidden="true">{label.charAt(0)}</span>
-      ) : (
-        <Image
-          src={`/categories/${file}`}
-          alt=""
-          width={44}
-          height={44}
-          className="h-11 w-11 object-contain"
-          onError={() => setFailed(true)}
-          unoptimized
-        />
-      )}
+    <span
+      className="flex h-14 w-14 items-center justify-center rounded-full text-2xl"
+      style={{ backgroundColor: `var(--v-${color}-bg)` }}
+    >
+      <span aria-hidden="true">{icon}</span>
       <span className="sr-only">{label}</span>
     </span>
   );
 }
 
 /* ============================ Scroll reveal ============================ */
-// Reference motion (ANIMATIONS.md): each block fades + rises into view once.
-// Toggles a CSS class via IntersectionObserver (no React state) — cheap + lint-clean.
+// Each block fades + rises into view once (IntersectionObserver, no React state).
 function Reveal({ children, className }: { children: React.ReactNode; className?: string }) {
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -115,8 +101,7 @@ function Reveal({ children, className }: { children: React.ReactNode; className?
 }
 
 /* ============================ Filter popover ============================ */
-// Shared dropdown shell for the Distance / Rating / Sort filters: white rounded
-// card, bold title + X close, content, and a Reset / black Apply footer.
+// Shared dropdown shell for the Distance / Rating / Sort filters.
 function FilterPopover({
   title,
   onClose,
@@ -141,7 +126,7 @@ function FilterPopover({
         <button type="button" onClick={onReset} className="text-body-sm font-semibold text-foreground hover:underline">
           Reset
         </button>
-        <button type="button" onClick={onClose} className="rounded-full bg-foreground px-5 py-2 text-body-sm font-bold text-background transition-colors hover:bg-foreground/90">
+        <button type="button" onClick={onClose} className="rounded-full bg-primary px-5 py-2 text-body-sm font-bold text-primary-foreground transition-colors hover:bg-primary/90">
           Apply
         </button>
       </div>
@@ -150,20 +135,15 @@ function FilterPopover({
 }
 
 /* ============================ Deals carousel ============================ */
-// Colourful deal cards (image on the right), a white pill CTA, auto-advancing
-// right→left on a gentle loop, pausing on hover, with manual white circular
-// arrows. The only place colour is used heavily.
+// Colourful deal cards with a white pill CTA + auto-advance. (Phase 4 refines the
+// motion + per-card imagery; the structure lives here.)
 function DealsCarousel({ images }: { images: string[] }) {
   const rowRef = useRef<HTMLDivElement>(null);
   const [paused, setPaused] = useState(false);
 
-  const CARD_STEP = 480; // px advanced per tick / arrow click
+  const CARD_STEP = 480;
+  const scrollByCard = (dir: 1 | -1) => rowRef.current?.scrollBy({ left: dir * CARD_STEP, behavior: 'smooth' });
 
-  const scrollByCard = (dir: 1 | -1) => {
-    rowRef.current?.scrollBy({ left: dir * CARD_STEP, behavior: 'smooth' });
-  };
-
-  // Gentle auto-advance; loops back to the start at the end. Paused on hover.
   useEffect(() => {
     if (paused) return;
     const el = rowRef.current;
@@ -179,7 +159,7 @@ function DealsCarousel({ images }: { images: string[] }) {
   }, [paused]);
 
   return (
-    <div className="relative mb-8">
+    <div className="relative">
       <div
         ref={rowRef}
         onMouseEnter={() => setPaused(true)}
@@ -192,7 +172,6 @@ function DealsCarousel({ images }: { images: string[] }) {
             style={{ backgroundColor: d.bg, color: d.fg }}
             className="shadow-soft relative flex h-52 w-[360px] shrink-0 overflow-hidden rounded-[20px] sm:h-56 sm:w-[460px]"
           >
-            {/* Left: title + subline + white pill CTA */}
             <div className="flex w-3/5 flex-col justify-between p-5">
               <div>
                 <p className="text-subheading font-bold leading-tight">{d.title}</p>
@@ -205,7 +184,6 @@ function DealsCarousel({ images }: { images: string[] }) {
                 {d.cta}
               </button>
             </div>
-            {/* Right: food / business image filling the panel */}
             <div className="relative w-2/5">
               {images[i % Math.max(images.length, 1)] ? (
                 <Image src={images[i % images.length]} alt="" fill className="object-cover" unoptimized />
@@ -217,7 +195,6 @@ function DealsCarousel({ images }: { images: string[] }) {
         ))}
       </div>
 
-      {/* Manual white circular arrows */}
       <button
         type="button"
         onClick={() => scrollByCard(-1)}
@@ -235,6 +212,121 @@ function DealsCarousel({ images }: { images: string[] }) {
         <ChevronRight className="h-5 w-5" aria-hidden="true" />
       </button>
     </div>
+  );
+}
+
+/* ============================ Store card + row ============================ */
+// One reusable store card: circular logo, name + heart, ★rating · (reviews) ·
+// distance · time. Used by both "Featured on Localys" and "Today's offers".
+function StoreCard({
+  b,
+  offer,
+  fav,
+  onToggleFav,
+  onOpen,
+}: {
+  b: Biz;
+  offer?: boolean;
+  fav?: boolean;
+  onToggleFav?: (id: string) => void;
+  onOpen: (b: Biz) => void;
+}) {
+  const meta = storeMeta(b.id);
+  const name = b.full_name || b.username || 'Store';
+  return (
+    <div className="shadow-soft w-56 shrink-0 rounded-[20px] border border-border bg-card p-4 text-center">
+      <div className="relative mx-auto w-fit">
+        {offer && (
+          <span className="absolute -left-1 -top-1 z-10 rounded-full bg-primary px-2 py-0.5 text-[10px] font-bold text-primary-foreground">
+            Offer
+          </span>
+        )}
+        <button
+          type="button"
+          onClick={() => onOpen(b)}
+          aria-label={`Open ${name}`}
+          className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-full border border-border bg-surface"
+        >
+          {b.profile_picture_url ? (
+            <Image src={b.profile_picture_url} alt="" width={96} height={96} className="h-full w-full object-cover" unoptimized />
+          ) : (
+            <StoreIcon className="h-8 w-8 text-muted-foreground" aria-hidden="true" />
+          )}
+        </button>
+      </div>
+
+      <div className="mt-3 flex items-center justify-center gap-1.5">
+        <button type="button" onClick={() => onOpen(b)} className="truncate text-body-sm font-bold text-foreground hover:underline">
+          {name}
+        </button>
+        {onToggleFav && (
+          <button
+            type="button"
+            onClick={() => onToggleFav(b.id)}
+            aria-pressed={fav}
+            aria-label={fav ? `Remove ${name} from favourites` : `Add ${name} to favourites`}
+            className="shrink-0 rounded-full p-1 text-muted-foreground transition-colors hover:text-primary"
+          >
+            <Heart className={cn('h-4 w-4', fav && 'fill-primary text-primary')} aria-hidden="true" />
+          </button>
+        )}
+      </div>
+
+      <p className="mt-1 flex flex-wrap items-center justify-center gap-x-1.5 text-caption text-foreground">
+        <span className="inline-flex items-center gap-0.5">
+          <Star className="h-3.5 w-3.5 fill-primary text-primary" aria-hidden="true" />
+          {meta.rating}
+        </span>
+        <span className="text-muted-foreground">({meta.reviews})</span>
+        <span aria-hidden="true">·</span>
+        {meta.distanceKm} km
+        <span aria-hidden="true">·</span>
+        {meta.pickupMin} min
+      </p>
+    </div>
+  );
+}
+
+function StoreRow({
+  title,
+  items,
+  favorites,
+  onToggleFav,
+  onOpen,
+  offer,
+}: {
+  title: string;
+  items: Biz[];
+  favorites?: Set<string>;
+  onToggleFav?: (id: string) => void;
+  onOpen: (b: Biz) => void;
+  offer?: boolean;
+}) {
+  const rowRef = useRef<HTMLDivElement>(null);
+  const scroll = (dir: 1 | -1) => rowRef.current?.scrollBy({ left: dir * 320, behavior: 'smooth' });
+
+  if (items.length === 0) return null;
+
+  return (
+    <section className="mt-12">
+      <div className="mb-4 flex items-center justify-between">
+        <h2 className="text-heading-sm font-bold text-foreground">{title}</h2>
+        <div className="flex items-center gap-2">
+          <button type="button" className="text-body-sm font-semibold text-foreground hover:underline">See all</button>
+          <button type="button" onClick={() => scroll(-1)} aria-label="Scroll left" className="hidden h-8 w-8 items-center justify-center rounded-full border border-border bg-card text-foreground transition-colors hover:bg-surface/60 lg:flex">
+            <ChevronLeft className="h-4 w-4" aria-hidden="true" />
+          </button>
+          <button type="button" onClick={() => scroll(1)} aria-label="Scroll right" className="hidden h-8 w-8 items-center justify-center rounded-full border border-border bg-card text-foreground transition-colors hover:bg-surface/60 lg:flex">
+            <ChevronRight className="h-4 w-4" aria-hidden="true" />
+          </button>
+        </div>
+      </div>
+      <div ref={rowRef} className="flex gap-4 overflow-x-auto px-0.5 py-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        {items.map((b) => (
+          <StoreCard key={b.id} b={b} offer={offer} fav={favorites?.has(b.id)} onToggleFav={onToggleFav} onOpen={onOpen} />
+        ))}
+      </div>
+    </section>
   );
 }
 
@@ -258,11 +350,11 @@ function HomeStorefront() {
   // Filter-chip state. Distance/offers are presentational; Rating + Sort genuinely
   // filter/sort the lists (using the deterministic demo meta).
   const [openFilter, setOpenFilter] = useState<'distance' | 'rating' | 'sort' | ''>('');
-  const [distance, setDistance] = useState(5); // km, shown in the Distance slider
+  const [distance, setDistance] = useState(5);
   const [offersOnly, setOffersOnly] = useState(false);
-  const [minRating, setMinRating] = useState(0); // 0 = Any; otherwise e.g. 4.5
+  const [minRating, setMinRating] = useState(0);
   const [sortBy, setSortBy] = useState<'recommended' | 'rating' | 'arrival'>('recommended');
-  const [nearCount, setNearCount] = useState(10); // "Show more" reveals additional stores
+  const [nearCount, setNearCount] = useState(10);
 
   // Session favourites (heart). Frontend-only; toggling never touches the backend.
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
@@ -292,7 +384,7 @@ function HomeStorefront() {
     };
   }, []);
 
-  // Filter by category type + Pickup/Service mode + the Rating filter, then sort.
+  // Category type + Pickup/Service mode + the Rating filter, then sort.
   const filtered = useMemo(() => {
     let list = businesses;
     if (mode === 'service') list = list.filter((b) => b.type === 'service');
@@ -313,17 +405,15 @@ function HomeStorefront() {
   const near = filtered.slice(0, nearCount);
   const hasMoreNear = filtered.length > nearCount;
 
-  const scrollCats = (dir: 1 | -1) => {
-    catRowRef.current?.scrollBy({ left: dir * 280, behavior: 'smooth' });
-  };
+  const open = (b: Biz) => router.push(`/profile/${b.username || b.id}`);
+  const scrollCats = (dir: 1 | -1) => catRowRef.current?.scrollBy({ left: dir * 280, behavior: 'smooth' });
 
   return (
     <div className="min-h-screen bg-background pb-24 lg:pb-12">
-      <div className="mx-auto max-w-[1200px] px-4 pt-5 lg:px-8">
-        {/* ===== Top row: Pickup|Service toggle + location ===== */}
-        <div className="mb-4 flex flex-wrap items-center gap-3">
-          {/* Rounded pill toggle — neutral active fill (soft card pill on a grey
-              track), never orange. Styled like the rounded search bar. */}
+      <div className="mx-auto max-w-[1280px] px-4 pt-6 lg:px-8">
+        {/* ===== Pickup|Service toggle + location ===== */}
+        <div className="mb-5 flex flex-wrap items-center gap-3">
+          {/* Rounded pill toggle — neutral active fill (never orange). */}
           <div className="inline-flex items-center rounded-full border border-border bg-surface p-1">
             {(['pickup', 'service'] as const).map((m) => (
               <button
@@ -352,8 +442,8 @@ function HomeStorefront() {
           </button>
         </div>
 
-        {/* ===== Category row (emoji/PNG) ===== */}
-        <div className="relative mb-4">
+        {/* ===== Category row (emoji tiles) ===== */}
+        <div className="relative mb-6">
           <div ref={catRowRef} className="flex gap-5 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {CATEGORIES.map((c) => (
               <button
@@ -362,10 +452,10 @@ function HomeStorefront() {
                 onClick={() => setActiveCategory(activeCategory === c.id ? '' : c.id)}
                 className="flex shrink-0 flex-col items-center gap-1.5"
               >
-                <span className={cn('rounded-full', activeCategory === c.id && 'ring-2 ring-foreground')}>
-                  <CategoryIcon file={c.file} label={c.label} />
+                <span className={cn('rounded-full', activeCategory === c.id && 'ring-2 ring-primary ring-offset-2 ring-offset-background')}>
+                  <CategoryIcon icon={c.icon} color={c.color} label={c.label} />
                 </span>
-                <span className={cn('text-caption', activeCategory === c.id ? 'font-bold text-foreground' : 'font-semibold text-foreground')}>
+                <span className={cn('text-caption font-semibold', activeCategory === c.id ? 'text-primary' : 'text-foreground')}>
                   {c.label}
                 </span>
               </button>
@@ -389,10 +479,9 @@ function HomeStorefront() {
           </button>
         </div>
 
-        {/* ===== Chip filters (oval, elevated, airy, horizontal scroll) ===== */}
-        <div className="relative mb-6">
+        {/* ===== Filter pills ===== */}
+        <div className="relative mb-8">
           <div className="flex gap-3 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            {/* Offers — toggle */}
             <button
               type="button"
               onClick={() => setOffersOnly((v) => !v)}
@@ -405,7 +494,6 @@ function HomeStorefront() {
               Offers
             </button>
 
-            {/* Distance — slider dropdown */}
             <button
               type="button"
               onClick={() => setOpenFilter(openFilter === 'distance' ? '' : 'distance')}
@@ -419,7 +507,6 @@ function HomeStorefront() {
               <ChevronDown className="h-4 w-4" aria-hidden="true" />
             </button>
 
-            {/* Rating — working dropdown that filters */}
             <button
               type="button"
               onClick={() => setOpenFilter(openFilter === 'rating' ? '' : 'rating')}
@@ -434,7 +521,6 @@ function HomeStorefront() {
               <ChevronDown className="h-4 w-4" aria-hidden="true" />
             </button>
 
-            {/* Sort — working dropdown */}
             <button
               type="button"
               onClick={() => setOpenFilter(openFilter === 'sort' ? '' : 'sort')}
@@ -449,7 +535,6 @@ function HomeStorefront() {
             </button>
           </div>
 
-          {/* Click-away backdrop for any open filter */}
           {openFilter && <div className="fixed inset-0 z-30" onClick={() => setOpenFilter('')} aria-hidden="true" />}
 
           {openFilter === 'distance' && (
@@ -473,8 +558,8 @@ function HomeStorefront() {
               <div className="flex flex-col">
                 {([['recommended', 'Recommended'], ['rating', 'Rating'], ['arrival', 'Earliest arrival']] as const).map(([val, label]) => (
                   <button key={val} type="button" onClick={() => setSortBy(val)} className="flex items-center gap-3 py-2.5 text-left">
-                    <span className={cn('flex h-5 w-5 items-center justify-center rounded-full border-2', sortBy === val ? 'border-foreground' : 'border-border')}>
-                      {sortBy === val && <span className="h-2.5 w-2.5 rounded-full bg-foreground" aria-hidden="true" />}
+                    <span className={cn('flex h-5 w-5 items-center justify-center rounded-full border-2', sortBy === val ? 'border-primary' : 'border-border')}>
+                      {sortBy === val && <span className="h-2.5 w-2.5 rounded-full bg-primary" aria-hidden="true" />}
                     </span>
                     <span className="text-body-sm font-semibold text-foreground">{label}</span>
                   </button>
@@ -484,251 +569,71 @@ function HomeStorefront() {
           )}
         </div>
 
-        {/* ===== Deals carousel (the one colourful area) ===== */}
+        {/* ===== Deals carousel ===== */}
         <Reveal>
           <DealsCarousel images={businesses.map((b) => b.profile_picture_url ?? '').filter(Boolean)} />
         </Reveal>
 
         {loading ? (
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="animate-pulse rounded-[16px] border border-border bg-card">
-                <div className="aspect-[4/3] rounded-t-[16px] bg-surface" />
-                <div className="space-y-2 p-3">
-                  <div className="h-4 w-3/4 rounded bg-surface" />
-                  <div className="h-3 w-1/2 rounded bg-surface" />
-                </div>
+          <div className="mt-12 flex gap-4 overflow-hidden">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="w-56 shrink-0 animate-pulse rounded-[20px] border border-border bg-card p-4">
+                <div className="mx-auto h-24 w-24 rounded-full bg-surface" />
+                <div className="mx-auto mt-3 h-4 w-2/3 rounded bg-surface" />
+                <div className="mx-auto mt-2 h-3 w-1/2 rounded bg-surface" />
               </div>
             ))}
           </div>
         ) : (
           <>
             <Reveal>
-              <FeaturedSection
-                items={featured}
-                favorites={favorites}
-                onToggleFav={toggleFav}
-                onOpen={(b) => router.push(`/profile/${b.username || b.id}`)}
-              />
+              <StoreRow title="Featured on Localys" items={featured} favorites={favorites} onToggleFav={toggleFav} onOpen={open} />
             </Reveal>
             <Reveal>
-              <StoreSection title="Today's offers" items={offers} offer onOpen={(b) => router.push(`/profile/${b.username || b.id}`)} />
+              <StoreRow title="Today's offers" items={offers} favorites={favorites} onToggleFav={toggleFav} offer onOpen={open} />
             </Reveal>
 
-            {/* Stores near you — circular logos */}
+            {/* Stores near you — compact circular logos + Show more */}
             <Reveal>
-            <section className="mt-12">
-              <div className="mb-4 flex items-center justify-between">
-                <h2 className="text-heading-sm font-bold text-foreground">Stores near you</h2>
-              </div>
-              <div className="flex gap-5 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                {near.map((b) => {
-                  const m = storeMeta(b.id);
-                  return (
-                    <Link key={b.id} href={`/profile/${b.username || b.id}`} className="flex w-24 shrink-0 flex-col items-center gap-1.5 text-center">
-                      <span className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full border border-border bg-surface">
-                        {b.profile_picture_url ? (
-                          <Image src={b.profile_picture_url} alt="" width={64} height={64} className="h-full w-full object-cover" unoptimized />
-                        ) : (
-                          <StoreIcon className="h-6 w-6 text-muted-foreground" aria-hidden="true" />
-                        )}
-                      </span>
-                      <span className="line-clamp-2 text-caption font-semibold text-foreground">{b.full_name || b.username}</span>
-                      <span className="text-caption text-foreground">{m.distanceKm} km · {m.pickupMin} min</span>
-                    </Link>
-                  );
-                })}
-                {near.length === 0 && <p className="py-6 text-body-sm text-muted-foreground">No businesses yet.</p>}
-              </div>
-              {hasMoreNear && (
-                <div className="mt-4 flex justify-center">
-                  <button
-                    type="button"
-                    onClick={() => setNearCount((n) => n + 10)}
-                    className="rounded-full border border-border bg-card px-6 py-2.5 text-body-sm font-bold text-foreground transition-colors hover:bg-surface"
-                  >
-                    Show more
-                  </button>
+              <section className="mt-12">
+                <div className="mb-4 flex items-center justify-between">
+                  <h2 className="text-heading-sm font-bold text-foreground">Stores near you</h2>
                 </div>
-              )}
-            </section>
+                <div className="flex gap-5 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                  {near.map((b) => {
+                    const m = storeMeta(b.id);
+                    return (
+                      <Link key={b.id} href={`/profile/${b.username || b.id}`} className="flex w-24 shrink-0 flex-col items-center gap-1.5 text-center">
+                        <span className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full border border-border bg-surface">
+                          {b.profile_picture_url ? (
+                            <Image src={b.profile_picture_url} alt="" width={64} height={64} className="h-full w-full object-cover" unoptimized />
+                          ) : (
+                            <StoreIcon className="h-6 w-6 text-muted-foreground" aria-hidden="true" />
+                          )}
+                        </span>
+                        <span className="line-clamp-2 text-caption font-semibold text-foreground">{b.full_name || b.username}</span>
+                        <span className="text-caption text-foreground">{m.distanceKm} km · {m.pickupMin} min</span>
+                      </Link>
+                    );
+                  })}
+                  {near.length === 0 && <p className="py-6 text-body-sm text-muted-foreground">No businesses yet.</p>}
+                </div>
+                {hasMoreNear && (
+                  <div className="mt-6 flex justify-center">
+                    <button
+                      type="button"
+                      onClick={() => setNearCount((n) => n + 10)}
+                      className="rounded-full border border-border bg-card px-6 py-2.5 text-body-sm font-bold text-foreground transition-colors hover:bg-surface"
+                    >
+                      Show more
+                    </button>
+                  </div>
+                )}
+              </section>
             </Reveal>
           </>
         )}
       </div>
     </div>
-  );
-}
-
-/* ============================ Store section (horizontal cards) ============================ */
-function StoreSection({
-  title,
-  items,
-  offer,
-  onOpen,
-}: {
-  title: string;
-  items: Biz[];
-  offer?: boolean;
-  onOpen: (b: Biz) => void;
-}) {
-  const rowRef = useRef<HTMLDivElement>(null);
-  const scroll = (dir: 1 | -1) => rowRef.current?.scrollBy({ left: dir * 320, behavior: 'smooth' });
-
-  if (items.length === 0) return null;
-
-  return (
-    <section className="mt-12">
-      <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-heading-sm font-bold text-foreground">{title}</h2>
-        <div className="flex items-center gap-2">
-          <button type="button" className="text-body-sm font-semibold text-foreground hover:underline">See all</button>
-          <button type="button" onClick={() => scroll(-1)} aria-label="Scroll left" className="hidden h-8 w-8 items-center justify-center rounded-full border border-border bg-card text-foreground transition-colors hover:bg-surface/60 lg:flex">
-            <ChevronLeft className="h-4 w-4" aria-hidden="true" />
-          </button>
-          <button type="button" onClick={() => scroll(1)} aria-label="Scroll right" className="hidden h-8 w-8 items-center justify-center rounded-full border border-border bg-card text-foreground transition-colors hover:bg-surface/60 lg:flex">
-            <ChevronRight className="h-4 w-4" aria-hidden="true" />
-          </button>
-        </div>
-      </div>
-      <div ref={rowRef} className="flex gap-4 overflow-x-auto px-0.5 py-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        {items.map((b) => {
-          const meta = storeMeta(b.id);
-          return (
-          <button
-            key={b.id}
-            type="button"
-            onClick={() => onOpen(b)}
-            className="shadow-soft w-64 shrink-0 overflow-hidden rounded-[24px] border border-border bg-card text-left transition-colors hover:border-foreground/30"
-          >
-            <div className="relative aspect-[4/3] bg-surface">
-              {b.profile_picture_url ? (
-                <Image src={b.profile_picture_url} alt="" fill className="object-cover" unoptimized />
-              ) : (
-                <div className="flex h-full w-full items-center justify-center">
-                  <StoreIcon className="h-10 w-10 text-muted-foreground" aria-hidden="true" />
-                </div>
-              )}
-              {offer && (
-                <span className="absolute left-2 top-2 rounded-full bg-foreground px-2 py-0.5 text-[10px] font-bold text-background">
-                  Offer
-                </span>
-              )}
-            </div>
-            <div className="p-3">
-              <p className="truncate text-body-sm font-bold text-foreground">{b.full_name || b.username}</p>
-              <div className="mt-1 flex items-center gap-1.5 text-caption text-foreground">
-                <span className="inline-flex items-center gap-0.5">
-                  <Star className="h-3.5 w-3.5 fill-primary text-primary" aria-hidden="true" />
-                  {meta.rating}
-                </span>
-                <span className="text-muted-foreground">({meta.reviews})</span>
-                <span aria-hidden="true">·</span>
-                <span>{meta.distanceKm} km</span>
-                <span aria-hidden="true">·</span>
-                <span className="inline-flex items-center gap-0.5">
-                  <Clock className="h-3 w-3" aria-hidden="true" />
-                  {meta.pickupMin} min
-                </span>
-              </div>
-            </div>
-          </button>
-          );
-        })}
-      </div>
-    </section>
-  );
-}
-
-/* ============================ Featured section (oval logo + heart + rating) ============================ */
-function FeaturedSection({
-  items,
-  favorites,
-  onToggleFav,
-  onOpen,
-}: {
-  items: Biz[];
-  favorites: Set<string>;
-  onToggleFav: (id: string) => void;
-  onOpen: (b: Biz) => void;
-}) {
-  const rowRef = useRef<HTMLDivElement>(null);
-  const scroll = (dir: 1 | -1) => rowRef.current?.scrollBy({ left: dir * 320, behavior: 'smooth' });
-
-  if (items.length === 0) return null;
-
-  return (
-    <section className="mt-12">
-      <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-heading-sm font-bold text-foreground">Featured on Localys</h2>
-        <div className="flex items-center gap-2">
-          <button type="button" className="text-body-sm font-semibold text-foreground hover:underline">See all</button>
-          <button type="button" onClick={() => scroll(-1)} aria-label="Scroll left" className="hidden h-8 w-8 items-center justify-center rounded-full border border-border bg-card text-foreground transition-colors hover:bg-surface/60 lg:flex">
-            <ChevronLeft className="h-4 w-4" aria-hidden="true" />
-          </button>
-          <button type="button" onClick={() => scroll(1)} aria-label="Scroll right" className="hidden h-8 w-8 items-center justify-center rounded-full border border-border bg-card text-foreground transition-colors hover:bg-surface/60 lg:flex">
-            <ChevronRight className="h-4 w-4" aria-hidden="true" />
-          </button>
-        </div>
-      </div>
-      <div ref={rowRef} className="flex gap-4 overflow-x-auto px-0.5 py-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        {items.map((b) => {
-          const meta = storeMeta(b.id);
-          const name = b.full_name || b.username || 'Store';
-          const fav = favorites.has(b.id);
-          // Soft, heavily-rounded card — image + text live inside one rounded box
-          return (
-            <div key={b.id} className="shadow-soft w-64 shrink-0 overflow-hidden rounded-[24px] border border-border bg-card">
-              {/* Store image (tap → store) */}
-              <button
-                type="button"
-                onClick={() => onOpen(b)}
-                aria-label={`Open ${name}`}
-                className="block w-full"
-              >
-                <div className="relative aspect-[4/3] bg-surface">
-                  {b.profile_picture_url ? (
-                    <Image src={b.profile_picture_url} alt="" fill className="object-cover" unoptimized />
-                  ) : (
-                    <div className="flex h-full w-full items-center justify-center">
-                      <StoreIcon className="h-10 w-10 text-muted-foreground" aria-hidden="true" />
-                    </div>
-                  )}
-                </div>
-              </button>
-              <div className="p-3">
-                {/* Name + heart */}
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => onOpen(b)}
-                    className="truncate text-body-sm font-bold text-foreground hover:underline"
-                  >
-                    {name}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => onToggleFav(b.id)}
-                    aria-label={fav ? `Remove ${name} from favourites` : `Add ${name} to favourites`}
-                    aria-pressed={fav}
-                    className="ml-auto shrink-0 rounded-full p-1 text-muted-foreground transition-colors hover:text-primary"
-                  >
-                    <Heart className={cn('h-4 w-4', fav && 'fill-primary text-primary')} aria-hidden="true" />
-                  </button>
-                </div>
-                {/* Rating · reviews · distance */}
-                <p className="mt-0.5 flex items-center gap-1 text-caption text-foreground">
-                  <Star className="h-3.5 w-3.5 fill-primary text-primary" aria-hidden="true" />
-                  {meta.rating}
-                  <span className="text-muted-foreground">({meta.reviews})</span>
-                  <span aria-hidden="true">·</span>
-                  {meta.distanceKm} km
-                </p>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </section>
   );
 }
