@@ -30,6 +30,12 @@ export function LayoutShell({ children }: { children: React.ReactNode }) {
     return <>{children}</>;
   }
 
+  // Localys Manager is a separate app with its own shell (app/manager/layout.tsx)
+  // — render it bare, without the customer chrome or content container.
+  if (pathname?.startsWith('/manager')) {
+    return <>{children}</>;
+  }
+
   return (
     <>
       <AppHeader onAccountOpen={() => setAccountOpen(true)} />
@@ -46,7 +52,9 @@ export function LayoutShell({ children }: { children: React.ReactNode }) {
       </div>
       <div className="pt-[6.25rem]">
         <div className="lg:pl-[208px]">
-          {children}
+          <main id="main-content" className="responsive-container">
+            {children}
+          </main>
           <Footer />
         </div>
       </div>

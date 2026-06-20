@@ -21,6 +21,8 @@ export function AppBottomNav() {
   const cartCount = getCartCount();
 
   if (pathname === '/login' || pathname === '/signup' || pathname === '/reset-password') return null;
+  // Localys Manager has its own navigation.
+  if (pathname?.startsWith('/manager')) return null;
 
   const isActive = (href: string) => (href === '/' ? pathname === '/' : pathname?.startsWith(href));
 

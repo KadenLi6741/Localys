@@ -25,17 +25,15 @@ interface DrawerProfile {
   username: string | null;
   full_name: string | null;
   profile_picture_url: string | null;
-  type: string | null;
+  account_type: string | null;
 }
 
 /**
  * Slide-out LEFT account drawer (opened by the header hamburger). COEXISTS with
  * the persistent nav rail — the rail is for navigation, this drawer is the
  * account menu (Uber-Eats-style). Backdrop + Esc + close button come from the
- * Sheet primitive; account-type row adapts to customer vs. business.
- *
- * NOTE: the account-type destinations point at the existing `/dashboard` for now;
- * Phase 5 reroutes them to the dedicated `/manager` onboarding + Localys Manager.
+ * Sheet primitive; account-type row adapts to customer vs. business
+ * (account_type): customers go to /business/new, owners switch to /manager.
  */
 export function AccountDrawer({ open, onOpenChange }: { open: boolean; onOpenChange: (v: boolean) => void }) {
   const router = useRouter();
@@ -49,7 +47,7 @@ export function AccountDrawer({ open, onOpenChange }: { open: boolean; onOpenCha
     let cancelled = false;
     supabase
       .from('profiles')
-      .select('username, full_name, profile_picture_url, type')
+      .select('username, full_name, profile_picture_url, account_type')
       .eq('id', user.id)
       .single()
       .then(({ data }) => {
@@ -63,7 +61,7 @@ export function AccountDrawer({ open, onOpenChange }: { open: boolean; onOpenCha
     };
   }, [open, user]);
 
-  const isBusiness = profile?.type != null;
+  const isBusiness = profile?.account_type === 'business';
   const name = profile?.full_name || profile?.username || user?.email || 'Your account';
   const initial = name.charAt(0).toUpperCase();
 
@@ -141,12 +139,12 @@ export function AccountDrawer({ open, onOpenChange }: { open: boolean; onOpenCha
 
           {/* Account-type action (customer vs business) */}
           {isBusiness ? (
-            <button type="button" onClick={() => go('/dashboard')} className={rowCls}>
+            <button type="button" onClick={() => go('/manager')} className={rowCls}>
               <ArrowLeftRight className="h-5 w-5 shrink-0" aria-hidden="true" />
               Switch to Localys Manager
             </button>
           ) : (
-            <button type="button" onClick={() => go('/dashboard')} className={rowCls}>
+            <button type="button" onClick={() => go('/business/new')} className={rowCls}>
               <Store className="h-5 w-5 shrink-0" aria-hidden="true" />
               Create a business account
             </button>

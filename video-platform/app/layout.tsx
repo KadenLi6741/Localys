@@ -53,11 +53,7 @@ export default function RootLayout({
         <Providers>
           <a href="#main-content" className="skip-to-main">Skip to main content</a>
           <PersistentVideoFeed />
-          <LayoutShell>
-            <main id="main-content" className="responsive-container">
-              {children}
-            </main>
-          </LayoutShell>
+          <LayoutShell>{children}</LayoutShell>
           <AppBottomNav />
           <ActivityPanel />
         </Providers>
