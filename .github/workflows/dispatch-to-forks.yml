@@ -32,7 +32,8 @@ jobs:
 
       - name: Add upstream and fetch upstream main
         run: |
-          git remote add upstream "$UPSTREAM_REPO" || true
+          git remote remove upstream || true
+          git remote add upstream "$UPSTREAM_REPO"
           git fetch upstream "$UPSTREAM_BRANCH" --prune --tags
 
       - name: Merge upstream main into hosting master
