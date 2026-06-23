@@ -10,7 +10,7 @@ on:
 
 env:
   UPSTREAM_REPO: https://github.com/KadenLi6741/Localys.git
-  BRANCH: master
+  BRANCH: main
 
 permissions:
   contents: write
