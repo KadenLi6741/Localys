@@ -1,11 +1,9 @@
 name: Sync from upstream into hosting branch
 
 on:
-  # Triggered by the upstream repo workflow
   repository_dispatch:
     types: [upstream_push]
 
-  # Optional manual trigger
   workflow_dispatch:
 
 env:
@@ -21,11 +19,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout hosting branch
+      - name: Checkout hosting master branch
         uses: actions/checkout@v4
         with:
-          token: $ secrets.GITHUB_TOKEN 
-          ref: $ env.TARGET_BRANCH 
+          ref: master
           fetch-depth: 0
 
       - name: Configure git
@@ -33,16 +30,16 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-      - name: Add upstream and fetch upstream branch
+      - name: Add upstream and fetch upstream main
         run: |
-          git remote add upstream "$ env.UPSTREAM_REPO " || true
-          git fetch upstream "$ env.UPSTREAM_BRANCH " --prune --tags
+          git remote add upstream "$UPSTREAM_REPO" || true
+          git fetch upstream "$UPSTREAM_BRANCH" --prune --tags
 
-      - name: Merge upstream into hosting branch
+      - name: Merge upstream main into hosting master
         run: |
-          git checkout "$ env.TARGET_BRANCH "
-          git merge "upstream/$ env.UPSTREAM_BRANCH " --no-edit
+          git checkout "$TARGET_BRANCH"
+          git merge "upstream/$UPSTREAM_BRANCH" --no-edit
 
-      - name: Push changes
+      - name: Push hosting master
         run: |
-          git push origin "$ env.TARGET_BRANCH "
+          git push origin "$TARGET_BRANCH"
