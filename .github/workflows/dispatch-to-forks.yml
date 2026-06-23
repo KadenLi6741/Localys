@@ -1,7 +1,7 @@
-name: Force sync from upstream (overwrite master)
+name: Sync from upstream into hosting branch
 
 on:
-  # Triggered by the upstream repo workflow (Option B)
+  # Triggered by the upstream repo workflow
   repository_dispatch:
     types: [upstream_push]
 
@@ -10,35 +10,39 @@ on:
 
 env:
   UPSTREAM_REPO: https://github.com/KadenLi6741/Localys.git
-  BRANCH: main
+  UPSTREAM_BRANCH: main
+  TARGET_BRANCH: master
 
 permissions:
   contents: write
 
 jobs:
-  force-sync:
+  sync:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout fork master
+      - name: Checkout hosting branch
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.UPSTREAM_SYNC_PAT }}
-          ref: ${{ env.BRANCH }}
+          token: $ secrets.GITHUB_TOKEN 
+          ref: $ env.TARGET_BRANCH 
           fetch-depth: 0
 
       - name: Configure git
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-      - name: Add upstream and fetch upstream/master
+
+      - name: Add upstream and fetch upstream branch
         run: |
-          git remote add upstream "${{ env.UPSTREAM_REPO }}" || true
-          git fetch upstream ${{ env.BRANCH }} --prune --tags
-      - name: Merge upstream into fork safely
+          git remote add upstream "$ env.UPSTREAM_REPO " || true
+          git fetch upstream "$ env.UPSTREAM_BRANCH " --prune --tags
+
+      - name: Merge upstream into hosting branch
         run: |
-          git checkout ${{ env.BRANCH }}
-          git merge upstream/${{ env.BRANCH }} --no-edit
-      
+          git checkout "$ env.TARGET_BRANCH "
+          git merge "upstream/$ env.UPSTREAM_BRANCH " --no-edit
+
       - name: Push changes
         run: |
-          git push origin ${{ env.BRANCH }}
+          git push origin "$ env.TARGET_BRANCH "
