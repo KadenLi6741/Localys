@@ -1,0 +1,98 @@
+{
+  "$schema": "https://design-tokens.github.io/community-group/format/",
+  "core": {
+    "text-primary": {
+      "value": "#000000",
+      "role": "text-primary",
+      "name": "theme-color"
+    },
+    "background": {
+      "value": "#ffffff",
+      "role": "background",
+      "name": "base-background-material-primary"
+    },
+    "border": {
+      "value": "#272727",
+      "role": "border",
+      "name": "base-background-material-primary"
+    },
+    "text-muted": {
+      "value": "#6b6b6b",
+      "role": "text-muted",
+      "name": "base-border-subtle"
+    },
+    "surface": {
+      "value": "#fee6e1",
+      "role": "surface",
+      "name": "base-error-background-disabled"
+    },
+    "accent": {
+      "value": "#ffb984",
+      "role": "accent",
+      "name": "base-warning-border-subtle"
+    }
+  },
+  "status": {
+    "danger": {
+      "value": "#3a0501",
+      "role": "danger",
+      "name": "base-error-background-statelayer-hover"
+    },
+    "success": {
+      "value": "#75e190",
+      "role": "success",
+      "name": "base-success-border-subtle"
+    }
+  },
+  "extended": {
+    "base-background-statelayer-hover": {
+      "value": "#111111",
+      "role": "unknown",
+      "name": "base-background-statelayer-hover"
+    },
+    "base-background-disabled": {
+      "value": "#5f5f5f",
+      "role": "unknown",
+      "name": "base-background-disabled"
+    },
+    "base-background-inverse-statelayer-hover": {
+      "value": "#ececec",
+      "role": "unknown",
+      "name": "base-background-inverse-statelayer-hover"
+    },
+    "base-border-inverse-subtle": {
+      "value": "#474747",
+      "role": "unknown",
+      "name": "base-border-inverse-subtle"
+    },
+    "base-border-subtle": {
+      "value": "#c4c4c4",
+      "role": "unknown",
+      "name": "base-border-subtle"
+    },
+    "base-error-border-subtle": {
+      "value": "#feac9c",
+      "role": "unknown",
+      "name": "base-error-border-subtle"
+    },
+    "base-error-background-disabled": {
+      "value": "#4e0600",
+      "role": "unknown",
+      "name": "base-error-background-disabled"
+    },
+    "base-success-border-subtle": {
+      "value": "#17904e",
+      "role": "unknown",
+      "name": "base-success-border-subtle"
+    },
+    "base-success-background-disabled": {
+      "value": "#ccfbcb",
+      "role": "unknown",
+      "name": "base-success-background-disabled"
+    }
+  },
+  "meta": {
+    "theme": "light",
+    "extracted": "2026-06-14"
+  }
+}
