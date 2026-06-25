@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, Play, X, Twitter, Youtube, Facebook, Instagram, MapPin } from "lucide-react";
+import OpenNowNearby from "@/components/OpenNowNearby";
 
 const slides = [
   {
@@ -162,6 +163,9 @@ export default function LandingScreen() {
           </div>
         </div>
       </section>
+
+      {/* Open right now near you */}
+      <OpenNowNearby />
 
       {/* Search */}
       <section className="mt-16 bg-black px-6 py-14 text-center">
