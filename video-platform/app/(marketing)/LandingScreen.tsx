@@ -1,21 +1,9 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  Search,
-  Upload,
-  Play,
-  X,
-  Twitter,
-  Music2,
-  Youtube,
-  Facebook,
-  Instagram,
-  MapPin,
-} from "lucide-react";
+import { Search, Play, X, Twitter, Youtube, Facebook, Instagram, MapPin } from "lucide-react";
 
 const slides = [
   {
@@ -70,16 +58,14 @@ export default function LandingScreen() {
             className="overflow-hidden border-b border-border bg-secondary"
           >
             <div className="relative flex items-center justify-center gap-2 px-4 py-2.5 text-sm">
-              <span className="text-accent">&#9670;</span>
+              <span className="text-accent">◆</span>
               <span className="font-semibold">Now available:</span>
-              <span className="text-muted-foreground">Trusted By over 1000+ business&nbsp;</span>
-              <a href="#" className="font-semibold underline-offset-4 hover:underline">
-                Learn More
-              </a>
+              <span className="text-muted-foreground">Trusted By over 1000+ businesses&nbsp;</span>
+              <a href="#" className="font-semibold underline-offset-4 hover:underline">Learn More</a>
               <button
                 onClick={() => setBanner(false)}
                 aria-label="Dismiss"
-                className="absolute right-3 top-1/2 -translate-y-1/2 p-0 text-muted-foreground hover:-translate-y-1/2 hover:scale-100 hover:text-foreground active:-translate-y-1/2 active:scale-100"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
               >
                 <X size={16} />
               </button>
@@ -100,13 +86,12 @@ export default function LandingScreen() {
               transition={{ duration: 1.1, ease: [0.65, 0, 0.35, 1] }}
               className="absolute inset-0"
             >
-              <Image
+              <img
                 src={current.image}
                 alt=""
-                fill
-                priority={slide === 0}
-                sizes="100vw"
-                className="object-cover"
+                className="h-full w-full object-cover"
+                width={1920}
+                height={1080}
               />
               <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/40 to-black/30" />
             </motion.div>
@@ -119,21 +104,9 @@ export default function LandingScreen() {
               <span className="font-display text-xl tracking-wide">Localy</span>
             </Link>
             <nav className="flex items-center gap-2 text-sm font-medium">
-              <Link
-                href="/login"
-                className="rounded-full bg-primary px-5 py-2 text-primary-foreground transition hover:bg-primary/90"
-              >
-                Sign in
-              </Link>
-              <Link
-                href="/signup"
-                className="rounded-full bg-black px-5 py-2 text-primary ring-1 ring-white/20 transition hover:bg-white/10"
-              >
-                Create account
-              </Link>
-              <Link href="/onboarding" className="hidden px-3 text-primary/80 hover:text-primary sm:inline">
-                For Small Buisnesses
-              </Link>
+              <Link href="/login" className="rounded-full bg-primary px-5 py-2 text-primary-foreground transition hover:bg-primary/90">Sign in</Link>
+              <Link href="/signup" className="rounded-full bg-white/15 px-5 py-2 text-white ring-1 ring-white/40 transition hover:bg-white/25">Create account</Link>
+              <Link href="/onboarding" className="hidden px-3 text-white/80 hover:text-white sm:inline">For Small Businesses</Link>
             </nav>
           </div>
 
@@ -149,28 +122,14 @@ export default function LandingScreen() {
                 className="max-w-2xl pt-8"
               >
                 <h1 className="font-display text-5xl uppercase leading-[0.95] tracking-tight text-primary sm:text-7xl">
-                  {current.title[0]}
-                  <br />
-                  {current.title[1]}
+                  {current.title[0]}<br />{current.title[1]}
                 </h1>
-                <p className="mt-5 max-w-lg text-sm leading-relaxed text-primary/85 sm:text-base">
-                  Discover your community&apos;s largest collection of local businesses: popular spots you already know,
-                  plus hidden gems, family-owned shops, exclusive deals, and services you won&apos;t find on major
-                  platforms.
+                <p className="mt-10 max-w-lg text-sm leading-relaxed text-primary/85 sm:text-base">
+                  Discover your community&apos;s largest collection of local businesses: popular spots you already know, plus hidden gems, family-owned shops, exclusive deals, and services you won&apos;t find on major platforms.
                 </p>
                 <div className="mt-7 flex flex-wrap gap-3">
-                  <Link
-                    href="/upload"
-                    className="rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground transition hover:scale-[1.02]"
-                  >
-                    Upload
-                  </Link>
-                  <Link
-                    href="/feed"
-                    className="rounded-full bg-transparent px-6 py-2.5 text-sm font-semibold text-primary ring-1 ring-white/40 transition hover:bg-white/10"
-                  >
-                    Explore Go+
-                  </Link>
+                  <Link href="/feed" className="rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground transition hover:scale-[1.02]">Browse local</Link>
+                  <Link href="/onboarding" className="rounded-full bg-transparent px-6 py-2.5 text-sm font-semibold text-white ring-1 ring-white/40 transition hover:bg-white/10">List your business</Link>
                 </div>
               </motion.div>
             </AnimatePresence>
@@ -182,7 +141,7 @@ export default function LandingScreen() {
                     key={i}
                     onClick={() => setSlide(i)}
                     aria-label={`Slide ${i + 1}`}
-                    className={`h-2 rounded-full p-0 transition-all hover:scale-100 active:scale-100 ${i === slide ? "w-6 bg-primary" : "w-2 bg-primary/40"}`}
+                    className={`h-2 rounded-full transition-all ${i === slide ? "w-6 bg-primary" : "w-2 bg-primary/40"}`}
                   />
                 ))}
               </div>
@@ -216,16 +175,13 @@ export default function LandingScreen() {
             />
           </div>
           <div className="mt-6 text-sm font-semibold text-white">or</div>
-          <Link
-            href="/upload"
-            className="mt-4 inline-flex items-center gap-2 rounded-full bg-white px-7 py-3 text-sm font-semibold text-black transition hover:scale-[1.02]"
-          >
-            <Upload size={16} /> Upload your own
+          <Link href="/feed" className="mt-4 inline-flex items-center gap-2 rounded-full bg-white px-7 py-3 text-sm font-semibold text-black transition hover:scale-[1.02]">
+            Browse all businesses
           </Link>
         </div>
       </section>
 
-      {/* Trending - sliding right-to-left */}
+      {/* Trending — sliding right-to-left */}
       <section className="mt-20 overflow-hidden">
         <h2 className="mb-8 text-center font-display text-2xl tracking-wide">See What&apos;s In Your Area</h2>
         <div className="group relative">
@@ -235,16 +191,10 @@ export default function LandingScreen() {
             transition={{ duration: 45, ease: "linear", repeat: Infinity }}
           >
             {[...trending, ...trending].map((t, i) => (
-              <div key={`${t.title}-${i}`} className="w-44 shrink-0 sm:w-52">
+              <div key={i} className="w-44 shrink-0 sm:w-52">
                 <div className="group/card relative aspect-square overflow-hidden rounded-md bg-muted">
-                  <Image
-                    src={t.img}
-                    alt={t.title}
-                    fill
-                    sizes="(min-width: 640px) 13rem, 11rem"
-                    className="object-cover transition duration-500 group-hover/card:scale-105"
-                  />
-                  <button className="absolute bottom-3 right-3 grid h-10 w-10 place-items-center rounded-full bg-accent p-0 text-accent-foreground opacity-0 shadow-lg transition group-hover/card:opacity-100">
+                  <img src={t.img} alt={t.title} loading="lazy" className="h-full w-full object-cover transition duration-500 group-hover/card:scale-105" />
+                  <button className="absolute bottom-3 right-3 grid h-10 w-10 place-items-center rounded-full bg-accent text-accent-foreground opacity-0 shadow-lg transition group-hover/card:opacity-100">
                     <Play size={16} className="ml-0.5 fill-current" />
                   </button>
                 </div>
@@ -255,16 +205,11 @@ export default function LandingScreen() {
           </motion.div>
         </div>
         <div className="mt-10 text-center">
-          <Link
-            href="/feed"
-            className="rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground transition hover:scale-[1.02]"
-          >
-            Explore small buisnesses
-          </Link>
+          <Link href="/feed" className="inline-block whitespace-nowrap rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground transition hover:scale-[1.02]">See all near you</Link>
         </div>
       </section>
 
-      {/* Never Stop Listening */}
+      {/* Never Stop Discovering */}
       <section className="mx-auto mt-32 grid max-w-6xl gap-10 px-6 md:grid-cols-2 md:items-center">
         <motion.div
           initial={{ opacity: 0, x: -40 }}
@@ -273,16 +218,14 @@ export default function LandingScreen() {
           transition={{ duration: 0.7 }}
         >
           <h2 className="font-display text-5xl uppercase leading-[0.95] tracking-tight sm:text-6xl">
-            NEVER STOP
-            <br />
-            DISCOVERING
+            NEVER STOP<br />DISCOVERING
           </h2>
           <div className="mt-8 flex items-center gap-5">
-            <div className="relative grid h-28 w-28 place-items-center rounded-md bg-white p-1.5">
-              <Image src="/landing/qr-code.png" alt="Scan QR code" width={1011} height={1024} className="h-full w-full object-contain" />
+            <div className="grid h-28 w-28 place-items-center rounded-md bg-white p-1.5">
+              <img src="/landing/qr-code.png" alt="Scan QR code" className="h-full w-full object-contain" />
             </div>
             <p className="max-w-xs text-sm text-muted-foreground">
-              Scan to grab the app. Unlimited discounts, new places, your choice &mdash; wherever you go.
+              Scan to grab the app. Unlimited discounts, new places, your choice — wherever you go.
             </p>
           </div>
         </motion.div>
@@ -293,18 +236,11 @@ export default function LandingScreen() {
           transition={{ duration: 0.9, ease: "easeOut" }}
           className="flex justify-center"
         >
-          <Image
-            src="/landing/listening-phone-v3.png"
-            alt="Restaurant interior"
-            width={543}
-            height={433}
-            loading="lazy"
-            className="w-full max-w-md rounded-lg"
-          />
+          <img src="/landing/listening-phone-v3.png" alt="App on phone" loading="lazy" className="w-full max-w-md rounded-lg" />
         </motion.div>
       </section>
 
-      {/* Calling All Creators */}
+      {/* Calling All Small Businesses */}
       <section className="mx-auto mt-28 grid max-w-6xl gap-10 px-6 md:grid-cols-2 md:items-center">
         <motion.div
           initial={{ opacity: 0, x: -60 }}
@@ -313,14 +249,7 @@ export default function LandingScreen() {
           transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
           className="overflow-hidden rounded-md"
         >
-          <Image
-            src="/landing/creator-dining.jpg"
-            alt="Friends dining at a local restaurant"
-            width={1920}
-            height={1280}
-            loading="lazy"
-            className="aspect-[4/3] w-full object-cover"
-          />
+          <img src="/landing/creator-dining.jpg" alt="Friends dining at a local restaurant" loading="lazy" className="aspect-[4/3] w-full object-cover" />
         </motion.div>
         <motion.div
           initial={{ opacity: 0, x: 60 }}
@@ -329,19 +258,13 @@ export default function LandingScreen() {
           transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
         >
           <h2 className="font-display text-5xl uppercase leading-[0.95] tracking-tight sm:text-6xl">
-            CALLING ALL
-            <br />
-            SMALL BUISNESSES
+            CALLING ALL<br />SMALL BUSINESSES
           </h2>
           <p className="mt-6 max-w-md text-sm leading-relaxed text-muted-foreground">
-            Discover hidden local businesses, connect directly with owners, and support the communities around you.
-            Explore authentic products, services, and experiences&mdash;all in one place.
+            Discover hidden local businesses, connect directly with owners, and support the communities around you. Explore authentic products, services, and experiences—all in one place.
           </p>
-          <Link
-            href="/onboarding"
-            className="mt-7 inline-flex rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground transition hover:scale-[1.02]"
-          >
-            Find out more
+          <Link href="/onboarding" className="mt-7 inline-block whitespace-nowrap rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground transition hover:scale-[1.02]">
+            List your business — it&apos;s free
           </Link>
         </motion.div>
       </section>
@@ -349,15 +272,12 @@ export default function LandingScreen() {
       {/* Footer */}
       <footer className="mx-auto mt-28 max-w-6xl px-6 pb-12">
         <div className="flex flex-wrap justify-center gap-7 text-muted-foreground">
-          {[Twitter, Music2, Music2, Youtube, Facebook, Instagram].map((Icon, i) => (
-            <a key={i} href="#" className="transition hover:text-foreground">
-              <Icon size={18} />
-            </a>
-          ))}
+          <a href="#" className="transition hover:text-foreground"><Twitter size={18} /></a>
+          <a href="#" className="transition hover:text-foreground"><Youtube size={18} /></a>
+          <a href="#" className="transition hover:text-foreground"><Facebook size={18} /></a>
+          <a href="#" className="transition hover:text-foreground"><Instagram size={18} /></a>
         </div>
-        <p className="mt-8 text-center text-xs text-muted-foreground">
-          &copy; {new Date().getFullYear()} LOCALY. All rights reserved.
-        </p>
+        <p className="mt-8 text-center text-xs text-muted-foreground">© {new Date().getFullYear()} LOCALY. All rights reserved.</p>
       </footer>
     </div>
   );
