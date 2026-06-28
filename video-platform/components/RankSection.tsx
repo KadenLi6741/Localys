@@ -59,9 +59,14 @@ export function RankSection({ moneySpent, points, bizCount }: ImpactInputs) {
         </button>
       </div>
 
-      <div className="flex flex-col items-center gap-3">
-        {/* Rank badge — ~2x larger, borderless, sits cleanly on the white card */}
-        <RankBadge src={current.image} alt={current.name} className="h-80 w-80 max-w-full sm:h-96 sm:w-96" />
+      <div className="flex flex-col items-center gap-1">
+        {/* Rank badge — kept at its large rendered size (h-[598px]/sm:h-[718px]),
+            but clipped by a shorter overflow-hidden box so the heavy white padding
+            baked into the image is trimmed top & bottom, condensing the card
+            WITHOUT shrinking the badge itself. */}
+        <div className="flex w-full items-center justify-center overflow-hidden h-[360px] sm:h-[430px]">
+          <RankBadge src={current.image} alt={current.name} className="h-[598px] w-[598px] max-w-full shrink-0 sm:h-[718px] sm:w-[718px]" />
+        </div>
         <div className="w-full text-center">
           <p className="text-2xl font-extrabold leading-tight text-gray-900 sm:text-3xl">{current.name}</p>
           <p className="mt-0.5 text-sm text-gray-500">Impact Score {score.toLocaleString()}</p>

@@ -15,21 +15,20 @@ import { getRankProgress } from '@/lib/ranks';
 // randomness) so the board never reshuffles between renders/refreshes.
 // ─────────────────────────────────────────────────────────────────────────────
 const COMMUNITY_SIZE = 42; // total people within 5 km
-const YOU_RANK = 7; // the demo account sits in the middle, with people to catch
-const YOU_IMPACT_SCORE = 6840; // between #6 and #8 below
 
-/** People ranked ABOVE and just below the current user (descending score). */
+/** Mock neighbors within 5 km (descending score). The current user is inserted
+ *  into this list by their REAL Impact Score, so their rank/badge stays in sync
+ *  with the "Your Rank" card. */
 const NEARBY_PEOPLE: { name: string; score: number }[] = [
-  { name: 'Marcus Chen', score: 18420 }, // #1
-  { name: 'Sofia Ramirez', score: 15890 }, // #2
-  { name: 'Aisha Patel', score: 13250 }, // #3
-  { name: 'Liam O’Connor', score: 11100 }, // #4
-  { name: 'Yuki Tanaka', score: 9540 }, // #5
-  { name: 'Diego Morales', score: 8200 }, // #6
-  // current user is inserted here at #7
-  { name: 'Priya Nair', score: 5980 }, // #8
-  { name: 'Noah Williams', score: 5210 }, // #9
-  { name: 'Emma Schmidt', score: 4760 }, // #10
+  { name: 'Marcus Chen', score: 18420 },
+  { name: 'Sofia Ramirez', score: 15890 },
+  { name: 'Aisha Patel', score: 13250 },
+  { name: 'Liam O’Connor', score: 11100 },
+  { name: 'Yuki Tanaka', score: 9540 },
+  { name: 'Diego Morales', score: 8200 },
+  { name: 'Priya Nair', score: 5980 },
+  { name: 'Noah Williams', score: 5210 },
+  { name: 'Emma Schmidt', score: 4760 },
 ];
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -62,20 +61,19 @@ function RankBadge({ src, name }: { src: string; name: string }) {
   );
 }
 
-export function CommunityLeaderboard({ youName }: { youName: string }) {
-  // Build the ranked rows by splicing the current user into position #7. The
-  // mock list is already sorted; we just insert "You" at the right spot.
-  const rows: LeaderboardRow[] = [];
-  const aboveYou = NEARBY_PEOPLE.slice(0, YOU_RANK - 1); // #1..#6
-  const belowYou = NEARBY_PEOPLE.slice(YOU_RANK - 1); // #8..#10
+export function CommunityLeaderboard({ youName, youScore }: { youName: string; youScore: number }) {
+  // Insert the current user into the sorted neighbor list by their REAL Impact
+  // Score, then number the rows. This keeps the leaderboard badge + position in
+  // sync with the "Your Rank" card (both derive from the same score).
+  const rows: LeaderboardRow[] = [
+    ...NEARBY_PEOPLE.map((p) => ({ ...p, isYou: false })),
+    { name: youName || 'You', score: youScore, isYou: true },
+  ]
+    .sort((a, b) => b.score - a.score)
+    .map((p, i) => ({ position: i + 1, name: p.name, score: p.score, isYou: p.isYou }));
 
-  aboveYou.forEach((p, i) =>
-    rows.push({ position: i + 1, name: p.name, score: p.score, isYou: false }),
-  );
-  rows.push({ position: YOU_RANK, name: youName || 'You', score: YOU_IMPACT_SCORE, isYou: true });
-  belowYou.forEach((p, i) =>
-    rows.push({ position: YOU_RANK + 1 + i, name: p.name, score: p.score, isYou: false }),
-  );
+  const youRank = rows.find((r) => r.isYou)!.position;
+  const aheadOfYou = youRank - 1;
 
   return (
     <div className="mb-4 rounded-2xl border border-gray-200 bg-white p-4 dark:border-white/10 dark:bg-[#1e1e1e]">
@@ -86,8 +84,10 @@ export function CommunityLeaderboard({ youName }: { youName: string }) {
       </div>
       <p className="mb-3 text-sm text-gray-500 dark:text-gray-400">
         You&apos;re ranked{' '}
-        <span className="font-bold text-[#f97316]">#{YOU_RANK}</span> of {COMMUNITY_SIZE} nearby —
-        catch the {YOU_RANK - 1} people above you.
+        <span className="font-bold text-[#f97316]">#{youRank}</span> of {COMMUNITY_SIZE} nearby
+        {aheadOfYou > 0
+          ? ` — catch the ${aheadOfYou} ${aheadOfYou === 1 ? 'person' : 'people'} above you.`
+          : ' — you’re #1 in your community! 🎉'}
       </p>
 
       <ol className="flex flex-col gap-1.5">
