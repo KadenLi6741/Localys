@@ -29,18 +29,18 @@ const slides = [
 
 // Every image in public/landing EXCEPT hero-restaurant and the two login-only photos.
 const trending = [
-  { img: "/landing/biz-ana-pastry.png", title: "Ana Pastry", artist: "26 Church St S" },
-  { img: "/landing/biz-aneals.png", title: "Aneal's Taste of the Islands", artist: "10220 Yonge St" },
-  { img: "/landing/biz-advanced-printing.webp", title: "Advanced Printing", artist: "10330 Yonge St" },
-  { img: "/landing/biz-align.png", title: "Align Health & Wellness", artist: "22 Richmond St" },
-  { img: "/landing/biz-acuvega.jpg", title: "Acuvega Wellness Center", artist: "207-22 Richmond St" },
-  { img: "/landing/biz-arnold.png", title: "Arnold Crescent Animal Hospital", artist: "26 Arnold Cres" },
-  { img: "/landing/Bookstore.webp", title: "Local Bookstore", artist: "Local & independent" },
-  { img: "/landing/catering buisness.jpg", title: "Catering Co.", artist: "Local & independent" },
-  { img: "/landing/landscaping company.webp", title: "Landscaping", artist: "Local & independent" },
-  { img: "/landing/hero-flowers.jpg", title: "Dream Rose Florist", artist: "14 Levendale Rd" },
-  { img: "/landing/hero-food.jpeg", title: "Pho Shop", artist: "5051 Yonge St" },
-  { img: "/landing/creator-dining.jpg", title: "Local Dining", artist: "Food & drink" },
+  { img: "/landing/biz-ana-pastry.png", title: "Ana Pastry", artist: "26 Church St S", type: "Bakery & Pastries", since: "2009", locations: "2 locations", busy: true, price: "$$", distance: "0.4 km", vibe: "Cozy · Sweet" },
+  { img: "/landing/biz-aneals.png", title: "Aneal's Taste of the Islands", artist: "10220 Yonge St", type: "Caribbean", since: "2003", locations: "1 location", busy: true, price: "$$", distance: "0.9 km", vibe: "Lively · Bold" },
+  { img: "/landing/biz-advanced-printing.webp", title: "Advanced Printing", artist: "10330 Yonge St", type: "Print & Signage", since: "1998", locations: "3 locations", busy: false, price: "$$$", distance: "1.2 km", vibe: "Quick · Reliable" },
+  { img: "/landing/biz-align.png", title: "Align Health & Wellness", artist: "22 Richmond St", type: "Chiropractic & Wellness", since: "2014", locations: "2 locations", busy: false, price: "$$$", distance: "1.5 km", vibe: "Calm · Serene" },
+  { img: "/landing/biz-acuvega.jpg", title: "Acuvega Wellness Center", artist: "207-22 Richmond St", type: "Acupuncture & Spa", since: "2017", locations: "1 location", busy: false, price: "$$$", distance: "1.6 km", vibe: "Peaceful · Modern" },
+  { img: "/landing/biz-arnold.png", title: "Arnold Crescent Animal Hospital", artist: "26 Arnold Cres", type: "Veterinary Care", since: "1995", locations: "1 location", busy: true, price: "$$", distance: "2.1 km", vibe: "Caring · Friendly" },
+  { img: "/landing/Bookstore.webp", title: "Local Bookstore", artist: "Local & independent", type: "Books & Stationery", since: "2010", locations: "1 location", busy: false, price: "$$", distance: "0.7 km", vibe: "Quiet · Charming" },
+  { img: "/landing/catering buisness.jpg", title: "Catering Co.", artist: "Local & independent", type: "Catering", since: "2012", locations: "2 locations", busy: true, price: "$$$", distance: "2.6 km", vibe: "Warm · Elegant" },
+  { img: "/landing/landscaping company.webp", title: "Landscaping", artist: "Local & independent", type: "Landscaping & Lawn Care", since: "2008", locations: "4 locations", busy: false, price: "$$", distance: "3.4 km", vibe: "Fresh · Green" },
+  { img: "/landing/hero-flowers.jpg", title: "Dream Rose Florist", artist: "14 Levendale Rd", type: "Florist", since: "2006", locations: "2 locations", busy: true, price: "$$", distance: "1.1 km", vibe: "Bright · Fragrant" },
+  { img: "/landing/hero-food.jpeg", title: "Pho Shop", artist: "5051 Yonge St", type: "Vietnamese", since: "2011", locations: "3 locations", busy: true, price: "$", distance: "0.6 km", vibe: "Casual · Comforting" },
+  { img: "/landing/creator-dining.jpg", title: "Local Dining", artist: "Food & drink", type: "Modern Bistro", since: "2013", locations: "1 location", busy: false, price: "$$", distance: "1.9 km", vibe: "Trendy · Social" },
 ];
 
 // ----- Bottom-of-page content (edit these freely) -----
@@ -242,8 +242,32 @@ export default function LandingScreen() {
                 <div className="group/card relative aspect-[8/7] overflow-hidden rounded-md bg-muted">
                   <img src={t.img} alt={t.title} loading="eager" className="h-full w-full object-cover transition duration-500 group-hover/card:scale-105" />
                 </div>
-                <div className="mt-3 truncate text-base font-semibold">{t.title}</div>
+                <div className="mt-3 flex items-center justify-between gap-2">
+                  <span className="truncate text-base font-semibold">{t.title}</span>
+                  <span
+                    className={`flex shrink-0 items-center gap-1 text-xs font-medium ${
+                      t.busy ? "text-amber-400" : "text-emerald-400"
+                    }`}
+                  >
+                    <span className={`h-2 w-2 rounded-full ${t.busy ? "bg-amber-400" : "bg-emerald-400"}`} />
+                    {t.busy ? "Busy now" : "Not busy"}
+                  </span>
+                </div>
                 <div className="truncate text-sm text-muted-foreground">{t.artist}</div>
+                <div className="mt-1 truncate text-xs font-semibold uppercase tracking-wide text-foreground/80">{t.type}</div>
+                <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
+                  <span>Since {t.since}</span>
+                  <span aria-hidden>·</span>
+                  <span>{t.locations}</span>
+                </div>
+                <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
+                  <span className="font-medium text-foreground">{t.price}</span>
+                  <span aria-hidden>·</span>
+                  <span>{t.distance} away</span>
+                </div>
+                <div className="mt-2 inline-flex rounded-full bg-white/[0.06] px-2.5 py-1 text-xs text-muted-foreground">
+                  {t.vibe}
+                </div>
               </div>
             ))}
           </div>
