@@ -245,19 +245,19 @@ export function MenuList({ userId, businessId, isOwnProfile, layout = 'grid', on
                         <div className="flex gap-1">
                           <button
                             onClick={(e) => { e.stopPropagation(); handleEditItem(item); }}
-                            className="w-7 h-7 flex items-center justify-center rounded-lg bg-[#f97316]/10 text-[#f97316] hover:bg-[#f97316]/20 hover:text-[#ea580c] transition-colors"
+                            className="w-7 h-7 shrink-0 flex items-center justify-center rounded-lg bg-white border border-[#f97316]/40 text-[#f97316] hover:text-[#ea580c] hover:border-[#ea580c] transition-colors"
                             aria-label={`Edit ${item.item_name}`}
                           >
-                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                             </svg>
                           </button>
                           <button
                             onClick={(e) => { e.stopPropagation(); setDeletingItemId(item.id); }}
-                            className="w-7 h-7 flex items-center justify-center rounded-lg bg-[#ef4444]/10 text-[#ef4444] hover:bg-[#ef4444]/20 hover:text-[#dc2626] transition-colors"
+                            className="w-7 h-7 shrink-0 flex items-center justify-center rounded-lg bg-white border border-[#ef4444]/40 text-[#ef4444] hover:text-[#dc2626] hover:border-[#dc2626] transition-colors"
                             aria-label={`Delete ${item.item_name}`}
                           >
-                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                             </svg>
                           </button>
