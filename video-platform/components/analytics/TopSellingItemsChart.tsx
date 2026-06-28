@@ -13,7 +13,7 @@ export function TopSellingItemsChart({ data }: TopSellingItemsChartProps) {
 
   return (
     <div>
-      <h4 className="text-sm font-semibold text-[#F5F0E8]/80 mb-3">🏆 Top Selling Items</h4>
+      <h4 className="text-sm font-semibold text-[#F5F0E8]/80 mb-3">Top Selling Items</h4>
       <div className="space-y-3">
         {data.map((item, i) => {
           const pct = (item.unitsSold / maxUnits) * 100;

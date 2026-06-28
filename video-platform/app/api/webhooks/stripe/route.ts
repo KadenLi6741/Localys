@@ -121,6 +121,10 @@ export async function POST(request: NextRequest) {
         const buyerId = metadata.buyerId;
         const couponCode = metadata.couponCode || null;
         const discountPercentage = parseInt(metadata.discountPercentage || '0');
+        const scheduledAt = metadata.scheduledAt || null;
+        const groupOrderId = metadata.groupOrderId || null;
+        const promoCodeId = metadata.promoCodeId || null;
+        const promoUsedCount = metadata.promoUsedCount ? parseInt(metadata.promoUsedCount) : null;
 
         // Check if already processed (deduplication)
         const { data: existingItem } = await supabase
@@ -175,6 +179,8 @@ export async function POST(request: NextRequest) {
             stripe_session_id: session.id,
             status: 'paid',
             purchased_at: new Date().toISOString(),
+            ...(scheduledAt && { scheduled_at: scheduledAt }),
+            ...(groupOrderId && { group_order_id: groupOrderId }),
           };
         });
 
@@ -200,6 +206,14 @@ export async function POST(request: NextRequest) {
               .update({ verification_token: token })
               .eq('id', row.id);
           }
+        }
+
+        // Increment promo code use count after confirmed payment
+        if (promoCodeId && promoUsedCount !== null) {
+          await supabase
+            .from('promo_codes')
+            .update({ used_count: promoUsedCount + 1 })
+            .eq('id', promoCodeId);
         }
 
         const itemNames = purchaseRecords.map(r => r.item_name).join(', ');

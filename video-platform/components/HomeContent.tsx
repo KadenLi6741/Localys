@@ -4,6 +4,8 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { Star, Check, Plus } from 'lucide-react';
+import { MenuPopup } from '@/components/feed/MenuPopup';
 import { useAuth } from '@/contexts/AuthContext';
 import { getVideosFeed, getLikeCounts, likeItem, unlikeItem, bookmarkVideo, unbookmarkVideo, getWeightedVideoFeed, trackVideoView } from '@/lib/supabase/videos';
 import { getUserCoins } from '@/lib/supabase/profiles';
@@ -12,7 +14,6 @@ import dynamic from 'next/dynamic';
 const CommentModal = dynamic(() => import('@/components/CommentModal').then(mod => mod.CommentModal), { ssr: false });
 import { Toast } from '@/components/Toast';
 import { sharePost } from '@/lib/utils/share';
-import { ThemeToggle } from '@/components/ThemeToggle';
 import { haversineDistance } from '@/lib/utils/geo';
 import { computeAveragePrice, computeRoundedPriceRange } from '@/lib/utils/pricing';
 
@@ -951,7 +952,7 @@ export function HomeContent({ isActive }: HomeContentProps) {
           100% { transform: translate(-50%, 0) scale(1); }
         }
       `}</style>
-      <div className="home-content-root fixed top-0 left-0 right-0 bottom-0 lg:left-60 z-10 overflow-hidden overscroll-none bg-[#1A1A18] text-foreground">
+      <div className="home-content-root fixed top-[112px] left-0 right-0 bottom-0 z-10 overflow-hidden overscroll-none bg-white text-foreground">
       {/* Ambient Particle Background - CSS shimmer effect */}
       <div className="home-feed-particles" aria-hidden="true" />
 
@@ -981,17 +982,20 @@ export function HomeContent({ isActive }: HomeContentProps) {
 
               return (
                 <>
-            <video
-              ref={(el) => { videoRefs.current[index] = el; }}
-              src={video.video_url}
-              className="h-full w-full object-contain cursor-pointer"
-              controls={false}
-              loop
-              playsInline
-              muted={!isActive || index !== currentIndex}
-              autoPlay={index === currentIndex}
-              onClick={index === currentIndex ? togglePlayPause : undefined}
-            />
+            {/* Main video — centered vertical column, fills with object-cover */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <video
+                ref={(el) => { videoRefs.current[index] = el; }}
+                src={video.video_url}
+                className="h-full w-full max-w-[min(100%,calc((100vh-112px)*9/16))] object-cover cursor-pointer"
+                controls={false}
+                loop
+                playsInline
+                muted={!isActive || index !== currentIndex}
+                autoPlay={index === currentIndex}
+                onClick={index === currentIndex ? togglePlayPause : undefined}
+              />
+            </div>
 
             {/* Centered Play Icon - shown when paused */}
             {index === currentIndex && !isPlaying && (
@@ -1002,90 +1006,48 @@ export function HomeContent({ isActive }: HomeContentProps) {
               </div>
             )}
 
-            {/* Business Info Overlay - Enhanced Glassmorphism */}
-            <div className="video-overlay-glass absolute bottom-0 left-0 right-0 px-4 pt-6 pb-3 border-t border-[#3A3A34]">
+            {/* Business Info Overlay — clean hierarchy, constrained to the video column */}
+            <div className="video-overlay-glass absolute bottom-3 left-1/2 z-20 w-[min(94vw,460px)] -translate-x-1/2 rounded-2xl px-4 py-3">
               <button
                 onClick={() => handleProfileClick(video.user_id, video.profiles?.username)}
                 onKeyDown={(e) => handleKeyDown(e, () => handleProfileClick(video.user_id, video.profiles?.username))}
-                className="text-left focus:outline-none focus:ring-2 focus:ring-[#F5A623] focus:ring-offset-2 focus:ring-offset-[#1A1A18] rounded"
+                className="rounded text-left focus:outline-none focus:ring-2 focus:ring-[#f97316]"
                 aria-label={`View profile of ${feedBusiness?.business_name || video.profiles?.full_name || 'Business'}`}
               >
-                <h2 className="text-2xl font-bold text-[#F5F0E8] mb-2 hover:underline">
+                <h2 className="text-xl font-bold text-white hover:underline">
                   {feedBusiness?.business_name || video.profiles?.full_name || 'Business'}
                 </h2>
               </button>
-              <p className="text-[#F5F0E8]/80 text-sm mb-2">{video.caption || ''}</p>
-              <div className="flex items-center gap-4 text-[#F5F0E8]/90 text-sm">
-                {feedBusiness?.average_rating && (
-                  <>
-                    <span>⭐ {feedBusiness.average_rating.toFixed(1)}</span>
-                    <span>•</span>
-                  </>
-                )}
+              {video.caption ? (
+                <p className="mt-1 line-clamp-2 text-sm text-white">{video.caption}</p>
+              ) : null}
+              <div className="mt-2 flex items-center gap-2 text-sm text-white">
+                {feedBusiness?.average_rating ? (
+                  <span className="inline-flex items-center gap-1 font-semibold">
+                    <Star className="h-4 w-4 fill-[#f97316] text-[#f97316]" />
+                    {feedBusiness.average_rating.toFixed(1)}
+                  </span>
+                ) : null}
+                <span aria-hidden>·</span>
                 <span>{commentCounts[video.id] || 0} reviews</span>
-                {feedDistanceLabel && (
+                {feedDistanceLabel ? (
                   <>
-                    <span>•</span>
+                    <span aria-hidden>·</span>
                     <span>{feedDistanceLabel} away</span>
                   </>
-                )}
+                ) : null}
               </div>
-
             </div>
 
+            {/* Left menu pop-up — view the business menu while watching */}
             {feedBusiness && (
-              <div className="absolute left-0 top-1/2 z-20 -translate-y-1/2 pl-2 sm:pl-3 lg:left-60">
-                <div className="group flex items-center">
-                  <div className="rounded-r-xl border border-[#3A3A34] bg-[#1A1A18]/85 p-2 sm:p-3 backdrop-blur-xl">
-                    <span className="text-base sm:text-xl" aria-hidden="true">📍</span>
-                    <span className="sr-only">Business quick info</span>
-                  </div>
-
-                  <div className="ml-1 sm:ml-2 w-0 overflow-hidden rounded-xl border border-[#3A3A34] bg-[#242420]/85 opacity-0 backdrop-blur-xl transition-all duration-300 group-hover:w-[220px] group-hover:opacity-100 group-focus-within:w-[220px] group-focus-within:opacity-100 sm:group-hover:w-[260px] sm:group-focus-within:w-[260px]">
-                    <div className="p-2 sm:p-3">
-                      <div className="grid grid-cols-3 gap-1.5 sm:gap-2 text-[10px] sm:text-xs">
-                        <div className="rounded-lg bg-[#3A3A34]/50 px-2 py-2">
-                          <p className="text-[#9E9A90]">Avg Price</p>
-                          <p className="text-[#F5F0E8] font-semibold">
-                            {feedBusiness.id && priceRanges[feedBusiness.id]
-                              ? (() => {
-                                  const avgPrice = computeAveragePrice(priceRanges[feedBusiness.id]);
-                                  return avgPrice ? `~$${avgPrice}` : '—';
-                                })()
-                              : '—'}
-                          </p>
-                        </div>
-                        <div className="rounded-lg bg-[#3A3A34]/50 px-2 py-2">
-                          <p className="text-[#9E9A90]">Distance</p>
-                          <p className="text-[#F5F0E8] font-semibold">{feedDistanceLabel || 'Use GPS'}</p>
-                        </div>
-                        <div className="rounded-lg bg-[#3A3A34]/50 px-2 py-2">
-                          <p className="text-[#9E9A90]">ETA</p>
-                          <p className="text-[#F5F0E8] font-semibold">{feedEta !== null ? `${feedEta} min` : '—'}</p>
-                        </div>
-                      </div>
-
-                      <div className="mt-1.5 sm:mt-2 flex gap-1.5 sm:gap-2">
-                        <a
-                          href={feedNearestLocation
-                            ? `https://www.google.com/maps/dir/?api=1&destination=${feedNearestLocation.latitude},${feedNearestLocation.longitude}`
-                            : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(feedBusiness.business_name)}`
-                          }
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="rounded-lg bg-[#F5A623] text-black text-[10px] sm:text-xs font-semibold px-2 py-1 sm:px-3 sm:py-1.5 hover:bg-[#F5A623]/90 transition-all"
-                        >
-                          Directions
-                        </a>
-                        <Link
-                          href={`/profile/${video.profiles?.username || video.user_id}`}
-                          className="rounded-lg bg-[#3A3A34]/50 border border-[#3A3A34] text-[#F5F0E8] text-[10px] sm:text-xs font-semibold px-2 py-1 sm:px-3 sm:py-1.5 hover:bg-[#3A3A34]/80 transition-all"
-                        >
-                          Menu
-                        </Link>
-                      </div>
-                    </div>
-                  </div>
+              <div className="absolute left-0 top-1/2 z-20 -translate-y-1/2">
+                <div className="relative">
+                  <MenuPopup
+                    userId={video.user_id || ''}
+                    businessId={feedBusiness.id || ''}
+                    businessName={feedBusiness.business_name || video.profiles?.full_name || 'Business'}
+                  />
                 </div>
               </div>
             )}
@@ -1096,12 +1058,9 @@ export function HomeContent({ isActive }: HomeContentProps) {
         ))}
       </div>
 
-      {/* Top Header */}
-      <header className="absolute top-0 left-0 right-0 z-30 border-b border-[#3A3A34] bg-[#1A1A18]/80 backdrop-blur-xl">
-        <div className="flex items-center justify-between px-3 py-2 sm:px-4 sm:py-3 md:px-5">
-          <h1 className="text-base sm:text-lg md:text-xl font-bold text-[#F5F0E8]">Localy</h1>
-
-          <div className="flex items-center gap-2 sm:gap-3">
+      {/* Floating feed controls — volume only; header provides nav/profile */}
+      <div className="absolute right-3 top-3 z-30">
+          <div className="flex items-center gap-2 rounded-full border border-white/15 bg-black/55 px-2 py-1.5 backdrop-blur-xl">
             {/* Volume Dropdown */}
             <div
               className="relative"
@@ -1138,7 +1097,7 @@ export function HomeContent({ isActive }: HomeContentProps) {
                     max="100"
                     value={Math.round(volume * 100)}
                     onChange={(e) => setVolume(parseInt(e.target.value, 10) / 100)}
-                    className="h-1.5 w-24 cursor-pointer rounded-full bg-[#3A3A34] accent-[#F5A623] outline-none"
+                    className="h-1.5 w-24 cursor-pointer rounded-full bg-[#3A3A34] accent-[#f97316] outline-none"
                     aria-label="Volume slider"
                     onMouseEnter={handleVolumeEnter}
                   />
@@ -1148,48 +1107,8 @@ export function HomeContent({ isActive }: HomeContentProps) {
                 </div>
               </div>
             </div>
-
-            <ThemeToggle />
-
-            {showCoinBadge && (
-              <Link
-                href="/buy-coins"
-                className="inline-flex h-9 items-center gap-2 rounded-lg border border-[#3A3A34] bg-[#242420] px-3 py-2 text-sm font-medium text-[#F5F0E8] transition-colors hover:bg-[#2E2E28]"
-                aria-label="Buy coins"
-              >
-                <span>🪙</span>
-                <span>{userCoins}</span>
-              </Link>
-            )}
-
-            <Link
-              href="/profile"
-              className="hidden md:flex items-center gap-2 transition-all duration-200 hover:opacity-80 active:scale-95"
-              aria-label="Open profile"
-            >
-              {headerProfile?.profile_picture_url ? (
-                <Image
-                  src={headerProfile.profile_picture_url}
-                  alt={headerProfile.full_name || headerProfile.username || 'Profile'}
-                  width={32}
-                  height={32}
-                  className="h-8 w-8 rounded-full object-cover border border-[#3A3A34]"
-                  unoptimized
-                />
-              ) : (
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#242420] text-xs font-semibold text-[#F5F0E8] border border-[#3A3A34]">
-                  {(headerProfile?.full_name || headerProfile?.username || user?.email || 'U').charAt(0).toUpperCase()}
-                </div>
-              )}
-              <div className="max-w-[140px] leading-none">
-                <p className="mb-0 truncate text-xs font-semibold text-[#F5F0E8]">
-                  @{headerProfile?.username || 'profile'}
-                </p>
-              </div>
-            </Link>
           </div>
-        </div>
-      </header>
+      </div>
 
       {/* Right Side - Interaction Buttons */}
       <div className="absolute right-0 top-1/2 -translate-y-1/2 z-20 flex flex-col items-center gap-2 pr-2 sm:gap-3 md:gap-4 md:pr-4">
@@ -1198,7 +1117,7 @@ export function HomeContent({ isActive }: HomeContentProps) {
           <button
             onClick={() => handleProfileClick(currentVideo.user_id, currentVideo.profiles?.username)}
             onKeyDown={(e) => handleKeyDown(e, () => handleProfileClick(currentVideo.user_id, currentVideo.profiles?.username))}
-            className="action-button-animate rounded-full focus:outline-none focus:ring-2 focus:ring-[#F5A623] focus:ring-offset-2 focus:ring-offset-[#1A1A18]"
+            className="action-button-animate rounded-full focus:outline-none focus:ring-2 focus:ring-[#f97316] focus:ring-offset-2 focus:ring-offset-[#1A1A18]"
             aria-label={`View profile of ${currentBusiness?.business_name || currentVideo.profiles?.full_name || 'user'}`}
           >
             <Image
@@ -1220,10 +1139,10 @@ export function HomeContent({ isActive }: HomeContentProps) {
             >
               <div className={`h-[25px] w-[25px] rounded-full flex items-center justify-center text-[11px] font-bold transition-all duration-300 ${
                 followedUsers.has(currentVideo.user_id!)
-                  ? 'bg-[#F5A623] text-[#1A1A18]'
+                  ? 'bg-[#f97316] text-white'
                   : 'border border-[#F5F0E8] bg-[#1A1A18]/80 text-[#F5F0E8]'
               }`}>
-                {followedUsers.has(currentVideo.user_id!) ? '✓' : '+'}
+                {followedUsers.has(currentVideo.user_id!) ? <Check className="h-3.5 w-3.5" /> : <Plus className="h-3.5 w-3.5" />}
               </div>
             </button>
           )}
@@ -1237,7 +1156,7 @@ export function HomeContent({ isActive }: HomeContentProps) {
           aria-label={isLiked ? 'Unlike video' : 'Like video'}
         >
           <div className={`w-9 h-9 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center transition-all duration-300 ${
-            isLiked ? 'bg-[#F5A623] shadow-lg shadow-[#F5A623]/40' : 'border border-[#3A3A34] bg-[#1A1A18]/80 backdrop-blur-xl hover:border-[#F5A623]/50 hover:shadow-lg hover:shadow-[#F5A623]/20'
+            isLiked ? 'bg-[#f97316] shadow-lg shadow-[#f97316]/40' : 'border border-[#3A3A34] bg-[#1A1A18]/80 backdrop-blur-xl hover:border-[#f97316]/50 hover:shadow-lg hover:shadow-[#f97316]/20'
           } ${likeAnimating === currentVideo.id ? 'like-icon-pop' : ''}`}>
             <svg
               className={`w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-[#F5F0E8] transition-all duration-300 ${
@@ -1250,7 +1169,7 @@ export function HomeContent({ isActive }: HomeContentProps) {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
             </svg>
           </div>
-          <span className="text-[#F5F0E8] text-[10px] sm:text-xs font-semibold">
+          <span className="text-[#F5F0E8] text-[10px] sm:text-xs font-semibold" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.9)' }}>
             {likeCounts[likeKey] || 0}
           </span>
         </button>
@@ -1262,24 +1181,24 @@ export function HomeContent({ isActive }: HomeContentProps) {
           className="action-button-animate flex flex-col items-center gap-1 transition-transform duration-200 hover:scale-110 active:scale-95"
           aria-label="Add a review or comment"
         >
-          <div className="flex h-9 w-9 sm:h-10 sm:w-10 md:h-12 md:w-12 items-center justify-center rounded-full border border-[#3A3A34] bg-[#1A1A18]/80 backdrop-blur-xl transition-all duration-300 hover:bg-[#242420]/90 hover:border-[#F5A623] hover:shadow-lg hover:shadow-[#F5A623]/30 active:scale-95">
-            <svg className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-[#F5F0E8] transition-colors duration-300 hover:text-[#F5A623]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="flex h-9 w-9 sm:h-10 sm:w-10 md:h-12 md:w-12 items-center justify-center rounded-full border border-[#3A3A34] bg-[#1A1A18]/80 backdrop-blur-xl transition-all duration-300 hover:bg-[#242420]/90 hover:border-[#f97316] hover:shadow-lg hover:shadow-[#f97316]/30 active:scale-95">
+            <svg className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-[#F5F0E8] transition-colors duration-300 hover:text-[#f97316]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
             </svg>
           </div>
-          <span className="text-[#F5F0E8] text-[10px] sm:text-xs font-semibold">{commentCounts[currentVideo.id] || 0}</span>
+          <span className="text-[#F5F0E8] text-[10px] sm:text-xs font-semibold" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.9)' }}>{commentCounts[currentVideo.id] || 0}</span>
         </button>
 
         {/* Location Button */}
         {distance && (
           <button className="action-button-animate flex flex-col items-center gap-1 transition-transform duration-200 hover:scale-110 active:scale-95" aria-label={`Distance: ${distance}`}>
-            <div className="flex h-9 w-9 sm:h-10 sm:w-10 md:h-12 md:w-12 items-center justify-center rounded-full border border-[#3A3A34] bg-[#1A1A18]/80 backdrop-blur-xl transition-all duration-300 hover:bg-[#242420]/90 hover:border-[#F5A623] hover:shadow-lg hover:shadow-[#F5A623]/30 active:scale-95">
-              <svg className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-[#F5F0E8] transition-colors duration-300 hover:text-[#F5A623]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="flex h-9 w-9 sm:h-10 sm:w-10 md:h-12 md:w-12 items-center justify-center rounded-full border border-[#3A3A34] bg-[#1A1A18]/80 backdrop-blur-xl transition-all duration-300 hover:bg-[#242420]/90 hover:border-[#f97316] hover:shadow-lg hover:shadow-[#f97316]/30 active:scale-95">
+              <svg className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-[#F5F0E8] transition-colors duration-300 hover:text-[#f97316]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
             </div>
-            <span className="text-[#F5F0E8] text-[10px] sm:text-xs font-semibold">{distance}</span>
+            <span className="text-[#F5F0E8] text-[10px] sm:text-xs font-semibold" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.9)' }}>{distance}</span>
           </button>
         )}
 
@@ -1290,7 +1209,7 @@ export function HomeContent({ isActive }: HomeContentProps) {
           aria-label={isBookmarked ? 'Remove bookmark' : 'Bookmark video'}
         >
           <div className={`w-9 h-9 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center transition-all duration-300 ${
-            isBookmarked ? 'bg-[#F5A623] shadow-lg shadow-[#F5A623]/40' : 'border border-[#3A3A34] bg-[#1A1A18]/80 backdrop-blur-xl hover:border-[#F5A623]/50 hover:shadow-lg hover:shadow-[#F5A623]/20'
+            isBookmarked ? 'bg-[#f97316] shadow-lg shadow-[#f97316]/40' : 'border border-[#3A3A34] bg-[#1A1A18]/80 backdrop-blur-xl hover:border-[#f97316]/50 hover:shadow-lg hover:shadow-[#f97316]/20'
           } ${bookmarkAnimating === currentVideo.id ? 'bookmark-icon-pop' : ''}`}>
             <svg
               className={`w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-[#F5F0E8] transition-all duration-300 ${
@@ -1312,8 +1231,8 @@ export function HomeContent({ isActive }: HomeContentProps) {
           className="action-button-animate flex flex-col items-center gap-1 transition-transform duration-200 hover:scale-110 active:scale-95"
           aria-label="Share this video"
         >
-          <div className="flex h-9 w-9 sm:h-10 sm:w-10 md:h-12 md:w-12 items-center justify-center rounded-full border border-[#3A3A34] bg-[#1A1A18]/80 backdrop-blur-xl transition-all duration-300 hover:bg-[#242420]/90 hover:border-[#F5A623] hover:shadow-lg hover:shadow-[#F5A623]/30 active:scale-95">
-            <svg className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-[#F5F0E8] transition-colors duration-300 hover:text-[#F5A623]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="flex h-9 w-9 sm:h-10 sm:w-10 md:h-12 md:w-12 items-center justify-center rounded-full border border-[#3A3A34] bg-[#1A1A18]/80 backdrop-blur-xl transition-all duration-300 hover:bg-[#242420]/90 hover:border-[#f97316] hover:shadow-lg hover:shadow-[#f97316]/30 active:scale-95">
+            <svg className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-[#F5F0E8] transition-colors duration-300 hover:text-[#f97316]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
             </svg>
           </div>
@@ -1342,8 +1261,8 @@ export function HomeContent({ isActive }: HomeContentProps) {
 
       {/* Admin Mode Badge */}
       {adminMode && (
-        <div className="fixed bottom-20 left-3 z-50 rounded-full bg-[#F5A623]/90 px-2.5 py-1 text-[11px] font-semibold text-[#1A1A18] backdrop-blur-sm">
-          ⚡ Admin
+        <div className="fixed bottom-20 left-3 z-50 rounded-full bg-[#f97316]/90 px-2.5 py-1 text-[11px] font-semibold text-white backdrop-blur-sm">
+          Admin
         </div>
       )}
     </div>

@@ -23,6 +23,8 @@ export interface ItemPurchase {
   stripe_session_id?: string;
   status: 'pending' | 'paid' | 'completed' | 'cancelled' | 'failed';
   purchased_at: string;
+  scheduled_at?: string;
+  group_order_id?: string;
 }
 
 export type Order = CoinPurchase | ItemPurchase;

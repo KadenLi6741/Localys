@@ -1,31 +1,24 @@
-import { Conversation } from '@/lib/supabase/messaging';
+import { ChatWithDetails } from '@/lib/supabase/messaging';
 import { ChatListItem } from './ChatListItem';
-import { useRouter } from 'next/navigation';
 
 interface ChatListProps {
-  chats: Conversation[];
+  chats: ChatWithDetails[];
   currentUserId: string;
   loading?: boolean;
+  activeChatId?: string | null;
+  onSelect: (chatId: string) => void;
 }
 
-export function ChatList({ chats, currentUserId, loading }: ChatListProps) {
-  const router = useRouter();
-
-  const handleChatClick = (chatId: string) => {
-    router.push(`/chats/${chatId}`);
-  };
-
+export function ChatList({ chats, loading, activeChatId, onSelect }: ChatListProps) {
   if (loading) {
     return (
-      <div className="space-y-4">
-        {[1, 2, 3].map((i) => (
-          <div key={i} className="animate-pulse">
-            <div className="flex items-center gap-4 p-4 bg-[#242420] border border-[#3A3A34] rounded-2xl">
-              <div className="w-14 h-14 rounded-full bg-[#2E2E28]"></div>
-              <div className="flex-1">
-                <div className="h-4 bg-[#2E2E28] rounded w-1/3 mb-2"></div>
-                <div className="h-3 bg-[#2E2E28] rounded w-2/3"></div>
-              </div>
+      <div>
+        {[1, 2, 3, 4, 5].map((i) => (
+          <div key={i} className="flex animate-pulse items-center gap-3 px-4 py-3">
+            <div className="h-11 w-11 shrink-0 rounded-full bg-gray-200 dark:bg-gray-700" />
+            <div className="flex-1 space-y-2">
+              <div className="h-3.5 w-1/3 rounded bg-gray-200 dark:bg-gray-700" />
+              <div className="h-3 w-2/3 rounded bg-gray-200 dark:bg-gray-700" />
             </div>
           </div>
         ))}
@@ -35,25 +28,23 @@ export function ChatList({ chats, currentUserId, loading }: ChatListProps) {
 
   if (chats.length === 0) {
     return (
-      <div className="text-center py-12">
-        <svg className="w-16 h-16 text-[#6BAF7A]/40 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-        </svg>
-        <p className="text-[#F5F0E8] font-semibold mb-2">No chats yet</p>
-        <p className="text-sm text-[#9E9A90]">
-          Start a new conversation by clicking the + button above
+      <div className="px-4 py-10 text-center">
+        <p className="text-sm font-medium text-gray-500 dark:text-gray-400">No conversations yet</p>
+        <p className="mt-1 text-xs text-gray-400 dark:text-gray-500">
+          Use the button above to start one
         </p>
       </div>
     );
   }
 
   return (
-    <div className="divide-y divide-[#3A3A34]">
+    <div className="divide-y divide-gray-100 dark:divide-gray-800">
       {chats.map((chat) => (
         <ChatListItem
           key={chat.id}
           chat={chat}
-          onClick={() => chat.id && handleChatClick(chat.id)}
+          isActive={chat.id === activeChatId}
+          onClick={() => chat.id && onSelect(chat.id)}
         />
       ))}
     </div>

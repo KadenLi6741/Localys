@@ -11,7 +11,7 @@ const makeBusinessIcon = (label: string, index: number) =>
   L.divIcon({
     className: '',
     html: `<div style="display:flex;flex-direction:column;align-items:center;gap:2px">
-      <div style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:22px;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.6))">📍</div>
+      <div style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:22px;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.6))"></div>
       ${index > 0 ? `<div style="background:rgba(0,0,0,0.75);color:white;font-size:10px;padding:1px 5px;border-radius:4px;white-space:nowrap;max-width:90px;overflow:hidden;text-overflow:ellipsis">${label}</div>` : ''}
     </div>`,
     iconSize: [32, 48],
@@ -166,14 +166,14 @@ export default function BusinessLocationMap({ locations, businessName }: Busines
                   {locations.length > 1 && <div style={{ color: '#555', fontSize: '12px' }}>{loc.label}</div>}
                   {straight !== null && (
                     <div style={{ marginTop: '6px', fontSize: '12px', color: '#333' }}>
-                      📏 {straight < 1
+                      {straight < 1
                         ? `${Math.round(straight * 1000)} m away`
                         : `${straight.toFixed(1)} km away`}
                     </div>
                   )}
                   {route ? (
                     <div style={{ fontSize: '12px', color: '#1a73e8', marginTop: '2px' }}>
-                      🚗 {formatDriveTime(route.drivingMinutes)} ({route.drivingKm} km)
+                      {formatDriveTime(route.drivingMinutes)} ({route.drivingKm} km)
                     </div>
                   ) : straight !== null ? (
                     <div style={{ fontSize: '11px', color: '#999', marginTop: '2px' }}>
@@ -238,7 +238,7 @@ export default function BusinessLocationMap({ locations, businessName }: Busines
           rel="noopener noreferrer"
           className="text-xs text-white/40 hover:text-white/60 transition-colors"
         >
-          Open in maps ↗
+          Open in maps 
         </a>
       </div>
     </div>

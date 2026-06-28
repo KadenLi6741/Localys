@@ -18,17 +18,23 @@ export default function CheckoutSuccessPage() {
 }
 
 function CheckoutSuccessContent() {
-  const { user } = useAuth();
+  const { user, session } = useAuth();
   const searchParams = useSearchParams();
   const sessionId = searchParams.get('session_id');
   const [confirmationNumber, setConfirmationNumber] = useState('');
 
   useEffect(() => {
-    if (!sessionId || !user) return;
+    if (!sessionId || !user || !session?.access_token) return;
 
     const getConfirmation = async () => {
       try {
-        const response = await fetch(`/api/verify-purchase?session_id=${sessionId}`);
+        const response = await fetch(`/api/verify-purchase?session_id=${sessionId}`, {
+          headers: { 'Authorization': `Bearer ${session.access_token}` },
+        });
+        if (!response.ok) {
+          console.error('Verify purchase failed:', response.status);
+          return;
+        }
         const data = await response.json();
         
         if (data.confirmationNumber) {
@@ -48,7 +54,7 @@ function CheckoutSuccessContent() {
       <div className="max-w-md w-full">
         <div className="bg-white/5 border border-green-500/30 rounded-lg p-8 text-center">
           {/* Success Icon */}
-          <div className="text-6xl mb-4">✅</div>
+          <div className="text-6xl mb-4"></div>
 
           <h1 className="text-3xl font-bold mb-2 text-green-400">Order Confirmed!</h1>
           <p className="text-white/60 mb-8">
@@ -75,7 +81,7 @@ function CheckoutSuccessContent() {
           {/* Status Message */}
           <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4 mb-6">
             <p className="text-blue-400 text-sm">
-              ✓ Your coins will be added to your account shortly
+              Your coins will be added to your account shortly
             </p>
           </div>
 

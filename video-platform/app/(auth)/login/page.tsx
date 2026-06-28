@@ -3,54 +3,53 @@
 import { Suspense, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { signIn, resetPasswordForEmail } from '@/lib/supabase/auth';
+import { signIn, resetPasswordForEmail, signInWithGoogle } from '@/lib/supabase/auth';
 import TurnstileWidget from '@/components/TurnstileWidget';
+import AuthSplitLayout from '@/components/auth/AuthSplitLayout';
 
+const ORANGE = '#f97316';
 const DEFAULT_LOCAL_TURNSTILE_SITE_KEY = '1x00000000000000000000AA';
 
 function isTurnstileEnabled(): boolean {
   if (process.env.NODE_ENV === 'production') {
     return true;
   }
-
   return process.env.NEXT_PUBLIC_TURNSTILE_ENABLED_IN_DEV === 'true';
 }
 
 function resolveTurnstileSiteKey(): string {
   const prodKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? '';
-
   if (typeof window === 'undefined') {
     return prodKey;
   }
-
   const hostname = window.location.hostname;
   const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '::1';
-
   if (!isLocalhost) {
     return prodKey;
   }
-
   const localKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY_LOCAL ?? '';
   return localKey || prodKey || DEFAULT_LOCAL_TURNSTILE_SITE_KEY;
 }
 
-async function verifyTurnstile(token: string): Promise<boolean> {
-  const res = await fetch('/api/verify-turnstile', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ token }),
-  });
-  const data = await res.json();
-  return data.success === true;
+const inputClass =
+  'w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 placeholder-gray-400 transition focus:border-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900/10';
+
+function GoogleIcon() {
+  return (
+    <svg className="h-5 w-5" viewBox="0 0 24 24" aria-hidden>
+      <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+      <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+      <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" />
+      <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+    </svg>
+  );
 }
 
 export default function LoginPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-transparent text-white flex items-center justify-center px-4">
-          <p className="text-white/70">Loading login...</p>
-        </div>
+        <div className="flex min-h-screen items-center justify-center bg-white px-4 text-gray-500">Loading login…</div>
       }
     >
       <LoginPageContent />
@@ -62,12 +61,14 @@ function LoginPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const isEmailVerified = searchParams.get('verified') === '1';
+  const oauthError = searchParams.get('error') === 'oauth';
   const turnstileEnabled = isTurnstileEnabled();
   const siteKey = resolveTurnstileSiteKey();
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [error, setError] = useState(oauthError ? 'Google sign-in was cancelled or failed. Please try again.' : '');
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [resetMode, setResetMode] = useState(false);
   const [resetSent, setResetSent] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
@@ -90,28 +91,32 @@ function LoginPageContent() {
     setError('');
   };
 
+  const handleGoogle = async () => {
+    setError('');
+    setGoogleLoading(true);
+    const { error: googleError } = await signInWithGoogle();
+    if (googleError) {
+      setError(googleError.message || 'Google sign-in failed');
+      setGoogleLoading(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
     if (turnstileEnabled && !turnstileToken) {
-      setError('Please wait for the security check to complete.');
+      setError('Please complete the security check.');
       return;
     }
 
     setLoading(true);
 
-    if (turnstileEnabled) {
-      const verified = await verifyTurnstile(turnstileToken!);
-      if (!verified) {
-        setError('Security check failed. Please try again.');
-        resetTurnstile();
-        setLoading(false);
-        return;
-      }
-    }
-
-    const { data, error: signInError } = await signIn({ identifier, password });
+    const { data, error: signInError } = await signIn({
+      identifier,
+      password,
+      captchaToken: turnstileEnabled ? turnstileToken ?? undefined : undefined,
+    });
 
     if (signInError) {
       setError(signInError.message || 'Failed to sign in');
@@ -121,8 +126,10 @@ function LoginPageContent() {
     }
 
     if (data?.session) {
-      router.push(isEmailVerified ? '/onboarding' : '/feed');
+      router.push(isEmailVerified ? '/onboarding' : '/home');
       router.refresh();
+    } else {
+      setLoading(false);
     }
   };
 
@@ -131,7 +138,7 @@ function LoginPageContent() {
     setError('');
 
     if (turnstileEnabled && !turnstileToken) {
-      setError('Please wait for the security check to complete.');
+      setError('Please complete the security check.');
       return;
     }
 
@@ -143,17 +150,10 @@ function LoginPageContent() {
 
     setLoading(true);
 
-    if (turnstileEnabled) {
-      const verified = await verifyTurnstile(turnstileToken!);
-      if (!verified) {
-        setError('Security check failed. Please try again.');
-        resetTurnstile();
-        setLoading(false);
-        return;
-      }
-    }
-
-    const { error: resetError } = await resetPasswordForEmail(normalizedIdentifier);
+    const { error: resetError } = await resetPasswordForEmail(
+      normalizedIdentifier,
+      turnstileEnabled ? turnstileToken ?? undefined : undefined,
+    );
 
     if (resetError) {
       setError(resetError.message || 'Failed to send reset email');
@@ -166,177 +166,138 @@ function LoginPageContent() {
     setLoading(false);
   };
 
+  // ----- Reset password mode -----
   if (resetMode) {
     return (
-      <div className="min-h-screen bg-transparent text-white flex items-center justify-center px-4">
-        <div className="w-full max-w-md space-y-8 bg-[rgba(36,36,32,0.85)] backdrop-blur-md border border-[#3A3A34] rounded-2xl p-8 shadow-xl" style={{ animation: 'fadeInUp 0.5s ease-out forwards', opacity: 0 }}>
+      <AuthSplitLayout>
+        <div className="space-y-6 text-gray-900">
           <div className="text-center">
-            <h1 className="entrance-slide text-4xl font-bold mb-2" style={{ animation: 'slideInLeft 0.4s ease-out 0.1s forwards', opacity: 0 }}>Localy</h1>
-            <p className="text-white/60">Reset your password</p>
+            <h1 className="text-3xl font-bold">Reset your password</h1>
+            <p className="mt-2 text-sm text-gray-500">Enter your email and we&apos;ll send you a reset link.</p>
           </div>
 
           {resetSent ? (
             <div className="space-y-6">
-              <div className="bg-green-500/20 border border-green-500 text-green-200 px-4 py-3 rounded-lg">
+              <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-center text-green-700">
                 Check your email for a password reset link.
               </div>
               <button
                 onClick={() => { switchToLogin(); setResetSent(false); }}
-                className="w-full bg-white text-black font-semibold py-3 rounded-lg hover:bg-white/90 active:scale-98 transition-all duration-200"
+                className="w-full rounded-lg py-3 font-semibold text-white transition hover:opacity-90"
+                style={{ backgroundColor: ORANGE }}
               >
-                Back to Sign In
+                Back to Sign in
               </button>
             </div>
           ) : (
-            <form onSubmit={handleResetPassword} className="space-y-6">
-              {isEmailVerified && (
-                <div className="bg-green-500/20 border border-green-500 text-green-200 px-4 py-3 rounded-lg">
-                  Email verified. Please sign in again to continue.
-                </div>
-              )}
-
+            <form onSubmit={handleResetPassword} className="space-y-5">
               {error && (
-                <div className="bg-red-500/20 border border-red-500 text-red-200 px-4 py-3 rounded-lg">
-                  {error}
-                </div>
+                <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-red-700">{error}</div>
               )}
-
               <div>
-                <label htmlFor="reset-email" className="block text-sm font-medium mb-2">
-                  Email
-                </label>
-                <input
-                  id="reset-email"
-                  type="email"
-                  value={identifier}
-                  onChange={(e) => setIdentifier(e.target.value)}
-                  required
-                  className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-white/40 focus:outline-none focus:border-white/40 focus:ring-2 focus:ring-white/20 transition-all duration-200"
-                  placeholder="you@example.com"
-                />
+                <label htmlFor="reset-email" className="sr-only">Email address</label>
+                <input id="reset-email" type="email" value={identifier} onChange={(e) => setIdentifier(e.target.value)} required className={inputClass} placeholder="Email Address" />
               </div>
 
               {turnstileEnabled && (
-                <TurnstileWidget
-                  siteKey={siteKey}
-                  onVerify={setTurnstileToken}
-                  onExpire={() => setTurnstileToken(null)}
-                  theme="dark"
-                  resetKey={turnstileResetKey}
-                />
+                <TurnstileWidget siteKey={siteKey} onVerify={setTurnstileToken} onExpire={() => setTurnstileToken(null)} theme="light" resetKey={turnstileResetKey} />
               )}
 
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-white text-black font-semibold py-3 rounded-lg disabled:bg-white/20 disabled:text-white/40 disabled:cursor-not-allowed hover:bg-white/90 active:scale-98 transition-all duration-200"
+                className="w-full rounded-lg py-3 font-semibold text-white transition hover:opacity-90 disabled:opacity-50"
+                style={{ backgroundColor: ORANGE }}
               >
-                {loading ? 'Sending...' : 'Send Reset Link'}
+                {loading ? 'Sending…' : 'Send reset link'}
+              </button>
+
+              <button type="button" onClick={switchToLogin} className="block w-full text-center text-sm text-gray-500 transition hover:text-gray-900">
+                Back to Sign in
               </button>
             </form>
           )}
-
-          {!resetSent && (
-            <p className="text-center text-white/60">
-              <button
-                onClick={switchToLogin}
-                className="text-white hover:underline"
-              >
-                Back to Sign In
-              </button>
-            </p>
-          )}
         </div>
-      </div>
+      </AuthSplitLayout>
     );
   }
 
+  // ----- Login mode -----
   return (
-    <div className="min-h-screen bg-transparent text-white flex items-center justify-center px-4">
-      <div className="w-full max-w-md space-y-8 bg-[rgba(36,36,32,0.85)] backdrop-blur-md border border-[#3A3A34] rounded-2xl p-8 shadow-xl" style={{ animation: 'fadeInUp 0.5s ease-out forwards', opacity: 0 }}>
-        <div className="text-center">
-          <h1 className="entrance-slide text-4xl font-bold mb-2" style={{ animation: 'slideInLeft 0.4s ease-out 0.1s forwards', opacity: 0 }}>Localy</h1>
-          <p className="text-white/60">Sign in to your account</p>
+    <AuthSplitLayout>
+      <div className="space-y-6 text-gray-900">
+        {/* Top row */}
+        <div className="flex items-center justify-end gap-3 text-sm">
+          <span className="text-gray-500">Don&apos;t have an account?</span>
+          <Link href="/signup" className="rounded-md border border-gray-300 px-4 py-1.5 font-medium text-gray-900 transition hover:bg-gray-50">
+            Sign up
+          </Link>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Heading */}
+        <div className="text-center">
+          <h1 className="text-3xl font-bold sm:text-4xl">Sign in to Localys</h1>
+          <p className="mt-2 text-sm text-gray-500">Welcome back — enter your details to continue.</p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
           {isEmailVerified && (
-            <div className="bg-green-500/20 border border-green-500 text-green-200 px-4 py-3 rounded-lg">
-              Email verified. Please sign in again to continue.
+            <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-center text-green-700">
+              Email verified. Please sign in to continue.
             </div>
           )}
-
           {error && (
-            <div className="bg-red-500/20 border border-red-500 text-red-200 px-4 py-3 rounded-lg">
-              {error}
-            </div>
+            <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-red-700">{error}</div>
           )}
 
           <div>
-            <label htmlFor="email" className="block text-sm font-medium mb-2">
-              Email
-            </label>
-            <input
-              id="email"
-              type="email"
-              value={identifier}
-              onChange={(e) => setIdentifier(e.target.value)}
-              required
-              className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-white/40 focus:outline-none focus:border-white/40 focus:ring-2 focus:ring-white/20 transition-all duration-200"
-              placeholder="you@example.com"
-            />
+            <label htmlFor="email" className="sr-only">Email address</label>
+            <input id="email" type="email" value={identifier} onChange={(e) => setIdentifier(e.target.value)} required className={inputClass} placeholder="Email Address" />
           </div>
 
           <div>
-            <div className="flex items-center justify-between mb-2">
-              <label htmlFor="password" className="block text-sm font-medium">
-                Password
-              </label>
-              <button
-                type="button"
-                onClick={switchToReset}
-                className="text-sm text-white/60 hover:text-white hover:underline transition-colors duration-200"
-              >
-                Forgot Password?
-              </button>
-            </div>
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-white/40 focus:outline-none focus:border-white/40 focus:ring-2 focus:ring-white/20 transition-all duration-200"
-              placeholder="••••••••"
-            />
+            <label htmlFor="password" className="sr-only">Password</label>
+            <input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required className={inputClass} placeholder="Password" />
+          </div>
+
+          <div className="text-center">
+            <button type="button" onClick={switchToReset} className="text-base font-semibold text-black transition hover:opacity-70">
+              Forgot the password?
+            </button>
           </div>
 
           {turnstileEnabled && (
-            <TurnstileWidget
-              siteKey={siteKey}
-              onVerify={setTurnstileToken}
-              onExpire={() => setTurnstileToken(null)}
-              theme="dark"
-              resetKey={turnstileResetKey}
-            />
+            <TurnstileWidget siteKey={siteKey} onVerify={setTurnstileToken} onExpire={() => setTurnstileToken(null)} theme="light" resetKey={turnstileResetKey} />
           )}
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-white text-black font-semibold py-3 rounded-lg disabled:bg-white/20 disabled:text-white/40 disabled:cursor-not-allowed hover:bg-white/90 active:scale-98 transition-all duration-200"
+            className="w-full rounded-lg py-3 font-semibold text-white transition hover:opacity-90 disabled:opacity-50"
+            style={{ backgroundColor: ORANGE }}
           >
-            {loading ? 'Signing in...' : 'Sign In'}
+            {loading ? 'Signing in…' : 'Login'}
           </button>
         </form>
 
-        <p className="text-center text-white/60">
-          Don't have an account?{' '}
-          <Link href="/signup" className="text-white hover:underline">
-            Sign up
-          </Link>
-        </p>
+        {/* OR divider */}
+        <div className="flex items-center gap-4">
+          <div className="h-px flex-1 bg-gray-200" />
+          <span className="text-xs font-medium text-gray-400">OR</span>
+          <div className="h-px flex-1 bg-gray-200" />
+        </div>
+
+        {/* Google */}
+        <button
+          type="button"
+          onClick={handleGoogle}
+          disabled={googleLoading}
+          className="flex w-full items-center justify-center gap-3 rounded-lg border border-gray-300 bg-white py-3 font-semibold text-gray-900 transition hover:bg-gray-50 disabled:opacity-60"
+        >
+          <GoogleIcon />
+          {googleLoading ? 'Opening Google…' : 'Sign in with Google'}
+        </button>
       </div>
-    </div>
+    </AuthSplitLayout>
   );
 }

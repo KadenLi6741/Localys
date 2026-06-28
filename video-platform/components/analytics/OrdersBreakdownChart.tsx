@@ -51,7 +51,7 @@ export function OrdersBreakdownChart({ data }: OrdersBreakdownChartProps) {
 
   return (
     <div>
-      <h4 className="text-sm font-semibold text-[#F5F0E8]/80 mb-3">📦 Orders Breakdown</h4>
+      <h4 className="text-sm font-semibold text-[#F5F0E8]/80 mb-3">Orders Breakdown</h4>
       <ResponsiveContainer width="100%" height={260}>
         <PieChart>
           <Pie

@@ -281,7 +281,7 @@ export default function CommentForm({
               className="px-3 py-1.5 rounded-lg font-semibold text-sm bg-white/10 text-white hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
               title="Add image"
             >
-              📷
+              Photo
             </button>
           </div>
           <button

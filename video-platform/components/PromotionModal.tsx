@@ -87,8 +87,9 @@ export function PromotionModal({ isOpen, onClose, videoId, userCoins, onSuccess,
           <button
             onClick={onClose}
             className="text-white/60 hover:text-white transition-colors"
+            aria-label="Close"
           >
-            ✕
+            &times;
           </button>
         </div>
 

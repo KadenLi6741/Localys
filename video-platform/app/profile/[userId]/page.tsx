@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react'; // useRef kept for 3-dot menu
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { useParams, usePathname, useRouter } from 'next/navigation';
@@ -8,9 +8,11 @@ import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase/client';
 import { getOrCreateOneToOneChat } from '@/lib/supabase/messaging';
-import { getUserBusiness, getBusinessLocations, Business, BusinessHours, BusinessLocation } from '@/lib/supabase/profiles';
+import { getUserBusiness, getBusinessLocations, getUserMenu, Business, BusinessHours, BusinessLocation } from '@/lib/supabase/profiles';
 import { MenuList } from '@/components/MenuList';
 import { PostedVideos } from '@/components/PostedVideos';
+import { StorePage, type StoreMenu, type StoreItem } from '@/components/store/StorePage';
+import storeMenus from '@/data/store-menus.json';
 
 const BusinessLocationMap = dynamic(
   () => import('@/components/BusinessLocationMap'),
@@ -39,6 +41,31 @@ export default function UserProfilePage() {
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+/** Build a StoreMenu from Supabase items for stores without a public/Menu folder. */
+function buildFallbackMenu(business: Business, items: any[]): StoreMenu {
+  const mapped: StoreItem[] = (items || []).map((it, i) => ({
+    id: it.id || `${business.owner_id}-${i}`,
+    name: it.item_name,
+    price: Number(it.price) || 0,
+    description: it.description || '',
+    image: it.image_url || undefined,
+    category: it.category || 'Menu',
+    likePct: 85 + (i % 14),
+    likeCount: 10 + (i % 40),
+  }));
+  const categories: string[] = [];
+  for (const it of mapped) if (!categories.includes(it.category)) categories.push(it.category);
+  return {
+    slug: '', banner: business.profile_picture_url || null,
+    rating: 4.7, ratingCount: '500+', address: 'Toronto, ON',
+    availability: 'Available today', hoursLabel: 'Mon–Sun 9:00 a.m. – 9:00 p.m.', deliveryTime: '20 min',
+    reviews: [], categories,
+    featuredIds: mapped.slice(0, 8).map((m) => m.id),
+    pickedIds: mapped.slice(8, 14).map((m) => m.id),
+    items: mapped,
+  };
+}
+
 const REPORT_REASONS = [
   { value: 'spam', label: 'Spam' },
   { value: 'harassment', label: 'Harassment or Bullying' },
@@ -59,15 +86,10 @@ function UserProfileContent() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [business, setBusiness] = useState<Business | null>(null);
   const [businessLocations, setBusinessLocations] = useState<BusinessLocation[]>([]);
-  const [showBusinessHours, setShowBusinessHours] = useState(false);
+  const [storeMenu, setStoreMenu] = useState<StoreMenu | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [messagingLoading, setMessagingLoading] = useState(false);
-
-  // Follow state
-  const [isFollowing, setIsFollowing] = useState(false);
-  const [followerCount, setFollowerCount] = useState(0);
-  const [followLoading, setFollowLoading] = useState(false);
 
   // 3-dot menu state
   const [showMenu, setShowMenu] = useState(false);
@@ -83,14 +105,6 @@ function UserProfileContent() {
   // Average rating state
   const [avgRating, setAvgRating] = useState<number | null>(null);
   const [totalReviews, setTotalReviews] = useState(0);
-
-  // Admin mode state (Ctrl+Shift+D) — persisted in localStorage
-  const [adminMode, setAdminMode] = useState(() => {
-    if (typeof window !== 'undefined') return localStorage.getItem('adminMode') === 'true';
-    return false;
-  });
-  const [adminFollowerBoost, setAdminFollowerBoost] = useState(0);
-  const realFollowerCountRef = useRef(0);
 
   useEffect(() => {
     if (identifier) {
@@ -108,11 +122,22 @@ function UserProfileContent() {
     }
   }, [profile?.type]);
 
-  // Load follow status + follower count when profile is loaded
+  // Resolve the Uber-Eats store menu: prefer the folder-driven manifest, else
+  // fall back to the store's Supabase items (neutral placeholder photos).
+  useEffect(() => {
+    if (!business || !profile) { setStoreMenu(null); return; }
+    const manifest = (storeMenus as Record<string, StoreMenu>)[business.business_name];
+    if (manifest) { setStoreMenu(manifest); return; }
+    let active = true;
+    (async () => {
+      const { data: menu } = await getUserMenu(profile.id);
+      if (active) setStoreMenu(buildFallbackMenu(business, (menu as any)?.menu_items || []));
+    })();
+    return () => { active = false; };
+  }, [business, profile]);
+
   useEffect(() => {
     if (profile && user) {
-      checkFollowStatus();
-      loadFollowerCount();
       loadAverageRating();
     }
   }, [profile, user]);
@@ -135,57 +160,6 @@ function UserProfileContent() {
     return () => clearTimeout(timer);
   }, [toastMessage]);
 
-  // Admin Mode keyboard shortcut (Ctrl+Shift+D)
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (e.ctrlKey && e.shiftKey && e.key === 'D') {
-        e.preventDefault();
-        setAdminMode(prev => {
-          if (prev) {
-            // Turning OFF — revert to real count
-            localStorage.removeItem('adminMode');
-            setAdminFollowerBoost(0);
-            setFollowerCount(realFollowerCountRef.current);
-          } else {
-            // Turning ON — snapshot real count
-            localStorage.setItem('adminMode', 'true');
-            realFollowerCountRef.current = followerCount;
-          }
-          return !prev;
-        });
-      }
-    };
-    window.addEventListener('keydown', handler);
-    return () => window.removeEventListener('keydown', handler);
-  }, [followerCount]);
-
-  // On mount, if admin mode was persisted, snapshot current follower count
-  useEffect(() => {
-    if (adminMode && followerCount > 0) {
-      realFollowerCountRef.current = followerCount;
-    }
-  }, [adminMode, followerCount]);
-
-  const checkFollowStatus = async () => {
-    if (!user || !profile) return;
-    const { data } = await supabase
-      .from('follows')
-      .select('id')
-      .eq('follower_id', user.id)
-      .eq('following_id', profile.id)
-      .maybeSingle();
-    setIsFollowing(!!data);
-  };
-
-  const loadFollowerCount = async () => {
-    if (!profile) return;
-    const { count } = await supabase
-      .from('follows')
-      .select('*', { count: 'exact', head: true })
-      .eq('following_id', profile.id);
-    setFollowerCount(count ?? 0);
-  };
-
   const loadAverageRating = async () => {
     if (!profile) return;
     // Get all videos by this user, then compute avg rating from comments with ratings
@@ -206,39 +180,6 @@ function UserProfileContent() {
       const sum = ratings.reduce((acc, r) => acc + (r.rating || 0), 0);
       setAvgRating(Math.round((sum / ratings.length) * 10) / 10);
       setTotalReviews(ratings.length);
-    }
-  };
-
-  const toggleFollow = async () => {
-    if (!user || !profile || followLoading) return;
-    setFollowLoading(true);
-    try {
-      if (isFollowing) {
-        await supabase
-          .from('follows')
-          .delete()
-          .eq('follower_id', user.id)
-          .eq('following_id', profile.id);
-        setIsFollowing(false);
-        setFollowerCount(c => Math.max(0, c - 1));
-        if (adminMode) {
-          realFollowerCountRef.current = Math.max(0, realFollowerCountRef.current - 1);
-        }
-      } else {
-        await supabase
-          .from('follows')
-          .insert({ follower_id: user.id, following_id: profile.id });
-        setIsFollowing(true);
-        setFollowerCount(c => c + 1 + (adminMode ? 1 : 0));
-        if (adminMode) {
-          realFollowerCountRef.current = realFollowerCountRef.current + 1;
-          setAdminFollowerBoost(b => b + 1);
-        }
-      }
-    } catch {
-      // silently fail
-    } finally {
-      setFollowLoading(false);
     }
   };
 
@@ -288,14 +229,6 @@ function UserProfileContent() {
       await supabase
         .from('blocks')
         .insert({ blocker_id: user.id, blocked_id: profile.id });
-      // Also unfollow if following
-      if (isFollowing) {
-        await supabase
-          .from('follows')
-          .delete()
-          .eq('follower_id', user.id)
-          .eq('following_id', profile.id);
-      }
       setToastColor('amber');
       setToastMessage(`@${profile.username} has been blocked`);
       setTimeout(() => router.push('/feed'), 1200);
@@ -406,10 +339,10 @@ function UserProfileContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#1A1A18] flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#F5F0E8] mx-auto mb-4"></div>
-          <p className="text-[#F5F0E8]">Loading profile...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#f97316] mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading…</p>
         </div>
       </div>
     );
@@ -417,19 +350,25 @@ function UserProfileContent() {
 
   if (error || !profile) {
     return (
-      <div className="min-h-screen bg-[#1A1A18] flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-[#F5F0E8] mb-4">Profile Not Found</h2>
-          <p className="text-[#F5F0E8]/60 mb-6">{error || 'This profile does not exist.'}</p>
+          <h2 className="text-2xl font-bold text-black mb-4">Profile Not Found</h2>
+          <p className="text-gray-500 mb-6">{error || 'This profile does not exist.'}</p>
           <Link
             href="/feed"
-            className="bg-[#F5A623] text-black font-semibold px-6 py-3 rounded-lg hover:bg-[#F5A623]/90 transition-all duration-200"
+            className="bg-[#f97316] text-white font-semibold px-6 py-3 rounded-lg hover:opacity-90 transition-all duration-200"
           >
             Back to Home
           </Link>
         </div>
       </div>
     );
+  }
+
+  // Business profiles render the Uber-Eats-style store page (white, no follow).
+  if (business) {
+    if (!storeMenu) return <div className="min-h-screen bg-white" />;
+    return <StorePage storeName={business.business_name} sellerId={profile.id} menu={storeMenu} />;
   }
 
   return (
@@ -439,7 +378,7 @@ function UserProfileContent() {
         <div className={`fixed top-6 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-lg text-sm font-medium shadow-lg transition-all duration-300 ${
           toastColor === 'sage' ? 'bg-[#6BAF7A] text-white' :
           toastColor === 'red' ? 'bg-[#E05C3A] text-white' :
-          'bg-[#F5A623] text-black'
+          'bg-[#f97316] text-black'
         }`}>
           {toastMessage}
         </div>
@@ -452,8 +391,8 @@ function UserProfileContent() {
             <h3 className="text-lg font-semibold text-[#F5F0E8] mb-4">Report @{profile.username}</h3>
             <div className="space-y-3">
               {REPORT_REASONS.map(r => (
-                <label key={r.value} className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors ${reportReason === r.value ? 'bg-[#F5A623]/20 border border-[#F5A623]/40' : 'bg-[#1A1A18] border border-[#3A3A34] hover:border-[#F5A623]/30'}`}>
-                  <input type="radio" name="reason" value={r.value} checked={reportReason === r.value} onChange={() => setReportReason(r.value)} className="accent-[#F5A623]" />
+                <label key={r.value} className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors ${reportReason === r.value ? 'bg-[#f97316]/20 border border-[#f97316]/40' : 'bg-[#1A1A18] border border-[#3A3A34] hover:border-[#f97316]/30'}`}>
+                  <input type="radio" name="reason" value={r.value} checked={reportReason === r.value} onChange={() => setReportReason(r.value)} className="accent-[#f97316]" />
                   <span className="text-sm text-[#F5F0E8]">{r.label}</span>
                 </label>
               ))}
@@ -463,7 +402,7 @@ function UserProfileContent() {
                 placeholder="Additional details (optional)"
                 rows={3}
                 maxLength={500}
-                className="w-full bg-[#1A1A18] border border-[#3A3A34] rounded-lg px-4 py-3 text-sm text-[#F5F0E8] placeholder-[#9E9A90] focus:outline-none focus:border-[#F5A623]/50 resize-none"
+                className="w-full bg-[#1A1A18] border border-[#3A3A34] rounded-lg px-4 py-3 text-sm text-[#F5F0E8] placeholder-[#9E9A90] focus:outline-none focus:border-[#f97316]/50 resize-none"
               />
             </div>
             <div className="flex gap-3 mt-5">
@@ -506,7 +445,7 @@ function UserProfileContent() {
               <div className="absolute right-0 top-full mt-1 bg-[#242420] border border-[#3A3A34] rounded-lg shadow-xl overflow-hidden min-w-[180px] z-20">
                 <button
                   onClick={() => { setShowMenu(false); setShowReportModal(true); }}
-                  className="w-full text-left px-4 py-3 text-sm text-[#F5F0E8] hover:bg-[#F5A623]/10 transition-colors flex items-center gap-3"
+                  className="w-full text-left px-4 py-3 text-sm text-[#F5F0E8] hover:bg-[#f97316]/10 transition-colors flex items-center gap-3"
                 >
                   <svg className="w-4 h-4 text-[#E05C3A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
@@ -534,85 +473,29 @@ function UserProfileContent() {
           <img
             src={profile.profile_picture_url || 'https://via.placeholder.com/120'}
             alt={profile.full_name}
-            className="w-32 h-32 rounded-full ring-2 ring-[#F5A623]/40 object-cover mb-4"
+            className="w-32 h-32 rounded-full ring-2 ring-[#f97316]/40 object-cover mb-4"
           />
           <h2 className="text-2xl font-bold mb-1">{profile.full_name}</h2>
           <p className="text-[#F5F0E8]/60 mb-1">@{profile.username}</p>
-
-          {/* Follower count */}
-          <p
-            className={`text-[#9E9A90] text-sm mb-4 ${adminMode ? 'cursor-pointer hover:text-[#F5A623] transition-colors select-none' : ''}`}
-            onClick={adminMode ? () => {
-              setAdminFollowerBoost(b => b + 1);
-              setFollowerCount(c => c + 1);
-            } : undefined}
-          >
-            {followerCount} {followerCount === 1 ? 'follower' : 'followers'}
-          </p>
 
           {profile.bio && (
             <p className="text-[#F5F0E8]/80 text-center max-w-md mb-2">{profile.bio}</p>
           )}
           
-          {/* Business Info */}
-          {business && (
-            <div className="flex items-center gap-2 flex-wrap justify-center mb-2">
-              <p className="text-[#F5A623] text-sm">🏪 {business.business_name}</p>
-              {business.business_type && (
-                <span className="bg-[#F5A623]/20 text-[#F5A623] text-xs px-2 py-1 rounded-full capitalize">
-                  {business.business_type === 'hybrid' ? '📦 Pickup & Delivery' : `🏷️ ${business.business_type}`}
-                </span>
-              )}
-              <button
-                onClick={() => setShowBusinessHours(!showBusinessHours)}
-                className="bg-[#F5A623]/20 text-[#F5A623] text-xs px-2 py-1 rounded-full hover:bg-[#F5A623]/30 transition-colors"
-              >
-                {showBusinessHours ? '⏰ Hide Hours' : '⏰ Show Hours'}
-              </button>
-            </div>
-          )}
-
           {/* Average Rating */}
           {avgRating !== null && (
             <p className="text-[#F5F0E8] text-sm mb-4">
-              ⭐ {avgRating} <span className="text-[#9E9A90]">({totalReviews} {totalReviews === 1 ? 'review' : 'reviews'})</span>
+              {avgRating} <span className="text-[#9E9A90]">({totalReviews} {totalReviews === 1 ? 'review' : 'reviews'})</span>
             </p>
           )}
 
           {/* Action Buttons Row */}
           <div className="flex items-center gap-3 mt-2">
-            {/* Follow Button */}
-            <button
-              onClick={toggleFollow}
-              disabled={followLoading}
-              className={`font-semibold px-5 py-2 rounded-lg transition-all duration-200 disabled:opacity-50 flex items-center gap-2 text-sm ${
-                isFollowing
-                  ? 'bg-[#F5A623] text-black hover:bg-[#F5A623]/90'
-                  : 'border-2 border-[#F5A623] text-[#F5A623] hover:bg-[#F5A623]/10'
-              }`}
-            >
-              {isFollowing ? (
-                <>
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
-                  </svg>
-                  Following
-                </>
-              ) : (
-                <>
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                  </svg>
-                  Follow
-                </>
-              )}
-            </button>
-            
             {/* Message Button */}
             <button
               onClick={handleMessageClick}
               disabled={messagingLoading}
-              className="bg-[#F5A623] text-black font-semibold px-5 py-2 rounded-lg hover:bg-[#F5A623]/90 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 text-sm"
+              className="bg-[#f97316] text-black font-semibold px-5 py-2 rounded-lg hover:bg-[#f97316]/90 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 text-sm"
             >
               {messagingLoading ? (
                 <>
@@ -642,50 +525,27 @@ function UserProfileContent() {
           </div>
         </div>
 
-        {/* Business Hours Section */}
-        {showBusinessHours && (
-          <div className="mt-8 mb-8">
-            <h3 className="text-xl font-semibold text-[#F5F0E8] mb-4">⏰ Business Hours</h3>
-            <div className="bg-[#242420] border border-[#3A3A34] rounded-lg p-6 space-y-2">
-              {business?.business_hours ? (
-                ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'].map((day) => (
-                  <div key={day} className="flex justify-between items-center text-sm">
-                    <span className="text-[#F5F0E8]/80 capitalize font-medium">{day}</span>
-                    <span className="text-[#F5F0E8]/60">
-                      {business.business_hours?.[day]?.closed ? (
-                        'Closed'
-                      ) : (
-                        `${business.business_hours?.[day]?.open || ''} - ${business.business_hours?.[day]?.close || ''}`
-                      )}
-                    </span>
-                  </div>
-                ))
-              ) : (
-                <p className="text-[#F5F0E8]/60 text-center py-4">Business hours not set</p>
-              )}
-            </div>
-          </div>
-        )}
-
         {/* Business Location Map */}
         {businessLocations.length > 0 && (
           <div className="mt-8">
             <h3 className="text-xl font-semibold text-[#F5F0E8] mb-4">
-              📍 Location{businessLocations.length > 1 ? 's' : ''}
+              Location{businessLocations.length > 1 ? 's' : ''}
             </h3>
             <div className="bg-[#242420] border border-[#3A3A34] rounded-lg overflow-hidden">
               <BusinessLocationMap
                 locations={businessLocations}
-                businessName={business?.business_name ?? ''}
+                businessName={profile.full_name}
               />
             </div>
           </div>
         )}
 
-        {/* Services Section (business only) */}
+        {/* Menu / Services Section (business only) */}
         {profile.type && (
           <div className="mt-8">
-            <h3 className="text-xl font-semibold text-[#F5F0E8] mb-4">⚙️ Services</h3>
+            <h3 className="text-xl font-semibold text-[#F5F0E8] mb-4">
+              {profile.type === 'service' ? 'Services' : 'Menu'}
+            </h3>
             <div className="bg-[#242420] border border-[#3A3A34] rounded-lg p-6">
               <MenuList userId={profile.id} isOwnProfile={false} />
             </div>
@@ -694,7 +554,7 @@ function UserProfileContent() {
 
         {/* Videos Section */}
         <div className="mt-8">
-          <h3 className="text-xl font-semibold text-[#F5F0E8] mb-4">📹 Videos</h3>
+          <h3 className="text-xl font-semibold text-[#F5F0E8] mb-4">Videos</h3>
           <div className="bg-[#242420] border border-[#3A3A34] rounded-lg p-6">
             <PostedVideos userId={profile.id} isOwnProfile={false} />
           </div>
@@ -710,14 +570,14 @@ function UserProfileContent() {
             </svg>
             <span className={`text-xs ${pathname === '/' ? 'text-[#F5F0E8]' : 'text-[#F5F0E8]/60'}`}>Home</span>
           </Link>
-          <Link href="/search" className="flex flex-col items-center gap-1 transition-transform duration-200 hover:scale-110 active:scale-95">
-            <svg className={`w-6 h-6 ${pathname === '/search' ? 'text-[#F5F0E8]' : 'text-[#F5F0E8]/60'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <Link href="/feed" className="flex flex-col items-center gap-1 transition-transform duration-200 hover:scale-110 active:scale-95">
+            <svg className={`w-6 h-6 ${pathname === '/feed' ? 'text-[#F5F0E8]' : 'text-[#F5F0E8]/60'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
-            <span className={`text-xs ${pathname === '/search' ? 'text-[#F5F0E8]' : 'text-[#F5F0E8]/60'}`}>Search</span>
+            <span className={`text-xs ${pathname === '/feed' ? 'text-[#F5F0E8]' : 'text-[#F5F0E8]/60'}`}>Discover</span>
           </Link>
           <Link href="/upload" className="flex flex-col items-center gap-1 transition-transform duration-200 hover:scale-110 active:scale-95">
-            <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-200 ${pathname === '/upload' ? 'bg-[#F5A623]' : 'bg-[#F5A623]/20'}`}>
+            <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-200 ${pathname === '/upload' ? 'bg-[#f97316]' : 'bg-[#f97316]/20'}`}>
               <svg className={`w-6 h-6 ${pathname === '/upload' ? 'text-black' : 'text-[#F5F0E8]'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
@@ -738,12 +598,6 @@ function UserProfileContent() {
         </div>
       </div>
 
-      {/* Admin Mode Badge */}
-      {adminMode && (
-        <div className="fixed bottom-20 left-3 z-50 rounded-full bg-[#F5A623]/90 px-2.5 py-1 text-[11px] font-semibold text-[#1A1A18] backdrop-blur-sm">
-          ⚡ Admin
-        </div>
-      )}
     </div>
   );
 }

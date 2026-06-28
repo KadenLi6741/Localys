@@ -504,7 +504,7 @@ export function MenuModal({ userId, businessId, menu, editItem, isOpen, onClose,
                       className="px-4 py-2 rounded-xl font-medium text-sm bg-[#242420] border border-[#3A3A34] text-[#F5F0E8] hover:bg-[#2E2E28] disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
                       title="Add item photo"
                     >
-                      📷 Add Photo
+                      Add Photo
                     </button>
                   </div>
 

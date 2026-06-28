@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { EditableProfilePicture } from '@/components/EditableProfilePicture';
+import { Logo } from '@/components/Logo';
 import { updateProfile } from '@/lib/supabase/profiles';
 
 export default function OnboardingPage() {
@@ -43,12 +44,12 @@ export default function OnboardingPage() {
       }
     }
 
-    router.push('/feed');
+    router.push('/home');
     router.refresh();
   };
 
   const handleSkip = () => {
-    router.push('/feed');
+    router.push('/home');
     router.refresh();
   };
 
@@ -71,7 +72,7 @@ export default function OnboardingPage() {
     <div className="min-h-screen bg-transparent text-white flex items-center justify-center px-4">
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
-          <h1 className="text-4xl font-bold mb-2">Localy</h1>
+          <Logo href={null} className="mb-2 justify-center text-white" iconClassName="h-8 w-8" textClassName="text-4xl" />
           <p className="text-white/60">Set up your profile</p>
         </div>
 

@@ -1,0 +1,3679 @@
+{
+  "Amy's Fish & Chips": {
+    "slug": "amys-fish-and-chips",
+    "folder": "Amy's Fish & Chips",
+    "banner": "/Menu/Amy's%20Fish%20%26%20Chips/Amy's%20Fish%20%26%20Chips.jpg",
+    "rating": 4.7,
+    "ratingCount": "500+",
+    "address": "6402 Bayview Ave, Richmond Hill, ON",
+    "availability": "Available today",
+    "hoursLabel": "Mon–Sun 9:00 a.m. – 9:00 p.m.",
+    "deliveryTime": "12 min",
+    "reviews": [
+      {
+        "name": "Tanya Z.",
+        "stars": 5,
+        "date": "15-03-24",
+        "text": "Really happy with my order. Highly recommend."
+      },
+      {
+        "name": "Nataly O.",
+        "stars": 5,
+        "date": "07-04-24",
+        "text": "Friendly service and everything arrived on time."
+      },
+      {
+        "name": "Tanya Z.",
+        "stars": 5,
+        "date": "04-01-24",
+        "text": "Really happy with my order. Highly recommend."
+      }
+    ],
+    "categories": [
+      "Fish & Chips",
+      "Seafood"
+    ],
+    "featuredIds": [
+      "amys-fish-and-chips-0",
+      "amys-fish-and-chips-1",
+      "amys-fish-and-chips-2"
+    ],
+    "pickedIds": [
+      "amys-fish-and-chips-0",
+      "amys-fish-and-chips-1",
+      "amys-fish-and-chips-2"
+    ],
+    "items": [
+      {
+        "id": "amys-fish-and-chips-0",
+        "name": "Haddock and Chips",
+        "price": 20,
+        "description": "Freshly cooked and served hot.",
+        "image": "/Menu/Amy's%20Fish%20%26%20Chips/Haddock%20and%20Chips.jpg",
+        "category": "Fish & Chips",
+        "likePct": 91,
+        "likeCount": 47
+      },
+      {
+        "id": "amys-fish-and-chips-1",
+        "name": "Halibut Fish (2 pcs)",
+        "price": 23.5,
+        "description": "A house favourite, made to order.",
+        "image": "/Menu/Amy's%20Fish%20%26%20Chips/Halibut%20Fish%20(2%20pcs).jpg",
+        "category": "Fish & Chips",
+        "likePct": 89,
+        "likeCount": 45
+      },
+      {
+        "id": "amys-fish-and-chips-2",
+        "name": "Shrimp",
+        "price": 20.5,
+        "description": "Freshly cooked and served hot.",
+        "image": "/Menu/Amy's%20Fish%20%26%20Chips/Shrimp.jpg",
+        "category": "Seafood",
+        "likePct": 96,
+        "likeCount": 22
+      }
+    ]
+  },
+  "Holy Smoke Barbecue": {
+    "slug": "holy-smoke-barbecue",
+    "folder": "Holy smoke Ribs",
+    "banner": "/Menu/Holy%20smoke%20Ribs/Holy%20Smoke%20Barbecue.jpg",
+    "rating": 4.5,
+    "ratingCount": "500+",
+    "address": "7255 Yonge St, North York, ON",
+    "availability": "Available today",
+    "hoursLabel": "Mon–Sun 9:00 a.m. – 9:00 p.m.",
+    "deliveryTime": "15 min",
+    "reviews": [
+      {
+        "name": "Marcus L.",
+        "stars": 5,
+        "date": "27-12-24",
+        "text": "My go-to spot — never disappoints."
+      },
+      {
+        "name": "Winnie C.",
+        "stars": 5,
+        "date": "19-01-24",
+        "text": "Exactly as described, fresh and well packaged."
+      },
+      {
+        "name": "Marcus L.",
+        "stars": 5,
+        "date": "16-10-24",
+        "text": "My go-to spot — never disappoints."
+      }
+    ],
+    "categories": [
+      "Sides",
+      "Combos & Platters",
+      "Smoked Meats",
+      "Desserts",
+      "Sandwiches"
+    ],
+    "featuredIds": [
+      "holy-smoke-barbecue-0",
+      "holy-smoke-barbecue-1",
+      "holy-smoke-barbecue-2",
+      "holy-smoke-barbecue-3",
+      "holy-smoke-barbecue-4",
+      "holy-smoke-barbecue-5",
+      "holy-smoke-barbecue-6",
+      "holy-smoke-barbecue-7"
+    ],
+    "pickedIds": [
+      "holy-smoke-barbecue-8",
+      "holy-smoke-barbecue-9",
+      "holy-smoke-barbecue-10",
+      "holy-smoke-barbecue-11",
+      "holy-smoke-barbecue-12",
+      "holy-smoke-barbecue-13"
+    ],
+    "items": [
+      {
+        "id": "holy-smoke-barbecue-0",
+        "name": "Baked Beans",
+        "price": 15.5,
+        "description": "Tender, smoky and full of flavour.",
+        "image": "/Menu/Holy%20smoke%20Ribs/Baked%20Beans.jpg",
+        "category": "Sides",
+        "likePct": 83,
+        "likeCount": 39
+      },
+      {
+        "id": "holy-smoke-barbecue-1",
+        "name": "BBQ Platter for one",
+        "price": 23,
+        "description": "Pitmaster favourite, served with our house sides.",
+        "image": "/Menu/Holy%20smoke%20Ribs/BBQ%20Platter%20for%20one.jpg",
+        "category": "Combos & Platters",
+        "likePct": 97,
+        "likeCount": 53
+      },
+      {
+        "id": "holy-smoke-barbecue-2",
+        "name": "BBQ Platter for two",
+        "price": 16,
+        "description": "Slow-smoked low and slow over hardwood.",
+        "image": "/Menu/Holy%20smoke%20Ribs/BBQ%20Platter%20for%20two.jpg",
+        "category": "Combos & Platters",
+        "likePct": 83,
+        "likeCount": 51
+      },
+      {
+        "id": "holy-smoke-barbecue-3",
+        "name": "Brisket & Pulled Pork Combo",
+        "price": 31.5,
+        "description": "Tender, smoky and full of flavour.",
+        "image": "/Menu/Holy%20smoke%20Ribs/Brisket%20%26%20Pulled%20Pork%20Combo.jpg",
+        "category": "Combos & Platters",
+        "likePct": 87,
+        "likeCount": 43
+      },
+      {
+        "id": "holy-smoke-barbecue-4",
+        "name": "Brisket & Rib Combo",
+        "price": 11,
+        "description": "Slow-smoked low and slow over hardwood.",
+        "image": "/Menu/Holy%20smoke%20Ribs/Brisket%20%26%20Rib%20Combo.jpg",
+        "category": "Combos & Platters",
+        "likePct": 82,
+        "likeCount": 62
+      },
+      {
+        "id": "holy-smoke-barbecue-5",
+        "name": "Chicken & Pork Rib Combo",
+        "price": 29,
+        "description": "Pitmaster favourite, served with our house sides.",
+        "image": "/Menu/Holy%20smoke%20Ribs/Chicken%20%26%20Pork%20Rib%20Combo.jpg",
+        "category": "Combos & Platters",
+        "likePct": 85,
+        "likeCount": 17
+      },
+      {
+        "id": "holy-smoke-barbecue-6",
+        "name": "Chicken Wings 1LB",
+        "price": 29,
+        "description": "Pitmaster favourite, served with our house sides.",
+        "image": "/Menu/Holy%20smoke%20Ribs/Chicken%20Wings%201LB.jpg",
+        "category": "Smoked Meats",
+        "likePct": 93,
+        "likeCount": 31
+      },
+      {
+        "id": "holy-smoke-barbecue-7",
+        "name": "Corn Bread Jalapeno Cheddar",
+        "price": 29.5,
+        "description": "Pitmaster favourite, served with our house sides.",
+        "image": "/Menu/Holy%20smoke%20Ribs/Corn%20Bread%20Jalapeno%20Cheddar.jpg",
+        "category": "Sides",
+        "likePct": 82,
+        "likeCount": 8
+      },
+      {
+        "id": "holy-smoke-barbecue-8",
+        "name": "Creamed Corn",
+        "price": 16.5,
+        "description": "Pitmaster favourite, served with our house sides.",
+        "image": "/Menu/Holy%20smoke%20Ribs/Creamed%20Corn.jpg",
+        "category": "Sides",
+        "likePct": 84,
+        "likeCount": 58
+      },
+      {
+        "id": "holy-smoke-barbecue-9",
+        "name": "Creamy Coleslaw",
+        "price": 31,
+        "description": "Tender, smoky and full of flavour.",
+        "image": "/Menu/Holy%20smoke%20Ribs/Creamy%20Coleslaw.jpg",
+        "category": "Sides",
+        "likePct": 90,
+        "likeCount": 22
+      },
+      {
+        "id": "holy-smoke-barbecue-10",
+        "name": "Crinkle-Cut Pickles",
+        "price": 31,
+        "description": "Pitmaster favourite, served with our house sides.",
+        "image": "/Menu/Holy%20smoke%20Ribs/Crinkle-Cut%20Pickles.jpg",
+        "category": "Sides",
+        "likePct": 87,
+        "likeCount": 19
+      },
+      {
+        "id": "holy-smoke-barbecue-11",
+        "name": "Famous Macaroni Salad",
+        "price": 14.5,
+        "description": "Tender, smoky and full of flavour.",
+        "image": "/Menu/Holy%20smoke%20Ribs/Famous%20Macaroni%20Salad.jpg",
+        "category": "Sides",
+        "likePct": 95,
+        "likeCount": 33
+      },
+      {
+        "id": "holy-smoke-barbecue-12",
+        "name": "Jalapeno Cheddar Sausage",
+        "price": 11,
+        "description": "Slow-smoked low and slow over hardwood.",
+        "image": "/Menu/Holy%20smoke%20Ribs/Jalapeno%20Cheddar%20Sausage.jpg",
+        "category": "Smoked Meats",
+        "likePct": 97,
+        "likeCount": 65
+      },
+      {
+        "id": "holy-smoke-barbecue-13",
+        "name": "Original Creamy Dill Potato Salad",
+        "price": 10,
+        "description": "Tender, smoky and full of flavour.",
+        "image": "/Menu/Holy%20smoke%20Ribs/Original%20Creamy%20Dill%20Potato%20Salad.jpg",
+        "category": "Sides",
+        "likePct": 94,
+        "likeCount": 32
+      },
+      {
+        "id": "holy-smoke-barbecue-14",
+        "name": "Pecan Pie (Slice)",
+        "price": 32,
+        "description": "Tender, smoky and full of flavour.",
+        "image": "/Menu/Holy%20smoke%20Ribs/Pecan%20Pie%20(Slice).jpg",
+        "category": "Desserts",
+        "likePct": 93,
+        "likeCount": 19
+      },
+      {
+        "id": "holy-smoke-barbecue-15",
+        "name": "Pork Back Ribs",
+        "price": 31.5,
+        "description": "Slow-smoked low and slow over hardwood.",
+        "image": "/Menu/Holy%20smoke%20Ribs/Pork%20Back%20Ribs.jpg",
+        "category": "Smoked Meats",
+        "likePct": 90,
+        "likeCount": 28
+      },
+      {
+        "id": "holy-smoke-barbecue-16",
+        "name": "Prime Brisket & Wings Combo",
+        "price": 11,
+        "description": "Pitmaster favourite, served with our house sides.",
+        "image": "/Menu/Holy%20smoke%20Ribs/Prime%20Brisket%20%26%20Wings%20Combo.jpg",
+        "category": "Combos & Platters",
+        "likePct": 98,
+        "likeCount": 24
+      },
+      {
+        "id": "holy-smoke-barbecue-17",
+        "name": "Prime Brisket by the 1 2 LB",
+        "price": 16,
+        "description": "Pitmaster favourite, served with our house sides.",
+        "image": "/Menu/Holy%20smoke%20Ribs/Prime%20Brisket%20by%20the%201_2%20LB.jpg",
+        "category": "Smoked Meats",
+        "likePct": 95,
+        "likeCount": 39
+      },
+      {
+        "id": "holy-smoke-barbecue-18",
+        "name": "Pulled Pork Sandwich",
+        "price": 11.5,
+        "description": "Pitmaster favourite, served with our house sides.",
+        "image": "/Menu/Holy%20smoke%20Ribs/Pulled%20Pork%20Sandwich.jpg",
+        "category": "Sandwiches",
+        "likePct": 98,
+        "likeCount": 12
+      },
+      {
+        "id": "holy-smoke-barbecue-19",
+        "name": "Smoked Brisket Sandwich",
+        "price": 16.5,
+        "description": "Slow-smoked low and slow over hardwood.",
+        "image": "/Menu/Holy%20smoke%20Ribs/Smoked%20Brisket%20Sandwich.jpg",
+        "category": "Sandwiches",
+        "likePct": 89,
+        "likeCount": 9
+      },
+      {
+        "id": "holy-smoke-barbecue-20",
+        "name": "Smoked Turkey Breast by the 1 2 LB",
+        "price": 24.5,
+        "description": "Slow-smoked low and slow over hardwood.",
+        "image": "/Menu/Holy%20smoke%20Ribs/Smoked%20Turkey%20Breast%20by%20the%201_2%20LB.jpg",
+        "category": "Smoked Meats",
+        "likePct": 92,
+        "likeCount": 42
+      },
+      {
+        "id": "holy-smoke-barbecue-21",
+        "name": "Texas Trio",
+        "price": 18,
+        "description": "Pitmaster favourite, served with our house sides.",
+        "image": "/Menu/Holy%20smoke%20Ribs/Texas%20Trio.jpg",
+        "category": "Combos & Platters",
+        "likePct": 84,
+        "likeCount": 16
+      },
+      {
+        "id": "holy-smoke-barbecue-22",
+        "name": "Tipsy Texan Sandwich",
+        "price": 31.5,
+        "description": "Pitmaster favourite, served with our house sides.",
+        "image": "/Menu/Holy%20smoke%20Ribs/Tipsy%20Texan%20Sandwich.jpg",
+        "category": "Sandwiches",
+        "likePct": 99,
+        "likeCount": 61
+      }
+    ]
+  },
+  "Pho Nga Son": {
+    "slug": "pho-nga-son",
+    "folder": "Pho Xelua resaturant",
+    "banner": "/Menu/Pho%20Xelua%20resaturant/PHO%20NGA%20SON.jpg",
+    "rating": 4.8,
+    "ratingCount": "500+",
+    "address": "10909 Yonge St, Richmond Hill, ON L4C 3E3",
+    "availability": "Available Saturday 11:00 a.m.",
+    "hoursLabel": "Sat 11:00 a.m. – 9:45 p.m.",
+    "deliveryTime": "11 min",
+    "reviews": [
+      {
+        "name": "Nataly O.",
+        "stars": 5,
+        "date": "11-11-23",
+        "text": "Best pho ever, I order here 3 times a week and it's always the same"
+      },
+      {
+        "name": "Winnie C.",
+        "stars": 5,
+        "date": "04-04-24",
+        "text": "Delicious, fresh and good portion! Will definitely order again!"
+      },
+      {
+        "name": "Tanya Z.",
+        "stars": 5,
+        "date": "24-11-25",
+        "text": "Fresh, tasty and not too spicy!"
+      }
+    ],
+    "categories": [
+      "Appetizer",
+      "Special Dishes (Mon Dac Biet)",
+      "Broken Steamed Rice (Com Tam)",
+      "Beef Noodle Soup (Pho)",
+      "Spicy Beef Noodle Soup (Bun Bo Hue)",
+      "Bun (Vermicelli)",
+      "Vietnamese Sandwich (Banh Mi)",
+      "Stir-Fried Dishes"
+    ],
+    "featuredIds": [
+      "pho-nga-son-17",
+      "pho-nga-son-18",
+      "pho-nga-son-9",
+      "pho-nga-son-1"
+    ],
+    "pickedIds": [
+      "pho-nga-son-0",
+      "pho-nga-son-2",
+      "pho-nga-son-3",
+      "pho-nga-son-4",
+      "pho-nga-son-5",
+      "pho-nga-son-6"
+    ],
+    "items": [
+      {
+        "id": "pho-nga-son-0",
+        "name": "A1.Deep Fried Spring Rolls (2 pcs) (Cha Gio) (2 Cuon)",
+        "price": 10,
+        "description": "Made fresh daily with a rich, flavorful broth.",
+        "image": "/Menu/Pho%20Xelua%20resaturant/A1.Deep%20Fried%20Spring%20Rolls%20(2%20pcs)%20(Cha%20Gio)%20(2%20Cuon).jpg",
+        "category": "Appetizer",
+        "likePct": 95,
+        "likeCount": 9
+      },
+      {
+        "id": "pho-nga-son-1",
+        "name": "A2. Fresh Salad Spring Rolls (2 pcs)",
+        "price": 13,
+        "description": "Fresh salad spring rolls, 2 pieces.",
+        "image": "/Menu/Pho%20Xelua%20resaturant/A2.%20Fresh%20Salad%20Spring%20Rolls%20(2%20pcs).jpg",
+        "category": "Appetizer",
+        "likePct": 93,
+        "likeCount": 49
+      },
+      {
+        "id": "pho-nga-son-2",
+        "name": "A3. Grilled Shrimp Mango Salad (Goi Xoai Tom Nuong)",
+        "price": 22,
+        "description": "Authentic and full of flavour.",
+        "image": "/Menu/Pho%20Xelua%20resaturant/A3.%20Grilled%20Shrimp%20Mango%20Salad%20(Goi%20Xoai%20Tom%20Nuong).jpg",
+        "category": "Appetizer",
+        "likePct": 82,
+        "likeCount": 20
+      },
+      {
+        "id": "pho-nga-son-3",
+        "name": "A4.Taro Salad (Goi Khoai Mon)",
+        "price": 10.5,
+        "description": "Authentic and full of flavour.",
+        "image": "/Menu/Pho%20Xelua%20resaturant/A4.Taro%20Salad%20(Goi%20Khoai%20Mon).jpg",
+        "category": "Appetizer",
+        "likePct": 89,
+        "likeCount": 63
+      },
+      {
+        "id": "pho-nga-son-4",
+        "name": "A5.Deep Fried Brine Chicken Wings (Canh Ga) (6 pcs)",
+        "price": 18,
+        "description": "A traditional favourite, served hot.",
+        "image": "/Menu/Pho%20Xelua%20resaturant/A5.Deep%20Fried%20Brine%20Chicken%20Wings%20(Canh%20Ga)%20(6%20pcs).jpg",
+        "category": "Appetizer",
+        "likePct": 84,
+        "likeCount": 28
+      },
+      {
+        "id": "pho-nga-son-5",
+        "name": "A6.Marinated Shrimp Paste on Sugarcane (Chao Tom) (3 pcs)",
+        "price": 14,
+        "description": "Authentic and full of flavour.",
+        "image": "/Menu/Pho%20Xelua%20resaturant/A6.Marinated%20Shrimp%20Paste%20on%20Sugarcane%20(Chao%20Tom)%20(3%20pcs).jpg",
+        "category": "Appetizer",
+        "likePct": 87,
+        "likeCount": 43
+      },
+      {
+        "id": "pho-nga-son-6",
+        "name": "B1.House Speical Vermicelli (Bun Dac Biet)",
+        "price": 24,
+        "description": "Authentic and full of flavour.",
+        "image": "/Menu/Pho%20Xelua%20resaturant/B1.House%20Speical%20Vermicelli%20(Bun%20Dac%20Biet).jpg",
+        "category": "Bun (Vermicelli)",
+        "likePct": 95,
+        "likeCount": 33
+      },
+      {
+        "id": "pho-nga-son-7",
+        "name": "BM1.Thit Nuong",
+        "price": 17.5,
+        "description": "Grilled lemongrass pork sandwich.",
+        "image": "/Menu/Pho%20Xelua%20resaturant/BM1.Thit%20Nuong.jpg",
+        "category": "Vietnamese Sandwich (Banh Mi)",
+        "likePct": 95,
+        "likeCount": 33
+      },
+      {
+        "id": "pho-nga-son-8",
+        "name": "BM5.Banh Mi Combo",
+        "price": 13,
+        "description": "Authentic and full of flavour.",
+        "image": "/Menu/Pho%20Xelua%20resaturant/BM5.Banh%20Mi%20Combo.jpg",
+        "category": "Vietnamese Sandwich (Banh Mi)",
+        "likePct": 82,
+        "likeCount": 8
+      },
+      {
+        "id": "pho-nga-son-9",
+        "name": "C1.House Special Rice (Com Dac Biet)",
+        "price": 10,
+        "description": "House special broken rice with grilled meats and egg.",
+        "image": "/Menu/Pho%20Xelua%20resaturant/C1.House%20Special%20Rice%20(Com%20Dac%20Biet).jpg",
+        "category": "Broken Steamed Rice (Com Tam)",
+        "likePct": 83,
+        "likeCount": 63
+      },
+      {
+        "id": "pho-nga-son-10",
+        "name": "C2. Com Suon Nuong",
+        "price": 20,
+        "description": "A traditional favourite, served hot.",
+        "image": "/Menu/Pho%20Xelua%20resaturant/C2.%20Com%20Suon%20Nuong.jpg",
+        "category": "Broken Steamed Rice (Com Tam)",
+        "likePct": 93,
+        "likeCount": 67
+      },
+      {
+        "id": "pho-nga-son-11",
+        "name": "C3. Com Ga Nuong",
+        "price": 12.5,
+        "description": "A traditional favourite, served hot.",
+        "image": "/Menu/Pho%20Xelua%20resaturant/C3.%20Com%20Ga%20Nuong.jpg",
+        "category": "Broken Steamed Rice (Com Tam)",
+        "likePct": 99,
+        "likeCount": 19
+      },
+      {
+        "id": "pho-nga-son-12",
+        "name": "C5. Com Suon Nuong and Ga Nuong",
+        "price": 21,
+        "description": "Made fresh daily with a rich, flavorful broth.",
+        "image": "/Menu/Pho%20Xelua%20resaturant/C5.%20Com%20Suon%20Nuong%20and%20Ga%20Nuong.jpg",
+        "category": "Broken Steamed Rice (Com Tam)",
+        "likePct": 92,
+        "likeCount": 66
+      },
+      {
+        "id": "pho-nga-son-13",
+        "name": "C6. Com Suon Nuong, Ga Nuong, and Trung Oppla  Chả Hấp",
+        "price": 13.5,
+        "description": "A traditional favourite, served hot.",
+        "image": "/Menu/Pho%20Xelua%20resaturant/C6.%20Com%20Suon%20Nuong%2C%20Ga%20Nuong%2C%20and%20Trung%20Oppla_%20Ch%E1%BA%A3%20H%E1%BA%A5p.jpg",
+        "category": "Broken Steamed Rice (Com Tam)",
+        "likePct": 90,
+        "likeCount": 22
+      },
+      {
+        "id": "pho-nga-son-14",
+        "name": "F3. Pad Thai  CHICKEN BEEF SHRIMPS",
+        "price": 17.5,
+        "description": "Made fresh daily with a rich, flavorful broth.",
+        "image": "/Menu/Pho%20Xelua%20resaturant/F3.%20Pad%20Thai%20%20CHICKEN_BEEF_SHRIMPS.jpg",
+        "category": "Stir-Fried Dishes",
+        "likePct": 86,
+        "likeCount": 66
+      },
+      {
+        "id": "pho-nga-son-15",
+        "name": "H1. Traditional Bun Bo Hue (Bun Bo Hue Truyen Thong)",
+        "price": 15,
+        "description": "Authentic and full of flavour.",
+        "image": "/Menu/Pho%20Xelua%20resaturant/H1.%20Traditional%20Bun%20Bo%20Hue%20(Bun%20Bo%20Hue%20Truyen%20Thong).jpg",
+        "category": "Spicy Beef Noodle Soup (Bun Bo Hue)",
+        "likePct": 95,
+        "likeCount": 9
+      },
+      {
+        "id": "pho-nga-son-16",
+        "name": "P0.Short Rib Pho (Pho Dac Biet Suon Bo)",
+        "price": 16.5,
+        "description": "Authentic and full of flavour.",
+        "image": "/Menu/Pho%20Xelua%20resaturant/P0.Short%20Rib%20Pho%20(Pho%20Dac%20Biet%20Suon%20Bo).jpg",
+        "category": "Beef Noodle Soup (Pho)",
+        "likePct": 83,
+        "likeCount": 15
+      },
+      {
+        "id": "pho-nga-son-17",
+        "name": "P1. Pho Combination",
+        "price": 16.5,
+        "description": "Rib eye beef, flank, tendon, tripe, and beef balls.",
+        "image": "/Menu/Pho%20Xelua%20resaturant/P1.%20Pho%20Combination.jpg",
+        "category": "Beef Noodle Soup (Pho)",
+        "likePct": 94,
+        "likeCount": 62
+      },
+      {
+        "id": "pho-nga-son-18",
+        "name": "P4. Flank Noodle Soup (Pho Nam)",
+        "price": 10,
+        "description": "Tender beef flank and rice noodles in a rich, flavorful broth.",
+        "image": "/Menu/Pho%20Xelua%20resaturant/P4.%20Flank%20Noodle%20Soup%20(Pho%20Nam).jpg",
+        "category": "Beef Noodle Soup (Pho)",
+        "likePct": 93,
+        "likeCount": 67
+      },
+      {
+        "id": "pho-nga-son-19",
+        "name": "P7. Rib Eye Beef and Tendon Noodle Soup (Pho Tai Gan)",
+        "price": 18,
+        "description": "A traditional favourite, served hot.",
+        "image": "/Menu/Pho%20Xelua%20resaturant/P7.%20Rib%20Eye%20Beef%20and%20Tendon%20Noodle%20Soup%20(Pho%20Tai%20Gan).jpg",
+        "category": "Beef Noodle Soup (Pho)",
+        "likePct": 83,
+        "likeCount": 33
+      },
+      {
+        "id": "pho-nga-son-20",
+        "name": "P9. Combination Pho W  Bone Marrow ( Phở Thập Cẩm Tuỷ Bò Nướng )",
+        "price": 9.5,
+        "description": "Made fresh daily with a rich, flavorful broth.",
+        "image": "/Menu/Pho%20Xelua%20resaturant/P9.%20Combination%20Pho%20W_%20Bone%20Marrow%20(%20Ph%E1%BB%9F%20Th%E1%BA%ADp%20C%E1%BA%A9m%20Tu%E1%BB%B7%20B%C3%B2%20N%C6%B0%E1%BB%9Bng%20).jpg",
+        "category": "Beef Noodle Soup (Pho)",
+        "likePct": 83,
+        "likeCount": 51
+      },
+      {
+        "id": "pho-nga-son-21",
+        "name": "S1.Tomato Crab Paste Vermicelli ( Bún Riêu)",
+        "price": 9.5,
+        "description": "A traditional favourite, served hot.",
+        "image": "/Menu/Pho%20Xelua%20resaturant/S1.Tomato%20Crab%20Paste%20Vermicelli%20(%20B%C3%BAn%20Ri%C3%AAu).jpg",
+        "category": "Special Dishes (Mon Dac Biet)",
+        "likePct": 99,
+        "likeCount": 49
+      },
+      {
+        "id": "pho-nga-son-22",
+        "name": "S2. Short Rib Stone Bowl (Pho to Da Suon Bo and Duoi Bo)",
+        "price": 23,
+        "description": "Authentic and full of flavour.",
+        "image": "/Menu/Pho%20Xelua%20resaturant/S2.%20Short%20Rib%20Stone%20Bowl%20(Pho%20to%20Da%20Suon%20Bo%20and%20Duoi%20Bo).jpg",
+        "category": "Special Dishes (Mon Dac Biet)",
+        "likePct": 83,
+        "likeCount": 57
+      },
+      {
+        "id": "pho-nga-son-23",
+        "name": "S3.Shrimp Cracker Pork Platter (Sharing)",
+        "price": 16,
+        "description": "Authentic and full of flavour.",
+        "image": "/Menu/Pho%20Xelua%20resaturant/S3.Shrimp%20Cracker%20Pork%20Platter%20(Sharing).jpg",
+        "category": "Special Dishes (Mon Dac Biet)",
+        "likePct": 84,
+        "likeCount": 34
+      },
+      {
+        "id": "pho-nga-son-24",
+        "name": "S4.House Special Wraps Platter (Sharing) (Banh Hoi)",
+        "price": 18,
+        "description": "Made fresh daily with a rich, flavorful broth.",
+        "image": "/Menu/Pho%20Xelua%20resaturant/S4.House%20Special%20Wraps%20Platter%20(Sharing)%20(Banh%20Hoi).jpg",
+        "category": "Special Dishes (Mon Dac Biet)",
+        "likePct": 91,
+        "likeCount": 41
+      },
+      {
+        "id": "pho-nga-son-25",
+        "name": "S5 Roasted Bone Marrow Steak Tartar ( Bò tái chanh tuỷ nướng) (1pc)",
+        "price": 9.5,
+        "description": "A traditional favourite, served hot.",
+        "image": "/Menu/Pho%20Xelua%20resaturant/S5%20Roasted%20Bone%20Marrow%20Steak%20Tartar%20(%20B%C3%B2%20t%C3%A1i%20chanh%20tu%E1%BB%B7%20n%C6%B0%E1%BB%9Bng)%20(1pc).jpg",
+        "category": "Special Dishes (Mon Dac Biet)",
+        "likePct": 93,
+        "likeCount": 37
+      }
+    ]
+  },
+  "Express Mart Kingston Road": {
+    "slug": "express-mart",
+    "folder": "Express Mart",
+    "banner": "/stores/express-mart/banner.jpg",
+    "rating": 4.7,
+    "ratingCount": "500+",
+    "address": "9722 Bayview Ave, Richmond Hill, ON",
+    "availability": "Available today",
+    "hoursLabel": "Mon–Sun 9:00 a.m. – 9:00 p.m.",
+    "deliveryTime": "32 min",
+    "reviews": [
+      {
+        "name": "Tanya Z.",
+        "stars": 5,
+        "date": "06-03-24",
+        "text": "Really happy with my order. Highly recommend."
+      },
+      {
+        "name": "Grace W.",
+        "stars": 5,
+        "date": "14-02-24",
+        "text": "Really happy with my order. Highly recommend."
+      },
+      {
+        "name": "Grace W.",
+        "stars": 5,
+        "date": "17-05-24",
+        "text": "Great quality and fast delivery, will order again!"
+      }
+    ],
+    "categories": [
+      "Soda & Juice",
+      "Chocolate & Candy",
+      "Water",
+      "Chips & Snacks"
+    ],
+    "featuredIds": [
+      "express-mart-0",
+      "express-mart-1",
+      "express-mart-2",
+      "express-mart-3",
+      "express-mart-4",
+      "express-mart-5",
+      "express-mart-6",
+      "express-mart-7"
+    ],
+    "pickedIds": [
+      "express-mart-8",
+      "express-mart-9",
+      "express-mart-10",
+      "express-mart-11",
+      "express-mart-12",
+      "express-mart-13"
+    ],
+    "items": [
+      {
+        "id": "express-mart-0",
+        "name": "7up Shirley Temple (355 ml)",
+        "price": 8.99,
+        "description": "Stocked and ready for you.",
+        "image": "/Menu/Express%20Mart/7up%20Shirley%20Temple%20(355%20ml).jpg",
+        "category": "Soda & Juice",
+        "likePct": 87,
+        "likeCount": 49
+      },
+      {
+        "id": "express-mart-1",
+        "name": "Airheads Blue Blast (15.6 g)",
+        "price": 6.49,
+        "description": "Grab-and-go favourite.",
+        "image": "/Menu/Express%20Mart/Airheads%20Blue%20Blast%20(15.6%20g).jpg",
+        "category": "Chocolate & Candy",
+        "likePct": 86,
+        "likeCount": 30
+      },
+      {
+        "id": "express-mart-2",
+        "name": "Airheads Soda Blue Raspberry (355 ml)",
+        "price": 8.49,
+        "description": "A snack-time classic.",
+        "image": "/Menu/Express%20Mart/Airheads%20Soda%20Blue%20Raspberry%20(355%20ml).jpg",
+        "category": "Soda & Juice",
+        "likePct": 88,
+        "likeCount": 50
+      },
+      {
+        "id": "express-mart-3",
+        "name": "Airheads Soda Watermelon (355 ml)",
+        "price": 11.49,
+        "description": "Stocked and ready for you.",
+        "image": "/Menu/Express%20Mart/Airheads%20Soda%20Watermelon%20(355%20ml).jpg",
+        "category": "Water",
+        "likePct": 98,
+        "likeCount": 54
+      },
+      {
+        "id": "express-mart-4",
+        "name": "Airheads Sour Watermelon (15.6 g)",
+        "price": 3.99,
+        "description": "Stocked and ready for you.",
+        "image": "/Menu/Express%20Mart/Airheads%20Sour%20Watermelon%20(15.6%20g).jpg",
+        "category": "Water",
+        "likePct": 93,
+        "likeCount": 13
+      },
+      {
+        "id": "express-mart-5",
+        "name": "Bugles Chilli Cheese Chips",
+        "price": 6.49,
+        "description": "A snack-time classic.",
+        "image": "/Menu/Express%20Mart/Bugles%20Chilli%20Cheese%20Chips.jpg",
+        "category": "Chips & Snacks",
+        "likePct": 86,
+        "likeCount": 54
+      },
+      {
+        "id": "express-mart-6",
+        "name": "Bugles Cinnamon Chips",
+        "price": 7.99,
+        "description": "Stocked and ready for you.",
+        "image": "/Menu/Express%20Mart/Bugles%20Cinnamon%20Chips.jpg",
+        "category": "Chips & Snacks",
+        "likePct": 83,
+        "likeCount": 63
+      },
+      {
+        "id": "express-mart-7",
+        "name": "Bugles Nacho Cheese Chips",
+        "price": 8.49,
+        "description": "Stocked and ready for you.",
+        "image": "/Menu/Express%20Mart/Bugles%20Nacho%20Cheese%20Chips.jpg",
+        "category": "Chips & Snacks",
+        "likePct": 96,
+        "likeCount": 10
+      },
+      {
+        "id": "express-mart-8",
+        "name": "Bugles Original Corn Chips",
+        "price": 7.99,
+        "description": "A snack-time classic.",
+        "image": "/Menu/Express%20Mart/Bugles%20Original%20Corn%20Chips.jpg",
+        "category": "Chips & Snacks",
+        "likePct": 83,
+        "likeCount": 63
+      },
+      {
+        "id": "express-mart-9",
+        "name": "Bugles Ranch Corn Chips",
+        "price": 9.49,
+        "description": "A snack-time classic.",
+        "image": "/Menu/Express%20Mart/Bugles%20Ranch%20Corn%20Chips.jpg",
+        "category": "Chips & Snacks",
+        "likePct": 90,
+        "likeCount": 10
+      },
+      {
+        "id": "express-mart-10",
+        "name": "Bugles Tabasco Corn Chips",
+        "price": 7.99,
+        "description": "Stocked and ready for you.",
+        "image": "/Menu/Express%20Mart/Bugles%20Tabasco%20Corn%20Chips.jpg",
+        "category": "Chips & Snacks",
+        "likePct": 97,
+        "likeCount": 41
+      },
+      {
+        "id": "express-mart-11",
+        "name": "Candy Popcorn M&M",
+        "price": 2.99,
+        "description": "Grab-and-go favourite.",
+        "image": "/Menu/Express%20Mart/Candy%20Popcorn%20M%26M.jpg",
+        "category": "Chocolate & Candy",
+        "likePct": 93,
+        "likeCount": 67
+      },
+      {
+        "id": "express-mart-12",
+        "name": "Candy Popcorn Snickers",
+        "price": 5.99,
+        "description": "Stocked and ready for you.",
+        "image": "/Menu/Express%20Mart/Candy%20Popcorn%20Snickers.jpg",
+        "category": "Chocolate & Candy",
+        "likePct": 93,
+        "likeCount": 55
+      },
+      {
+        "id": "express-mart-13",
+        "name": "Haribo Gold Bears Sour (142 g)",
+        "price": 7.99,
+        "description": "Grab-and-go favourite.",
+        "image": "/Menu/Express%20Mart/Haribo%20Gold%20Bears%20Sour%20(142%20g).jpg",
+        "category": "Chocolate & Candy",
+        "likePct": 85,
+        "likeCount": 41
+      },
+      {
+        "id": "express-mart-14",
+        "name": "Haribo Happy Cola (142 g)",
+        "price": 6.49,
+        "description": "Stocked and ready for you.",
+        "image": "/Menu/Express%20Mart/Haribo%20Happy%20Cola%20(142%20g).jpg",
+        "category": "Soda & Juice",
+        "likePct": 90,
+        "likeCount": 16
+      },
+      {
+        "id": "express-mart-15",
+        "name": "Haribo Watermelon (142 g)",
+        "price": 3.99,
+        "description": "A snack-time classic.",
+        "image": "/Menu/Express%20Mart/Haribo%20Watermelon%20(142%20g).jpg",
+        "category": "Water",
+        "likePct": 83,
+        "likeCount": 45
+      },
+      {
+        "id": "express-mart-16",
+        "name": "Hi-Chew Banana (50 g)",
+        "price": 8.49,
+        "description": "A snack-time classic.",
+        "image": "/Menu/Express%20Mart/Hi-Chew%20Banana%20(50%20g).jpg",
+        "category": "Chocolate & Candy",
+        "likePct": 84,
+        "likeCount": 10
+      },
+      {
+        "id": "express-mart-17",
+        "name": "Hi-Chew Getaway Mix (80 g)",
+        "price": 12.49,
+        "description": "A snack-time classic.",
+        "image": "/Menu/Express%20Mart/Hi-Chew%20Getaway%20Mix%20(80%20g).jpg",
+        "category": "Chocolate & Candy",
+        "likePct": 90,
+        "likeCount": 34
+      },
+      {
+        "id": "express-mart-18",
+        "name": "Hi-Chew Kiwi (50 g)",
+        "price": 7.99,
+        "description": "A snack-time classic.",
+        "image": "/Menu/Express%20Mart/Hi-Chew%20Kiwi%20(50%20g).jpg",
+        "category": "Chocolate & Candy",
+        "likePct": 87,
+        "likeCount": 31
+      },
+      {
+        "id": "express-mart-19",
+        "name": "Hi-Chew Soda Pop Cola (80 g)",
+        "price": 9.99,
+        "description": "A snack-time classic.",
+        "image": "/Menu/Express%20Mart/Hi-Chew%20Soda%20Pop%20Cola%20(80%20g).jpg",
+        "category": "Soda & Juice",
+        "likePct": 93,
+        "likeCount": 61
+      },
+      {
+        "id": "express-mart-20",
+        "name": "Kitkat Duos Mint & Dark Chocolate",
+        "price": 12.49,
+        "description": "Grab-and-go favourite.",
+        "image": "/Menu/Express%20Mart/Kitkat%20Duos%20Mint%20%26%20Dark%20Chocolate.jpg",
+        "category": "Soda & Juice",
+        "likePct": 88,
+        "likeCount": 62
+      },
+      {
+        "id": "express-mart-21",
+        "name": "Kool-Aid Soda Blue Raspberry Lemonade (355 ml)",
+        "price": 7.49,
+        "description": "A snack-time classic.",
+        "image": "/Menu/Express%20Mart/Kool-Aid%20Soda%20Blue%20Raspberry%20Lemonade%20(355%20ml).jpg",
+        "category": "Soda & Juice",
+        "likePct": 88,
+        "likeCount": 62
+      },
+      {
+        "id": "express-mart-22",
+        "name": "Mike And Ike Hot Tamales Tropical Heat Fruit Candy (141 g)",
+        "price": 9.49,
+        "description": "Stocked and ready for you.",
+        "image": "/Menu/Express%20Mart/Mike%20And%20Ike%20Hot%20Tamales%20Tropical%20Heat%20Fruit%20Candy%20(141%20g).png",
+        "category": "Chocolate & Candy",
+        "likePct": 88,
+        "likeCount": 20
+      },
+      {
+        "id": "express-mart-23",
+        "name": "Mike And Ike Mega Mix Fruit Candy (141 g)",
+        "price": 10.49,
+        "description": "Stocked and ready for you.",
+        "image": "/Menu/Express%20Mart/Mike%20And%20Ike%20Mega%20Mix%20Fruit%20Candy%20(141%20g).jpg",
+        "category": "Chocolate & Candy",
+        "likePct": 94,
+        "likeCount": 56
+      },
+      {
+        "id": "express-mart-24",
+        "name": "Milk Duds Chocolate (141 g)",
+        "price": 11.49,
+        "description": "Stocked and ready for you.",
+        "image": "/Menu/Express%20Mart/Milk%20Duds%20Chocolate%20(141%20g).jpg",
+        "category": "Soda & Juice",
+        "likePct": 94,
+        "likeCount": 26
+      },
+      {
+        "id": "express-mart-25",
+        "name": "Milka Chips Ahoy! Chocolate Bar (100 g)",
+        "price": 3.49,
+        "description": "A snack-time classic.",
+        "image": "/Menu/Express%20Mart/Milka%20Chips%20Ahoy!%20Chocolate%20Bar%20(100%20g).jpg",
+        "category": "Soda & Juice",
+        "likePct": 90,
+        "likeCount": 40
+      },
+      {
+        "id": "express-mart-26",
+        "name": "Milka Oreo Chocolate Bar (100 g)",
+        "price": 12.49,
+        "description": "Stocked and ready for you.",
+        "image": "/Menu/Express%20Mart/Milka%20Oreo%20Chocolate%20Bar%20(100%20g).jpg",
+        "category": "Soda & Juice",
+        "likePct": 90,
+        "likeCount": 52
+      },
+      {
+        "id": "express-mart-27",
+        "name": "Milka Strawberry Chocolate Bar (100 g)",
+        "price": 10.49,
+        "description": "Grab-and-go favourite.",
+        "image": "/Menu/Express%20Mart/Milka%20Strawberry%20Chocolate%20Bar%20(100%20g).jpg",
+        "category": "Soda & Juice",
+        "likePct": 94,
+        "likeCount": 56
+      },
+      {
+        "id": "express-mart-28",
+        "name": "Milka White Chocolate Bar (100 g)",
+        "price": 9.49,
+        "description": "A snack-time classic.",
+        "image": "/Menu/Express%20Mart/Milka%20White%20Chocolate%20Bar%20(100%20g).jpg",
+        "category": "Soda & Juice",
+        "likePct": 96,
+        "likeCount": 46
+      },
+      {
+        "id": "express-mart-29",
+        "name": "Raffaello Premium White Chocolate Bar (100 g)",
+        "price": 6.99,
+        "description": "Grab-and-go favourite.",
+        "image": "/Menu/Express%20Mart/Raffaello%20Premium%20White%20Chocolate%20Bar%20(100%20g).jpg",
+        "category": "Soda & Juice",
+        "likePct": 95,
+        "likeCount": 33
+      },
+      {
+        "id": "express-mart-30",
+        "name": "Reese's Oreo Peanut Butter Cups (King Size)",
+        "price": 12.99,
+        "description": "Grab-and-go favourite.",
+        "image": "/Menu/Express%20Mart/Reese's%20Oreo%20Peanut%20Butter%20Cups%20(King%20Size).jpg",
+        "category": "Chocolate & Candy",
+        "likePct": 85,
+        "likeCount": 35
+      },
+      {
+        "id": "express-mart-31",
+        "name": "Reese's Oreo Peanut Butter Cups (Regular Size)",
+        "price": 10.49,
+        "description": "Grab-and-go favourite.",
+        "image": "/Menu/Express%20Mart/Reese's%20Oreo%20Peanut%20Butter%20Cups%20(Regular%20Size).jpg",
+        "category": "Chocolate & Candy",
+        "likePct": 86,
+        "likeCount": 60
+      },
+      {
+        "id": "express-mart-32",
+        "name": "Reese's PB&J Grape Big Cup",
+        "price": 6.49,
+        "description": "Grab-and-go favourite.",
+        "image": "/Menu/Express%20Mart/Reese's%20PB%26J%20Grape%20Big%20Cup.jpg",
+        "category": "Chocolate & Candy",
+        "likePct": 90,
+        "likeCount": 16
+      },
+      {
+        "id": "express-mart-33",
+        "name": "Sour Patch Extreme Candy",
+        "price": 2.99,
+        "description": "Stocked and ready for you.",
+        "image": "/Menu/Express%20Mart/Sour%20Patch%20Extreme%20Candy.jpg",
+        "category": "Chocolate & Candy",
+        "likePct": 87,
+        "likeCount": 67
+      },
+      {
+        "id": "express-mart-34",
+        "name": "Sprite Tropical Mix (355 ml)",
+        "price": 11.99,
+        "description": "Stocked and ready for you.",
+        "image": "/Menu/Express%20Mart/Sprite%20Tropical%20Mix%20(355%20ml).jpg",
+        "category": "Soda & Juice",
+        "likePct": 91,
+        "likeCount": 41
+      },
+      {
+        "id": "express-mart-35",
+        "name": "Trolli Sour Bursting Crawlers Candy (120 g)",
+        "price": 9.99,
+        "description": "A snack-time classic.",
+        "image": "/Menu/Express%20Mart/Trolli%20Sour%20Bursting%20Crawlers%20Candy%20(120%20g).jpg",
+        "category": "Chocolate & Candy",
+        "likePct": 89,
+        "likeCount": 27
+      },
+      {
+        "id": "express-mart-36",
+        "name": "Van Holten's Dill Pickle",
+        "price": 11.99,
+        "description": "A snack-time classic.",
+        "image": "/Menu/Express%20Mart/Van%20Holten's%20Dill%20Pickle.jpg",
+        "category": "Chips & Snacks",
+        "likePct": 97,
+        "likeCount": 59
+      },
+      {
+        "id": "express-mart-37",
+        "name": "Van Holten's Sour Cream Pickle",
+        "price": 10.99,
+        "description": "A snack-time classic.",
+        "image": "/Menu/Express%20Mart/Van%20Holten's%20Sour%20Cream%20Pickle.jpg",
+        "category": "Chocolate & Candy",
+        "likePct": 99,
+        "likeCount": 61
+      },
+      {
+        "id": "express-mart-38",
+        "name": "Van Holten's Warheads Blue Raspberry Pickle",
+        "price": 8.99,
+        "description": "Stocked and ready for you.",
+        "image": "/Menu/Express%20Mart/Van%20Holten's%20Warheads%20Blue%20Raspberry%20Pickle.jpg",
+        "category": "Chips & Snacks",
+        "likePct": 87,
+        "likeCount": 43
+      }
+    ]
+  },
+  "K1 Floral Studio": {
+    "slug": "k1-floral-studio",
+    "folder": "Florio Studio",
+    "banner": "/stores/k1-floral-studio/banner.jpg",
+    "rating": 4.6,
+    "ratingCount": "500+",
+    "address": "2151 Yonge St, Markham, ON",
+    "availability": "Available today",
+    "hoursLabel": "Mon–Sun 9:00 a.m. – 9:00 p.m.",
+    "deliveryTime": "11 min",
+    "reviews": [
+      {
+        "name": "Daniel K.",
+        "stars": 5,
+        "date": "24-06-24",
+        "text": "My go-to spot — never disappoints."
+      },
+      {
+        "name": "Marcus L.",
+        "stars": 5,
+        "date": "16-07-24",
+        "text": "Exactly as described, fresh and well packaged."
+      },
+      {
+        "name": "Winnie C.",
+        "stars": 5,
+        "date": "08-08-24",
+        "text": "Good portion and fair prices. Solid choice."
+      }
+    ],
+    "categories": [
+      "Bouquets & Flowers",
+      "Gift Boxes",
+      "Roses"
+    ],
+    "featuredIds": [
+      "k1-floral-studio-0",
+      "k1-floral-studio-1",
+      "k1-floral-studio-2",
+      "k1-floral-studio-3",
+      "k1-floral-studio-4",
+      "k1-floral-studio-5",
+      "k1-floral-studio-6",
+      "k1-floral-studio-7"
+    ],
+    "pickedIds": [
+      "k1-floral-studio-8",
+      "k1-floral-studio-9",
+      "k1-floral-studio-10",
+      "k1-floral-studio-11",
+      "k1-floral-studio-12",
+      "k1-floral-studio-13"
+    ],
+    "items": [
+      {
+        "id": "k1-floral-studio-0",
+        "name": "Amazing Blue",
+        "price": 87.5,
+        "description": "Fresh blooms, beautifully arranged.",
+        "image": "/Menu/Florio%20Studio/Amazing%20Blue.jpg",
+        "category": "Bouquets & Flowers",
+        "likePct": 90,
+        "likeCount": 40
+      },
+      {
+        "id": "k1-floral-studio-1",
+        "name": "Blue Delight",
+        "price": 63,
+        "description": "Fresh blooms, beautifully arranged.",
+        "image": "/Menu/Florio%20Studio/Blue%20Delight.jpg",
+        "category": "Bouquets & Flowers",
+        "likePct": 86,
+        "likeCount": 24
+      },
+      {
+        "id": "k1-floral-studio-2",
+        "name": "Bold & beautiful",
+        "price": 43.5,
+        "description": "Fresh blooms, beautifully arranged.",
+        "image": "/Menu/Florio%20Studio/Bold%20%26%20beautiful.jpg",
+        "category": "Bouquets & Flowers",
+        "likePct": 85,
+        "likeCount": 11
+      },
+      {
+        "id": "k1-floral-studio-3",
+        "name": "Box of love",
+        "price": 67.5,
+        "description": "A handcrafted arrangement for any occasion.",
+        "image": "/Menu/Florio%20Studio/Box%20of%20love.jpg",
+        "category": "Gift Boxes",
+        "likePct": 83,
+        "likeCount": 9
+      },
+      {
+        "id": "k1-floral-studio-4",
+        "name": "Breath Taking",
+        "price": 76.5,
+        "description": "Fresh blooms, beautifully arranged.",
+        "image": "/Menu/Florio%20Studio/Breath%20Taking.jpg",
+        "category": "Bouquets & Flowers",
+        "likePct": 97,
+        "likeCount": 35
+      },
+      {
+        "id": "k1-floral-studio-5",
+        "name": "Celebration of Life",
+        "price": 65,
+        "description": "Designed by our florists with care.",
+        "image": "/Menu/Florio%20Studio/Celebration%20of%20Life.jpg",
+        "category": "Bouquets & Flowers",
+        "likePct": 94,
+        "likeCount": 38
+      },
+      {
+        "id": "k1-floral-studio-6",
+        "name": "Dancing Purple",
+        "price": 92.5,
+        "description": "Fresh blooms, beautifully arranged.",
+        "image": "/Menu/Florio%20Studio/Dancing%20Purple.jpg",
+        "category": "Bouquets & Flowers",
+        "likePct": 99,
+        "likeCount": 13
+      },
+      {
+        "id": "k1-floral-studio-7",
+        "name": "Deep impression",
+        "price": 88,
+        "description": "Fresh blooms, beautifully arranged.",
+        "image": "/Menu/Florio%20Studio/Deep%20impression.jpg",
+        "category": "Bouquets & Flowers",
+        "likePct": 84,
+        "likeCount": 28
+      },
+      {
+        "id": "k1-floral-studio-8",
+        "name": "Deep Love",
+        "price": 48,
+        "description": "Fresh blooms, beautifully arranged.",
+        "image": "/Menu/Florio%20Studio/Deep%20Love.jpg",
+        "category": "Bouquets & Flowers",
+        "likePct": 85,
+        "likeCount": 47
+      },
+      {
+        "id": "k1-floral-studio-9",
+        "name": "Dream box",
+        "price": 40,
+        "description": "A handcrafted arrangement for any occasion.",
+        "image": "/Menu/Florio%20Studio/Dream%20box.jpg",
+        "category": "Gift Boxes",
+        "likePct": 97,
+        "likeCount": 17
+      },
+      {
+        "id": "k1-floral-studio-10",
+        "name": "Endless Love-001",
+        "price": 87,
+        "description": "Fresh blooms, beautifully arranged.",
+        "image": "/Menu/Florio%20Studio/Endless%20Love-001.jpg",
+        "category": "Bouquets & Flowers",
+        "likePct": 99,
+        "likeCount": 37
+      },
+      {
+        "id": "k1-floral-studio-11",
+        "name": "Endless Love",
+        "price": 64.5,
+        "description": "A handcrafted arrangement for any occasion.",
+        "image": "/Menu/Florio%20Studio/Endless%20Love.jpg",
+        "category": "Bouquets & Flowers",
+        "likePct": 83,
+        "likeCount": 21
+      },
+      {
+        "id": "k1-floral-studio-12",
+        "name": "Everlasting Romance",
+        "price": 40.5,
+        "description": "Fresh blooms, beautifully arranged.",
+        "image": "/Menu/Florio%20Studio/Everlasting%20Romance.jpg",
+        "category": "Bouquets & Flowers",
+        "likePct": 90,
+        "likeCount": 46
+      },
+      {
+        "id": "k1-floral-studio-13",
+        "name": "Garden Flowers",
+        "price": 69,
+        "description": "A handcrafted arrangement for any occasion.",
+        "image": "/Menu/Florio%20Studio/Garden%20Flowers.jpg",
+        "category": "Bouquets & Flowers",
+        "likePct": 90,
+        "likeCount": 16
+      },
+      {
+        "id": "k1-floral-studio-14",
+        "name": "Happy Holiday",
+        "price": 44.5,
+        "description": "A handcrafted arrangement for any occasion.",
+        "image": "/Menu/Florio%20Studio/Happy%20Holiday.jpg",
+        "category": "Bouquets & Flowers",
+        "likePct": 89,
+        "likeCount": 45
+      },
+      {
+        "id": "k1-floral-studio-15",
+        "name": "Heavens Gate",
+        "price": 49,
+        "description": "Designed by our florists with care.",
+        "image": "/Menu/Florio%20Studio/Heavens%20Gate.jpg",
+        "category": "Bouquets & Flowers",
+        "likePct": 94,
+        "likeCount": 38
+      },
+      {
+        "id": "k1-floral-studio-16",
+        "name": "Holiday Blessings",
+        "price": 47,
+        "description": "A handcrafted arrangement for any occasion.",
+        "image": "/Menu/Florio%20Studio/Holiday%20Blessings.jpg",
+        "category": "Bouquets & Flowers",
+        "likePct": 97,
+        "likeCount": 35
+      },
+      {
+        "id": "k1-floral-studio-17",
+        "name": "Joyful heart",
+        "price": 43.5,
+        "description": "Fresh blooms, beautifully arranged.",
+        "image": "/Menu/Florio%20Studio/Joyful%20heart.jpg",
+        "category": "Bouquets & Flowers",
+        "likePct": 90,
+        "likeCount": 16
+      },
+      {
+        "id": "k1-floral-studio-18",
+        "name": "Love Chanel",
+        "price": 39,
+        "description": "Fresh blooms, beautifully arranged.",
+        "image": "/Menu/Florio%20Studio/Love%20Chanel.jpg",
+        "category": "Bouquets & Flowers",
+        "likePct": 84,
+        "likeCount": 46
+      },
+      {
+        "id": "k1-floral-studio-19",
+        "name": "Love you for ever",
+        "price": 47.5,
+        "description": "A handcrafted arrangement for any occasion.",
+        "image": "/Menu/Florio%20Studio/Love%20you%20for%20ever.jpg",
+        "category": "Bouquets & Flowers",
+        "likePct": 91,
+        "likeCount": 65
+      },
+      {
+        "id": "k1-floral-studio-20",
+        "name": "Peaceful Thought",
+        "price": 44.5,
+        "description": "Fresh blooms, beautifully arranged.",
+        "image": "/Menu/Florio%20Studio/Peaceful%20Thought.jpg",
+        "category": "Bouquets & Flowers",
+        "likePct": 93,
+        "likeCount": 67
+      },
+      {
+        "id": "k1-floral-studio-21",
+        "name": "Peaceful White Roses",
+        "price": 66.5,
+        "description": "Fresh blooms, beautifully arranged.",
+        "image": "/Menu/Florio%20Studio/Peaceful%20White%20Roses.jpg",
+        "category": "Roses",
+        "likePct": 91,
+        "likeCount": 35
+      },
+      {
+        "id": "k1-floral-studio-22",
+        "name": "Pink and love",
+        "price": 83.5,
+        "description": "Fresh blooms, beautifully arranged.",
+        "image": "/Menu/Florio%20Studio/Pink%20and%20love.jpg",
+        "category": "Bouquets & Flowers",
+        "likePct": 90,
+        "likeCount": 40
+      },
+      {
+        "id": "k1-floral-studio-23",
+        "name": "Pink Violets",
+        "price": 51,
+        "description": "Designed by our florists with care.",
+        "image": "/Menu/Florio%20Studio/Pink%20Violets.jpg",
+        "category": "Bouquets & Flowers",
+        "likePct": 83,
+        "likeCount": 63
+      },
+      {
+        "id": "k1-floral-studio-24",
+        "name": "Promise of love 2026",
+        "price": 81.5,
+        "description": "Designed by our florists with care.",
+        "image": "/Menu/Florio%20Studio/Promise%20of%20love%202026.jpg",
+        "category": "Bouquets & Flowers",
+        "likePct": 91,
+        "likeCount": 53
+      },
+      {
+        "id": "k1-floral-studio-25",
+        "name": "Purple Violets",
+        "price": 81,
+        "description": "Designed by our florists with care.",
+        "image": "/Menu/Florio%20Studio/Purple%20Violets.jpg",
+        "category": "Bouquets & Flowers",
+        "likePct": 83,
+        "likeCount": 63
+      },
+      {
+        "id": "k1-floral-studio-26",
+        "name": "Sofia",
+        "price": 36.5,
+        "description": "Designed by our florists with care.",
+        "image": "/Menu/Florio%20Studio/Sofia.jpg",
+        "category": "Bouquets & Flowers",
+        "likePct": 95,
+        "likeCount": 57
+      },
+      {
+        "id": "k1-floral-studio-27",
+        "name": "Sweet Smile",
+        "price": 61,
+        "description": "Fresh blooms, beautifully arranged.",
+        "image": "/Menu/Florio%20Studio/Sweet%20Smile.jpg",
+        "category": "Bouquets & Flowers",
+        "likePct": 95,
+        "likeCount": 15
+      },
+      {
+        "id": "k1-floral-studio-28",
+        "name": "Sweetness and Romance",
+        "price": 70.5,
+        "description": "Designed by our florists with care.",
+        "image": "/Menu/Florio%20Studio/Sweetness%20and%20Romance.jpg",
+        "category": "Bouquets & Flowers",
+        "likePct": 98,
+        "likeCount": 36
+      },
+      {
+        "id": "k1-floral-studio-29",
+        "name": "Vertical Love",
+        "price": 38.5,
+        "description": "Fresh blooms, beautifully arranged.",
+        "image": "/Menu/Florio%20Studio/Vertical%20Love.jpg",
+        "category": "Bouquets & Flowers",
+        "likePct": 93,
+        "likeCount": 61
+      },
+      {
+        "id": "k1-floral-studio-30",
+        "name": "Whispers of Love 2026",
+        "price": 42,
+        "description": "Designed by our florists with care.",
+        "image": "/Menu/Florio%20Studio/Whispers%20of%20Love%202026.jpg",
+        "category": "Bouquets & Flowers",
+        "likePct": 93,
+        "likeCount": 67
+      },
+      {
+        "id": "k1-floral-studio-31",
+        "name": "White Delight",
+        "price": 69.5,
+        "description": "Designed by our florists with care.",
+        "image": "/Menu/Florio%20Studio/White%20Delight.jpg",
+        "category": "Bouquets & Flowers",
+        "likePct": 87,
+        "likeCount": 43
+      },
+      {
+        "id": "k1-floral-studio-32",
+        "name": "With all my heart",
+        "price": 43.5,
+        "description": "A handcrafted arrangement for any occasion.",
+        "image": "/Menu/Florio%20Studio/With%20all%20my%20heart.jpg",
+        "category": "Bouquets & Flowers",
+        "likePct": 82,
+        "likeCount": 20
+      },
+      {
+        "id": "k1-floral-studio-33",
+        "name": "Yellow Smile",
+        "price": 93,
+        "description": "Designed by our florists with care.",
+        "image": "/Menu/Florio%20Studio/Yellow%20Smile.jpg",
+        "category": "Bouquets & Flowers",
+        "likePct": 93,
+        "likeCount": 43
+      }
+    ]
+  },
+  "Flowers Gifts and Balloons": {
+    "slug": "flowers-gifts-and-balloons",
+    "folder": "Flowers Gifts and Baloons",
+    "banner": "/stores/flowers-gifts-and-balloons/banner.jpg",
+    "rating": 4.6,
+    "ratingCount": "500+",
+    "address": "6856 Bayview Ave, Thornhill, ON",
+    "availability": "Available today",
+    "hoursLabel": "Mon–Sun 9:00 a.m. – 9:00 p.m.",
+    "deliveryTime": "16 min",
+    "reviews": [
+      {
+        "name": "Nataly O.",
+        "stars": 5,
+        "date": "15-09-24",
+        "text": "Really happy with my order. Highly recommend."
+      },
+      {
+        "name": "Grace W.",
+        "stars": 5,
+        "date": "07-10-24",
+        "text": "Friendly service and everything arrived on time."
+      },
+      {
+        "name": "Priya S.",
+        "stars": 5,
+        "date": "26-11-24",
+        "text": "Great quality and fast delivery, will order again!"
+      }
+    ],
+    "categories": [
+      "Roses",
+      "Gift Baskets",
+      "Balloons",
+      "Bouquets & Flowers"
+    ],
+    "featuredIds": [
+      "flowers-gifts-and-balloons-0",
+      "flowers-gifts-and-balloons-1",
+      "flowers-gifts-and-balloons-2",
+      "flowers-gifts-and-balloons-3",
+      "flowers-gifts-and-balloons-4",
+      "flowers-gifts-and-balloons-5",
+      "flowers-gifts-and-balloons-6",
+      "flowers-gifts-and-balloons-7"
+    ],
+    "pickedIds": [
+      "flowers-gifts-and-balloons-8",
+      "flowers-gifts-and-balloons-9",
+      "flowers-gifts-and-balloons-10",
+      "flowers-gifts-and-balloons-11",
+      "flowers-gifts-and-balloons-12",
+      "flowers-gifts-and-balloons-13"
+    ],
+    "items": [
+      {
+        "id": "flowers-gifts-and-balloons-0",
+        "name": "1 red rose wrapped and tied with ribbon. (FGB326)",
+        "price": 83,
+        "description": "A handcrafted arrangement for any occasion.",
+        "image": "/Menu/Flowers%20Gifts%20and%20Baloons/1%20red%20rose%20wrapped%20and%20tied%20with%20ribbon.%20(FGB326).jpg",
+        "category": "Roses",
+        "likePct": 85,
+        "likeCount": 53
+      },
+      {
+        "id": "flowers-gifts-and-balloons-1",
+        "name": "24 Premium Red Roses Bouquet (FGB628)",
+        "price": 79.5,
+        "description": "Fresh blooms, beautifully arranged.",
+        "image": "/Menu/Flowers%20Gifts%20and%20Baloons/24%20Premium%20Red%20Roses%20Bouquet%20(FGB628).jpg",
+        "category": "Roses",
+        "likePct": 92,
+        "likeCount": 48
+      },
+      {
+        "id": "flowers-gifts-and-balloons-2",
+        "name": "24 Red Roses Bouquet with Butterfly Charm ( FGB397)",
+        "price": 69,
+        "description": "Fresh blooms, beautifully arranged.",
+        "image": "/Menu/Flowers%20Gifts%20and%20Baloons/24%20Red%20Roses%20Bouquet%20with%20Butterfly%20Charm_(%20FGB397).jpg",
+        "category": "Roses",
+        "likePct": 88,
+        "likeCount": 44
+      },
+      {
+        "id": "flowers-gifts-and-balloons-3",
+        "name": "24 White Roses with Congratulations Balloon",
+        "price": 55.5,
+        "description": "Fresh blooms, beautifully arranged.",
+        "image": "/Menu/Flowers%20Gifts%20and%20Baloons/24%20White%20Roses%20with%20Congratulations%20Balloon_.jpg",
+        "category": "Roses",
+        "likePct": 98,
+        "likeCount": 30
+      },
+      {
+        "id": "flowers-gifts-and-balloons-4",
+        "name": "3 Dozen Red Roses with Happy Birthday Message",
+        "price": 36.5,
+        "description": "A handcrafted arrangement for any occasion.",
+        "image": "/Menu/Flowers%20Gifts%20and%20Baloons/3%20Dozen%20Red%20Roses%20with%20Happy%20Birthday%20Message.jpg",
+        "category": "Roses",
+        "likePct": 87,
+        "likeCount": 25
+      },
+      {
+        "id": "flowers-gifts-and-balloons-5",
+        "name": "6 Blue Roses with Diamond Buttons",
+        "price": 63.5,
+        "description": "Designed by our florists with care.",
+        "image": "/Menu/Flowers%20Gifts%20and%20Baloons/6%20Blue%20Roses%20with%20Diamond%20Buttons.jpg",
+        "category": "Roses",
+        "likePct": 84,
+        "likeCount": 40
+      },
+      {
+        "id": "flowers-gifts-and-balloons-6",
+        "name": "A COLORFUL ASSORTMENT OF FRESH FRUITS  (FGB169)",
+        "price": 85,
+        "description": "Designed by our florists with care.",
+        "image": "/Menu/Flowers%20Gifts%20and%20Baloons/A%20COLORFUL%20ASSORTMENT%20OF%20FRESH%20FRUITS_%20(FGB169).jpg",
+        "category": "Gift Baskets",
+        "likePct": 88,
+        "likeCount": 32
+      },
+      {
+        "id": "flowers-gifts-and-balloons-7",
+        "name": "Adorable Bear",
+        "price": 73,
+        "description": "A handcrafted arrangement for any occasion.",
+        "image": "/Menu/Flowers%20Gifts%20and%20Baloons/Adorable%20Bear.jpg",
+        "category": "Gift Baskets",
+        "likePct": 83,
+        "likeCount": 63
+      },
+      {
+        "id": "flowers-gifts-and-balloons-8",
+        "name": "Balloon Cluster with Floating Top Balloons (FGB582)",
+        "price": 43.5,
+        "description": "Fresh blooms, beautifully arranged.",
+        "image": "/Menu/Flowers%20Gifts%20and%20Baloons/Balloon%20Cluster%20with%20Floating%20Top%20Balloons%20(FGB582).jpg",
+        "category": "Balloons",
+        "likePct": 92,
+        "likeCount": 36
+      },
+      {
+        "id": "flowers-gifts-and-balloons-9",
+        "name": "Beautiful Day Bouquet (FGB338)",
+        "price": 84,
+        "description": "Designed by our florists with care.",
+        "image": "/Menu/Flowers%20Gifts%20and%20Baloons/Beautiful%20Day%20Bouquet%20(FGB338).jpg",
+        "category": "Bouquets & Flowers",
+        "likePct": 97,
+        "likeCount": 35
+      },
+      {
+        "id": "flowers-gifts-and-balloons-10",
+        "name": "Birthday Celebration (FGB606)",
+        "price": 76.5,
+        "description": "Fresh blooms, beautifully arranged.",
+        "image": "/Menu/Flowers%20Gifts%20and%20Baloons/Birthday%20Celebration%20(FGB606).jpg",
+        "category": "Bouquets & Flowers",
+        "likePct": 94,
+        "likeCount": 8
+      },
+      {
+        "id": "flowers-gifts-and-balloons-11",
+        "name": "Birthday Celebration Shine (FGB627)",
+        "price": 88.5,
+        "description": "Designed by our florists with care.",
+        "image": "/Menu/Flowers%20Gifts%20and%20Baloons/Birthday%20Celebration%20Shine%20(FGB627).jpg",
+        "category": "Bouquets & Flowers",
+        "likePct": 92,
+        "likeCount": 30
+      },
+      {
+        "id": "flowers-gifts-and-balloons-12",
+        "name": "Blue Serenity",
+        "price": 76.5,
+        "description": "Fresh blooms, beautifully arranged.",
+        "image": "/Menu/Flowers%20Gifts%20and%20Baloons/Blue%20Serenity_.jpg",
+        "category": "Bouquets & Flowers",
+        "likePct": 88,
+        "likeCount": 44
+      },
+      {
+        "id": "flowers-gifts-and-balloons-13",
+        "name": "Blushing Elegance",
+        "price": 77.5,
+        "description": "A handcrafted arrangement for any occasion.",
+        "image": "/Menu/Flowers%20Gifts%20and%20Baloons/Blushing%20Elegance.jpg",
+        "category": "Bouquets & Flowers",
+        "likePct": 83,
+        "likeCount": 15
+      },
+      {
+        "id": "flowers-gifts-and-balloons-14",
+        "name": "Blushing Grace",
+        "price": 36,
+        "description": "Fresh blooms, beautifully arranged.",
+        "image": "/Menu/Flowers%20Gifts%20and%20Baloons/Blushing%20Grace_.jpg",
+        "category": "Bouquets & Flowers",
+        "likePct": 97,
+        "likeCount": 47
+      },
+      {
+        "id": "flowers-gifts-and-balloons-15",
+        "name": "Blushing Harmony",
+        "price": 48,
+        "description": "A handcrafted arrangement for any occasion.",
+        "image": "/Menu/Flowers%20Gifts%20and%20Baloons/Blushing%20Harmony.jpg",
+        "category": "Bouquets & Flowers",
+        "likePct": 89,
+        "likeCount": 63
+      },
+      {
+        "id": "flowers-gifts-and-balloons-16",
+        "name": "Bountiful Affection (FGB421)",
+        "price": 94.5,
+        "description": "Designed by our florists with care.",
+        "image": "/Menu/Flowers%20Gifts%20and%20Baloons/Bountiful%20Affection%20(FGB421).jpg",
+        "category": "Bouquets & Flowers",
+        "likePct": 83,
+        "likeCount": 39
+      },
+      {
+        "id": "flowers-gifts-and-balloons-17",
+        "name": "celebrating special moments (FGB531)",
+        "price": 36,
+        "description": "Fresh blooms, beautifully arranged.",
+        "image": "/Menu/Flowers%20Gifts%20and%20Baloons/celebrating%20special%20moments%20(FGB531).jpg",
+        "category": "Bouquets & Flowers",
+        "likePct": 90,
+        "likeCount": 28
+      },
+      {
+        "id": "flowers-gifts-and-balloons-18",
+        "name": "Charming White & Lavender Daisy Bouquet (FGB629)",
+        "price": 59,
+        "description": "A handcrafted arrangement for any occasion.",
+        "image": "/Menu/Flowers%20Gifts%20and%20Baloons/Charming%20White%20%26%20Lavender%20Daisy%20Bouquet%20(FGB629).jpg",
+        "category": "Bouquets & Flowers",
+        "likePct": 94,
+        "likeCount": 26
+      },
+      {
+        "id": "flowers-gifts-and-balloons-19",
+        "name": "Classic Bouquet (FGB502)",
+        "price": 47,
+        "description": "Fresh blooms, beautifully arranged.",
+        "image": "/Menu/Flowers%20Gifts%20and%20Baloons/Classic%20Bouquet%20(FGB502).jpg",
+        "category": "Bouquets & Flowers",
+        "likePct": 97,
+        "likeCount": 17
+      },
+      {
+        "id": "flowers-gifts-and-balloons-20",
+        "name": "Eid Mubarak Balloons,",
+        "price": 90,
+        "description": "Designed by our florists with care.",
+        "image": "/Menu/Flowers%20Gifts%20and%20Baloons/Eid%20Mubarak%20Balloons%2C.jpg",
+        "category": "Balloons",
+        "likePct": 82,
+        "likeCount": 62
+      },
+      {
+        "id": "flowers-gifts-and-balloons-21",
+        "name": "Elegant 2 dozen Pink Roses",
+        "price": 60.5,
+        "description": "Fresh blooms, beautifully arranged.",
+        "image": "/Menu/Flowers%20Gifts%20and%20Baloons/Elegant%202%20dozen%20Pink%20Roses.jpg",
+        "category": "Roses",
+        "likePct": 85,
+        "likeCount": 47
+      },
+      {
+        "id": "flowers-gifts-and-balloons-22",
+        "name": "Elegant Affection",
+        "price": 40,
+        "description": "Designed by our florists with care.",
+        "image": "/Menu/Flowers%20Gifts%20and%20Baloons/Elegant%20Affection.jpg",
+        "category": "Bouquets & Flowers",
+        "likePct": 86,
+        "likeCount": 24
+      },
+      {
+        "id": "flowers-gifts-and-balloons-23",
+        "name": "Elegant Charm  6 Blue Roses (FGB635)",
+        "price": 94.5,
+        "description": "Fresh blooms, beautifully arranged.",
+        "image": "/Menu/Flowers%20Gifts%20and%20Baloons/Elegant%20Charm_%206%20Blue%20Roses%20(FGB635).jpg",
+        "category": "Roses",
+        "likePct": 94,
+        "likeCount": 50
+      },
+      {
+        "id": "flowers-gifts-and-balloons-24",
+        "name": "Ferrero Birthday Bouquet",
+        "price": 89,
+        "description": "Fresh blooms, beautifully arranged.",
+        "image": "/Menu/Flowers%20Gifts%20and%20Baloons/Ferrero%20Birthday%20Bouquet.jpg",
+        "category": "Gift Baskets",
+        "likePct": 90,
+        "likeCount": 40
+      },
+      {
+        "id": "flowers-gifts-and-balloons-25",
+        "name": "Fresh Real Red Rose Petals",
+        "price": 87.5,
+        "description": "Designed by our florists with care.",
+        "image": "/Menu/Flowers%20Gifts%20and%20Baloons/Fresh%20Real%20Red%20Rose%20Petals.jpg",
+        "category": "Roses",
+        "likePct": 82,
+        "likeCount": 38
+      },
+      {
+        "id": "flowers-gifts-and-balloons-26",
+        "name": "Gourmet Snacks & Sweets Gift Basket (FGB804)",
+        "price": 87,
+        "description": "Designed by our florists with care.",
+        "image": "/Menu/Flowers%20Gifts%20and%20Baloons/Gourmet%20Snacks%20%26%20Sweets%20Gift%20Basket%20(FGB804).jpg",
+        "category": "Gift Baskets",
+        "likePct": 86,
+        "likeCount": 12
+      },
+      {
+        "id": "flowers-gifts-and-balloons-27",
+        "name": "Half Dozen Pink Roses (FGB322)",
+        "price": 55.5,
+        "description": "A handcrafted arrangement for any occasion.",
+        "image": "/Menu/Flowers%20Gifts%20and%20Baloons/Half%20Dozen%20Pink%20Roses%20(FGB322).jpg",
+        "category": "Roses",
+        "likePct": 87,
+        "likeCount": 43
+      },
+      {
+        "id": "flowers-gifts-and-balloons-28",
+        "name": "Happy Birthday Celebration (FGB574)",
+        "price": 80,
+        "description": "Designed by our florists with care.",
+        "image": "/Menu/Flowers%20Gifts%20and%20Baloons/Happy%20Birthday%20Celebration%20(FGB574).jpg",
+        "category": "Bouquets & Flowers",
+        "likePct": 82,
+        "likeCount": 26
+      },
+      {
+        "id": "flowers-gifts-and-balloons-29",
+        "name": "Harmony in Bloom (FGB485)",
+        "price": 50,
+        "description": "Fresh blooms, beautifully arranged.",
+        "image": "/Menu/Flowers%20Gifts%20and%20Baloons/Harmony%20in%20Bloom%20(FGB485).jpg",
+        "category": "Bouquets & Flowers",
+        "likePct": 90,
+        "likeCount": 52
+      },
+      {
+        "id": "flowers-gifts-and-balloons-30",
+        "name": "Harmony of Blues (FGB117)",
+        "price": 77.5,
+        "description": "Fresh blooms, beautifully arranged.",
+        "image": "/Menu/Flowers%20Gifts%20and%20Baloons/Harmony%20of%20Blues%20(FGB117).jpg",
+        "category": "Bouquets & Flowers",
+        "likePct": 98,
+        "likeCount": 12
+      },
+      {
+        "id": "flowers-gifts-and-balloons-31",
+        "name": "Joyful Birthday Wishes (FGB484)",
+        "price": 85.5,
+        "description": "A handcrafted arrangement for any occasion.",
+        "image": "/Menu/Flowers%20Gifts%20and%20Baloons/Joyful%20Birthday%20Wishes%20(FGB484).jpg",
+        "category": "Bouquets & Flowers",
+        "likePct": 96,
+        "likeCount": 28
+      },
+      {
+        "id": "flowers-gifts-and-balloons-32",
+        "name": "Lovely White and Pink (FGB503)",
+        "price": 41,
+        "description": "Fresh blooms, beautifully arranged.",
+        "image": "/Menu/Flowers%20Gifts%20and%20Baloons/Lovely%20White%20and%20Pink%20(FGB503).jpg",
+        "category": "Bouquets & Flowers",
+        "likePct": 84,
+        "likeCount": 64
+      },
+      {
+        "id": "flowers-gifts-and-balloons-33",
+        "name": "Graceful Blooms",
+        "price": 37,
+        "description": "A handcrafted arrangement for any occasion.",
+        "image": "/Menu/Flowers%20Gifts%20and%20Baloons/_Graceful%20Blooms.jpg",
+        "category": "Bouquets & Flowers",
+        "likePct": 82,
+        "likeCount": 38
+      }
+    ]
+  },
+  "Waterford Convenience": {
+    "slug": "waterford-convenience",
+    "folder": "Waterford Convience",
+    "banner": "/stores/waterford-convenience/banner.jpg",
+    "rating": 4.5,
+    "ratingCount": "500+",
+    "address": "3465 Bayview Ave, Markham, ON",
+    "availability": "Available today",
+    "hoursLabel": "Mon–Sun 9:00 a.m. – 9:00 p.m.",
+    "deliveryTime": "25 min",
+    "reviews": [
+      {
+        "name": "Marcus L.",
+        "stars": 5,
+        "date": "02-08-24",
+        "text": "Exactly as described, fresh and well packaged."
+      },
+      {
+        "name": "Omar H.",
+        "stars": 5,
+        "date": "10-07-24",
+        "text": "Exactly as described, fresh and well packaged."
+      },
+      {
+        "name": "Marcus L.",
+        "stars": 5,
+        "date": "18-06-24",
+        "text": "Exactly as described, fresh and well packaged."
+      }
+    ],
+    "categories": [
+      "Health & Medicine",
+      "Soda & Juice",
+      "Water",
+      "Chocolate & Candy",
+      "Household",
+      "Trading Cards",
+      "Snacks"
+    ],
+    "featuredIds": [
+      "waterford-convenience-0",
+      "waterford-convenience-1",
+      "waterford-convenience-2",
+      "waterford-convenience-3",
+      "waterford-convenience-4",
+      "waterford-convenience-5",
+      "waterford-convenience-6",
+      "waterford-convenience-7"
+    ],
+    "pickedIds": [
+      "waterford-convenience-8",
+      "waterford-convenience-9",
+      "waterford-convenience-10",
+      "waterford-convenience-11",
+      "waterford-convenience-12",
+      "waterford-convenience-13"
+    ],
+    "items": [
+      {
+        "id": "waterford-convenience-0",
+        "name": "10pc Disposable Face Masks",
+        "price": 3.99,
+        "description": "Stocked and ready for you.",
+        "image": "/Menu/Waterford%20Convience/10pc%20Disposable%20Face%20Masks.jpg",
+        "category": "Health & Medicine",
+        "likePct": 91,
+        "likeCount": 29
+      },
+      {
+        "id": "waterford-convenience-1",
+        "name": "5 pc Disposable Face Mask",
+        "price": 7.49,
+        "description": "Stocked and ready for you.",
+        "image": "/Menu/Waterford%20Convience/5%20pc%20Disposable%20Face%20Mask.jpg",
+        "category": "Health & Medicine",
+        "likePct": 82,
+        "likeCount": 14
+      },
+      {
+        "id": "waterford-convenience-2",
+        "name": "A & W Cream Soda Zero Sugar 355 ml Cans (Pack of 12)",
+        "price": 3.99,
+        "description": "A snack-time classic.",
+        "image": "/Menu/Waterford%20Convience/A%20%26%20W%20Cream%20Soda%20Zero%20Sugar%20355%20ml%20Cans%20(Pack%20of%2012).jpg",
+        "category": "Soda & Juice",
+        "likePct": 91,
+        "likeCount": 59
+      },
+      {
+        "id": "waterford-convenience-3",
+        "name": "Advil Liqui- Gels Extra Strength 12 Capsules",
+        "price": 3.99,
+        "description": "Stocked and ready for you.",
+        "image": "/Menu/Waterford%20Convience/Advil%20Liqui-%20Gels%20Extra%20Strength%2012%20Capsules.jpg",
+        "category": "Health & Medicine",
+        "likePct": 89,
+        "likeCount": 15
+      },
+      {
+        "id": "waterford-convenience-4",
+        "name": "Allen's Apple Juice 1.89L",
+        "price": 10.99,
+        "description": "Grab-and-go favourite.",
+        "image": "/Menu/Waterford%20Convience/Allen's%20Apple%20Juice%201.89L.jpg",
+        "category": "Soda & Juice",
+        "likePct": 85,
+        "likeCount": 23
+      },
+      {
+        "id": "waterford-convenience-5",
+        "name": "Aquafina Pure Water (1.5 L)",
+        "price": 5.99,
+        "description": "Grab-and-go favourite.",
+        "image": "/Menu/Waterford%20Convience/Aquafina%20Pure%20Water%20(1.5%20L).jpg",
+        "category": "Water",
+        "likePct": 89,
+        "likeCount": 63
+      },
+      {
+        "id": "waterford-convenience-6",
+        "name": "Aquafina Water 1L",
+        "price": 5.99,
+        "description": "A snack-time classic.",
+        "image": "/Menu/Waterford%20Convience/Aquafina%20Water%201L.jpg",
+        "category": "Water",
+        "likePct": 87,
+        "likeCount": 25
+      },
+      {
+        "id": "waterford-convenience-7",
+        "name": "Aquafina Water 500 ml",
+        "price": 4.49,
+        "description": "A snack-time classic.",
+        "image": "/Menu/Waterford%20Convience/Aquafina%20Water%20500%20ml.jpg",
+        "category": "Water",
+        "likePct": 82,
+        "likeCount": 26
+      },
+      {
+        "id": "waterford-convenience-8",
+        "name": "Aquafina Water 591 ml",
+        "price": 4.49,
+        "description": "A snack-time classic.",
+        "image": "/Menu/Waterford%20Convience/Aquafina%20Water%20591%20ml.jpg",
+        "category": "Water",
+        "likePct": 96,
+        "likeCount": 28
+      },
+      {
+        "id": "waterford-convenience-9",
+        "name": "Benadryl Children's Liquid Allergy Medicine, Bubble Gum (100 ml)",
+        "price": 10.99,
+        "description": "Stocked and ready for you.",
+        "image": "/Menu/Waterford%20Convience/Benadryl%20Children's%20Liquid%20Allergy%20Medicine%2C%20Bubble%20Gum%20(100%20ml).jpg",
+        "category": "Soda & Juice",
+        "likePct": 89,
+        "likeCount": 51
+      },
+      {
+        "id": "waterford-convenience-10",
+        "name": "Brookside Blood Orange & Peach 235g",
+        "price": 7.99,
+        "description": "A snack-time classic.",
+        "image": "/Menu/Waterford%20Convience/Brookside%20Blood%20Orange%20%26%20Peach%20235g.jpg",
+        "category": "Chocolate & Candy",
+        "likePct": 91,
+        "likeCount": 41
+      },
+      {
+        "id": "waterford-convenience-11",
+        "name": "Brookside Cherry Flavour 200g",
+        "price": 7.49,
+        "description": "Grab-and-go favourite.",
+        "image": "/Menu/Waterford%20Convience/Brookside%20Cherry%20Flavour%20200g.jpg",
+        "category": "Chocolate & Candy",
+        "likePct": 90,
+        "likeCount": 28
+      },
+      {
+        "id": "waterford-convenience-12",
+        "name": "Cascade Dishwasher Detergent ActionPacs 924g",
+        "price": 11.49,
+        "description": "Stocked and ready for you.",
+        "image": "/Menu/Waterford%20Convience/Cascade%20Dishwasher%20Detergent%20ActionPacs%20924g.jpg",
+        "category": "Household",
+        "likePct": 88,
+        "likeCount": 8
+      },
+      {
+        "id": "waterford-convenience-13",
+        "name": "Cascade Original Dishwasher Detergent 1.69kg",
+        "price": 4.49,
+        "description": "Stocked and ready for you.",
+        "image": "/Menu/Waterford%20Convience/Cascade%20Original%20Dishwasher%20Detergent%201.69kg.jpg",
+        "category": "Household",
+        "likePct": 90,
+        "likeCount": 40
+      },
+      {
+        "id": "waterford-convenience-14",
+        "name": "Cascade Platinum Dishwasher Detergent ActionPacs616g",
+        "price": 2.49,
+        "description": "A snack-time classic.",
+        "image": "/Menu/Waterford%20Convience/Cascade%20Platinum%20Dishwasher%20Detergent%20ActionPacs616g.jpg",
+        "category": "Household",
+        "likePct": 82,
+        "likeCount": 38
+      },
+      {
+        "id": "waterford-convenience-15",
+        "name": "Cascade Power Clean Dishwasher Detergent ActionPacs 1.77kg",
+        "price": 6.99,
+        "description": "A snack-time classic.",
+        "image": "/Menu/Waterford%20Convience/Cascade%20Power%20Clean%20Dishwasher%20Detergent%20ActionPacs%201.77kg.jpg",
+        "category": "Household",
+        "likePct": 93,
+        "likeCount": 55
+      },
+      {
+        "id": "waterford-convenience-16",
+        "name": "Claritin -Allergies 10 tablets",
+        "price": 9.49,
+        "description": "A snack-time classic.",
+        "image": "/Menu/Waterford%20Convience/Claritin%20-Allergies%2010%20tablets.jpg",
+        "category": "Health & Medicine",
+        "likePct": 94,
+        "likeCount": 20
+      },
+      {
+        "id": "waterford-convenience-17",
+        "name": "Dasani 591ml",
+        "price": 12.99,
+        "description": "Grab-and-go favourite.",
+        "image": "/Menu/Waterford%20Convience/Dasani%20591ml.jpg",
+        "category": "Water",
+        "likePct": 93,
+        "likeCount": 19
+      },
+      {
+        "id": "waterford-convenience-18",
+        "name": "Dawn Ultra Dishwashing Liquid 473ml",
+        "price": 3.99,
+        "description": "Stocked and ready for you.",
+        "image": "/Menu/Waterford%20Convience/Dawn%20Ultra%20Dishwashing%20Liquid%20473ml.jpg",
+        "category": "Household",
+        "likePct": 93,
+        "likeCount": 61
+      },
+      {
+        "id": "waterford-convenience-19",
+        "name": "DayQuil Cold&Flu 16 Liquid Capsules",
+        "price": 6.49,
+        "description": "A snack-time classic.",
+        "image": "/Menu/Waterford%20Convience/DayQuil%20Cold%26Flu%2016%20Liquid%20Capsules.jpg",
+        "category": "Health & Medicine",
+        "likePct": 90,
+        "likeCount": 34
+      },
+      {
+        "id": "waterford-convenience-20",
+        "name": "Disposable Face Mask (50 Piece Box)",
+        "price": 10.99,
+        "description": "Grab-and-go favourite.",
+        "image": "/Menu/Waterford%20Convience/Disposable%20Face%20Mask%20(50%20Piece%20Box).jpg",
+        "category": "Health & Medicine",
+        "likePct": 85,
+        "likeCount": 59
+      },
+      {
+        "id": "waterford-convenience-21",
+        "name": "Dristan Nasal Mist 30 ml",
+        "price": 4.49,
+        "description": "Stocked and ready for you.",
+        "image": "/Menu/Waterford%20Convience/Dristan%20Nasal%20Mist%2030%20ml.jpg",
+        "category": "Health & Medicine",
+        "likePct": 90,
+        "likeCount": 10
+      },
+      {
+        "id": "waterford-convenience-22",
+        "name": "Evian Natural Spring Water (1.5 L)",
+        "price": 4.49,
+        "description": "A snack-time classic.",
+        "image": "/Menu/Waterford%20Convience/Evian%20Natural%20Spring%20Water%20(1.5%20L).jpg",
+        "category": "Water",
+        "likePct": 82,
+        "likeCount": 62
+      },
+      {
+        "id": "waterford-convenience-23",
+        "name": "FIJI Natural Spring Water (1.5 L)",
+        "price": 6.99,
+        "description": "Grab-and-go favourite.",
+        "image": "/Menu/Waterford%20Convience/FIJI%20Natural%20Spring%20Water%20(1.5%20L).jpg",
+        "category": "Water",
+        "likePct": 89,
+        "likeCount": 33
+      },
+      {
+        "id": "waterford-convenience-24",
+        "name": "Fiji Natural Spring Water 1L",
+        "price": 12.99,
+        "description": "Grab-and-go favourite.",
+        "image": "/Menu/Waterford%20Convience/Fiji%20Natural%20Spring%20Water%201L.jpg",
+        "category": "Water",
+        "likePct": 93,
+        "likeCount": 31
+      },
+      {
+        "id": "waterford-convenience-25",
+        "name": "Hockey SP 2020-21",
+        "price": 5.99,
+        "description": "Grab-and-go favourite.",
+        "image": "/Menu/Waterford%20Convience/Hockey%20SP%202020-21.jpg",
+        "category": "Trading Cards",
+        "likePct": 95,
+        "likeCount": 57
+      },
+      {
+        "id": "waterford-convenience-26",
+        "name": "Hockey SP 2021-22",
+        "price": 7.99,
+        "description": "Grab-and-go favourite.",
+        "image": "/Menu/Waterford%20Convience/Hockey%20SP%202021-22.jpg",
+        "category": "Trading Cards",
+        "likePct": 83,
+        "likeCount": 51
+      },
+      {
+        "id": "waterford-convenience-27",
+        "name": "Hockey SP 2022-23",
+        "price": 11.99,
+        "description": "A snack-time classic.",
+        "image": "/Menu/Waterford%20Convience/Hockey%20SP%202022-23.jpg",
+        "category": "Trading Cards",
+        "likePct": 93,
+        "likeCount": 31
+      },
+      {
+        "id": "waterford-convenience-28",
+        "name": "Hockey SP 2023-24",
+        "price": 11.99,
+        "description": "A snack-time classic.",
+        "image": "/Menu/Waterford%20Convience/Hockey%20SP%202023-24.jpg",
+        "category": "Trading Cards",
+        "likePct": 99,
+        "likeCount": 25
+      },
+      {
+        "id": "waterford-convenience-29",
+        "name": "Hockey SP 2024-2025",
+        "price": 10.99,
+        "description": "Stocked and ready for you.",
+        "image": "/Menu/Waterford%20Convience/Hockey%20SP%202024-2025.jpg",
+        "category": "Trading Cards",
+        "likePct": 99,
+        "likeCount": 61
+      },
+      {
+        "id": "waterford-convenience-30",
+        "name": "Hockey SP 2025-26",
+        "price": 4.99,
+        "description": "A snack-time classic.",
+        "image": "/Menu/Waterford%20Convience/Hockey%20SP%202025-26.jpg",
+        "category": "Trading Cards",
+        "likePct": 91,
+        "likeCount": 35
+      },
+      {
+        "id": "waterford-convenience-31",
+        "name": "Infants' Tylenol 24 ml  (0-23 Months)",
+        "price": 6.99,
+        "description": "Grab-and-go favourite.",
+        "image": "/Menu/Waterford%20Convience/Infants'%20Tylenol%2024%20ml%20%20(0-23%20Months).jpg",
+        "category": "Health & Medicine",
+        "likePct": 91,
+        "likeCount": 59
+      },
+      {
+        "id": "waterford-convenience-32",
+        "name": "IsopropylAlcohol 500ml",
+        "price": 10.49,
+        "description": "Grab-and-go favourite.",
+        "image": "/Menu/Waterford%20Convience/IsopropylAlcohol%20500ml.jpg",
+        "category": "Health & Medicine",
+        "likePct": 82,
+        "likeCount": 38
+      },
+      {
+        "id": "waterford-convenience-33",
+        "name": "M & M ' s  Milk Chocolate 165g",
+        "price": 4.99,
+        "description": "A snack-time classic.",
+        "image": "/Menu/Waterford%20Convience/M%20%26%20M%20'%20s%20%20Milk%20Chocolate%20165g.jpg",
+        "category": "Soda & Juice",
+        "likePct": 89,
+        "likeCount": 63
+      },
+      {
+        "id": "waterford-convenience-34",
+        "name": "M & M ' s  Peanut Butter 155g",
+        "price": 11.49,
+        "description": "A snack-time classic.",
+        "image": "/Menu/Waterford%20Convience/M%20%26%20M%20'%20s%20%20Peanut%20Butter%20155g.jpg",
+        "category": "Chocolate & Candy",
+        "likePct": 96,
+        "likeCount": 16
+      },
+      {
+        "id": "waterford-convenience-35",
+        "name": "M & M's  Caramel 155g",
+        "price": 8.49,
+        "description": "Stocked and ready for you.",
+        "image": "/Menu/Waterford%20Convience/M%20%26%20M's%20%20Caramel%20155g.jpg",
+        "category": "Chocolate & Candy",
+        "likePct": 90,
+        "likeCount": 10
+      },
+      {
+        "id": "waterford-convenience-36",
+        "name": "M & M's  Milk Chocolate  100g",
+        "price": 9.49,
+        "description": "A snack-time classic.",
+        "image": "/Menu/Waterford%20Convience/M%20%26%20M's%20%20Milk%20Chocolate%20%20100g.jpg",
+        "category": "Soda & Juice",
+        "likePct": 96,
+        "likeCount": 46
+      },
+      {
+        "id": "waterford-convenience-37",
+        "name": "M & M's  Minis Milk Chocolate  200g",
+        "price": 9.99,
+        "description": "A snack-time classic.",
+        "image": "/Menu/Waterford%20Convience/M%20%26%20M's%20%20Minis%20Milk%20Chocolate%20%20200g.jpg",
+        "category": "Soda & Juice",
+        "likePct": 87,
+        "likeCount": 37
+      },
+      {
+        "id": "waterford-convenience-38",
+        "name": "M & M's  Peanut  100g",
+        "price": 11.49,
+        "description": "A snack-time classic.",
+        "image": "/Menu/Waterford%20Convience/M%20%26%20M's%20%20Peanut%20%20100g.jpg",
+        "category": "Chocolate & Candy",
+        "likePct": 96,
+        "likeCount": 46
+      },
+      {
+        "id": "waterford-convenience-39",
+        "name": "M & M's  Peanut  Butter  100g",
+        "price": 8.49,
+        "description": "Grab-and-go favourite.",
+        "image": "/Menu/Waterford%20Convience/M%20%26%20M's%20%20Peanut%20%20Butter%20%20100g.jpg",
+        "category": "Chocolate & Candy",
+        "likePct": 98,
+        "likeCount": 24
+      },
+      {
+        "id": "waterford-convenience-40",
+        "name": "M & M's  Peanut 165g",
+        "price": 1.99,
+        "description": "Grab-and-go favourite.",
+        "image": "/Menu/Waterford%20Convience/M%20%26%20M's%20%20Peanut%20165g.jpg",
+        "category": "Chocolate & Candy",
+        "likePct": 89,
+        "likeCount": 21
+      },
+      {
+        "id": "waterford-convenience-41",
+        "name": "M&M's Almond, Take Home Size (185 g)",
+        "price": 9.99,
+        "description": "Grab-and-go favourite.",
+        "image": "/Menu/Waterford%20Convience/M%26M's%20Almond%2C%20Take%20Home%20Size%20(185%20g).jpg",
+        "category": "Chocolate & Candy",
+        "likePct": 97,
+        "likeCount": 65
+      },
+      {
+        "id": "waterford-convenience-42",
+        "name": "M&M's Minis Milk Chocolate 100g",
+        "price": 11.49,
+        "description": "Grab-and-go favourite.",
+        "image": "/Menu/Waterford%20Convience/M%26M's%20Minis%20Milk%20Chocolate%20100g.jpg",
+        "category": "Soda & Juice",
+        "likePct": 88,
+        "likeCount": 32
+      },
+      {
+        "id": "waterford-convenience-43",
+        "name": "Maltesers 100g",
+        "price": 12.99,
+        "description": "A snack-time classic.",
+        "image": "/Menu/Waterford%20Convience/Maltesers%20100g.jpg",
+        "category": "Chocolate & Candy",
+        "likePct": 99,
+        "likeCount": 37
+      },
+      {
+        "id": "waterford-convenience-44",
+        "name": "Maltesers Stand Up Pouch (165 g)",
+        "price": 10.99,
+        "description": "Stocked and ready for you.",
+        "image": "/Menu/Waterford%20Convience/Maltesers%20Stand%20Up%20Pouch%20(165%20g).jpg",
+        "category": "Chocolate & Candy",
+        "likePct": 97,
+        "likeCount": 47
+      },
+      {
+        "id": "waterford-convenience-45",
+        "name": "NBA HOOPS Basketball 2024-25(15 cards inside)",
+        "price": 7.49,
+        "description": "Grab-and-go favourite.",
+        "image": "/Menu/Waterford%20Convience/NBA%20HOOPS%20Basketball%202024-25(15%20cards%20inside).jpg",
+        "category": "Trading Cards",
+        "likePct": 92,
+        "likeCount": 30
+      },
+      {
+        "id": "waterford-convenience-46",
+        "name": "NyQuil Cold&Flu 16 Liquid Capsules",
+        "price": 7.99,
+        "description": "Grab-and-go favourite.",
+        "image": "/Menu/Waterford%20Convience/NyQuil%20Cold%26Flu%2016%20Liquid%20Capsules.jpg",
+        "category": "Health & Medicine",
+        "likePct": 99,
+        "likeCount": 67
+      },
+      {
+        "id": "waterford-convenience-47",
+        "name": "Nyquil Complete Cold&Flu Liquid 354ml",
+        "price": 9.49,
+        "description": "A snack-time classic.",
+        "image": "/Menu/Waterford%20Convience/Nyquil%20Complete%20Cold%26Flu%20Liquid%20354ml.jpg",
+        "category": "Health & Medicine",
+        "likePct": 88,
+        "likeCount": 20
+      },
+      {
+        "id": "waterford-convenience-48",
+        "name": "NyQuil Complete Honey Cold&Flu 354ml",
+        "price": 10.99,
+        "description": "Grab-and-go favourite.",
+        "image": "/Menu/Waterford%20Convience/NyQuil%20Complete%20Honey%20Cold%26Flu%20354ml.jpg",
+        "category": "Health & Medicine",
+        "likePct": 91,
+        "likeCount": 35
+      },
+      {
+        "id": "waterford-convenience-49",
+        "name": "Ocean Spray Original Juice Cocktail, Cranberry (1.89 L)",
+        "price": 10.49,
+        "description": "Grab-and-go favourite.",
+        "image": "/Menu/Waterford%20Convience/Ocean%20Spray%20Original%20Juice%20Cocktail%2C%20Cranberry%20(1.89%20L).jpg",
+        "category": "Soda & Juice",
+        "likePct": 96,
+        "likeCount": 34
+      },
+      {
+        "id": "waterford-convenience-50",
+        "name": "Ocean Spray-Cran-Raspberry 1.89L",
+        "price": 2.49,
+        "description": "Stocked and ready for you.",
+        "image": "/Menu/Waterford%20Convience/Ocean%20Spray-Cran-Raspberry%201.89L.jpg",
+        "category": "Snacks",
+        "likePct": 82,
+        "likeCount": 14
+      },
+      {
+        "id": "waterford-convenience-51",
+        "name": "Otrivin Nasal Spray Complete Nasal Care , Cold & Allergy  Medication, Nasal Decongestant 20ml",
+        "price": 10.99,
+        "description": "Grab-and-go favourite.",
+        "image": "/Menu/Waterford%20Convience/Otrivin%20Nasal%20Spray%20Complete%20Nasal%20Care%20%2C%20Cold%20%26%20Allergy%20%20Medication%2C%20Nasal%20Decongestant%2020ml.jpg",
+        "category": "Health & Medicine",
+        "likePct": 89,
+        "likeCount": 39
+      },
+      {
+        "id": "waterford-convenience-52",
+        "name": "Palmolive Orange Dish Liquid  828 ml",
+        "price": 8.99,
+        "description": "Grab-and-go favourite.",
+        "image": "/Menu/Waterford%20Convience/Palmolive%20Orange%20Dish%20Liquid%20%20828%20ml.jpg",
+        "category": "Household",
+        "likePct": 83,
+        "likeCount": 45
+      }
+    ]
+  },
+  "Razi Pharmacy": {
+    "slug": "razi-pharmacy",
+    "folder": "RAZI pharmacy",
+    "banner": "/stores/razi-pharmacy/banner.jpg",
+    "rating": 4.5,
+    "ratingCount": "500+",
+    "address": "6215 Hwy 7, North York, ON",
+    "availability": "Available today",
+    "hoursLabel": "Mon–Sun 9:00 a.m. – 9:00 p.m.",
+    "deliveryTime": "25 min",
+    "reviews": [
+      {
+        "name": "Daniel K.",
+        "stars": 5,
+        "date": "02-02-24",
+        "text": "Exactly as described, fresh and well packaged."
+      },
+      {
+        "name": "Winnie C.",
+        "stars": 5,
+        "date": "10-01-24",
+        "text": "Exactly as described, fresh and well packaged."
+      },
+      {
+        "name": "Winnie C.",
+        "stars": 5,
+        "date": "13-04-24",
+        "text": "My go-to spot — never disappoints."
+      }
+    ],
+    "categories": [
+      "Vitamins & Supplements",
+      "Oral Care",
+      "Sexual Wellness",
+      "Lip Care",
+      "Health & Wellness",
+      "Candy & Snacks"
+    ],
+    "featuredIds": [
+      "razi-pharmacy-0",
+      "razi-pharmacy-1",
+      "razi-pharmacy-2",
+      "razi-pharmacy-3",
+      "razi-pharmacy-4",
+      "razi-pharmacy-5",
+      "razi-pharmacy-6",
+      "razi-pharmacy-7"
+    ],
+    "pickedIds": [
+      "razi-pharmacy-8",
+      "razi-pharmacy-9",
+      "razi-pharmacy-10",
+      "razi-pharmacy-11",
+      "razi-pharmacy-12",
+      "razi-pharmacy-13"
+    ],
+    "items": [
+      {
+        "id": "razi-pharmacy-0",
+        "name": "Aderna smart Relieves symptoms of stress 90 capsules",
+        "price": 18.49,
+        "description": "Trusted relief, ready when you need it.",
+        "image": "/Menu/RAZI%20pharmacy/Aderna%20smart%20Relieves%20symptoms%20of%20stress%2090%20capsules.jpg",
+        "category": "Vitamins & Supplements",
+        "likePct": 86,
+        "likeCount": 24
+      },
+      {
+        "id": "razi-pharmacy-1",
+        "name": "Anbesol Gel Extra Strength Canker Sores 7g",
+        "price": 39.49,
+        "description": "A pharmacy staple.",
+        "image": "/Menu/RAZI%20pharmacy/Anbesol%20Gel%20Extra%20Strength%20Canker%20Sores%207g.jpg",
+        "category": "Oral Care",
+        "likePct": 82,
+        "likeCount": 20
+      },
+      {
+        "id": "razi-pharmacy-2",
+        "name": "Astroglide gel  Sensitive Skin Lubricant 90 g",
+        "price": 41.49,
+        "description": "Everyday health essential.",
+        "image": "/Menu/RAZI%20pharmacy/Astroglide%20gel%20%20Sensitive%20Skin%20Lubricant%2090%20g.jpg",
+        "category": "Sexual Wellness",
+        "likePct": 90,
+        "likeCount": 16
+      },
+      {
+        "id": "razi-pharmacy-3",
+        "name": "Astroglide gel Lubricant 113 g",
+        "price": 18.99,
+        "description": "A pharmacy staple.",
+        "image": "/Menu/RAZI%20pharmacy/Astroglide%20gel%20Lubricant%20113%20g.jpg",
+        "category": "Sexual Wellness",
+        "likePct": 91,
+        "likeCount": 11
+      },
+      {
+        "id": "razi-pharmacy-4",
+        "name": "Blistex Berry Lip balm",
+        "price": 7.99,
+        "description": "A pharmacy staple.",
+        "image": "/Menu/RAZI%20pharmacy/Blistex%20Berry%20Lip%20balm.jpg",
+        "category": "Lip Care",
+        "likePct": 89,
+        "likeCount": 39
+      },
+      {
+        "id": "razi-pharmacy-5",
+        "name": "Blistex Lip Medex Cold Sore, Severely Dry Cracked Lips 4.25g",
+        "price": 20.49,
+        "description": "A pharmacy staple.",
+        "image": "/Menu/RAZI%20pharmacy/Blistex%20Lip%20Medex%20Cold%20Sore%2C%20Severely%20Dry%20Cracked%20Lips%204.25g.jpg",
+        "category": "Lip Care",
+        "likePct": 88,
+        "likeCount": 56
+      },
+      {
+        "id": "razi-pharmacy-6",
+        "name": "Blistex Regular Lip balm",
+        "price": 30.99,
+        "description": "A pharmacy staple.",
+        "image": "/Menu/RAZI%20pharmacy/Blistex%20Regular%20Lip%20balm.jpg",
+        "category": "Lip Care",
+        "likePct": 97,
+        "likeCount": 41
+      },
+      {
+        "id": "razi-pharmacy-7",
+        "name": "Colgate Kids T P (75 ml)",
+        "price": 34.99,
+        "description": "Trusted relief, ready when you need it.",
+        "image": "/Menu/RAZI%20pharmacy/Colgate%20Kids%20T_P%20(75%20ml).jpg",
+        "category": "Oral Care",
+        "likePct": 87,
+        "likeCount": 43
+      },
+      {
+        "id": "razi-pharmacy-8",
+        "name": "Colgate PreviDent 5000 Plus 39 ml",
+        "price": 6.99,
+        "description": "Trusted relief, ready when you need it.",
+        "image": "/Menu/RAZI%20pharmacy/Colgate%20PreviDent%205000%20Plus%2039%20ml.jpg",
+        "category": "Oral Care",
+        "likePct": 83,
+        "likeCount": 21
+      },
+      {
+        "id": "razi-pharmacy-9",
+        "name": "Contingency One Levonorgestrel Tablet 1.5 mg",
+        "price": 38.99,
+        "description": "Everyday health essential.",
+        "image": "/Menu/RAZI%20pharmacy/Contingency%20One%20Levonorgestrel%20Tablet%201.5%20mg.jpg",
+        "category": "Vitamins & Supplements",
+        "likePct": 91,
+        "likeCount": 17
+      },
+      {
+        "id": "razi-pharmacy-10",
+        "name": "D urex Intense Orgasmic 10 C ondoms",
+        "price": 28.49,
+        "description": "A pharmacy staple.",
+        "image": "/Menu/RAZI%20pharmacy/D%20urex%20Intense%20Orgasmic%2010%20C%20ondoms.jpg",
+        "category": "Sexual Wellness",
+        "likePct": 94,
+        "likeCount": 26
+      },
+      {
+        "id": "razi-pharmacy-11",
+        "name": "D urex Original Lubricant  100 ml",
+        "price": 32.49,
+        "description": "A pharmacy staple.",
+        "image": "/Menu/RAZI%20pharmacy/D%20urex%20Original%20Lubricant%20%20100%20ml.jpg",
+        "category": "Health & Wellness",
+        "likePct": 92,
+        "likeCount": 54
+      },
+      {
+        "id": "razi-pharmacy-12",
+        "name": "D urex Play Massage 2 in 1 Aloe Vera 200 ml",
+        "price": 34.49,
+        "description": "A pharmacy staple.",
+        "image": "/Menu/RAZI%20pharmacy/D%20urex%20Play%20Massage%202%20in%201%20Aloe%20Vera%20200%20ml.jpg",
+        "category": "Sexual Wellness",
+        "likePct": 84,
+        "likeCount": 64
+      },
+      {
+        "id": "razi-pharmacy-13",
+        "name": "Durex Pleasure Ring (10 g)",
+        "price": 14.99,
+        "description": "A pharmacy staple.",
+        "image": "/Menu/RAZI%20pharmacy/Durex%20Pleasure%20Ring%20(10%20g).jpg",
+        "category": "Sexual Wellness",
+        "likePct": 89,
+        "likeCount": 63
+      },
+      {
+        "id": "razi-pharmacy-14",
+        "name": "Durex Sensi-Thin Ultra Fine Lubricated Condoms (12 ct)",
+        "price": 33.49,
+        "description": "Trusted relief, ready when you need it.",
+        "image": "/Menu/RAZI%20pharmacy/Durex%20Sensi-Thin%20Ultra%20Fine%20Lubricated%20Condoms%20(12%20ct).jpg",
+        "category": "Sexual Wellness",
+        "likePct": 90,
+        "likeCount": 40
+      },
+      {
+        "id": "razi-pharmacy-15",
+        "name": "Emergen-C 1000 mg Vit C + 7 B Vitamins 30 Sachets (Raspberry)",
+        "price": 37.99,
+        "description": "A pharmacy staple.",
+        "image": "/Menu/RAZI%20pharmacy/Emergen-C%201000%20mg%20Vit%20C%20%2B%207%20B%20Vitamins%2030%20Sachets%20(Raspberry).jpg",
+        "category": "Vitamins & Supplements",
+        "likePct": 97,
+        "likeCount": 17
+      },
+      {
+        "id": "razi-pharmacy-16",
+        "name": "Emergen-C 1000 mg Vit C + 7B Vitamins 30 Sachets (Tangerine)",
+        "price": 37.49,
+        "description": "Trusted relief, ready when you need it.",
+        "image": "/Menu/RAZI%20pharmacy/Emergen-C%201000%20mg%20Vit%20C%20%2B%207B%20Vitamins%2030%20Sachets%20(Tangerine).jpg",
+        "category": "Vitamins & Supplements",
+        "likePct": 88,
+        "likeCount": 20
+      },
+      {
+        "id": "razi-pharmacy-17",
+        "name": "Emergen-C Vitamin C 1000 mg Drink Mix, Orange (30 ct)",
+        "price": 14.99,
+        "description": "Trusted relief, ready when you need it.",
+        "image": "/Menu/RAZI%20pharmacy/Emergen-C%20Vitamin%20C%201000%20mg%20Drink%20Mix%2C%20Orange%20(30%20ct).jpg",
+        "category": "Vitamins & Supplements",
+        "likePct": 95,
+        "likeCount": 39
+      },
+      {
+        "id": "razi-pharmacy-18",
+        "name": "Excel Strong Mintgum (16.8 g)",
+        "price": 13.99,
+        "description": "Everyday health essential.",
+        "image": "/Menu/RAZI%20pharmacy/Excel%20Strong%20Mintgum%20(16.8%20g).jpg",
+        "category": "Oral Care",
+        "likePct": 91,
+        "likeCount": 11
+      },
+      {
+        "id": "razi-pharmacy-19",
+        "name": "FeraMax 150 (100's capsules)",
+        "price": 15.99,
+        "description": "A pharmacy staple.",
+        "image": "/Menu/RAZI%20pharmacy/FeraMax%20150%20(100's%20capsules).jpg",
+        "category": "Vitamins & Supplements",
+        "likePct": 87,
+        "likeCount": 49
+      },
+      {
+        "id": "razi-pharmacy-20",
+        "name": "FeraMax 150 (30's capsules)",
+        "price": 21.99,
+        "description": "Trusted relief, ready when you need it.",
+        "image": "/Menu/RAZI%20pharmacy/FeraMax%20150%20(30's%20capsules).jpg",
+        "category": "Vitamins & Supplements",
+        "likePct": 95,
+        "likeCount": 9
+      },
+      {
+        "id": "razi-pharmacy-21",
+        "name": "FeraMax 45 Maintenance (30 Chewable Tabs)",
+        "price": 22.49,
+        "description": "Everyday health essential.",
+        "image": "/Menu/RAZI%20pharmacy/FeraMax%2045%20Maintenance%20(30%20Chewable%20Tabs).jpg",
+        "category": "Vitamins & Supplements",
+        "likePct": 90,
+        "likeCount": 28
+      },
+      {
+        "id": "razi-pharmacy-22",
+        "name": "GUM EEZ- Thru Floss 25 Threaders",
+        "price": 15.49,
+        "description": "A pharmacy staple.",
+        "image": "/Menu/RAZI%20pharmacy/GUM%20EEZ-%20Thru%20Floss%2025%20Threaders.jpg",
+        "category": "Oral Care",
+        "likePct": 88,
+        "likeCount": 50
+      },
+      {
+        "id": "razi-pharmacy-23",
+        "name": "GUM Professional Clean Flosser Picks (90 ct)",
+        "price": 37.99,
+        "description": "A pharmacy staple.",
+        "image": "/Menu/RAZI%20pharmacy/GUM%20Professional%20Clean%20Flosser%20Picks%20(90%20ct).jpg",
+        "category": "Oral Care",
+        "likePct": 99,
+        "likeCount": 61
+      },
+      {
+        "id": "razi-pharmacy-24",
+        "name": "Jamieson D3 2500 UI 180 Tablets",
+        "price": 19.99,
+        "description": "Everyday health essential.",
+        "image": "/Menu/RAZI%20pharmacy/Jamieson%20D3%202500%20UI%20180%20Tablets.jpg",
+        "category": "Vitamins & Supplements",
+        "likePct": 89,
+        "likeCount": 45
+      },
+      {
+        "id": "razi-pharmacy-25",
+        "name": "Jamieson Vitamin B12 Metabolic Support Timed Release Tablets 1200 Mcg (80 ct)",
+        "price": 18.49,
+        "description": "Everyday health essential.",
+        "image": "/Menu/RAZI%20pharmacy/Jamieson%20Vitamin%20B12%20Metabolic%20Support%20Timed%20Release%20Tablets%201200%20Mcg%20(80%20ct).jpg",
+        "category": "Vitamins & Supplements",
+        "likePct": 94,
+        "likeCount": 50
+      },
+      {
+        "id": "razi-pharmacy-26",
+        "name": "Kinder Bueno Chocolate Bars, 43 g",
+        "price": 20.99,
+        "description": "Trusted relief, ready when you need it.",
+        "image": "/Menu/RAZI%20pharmacy/Kinder%20Bueno%20Chocolate%20Bars%2C%2043%20g.jpg",
+        "category": "Candy & Snacks",
+        "likePct": 89,
+        "likeCount": 39
+      },
+      {
+        "id": "razi-pharmacy-27",
+        "name": "Kit Kat King Size Chocolate Wafer Bars, 73 g",
+        "price": 38.99,
+        "description": "Everyday health essential.",
+        "image": "/Menu/RAZI%20pharmacy/Kit%20Kat%20King%20Size%20Chocolate%20Wafer%20Bars%2C%2073%20g.jpg",
+        "category": "Candy & Snacks",
+        "likePct": 89,
+        "likeCount": 39
+      },
+      {
+        "id": "razi-pharmacy-28",
+        "name": "KitKat Chocolate (45 g)",
+        "price": 40.49,
+        "description": "A pharmacy staple.",
+        "image": "/Menu/RAZI%20pharmacy/KitKat%20Chocolate%20(45%20g).jpg",
+        "category": "Candy & Snacks",
+        "likePct": 88,
+        "likeCount": 56
+      },
+      {
+        "id": "razi-pharmacy-29",
+        "name": "KitKat Chunky Rolo Chocolate Bar (42 g)",
+        "price": 27.49,
+        "description": "Everyday health essential.",
+        "image": "/Menu/RAZI%20pharmacy/KitKat%20Chunky%20Rolo%20Chocolate%20Bar%20(42%20g).jpg",
+        "category": "Candy & Snacks",
+        "likePct": 96,
+        "likeCount": 22
+      },
+      {
+        "id": "razi-pharmacy-30",
+        "name": "Lifesavers Five Flavour 180g Gummies",
+        "price": 14.99,
+        "description": "A pharmacy staple.",
+        "image": "/Menu/RAZI%20pharmacy/Lifesavers%20Five%20Flavour%20180g%20Gummies.jpg",
+        "category": "Candy & Snacks",
+        "likePct": 93,
+        "likeCount": 13
+      },
+      {
+        "id": "razi-pharmacy-31",
+        "name": "Loacker Hazelnut, 45 g",
+        "price": 13.99,
+        "description": "Everyday health essential.",
+        "image": "/Menu/RAZI%20pharmacy/Loacker%20Hazelnut%2C%2045%20g.jpg",
+        "category": "Candy & Snacks",
+        "likePct": 91,
+        "likeCount": 59
+      },
+      {
+        "id": "razi-pharmacy-32",
+        "name": "Nivea Caring Lip Balm",
+        "price": 8.99,
+        "description": "A pharmacy staple.",
+        "image": "/Menu/RAZI%20pharmacy/Nivea%20Caring%20Lip%20Balm.jpg",
+        "category": "Lip Care",
+        "likePct": 99,
+        "likeCount": 67
+      },
+      {
+        "id": "razi-pharmacy-33",
+        "name": "Orajel 3 Medicated Cold sores 5.3g",
+        "price": 6.49,
+        "description": "Everyday health essential.",
+        "image": "/Menu/RAZI%20pharmacy/Orajel%203_Medicated%20Cold%20sores%205.3g.jpg",
+        "category": "Oral Care",
+        "likePct": 98,
+        "likeCount": 30
+      },
+      {
+        "id": "razi-pharmacy-34",
+        "name": "Orajel 3 Medicated Severe Toothache 7g",
+        "price": 37.49,
+        "description": "Trusted relief, ready when you need it.",
+        "image": "/Menu/RAZI%20pharmacy/Orajel%203_Medicated%20Severe%20Toothache%207g.jpg",
+        "category": "Oral Care",
+        "likePct": 94,
+        "likeCount": 8
+      },
+      {
+        "id": "razi-pharmacy-35",
+        "name": "Orajel Maximum Liquid Toothache relief 13ml",
+        "price": 24.99,
+        "description": "Trusted relief, ready when you need it.",
+        "image": "/Menu/RAZI%20pharmacy/Orajel%20Maximum%20Liquid%20Toothache%20relief%2013ml.jpg",
+        "category": "Oral Care",
+        "likePct": 91,
+        "likeCount": 59
+      },
+      {
+        "id": "razi-pharmacy-36",
+        "name": "Orajel Maximum PM Toothache relief 5.3g",
+        "price": 22.49,
+        "description": "Everyday health essential.",
+        "image": "/Menu/RAZI%20pharmacy/Orajel%20Maximum%20PM%20Toothache%20relief%205.3g.jpg",
+        "category": "Oral Care",
+        "likePct": 98,
+        "likeCount": 60
+      },
+      {
+        "id": "razi-pharmacy-37",
+        "name": "OralB Indicator Medium Toothbrush",
+        "price": 9.99,
+        "description": "Everyday health essential.",
+        "image": "/Menu/RAZI%20pharmacy/OralB%20Indicator%20Medium%20Toothbrush.jpg",
+        "category": "Oral Care",
+        "likePct": 99,
+        "likeCount": 31
+      },
+      {
+        "id": "razi-pharmacy-38",
+        "name": "Palafer (30's capsules)",
+        "price": 23.49,
+        "description": "A pharmacy staple.",
+        "image": "/Menu/RAZI%20pharmacy/Palafer%20(30's%20capsules).jpg",
+        "category": "Vitamins & Supplements",
+        "likePct": 86,
+        "likeCount": 12
+      },
+      {
+        "id": "razi-pharmacy-39",
+        "name": "Palafer (90's capsules)",
+        "price": 24.49,
+        "description": "Trusted relief, ready when you need it.",
+        "image": "/Menu/RAZI%20pharmacy/Palafer%20(90's%20capsules).jpg",
+        "category": "Vitamins & Supplements",
+        "likePct": 86,
+        "likeCount": 54
+      },
+      {
+        "id": "razi-pharmacy-40",
+        "name": "Palafer CF (30's capsules)",
+        "price": 16.99,
+        "description": "A pharmacy staple.",
+        "image": "/Menu/RAZI%20pharmacy/Palafer%20CF%20(30's%20capsules).jpg",
+        "category": "Vitamins & Supplements",
+        "likePct": 91,
+        "likeCount": 41
+      },
+      {
+        "id": "razi-pharmacy-41",
+        "name": "Plan B Emergency Contraceptive Levonorgestrel Tablet 1.5 mg, Women",
+        "price": 5.99,
+        "description": "A pharmacy staple.",
+        "image": "/Menu/RAZI%20pharmacy/Plan%20B%20Emergency%20Contraceptive%20Levonorgestrel%20Tablet%201.5%20mg%2C%20Women.jpg",
+        "category": "Vitamins & Supplements",
+        "likePct": 89,
+        "likeCount": 33
+      },
+      {
+        "id": "razi-pharmacy-42",
+        "name": "Polyride ultra 350 mg + B12 + Vit C (30 Vegan Caps)",
+        "price": 5.49,
+        "description": "A pharmacy staple.",
+        "image": "/Menu/RAZI%20pharmacy/Polyride%20ultra%20350%20mg%20%2B%20B12%20%2B%20Vit%20C%20(30%20Vegan%20Caps).jpg",
+        "category": "Vitamins & Supplements",
+        "likePct": 90,
+        "likeCount": 16
+      },
+      {
+        "id": "razi-pharmacy-43",
+        "name": "Sensodyne Pronamel Extra Fresh 75 ml",
+        "price": 12.49,
+        "description": "A pharmacy staple.",
+        "image": "/Menu/RAZI%20pharmacy/Sensodyne%20Pronamel%20Extra%20Fresh%2075%20ml.jpg",
+        "category": "Oral Care",
+        "likePct": 94,
+        "likeCount": 56
+      },
+      {
+        "id": "razi-pharmacy-44",
+        "name": "Toblerone Swiss Milk Chocolate Bar (35 g)",
+        "price": 39.49,
+        "description": "Everyday health essential.",
+        "image": "/Menu/RAZI%20pharmacy/Toblerone%20Swiss%20Milk%20Chocolate%20Bar%20(35%20g).jpg",
+        "category": "Candy & Snacks",
+        "likePct": 96,
+        "likeCount": 28
+      },
+      {
+        "id": "razi-pharmacy-45",
+        "name": "Trojan Hot Spot Vibrating Ring (40 g)",
+        "price": 24.49,
+        "description": "Trusted relief, ready when you need it.",
+        "image": "/Menu/RAZI%20pharmacy/Trojan%20Hot%20Spot%20Vibrating%20Ring%20(40%20g).jpg",
+        "category": "Sexual Wellness",
+        "likePct": 84,
+        "likeCount": 28
+      },
+      {
+        "id": "razi-pharmacy-46",
+        "name": "Trojan Pleasure Pack 12 C ondoms",
+        "price": 13.99,
+        "description": "A pharmacy staple.",
+        "image": "/Menu/RAZI%20pharmacy/Trojan%20Pleasure%20Pack%2012%20C%20ondoms.jpg",
+        "category": "Sexual Wellness",
+        "likePct": 97,
+        "likeCount": 53
+      },
+      {
+        "id": "razi-pharmacy-47",
+        "name": "Trojan Thin, Value pack",
+        "price": 36.49,
+        "description": "Everyday health essential.",
+        "image": "/Menu/RAZI%20pharmacy/Trojan%20Thin%2C%20Value%20pack.jpg",
+        "category": "Sexual Wellness",
+        "likePct": 98,
+        "likeCount": 30
+      },
+      {
+        "id": "razi-pharmacy-48",
+        "name": "Trojan Vibrations Tandem Couples Vibrating Ring (40 g)",
+        "price": 40.49,
+        "description": "A pharmacy staple.",
+        "image": "/Menu/RAZI%20pharmacy/Trojan%20Vibrations%20Tandem%20Couples%20Vibrating%20Ring%20(40%20g).jpg",
+        "category": "Sexual Wellness",
+        "likePct": 90,
+        "likeCount": 64
+      },
+      {
+        "id": "razi-pharmacy-49",
+        "name": "Vagisil Healthy Protect Wash (360 ml)",
+        "price": 21.49,
+        "description": "Everyday health essential.",
+        "image": "/Menu/RAZI%20pharmacy/Vagisil%20Healthy%20Protect%20Wash%20(360%20ml).jpg",
+        "category": "Sexual Wellness",
+        "likePct": 88,
+        "likeCount": 8
+      },
+      {
+        "id": "razi-pharmacy-50",
+        "name": "Vagisil Odour Controlling Desodorisant Daily Intimate Wash (360 g)",
+        "price": 33.99,
+        "description": "Trusted relief, ready when you need it.",
+        "image": "/Menu/RAZI%20pharmacy/Vagisil%20Odour%20Controlling%20Desodorisant%20Daily%20Intimate%20Wash%20(360%20g).jpg",
+        "category": "Sexual Wellness",
+        "likePct": 85,
+        "likeCount": 17
+      },
+      {
+        "id": "razi-pharmacy-51",
+        "name": "WakeUps  100 mg Caffeine 50 Tablets",
+        "price": 38.99,
+        "description": "Trusted relief, ready when you need it.",
+        "image": "/Menu/RAZI%20pharmacy/WakeUps%20%20100%20mg%20Caffeine%2050%20Tablets.jpg",
+        "category": "Vitamins & Supplements",
+        "likePct": 95,
+        "likeCount": 39
+      },
+      {
+        "id": "razi-pharmacy-52",
+        "name": "WakeUps  200 mg Caffeine 50 Tablets",
+        "price": 25.49,
+        "description": "A pharmacy staple.",
+        "image": "/Menu/RAZI%20pharmacy/WakeUps%20%20200%20mg%20Caffeine%2050%20Tablets.jpg",
+        "category": "Vitamins & Supplements",
+        "likePct": 96,
+        "likeCount": 22
+      }
+    ]
+  },
+  "Ambrosia Thornhills": {
+    "slug": "ambrosia-thornhills",
+    "folder": "Ambrosia",
+    "banner": "/stores/ambrosia-thornhills/banner.jpg",
+    "rating": 4.7,
+    "ratingCount": "500+",
+    "address": "8367 Bathurst St, Richmond Hill, ON",
+    "availability": "Available today",
+    "hoursLabel": "Mon–Sun 9:00 a.m. – 9:00 p.m.",
+    "deliveryTime": "27 min",
+    "reviews": [
+      {
+        "name": "Daniel K.",
+        "stars": 5,
+        "date": "12-06-24",
+        "text": "My go-to spot — never disappoints."
+      },
+      {
+        "name": "Winnie C.",
+        "stars": 5,
+        "date": "20-05-24",
+        "text": "My go-to spot — never disappoints."
+      },
+      {
+        "name": "Winnie C.",
+        "stars": 5,
+        "date": "23-08-24",
+        "text": "Good portion and fair prices. Solid choice."
+      }
+    ],
+    "categories": [
+      "Snacks & Nuts",
+      "Organic & Herbs",
+      "Pantry",
+      "Drinks"
+    ],
+    "featuredIds": [
+      "ambrosia-thornhills-0",
+      "ambrosia-thornhills-1",
+      "ambrosia-thornhills-2",
+      "ambrosia-thornhills-3",
+      "ambrosia-thornhills-4",
+      "ambrosia-thornhills-5",
+      "ambrosia-thornhills-6",
+      "ambrosia-thornhills-7"
+    ],
+    "pickedIds": [
+      "ambrosia-thornhills-8",
+      "ambrosia-thornhills-9",
+      "ambrosia-thornhills-10",
+      "ambrosia-thornhills-11",
+      "ambrosia-thornhills-12",
+      "ambrosia-thornhills-13"
+    ],
+    "items": [
+      {
+        "id": "ambrosia-thornhills-0",
+        "name": "17 Cooks - Spicy Mexican 7 Layer Dip - 272g",
+        "price": 3.49,
+        "description": "Fresh, quality grocery pick.",
+        "image": "/Menu/Ambrosia/17%20Cooks%20-%20Spicy%20Mexican%207%20Layer%20Dip%20-%20272g.jpg",
+        "category": "Snacks & Nuts",
+        "likePct": 92,
+        "likeCount": 66
+      },
+      {
+        "id": "ambrosia-thornhills-1",
+        "name": "17 Cooks Tzatziki Dip (227 g)",
+        "price": 4.49,
+        "description": "Fresh, quality grocery pick.",
+        "image": "/Menu/Ambrosia/17%20Cooks%20Tzatziki%20Dip%20(227%20g).jpg",
+        "category": "Snacks & Nuts",
+        "likePct": 90,
+        "likeCount": 52
+      },
+      {
+        "id": "ambrosia-thornhills-2",
+        "name": "Ambrosia - Organic Black Sesame Seeds - 454g",
+        "price": 4.99,
+        "description": "An everyday pantry favourite.",
+        "image": "/Menu/Ambrosia/Ambrosia%20-%20Organic%20Black%20Sesame%20Seeds%20-%20454g.jpg",
+        "category": "Snacks & Nuts",
+        "likePct": 97,
+        "likeCount": 23
+      },
+      {
+        "id": "ambrosia-thornhills-3",
+        "name": "Ambrosia - Organic Chamomile Flowers - 28g",
+        "price": 7.49,
+        "description": "Good food, good value.",
+        "image": "/Menu/Ambrosia/Ambrosia%20-%20Organic%20Chamomile%20Flowers%20-%2028g.jpg",
+        "category": "Organic & Herbs",
+        "likePct": 94,
+        "likeCount": 26
+      },
+      {
+        "id": "ambrosia-thornhills-4",
+        "name": "Ambrosia - Organic Dandelion Leaf - 28g",
+        "price": 10.99,
+        "description": "Good food, good value.",
+        "image": "/Menu/Ambrosia/Ambrosia%20-%20Organic%20Dandelion%20Leaf%20-%2028g.jpg",
+        "category": "Organic & Herbs",
+        "likePct": 95,
+        "likeCount": 15
+      },
+      {
+        "id": "ambrosia-thornhills-5",
+        "name": "Ambrosia - Organic Raw Pumpkin Seeds - 454g",
+        "price": 4.49,
+        "description": "Good food, good value.",
+        "image": "/Menu/Ambrosia/Ambrosia%20-%20Organic%20Raw%20Pumpkin%20Seeds%20-%20454g.jpg",
+        "category": "Snacks & Nuts",
+        "likePct": 98,
+        "likeCount": 12
+      },
+      {
+        "id": "ambrosia-thornhills-6",
+        "name": "Ambrosia - Organic Whole Raw Cashew - 227g",
+        "price": 15.49,
+        "description": "Good food, good value.",
+        "image": "/Menu/Ambrosia/Ambrosia%20-%20Organic%20Whole%20Raw%20Cashew%20-%20227g.jpg",
+        "category": "Snacks & Nuts",
+        "likePct": 84,
+        "likeCount": 10
+      },
+      {
+        "id": "ambrosia-thornhills-7",
+        "name": "Beretta Mild Beef Sticks (100 g)",
+        "price": 13.49,
+        "description": "Fresh, quality grocery pick.",
+        "image": "/Menu/Ambrosia/Beretta%20Mild%20Beef%20Sticks%20(100%20g).jpg",
+        "category": "Snacks & Nuts",
+        "likePct": 86,
+        "likeCount": 48
+      },
+      {
+        "id": "ambrosia-thornhills-8",
+        "name": "Better Bovine 100% Grass Fed Extra Lean Beef Jerky (50 g)",
+        "price": 14.99,
+        "description": "An everyday pantry favourite.",
+        "image": "/Menu/Ambrosia/Better%20Bovine%20100%25%20Grass%20Fed%20Extra%20Lean%20Beef%20Jerky%20(50%20g).jpg",
+        "category": "Snacks & Nuts",
+        "likePct": 91,
+        "likeCount": 11
+      },
+      {
+        "id": "ambrosia-thornhills-9",
+        "name": "Better Bovine 100% Grass-Fed Wagyu Beef Jerky (50 g)",
+        "price": 10.99,
+        "description": "An everyday pantry favourite.",
+        "image": "/Menu/Ambrosia/Better%20Bovine%20100%25%20Grass-Fed%20Wagyu%20Beef%20Jerky%20(50%20g).jpg",
+        "category": "Snacks & Nuts",
+        "likePct": 97,
+        "likeCount": 35
+      },
+      {
+        "id": "ambrosia-thornhills-10",
+        "name": "Bluapple - Bluapple - 2 APPLES",
+        "price": 9.49,
+        "description": "Good food, good value.",
+        "image": "/Menu/Ambrosia/Bluapple%20-%20Bluapple%20-%202%20APPLES.jpg",
+        "category": "Pantry",
+        "likePct": 84,
+        "likeCount": 58
+      },
+      {
+        "id": "ambrosia-thornhills-11",
+        "name": "Blue Monkey Sparkling Juice Drink, Lychee (330 ml)",
+        "price": 6.99,
+        "description": "Good food, good value.",
+        "image": "/Menu/Ambrosia/Blue%20Monkey%20Sparkling%20Juice%20Drink%2C%20Lychee%20(330%20ml).jpg",
+        "category": "Drinks",
+        "likePct": 97,
+        "likeCount": 41
+      },
+      {
+        "id": "ambrosia-thornhills-12",
+        "name": "Blue Monkey Sparkling Watermelon Juice (330 ml)",
+        "price": 3.99,
+        "description": "Fresh, quality grocery pick.",
+        "image": "/Menu/Ambrosia/Blue%20Monkey%20Sparkling%20Watermelon%20Juice%20(330%20ml).jpg",
+        "category": "Drinks",
+        "likePct": 87,
+        "likeCount": 43
+      },
+      {
+        "id": "ambrosia-thornhills-13",
+        "name": "Brothers Strawberry Crisps (7.5 g)",
+        "price": 15.99,
+        "description": "An everyday pantry favourite.",
+        "image": "/Menu/Ambrosia/Brothers%20Strawberry%20Crisps%20(7.5%20g).jpg",
+        "category": "Snacks & Nuts",
+        "likePct": 85,
+        "likeCount": 23
+      },
+      {
+        "id": "ambrosia-thornhills-14",
+        "name": "Bulk - Dry Roasted Cashews Salted -  1.00 lbs (REG $8.99)",
+        "price": 11.49,
+        "description": "An everyday pantry favourite.",
+        "image": "/Menu/Ambrosia/Bulk%20-%20Dry%20Roasted%20Cashews%20Salted%20-%20_1.00%20lbs%20(REG%20%248.99).jpg",
+        "category": "Snacks & Nuts",
+        "likePct": 92,
+        "likeCount": 54
+      },
+      {
+        "id": "ambrosia-thornhills-15",
+        "name": "Bulk - Dry Roasted Cashews Unsalted -  1.00 lbs (REG $8.99)",
+        "price": 13.99,
+        "description": "Fresh, quality grocery pick.",
+        "image": "/Menu/Ambrosia/Bulk%20-%20Dry%20Roasted%20Cashews%20Unsalted%20-%20_1.00%20lbs%20(REG%20%248.99).jpg",
+        "category": "Snacks & Nuts",
+        "likePct": 87,
+        "likeCount": 55
+      },
+      {
+        "id": "ambrosia-thornhills-16",
+        "name": "Cookstown Greens Organic Micro Broccoli (75 g)",
+        "price": 4.49,
+        "description": "An everyday pantry favourite.",
+        "image": "/Menu/Ambrosia/Cookstown%20Greens%20Organic%20Micro%20Broccoli%20(75%20g).jpg",
+        "category": "Organic & Herbs",
+        "likePct": 86,
+        "likeCount": 18
+      },
+      {
+        "id": "ambrosia-thornhills-17",
+        "name": "Cove Drinks Ginger Ale (355 ml)",
+        "price": 7.49,
+        "description": "An everyday pantry favourite.",
+        "image": "/Menu/Ambrosia/Cove%20Drinks%20Ginger%20Ale%20(355%20ml).jpg",
+        "category": "Drinks",
+        "likePct": 92,
+        "likeCount": 54
+      },
+      {
+        "id": "ambrosia-thornhills-18",
+        "name": "Cove Drinks Soda, Cherry (355 ml)",
+        "price": 10.49,
+        "description": "Good food, good value.",
+        "image": "/Menu/Ambrosia/Cove%20Drinks%20Soda%2C%20Cherry%20(355%20ml).jpg",
+        "category": "Drinks",
+        "likePct": 98,
+        "likeCount": 66
+      },
+      {
+        "id": "ambrosia-thornhills-19",
+        "name": "Cove Drinks Zero Sugar Probiotics Soda, Grapefruit (355 ml)",
+        "price": 4.49,
+        "description": "Fresh, quality grocery pick.",
+        "image": "/Menu/Ambrosia/Cove%20Drinks%20Zero%20Sugar%20Probiotics%20Soda%2C%20Grapefruit%20(355%20ml).jpg",
+        "category": "Drinks",
+        "likePct": 86,
+        "likeCount": 66
+      },
+      {
+        "id": "ambrosia-thornhills-20",
+        "name": "Dr.Cove Zero Sugar Probiotic Soda (355 ml)",
+        "price": 5.99,
+        "description": "Fresh, quality grocery pick.",
+        "image": "/Menu/Ambrosia/Dr.Cove%20Zero%20Sugar%20Probiotic%20Soda%20(355%20ml).jpg",
+        "category": "Drinks",
+        "likePct": 91,
+        "likeCount": 29
+      }
+    ]
+  },
+  "Ashario Pets North York": {
+    "slug": "ashario-pets",
+    "folder": "Ashario Pets",
+    "banner": "/stores/ashario-pets/banner.jpg",
+    "rating": 4.5,
+    "ratingCount": "500+",
+    "address": "4865 Bayview Ave, Markham, ON",
+    "availability": "Available today",
+    "hoursLabel": "Mon–Sun 9:00 a.m. – 9:00 p.m.",
+    "deliveryTime": "25 min",
+    "reviews": [
+      {
+        "name": "Marcus L.",
+        "stars": 5,
+        "date": "19-04-24",
+        "text": "Good portion and fair prices. Solid choice."
+      },
+      {
+        "name": "Winnie C.",
+        "stars": 5,
+        "date": "18-09-24",
+        "text": "Good portion and fair prices. Solid choice."
+      },
+      {
+        "name": "Marcus L.",
+        "stars": 5,
+        "date": "08-02-24",
+        "text": "Good portion and fair prices. Solid choice."
+      }
+    ],
+    "categories": [
+      "Dog Food",
+      "Health & Wellness",
+      "Toys & Play",
+      "Carriers & Beds",
+      "Pet Supplies",
+      "Dog Treats"
+    ],
+    "featuredIds": [
+      "ashario-pets-0",
+      "ashario-pets-1",
+      "ashario-pets-2",
+      "ashario-pets-3",
+      "ashario-pets-4",
+      "ashario-pets-5",
+      "ashario-pets-6",
+      "ashario-pets-7"
+    ],
+    "pickedIds": [
+      "ashario-pets-8",
+      "ashario-pets-9",
+      "ashario-pets-10",
+      "ashario-pets-11",
+      "ashario-pets-12",
+      "ashario-pets-13"
+    ],
+    "items": [
+      {
+        "id": "ashario-pets-0",
+        "name": "5Strands - Pet Raw Food and Environmental Intolerance Test Kit",
+        "price": 56.49,
+        "description": "Picked for happy, healthy pets.",
+        "image": "/Menu/Ashario%20Pets/5Strands%20-%20Pet%20Raw%20Food%20and%20Environmental%20Intolerance%20Test%20Kit.jpg",
+        "category": "Dog Food",
+        "likePct": 88,
+        "likeCount": 20
+      },
+      {
+        "id": "ashario-pets-1",
+        "name": "ACANA Adult Chicken Dry Dog Food",
+        "price": 37.99,
+        "description": "Quality your pet will love.",
+        "image": "/Menu/Ashario%20Pets/ACANA%20Adult%20Chicken%20Dry%20Dog%20Food.jpg",
+        "category": "Dog Food",
+        "likePct": 89,
+        "likeCount": 63
+      },
+      {
+        "id": "ashario-pets-2",
+        "name": "ACANA Chicken Adult Dry Dog Food (Large breed)",
+        "price": 48.99,
+        "description": "Picked for happy, healthy pets.",
+        "image": "/Menu/Ashario%20Pets/ACANA%20Chicken%20Adult%20Dry%20Dog%20Food%20(Large%20breed).jpg",
+        "category": "Dog Food",
+        "likePct": 93,
+        "likeCount": 37
+      },
+      {
+        "id": "ashario-pets-3",
+        "name": "ACANA Healthy Grains Dry Dog Food, Sea & Farm, Puppy (10.2 kg)",
+        "price": 42.49,
+        "description": "Trusted brand, great everyday value.",
+        "image": "/Menu/Ashario%20Pets/ACANA%20Healthy%20Grains%20Dry%20Dog%20Food%2C%20Sea%20%26%20Farm%2C%20Puppy%20(10.2%20kg).jpg",
+        "category": "Dog Food",
+        "likePct": 92,
+        "likeCount": 24
+      },
+      {
+        "id": "ashario-pets-4",
+        "name": "ACANA Regionals Grasslands Dry Dog Food (11.4 kg)",
+        "price": 32.99,
+        "description": "Quality your pet will love.",
+        "image": "/Menu/Ashario%20Pets/ACANA%20Regionals%20Grasslands%20Dry%20Dog%20Food%20(11.4%20kg).jpg",
+        "category": "Dog Food",
+        "likePct": 87,
+        "likeCount": 13
+      },
+      {
+        "id": "ashario-pets-5",
+        "name": "Advantage II - Flea & Tick Medicine - Large Dog",
+        "price": 14.49,
+        "description": "Trusted brand, great everyday value.",
+        "image": "/Menu/Ashario%20Pets/Advantage%20II%20-%20Flea%20%26%20Tick%20Medicine%20-%20Large%20Dog.jpg",
+        "category": "Health & Wellness",
+        "likePct": 90,
+        "likeCount": 46
+      },
+      {
+        "id": "ashario-pets-6",
+        "name": "Advantage II - Flea & Tick Medicine - Medium Dog",
+        "price": 49.49,
+        "description": "Quality your pet will love.",
+        "image": "/Menu/Ashario%20Pets/Advantage%20II%20-%20Flea%20%26%20Tick%20Medicine%20-%20Medium%20Dog.jpg",
+        "category": "Health & Wellness",
+        "likePct": 96,
+        "likeCount": 16
+      },
+      {
+        "id": "ashario-pets-7",
+        "name": "Aikiou - Hexa Blue Slow Feeder",
+        "price": 52.49,
+        "description": "Trusted brand, great everyday value.",
+        "image": "/Menu/Ashario%20Pets/Aikiou%20-%20Hexa%20Blue%20Slow%20Feeder.jpg",
+        "category": "Toys & Play",
+        "likePct": 92,
+        "likeCount": 48
+      },
+      {
+        "id": "ashario-pets-8",
+        "name": "Ashario Pets - Dispenser Dog Toy - Teeth Cleaning Ring - Large",
+        "price": 52.49,
+        "description": "Picked for happy, healthy pets.",
+        "image": "/Menu/Ashario%20Pets/Ashario%20Pets%20-%20Dispenser%20Dog%20Toy%20-%20Teeth%20Cleaning%20Ring%20-%20Large.jpg",
+        "category": "Toys & Play",
+        "likePct": 90,
+        "likeCount": 10
+      },
+      {
+        "id": "ashario-pets-9",
+        "name": "Ashario Pets - Dog Toy - Teeth Cleaning Ring - Small",
+        "price": 27.99,
+        "description": "Trusted brand, great everyday value.",
+        "image": "/Menu/Ashario%20Pets/Ashario%20Pets%20-%20Dog%20Toy%20-%20Teeth%20Cleaning%20Ring%20-%20Small.jpg",
+        "category": "Toys & Play",
+        "likePct": 93,
+        "likeCount": 25
+      },
+      {
+        "id": "ashario-pets-10",
+        "name": "Ashario Pets -  BreezyVest  Summer Lightweight Reflective Harness - Blue - M",
+        "price": 7.99,
+        "description": "Trusted brand, great everyday value.",
+        "image": "/Menu/Ashario%20Pets/Ashario%20Pets%20-%20_BreezyVest_%20Summer%20Lightweight%20Reflective%20Harness%20-%20Blue%20-%20M.jpg",
+        "category": "Carriers & Beds",
+        "likePct": 93,
+        "likeCount": 37
+      },
+      {
+        "id": "ashario-pets-11",
+        "name": "Baci+ - Probio+ Vivoflora Action+ For Dogs - 14 Grams",
+        "price": 10.99,
+        "description": "Quality your pet will love.",
+        "image": "/Menu/Ashario%20Pets/Baci%2B%20-%20Probio%2B%20Vivoflora%20Action%2B%20For%20Dogs%20-%2014%20Grams.jpg",
+        "category": "Health & Wellness",
+        "likePct": 85,
+        "likeCount": 23
+      },
+      {
+        "id": "ashario-pets-12",
+        "name": "Baci+ 3-In-1 Healthy Aging For Adult Dogs (60 g)",
+        "price": 39.99,
+        "description": "Trusted brand, great everyday value.",
+        "image": "/Menu/Ashario%20Pets/Baci%2B%203-In-1%20Healthy%20Aging%20For%20Adult%20Dogs%20(60%20g).jpg",
+        "category": "Health & Wellness",
+        "likePct": 97,
+        "likeCount": 17
+      },
+      {
+        "id": "ashario-pets-13",
+        "name": "Baci+ Probio Intestinal Health For Dogs (14 g)",
+        "price": 30.49,
+        "description": "Quality your pet will love.",
+        "image": "/Menu/Ashario%20Pets/Baci%2B%20Probio%20Intestinal%20Health%20For%20Dogs%20(14%20g).jpg",
+        "category": "Health & Wellness",
+        "likePct": 84,
+        "likeCount": 64
+      },
+      {
+        "id": "ashario-pets-14",
+        "name": "Beco - Recycled Plastic Poop Bag Dispenser - 15 Count",
+        "price": 62.99,
+        "description": "Trusted brand, great everyday value.",
+        "image": "/Menu/Ashario%20Pets/Beco%20-%20Recycled%20Plastic%20Poop%20Bag%20Dispenser%20-%2015%20Count.jpg",
+        "category": "Pet Supplies",
+        "likePct": 97,
+        "likeCount": 11
+      },
+      {
+        "id": "ashario-pets-15",
+        "name": "Benko - Beef Training Dog Treats - 227 Grams",
+        "price": 59.49,
+        "description": "Trusted brand, great everyday value.",
+        "image": "/Menu/Ashario%20Pets/Benko%20-%20Beef%20Training%20Dog%20Treats%20-%20227%20Grams.jpg",
+        "category": "Dog Treats",
+        "likePct": 98,
+        "likeCount": 48
+      },
+      {
+        "id": "ashario-pets-16",
+        "name": "Benko - Mini Dino Dog Bone",
+        "price": 50.49,
+        "description": "Trusted brand, great everyday value.",
+        "image": "/Menu/Ashario%20Pets/Benko%20-%20Mini%20Dino%20Dog%20Bone.jpg",
+        "category": "Dog Treats",
+        "likePct": 94,
+        "likeCount": 14
+      },
+      {
+        "id": "ashario-pets-17",
+        "name": "Benko Beef Sticks With Garlic Dog Treats (12 ct)",
+        "price": 19.99,
+        "description": "Picked for happy, healthy pets.",
+        "image": "/Menu/Ashario%20Pets/Benko%20Beef%20Sticks%20With%20Garlic%20Dog%20Treats%20(12%20ct).jpg",
+        "category": "Dog Treats",
+        "likePct": 87,
+        "likeCount": 43
+      },
+      {
+        "id": "ashario-pets-18",
+        "name": "Benko Mini Beef Bite Knuckle Dog Treat",
+        "price": 24.49,
+        "description": "Trusted brand, great everyday value.",
+        "image": "/Menu/Ashario%20Pets/Benko%20Mini%20Beef%20Bite%20Knuckle%20Dog%20Treat.jpg",
+        "category": "Dog Treats",
+        "likePct": 92,
+        "likeCount": 48
+      },
+      {
+        "id": "ashario-pets-19",
+        "name": "Bergamo - Gipsy Eco Metal Door Carrier For Large Pets - Green",
+        "price": 63.99,
+        "description": "Picked for happy, healthy pets.",
+        "image": "/Menu/Ashario%20Pets/Bergamo%20-%20Gipsy%20Eco%20Metal%20Door%20Carrier%20For%20Large%20Pets%20-%20Green.jpg",
+        "category": "Carriers & Beds",
+        "likePct": 85,
+        "likeCount": 23
+      },
+      {
+        "id": "ashario-pets-20",
+        "name": "Bergamo - Gipsy Eco Metal Door Carrier For Large Pets - Ice Blue",
+        "price": 46.99,
+        "description": "Trusted brand, great everyday value.",
+        "image": "/Menu/Ashario%20Pets/Bergamo%20-%20Gipsy%20Eco%20Metal%20Door%20Carrier%20For%20Large%20Pets%20-%20Ice%20Blue.jpg",
+        "category": "Carriers & Beds",
+        "likePct": 85,
+        "likeCount": 23
+      },
+      {
+        "id": "ashario-pets-21",
+        "name": "Big Country Raw - Bag Of Marrow Bones Dog Treats - Large",
+        "price": 36.99,
+        "description": "Picked for happy, healthy pets.",
+        "image": "/Menu/Ashario%20Pets/Big%20Country%20Raw%20-%20Bag%20Of%20Marrow%20Bones%20Dog%20Treats%20-%20Large.jpg",
+        "category": "Dog Treats",
+        "likePct": 83,
+        "likeCount": 9
+      },
+      {
+        "id": "ashario-pets-22",
+        "name": "Big Country Raw - Turkey Dinner Carton Raw Dog Food - 4 lb",
+        "price": 53.49,
+        "description": "Trusted brand, great everyday value.",
+        "image": "/Menu/Ashario%20Pets/Big%20Country%20Raw%20-%20Turkey%20Dinner%20Carton%20Raw%20Dog%20Food%20-%204%20lb.jpg",
+        "category": "Dog Food",
+        "likePct": 84,
+        "likeCount": 52
+      },
+      {
+        "id": "ashario-pets-23",
+        "name": "BuD'z - Comfort Flat Dog Bed - Large (41x26x2in)",
+        "price": 19.99,
+        "description": "Picked for happy, healthy pets.",
+        "image": "/Menu/Ashario%20Pets/BuD'z%20-%20Comfort%20Flat%20Dog%20Bed%20-%20Large%20(41x26x2in).jpg",
+        "category": "Carriers & Beds",
+        "likePct": 95,
+        "likeCount": 27
+      },
+      {
+        "id": "ashario-pets-24",
+        "name": "Carino - Seal Oil - 500 mL",
+        "price": 16.49,
+        "description": "Quality your pet will love.",
+        "image": "/Menu/Ashario%20Pets/Carino%20-%20Seal%20Oil%20-%20500%20mL.jpg",
+        "category": "Health & Wellness",
+        "likePct": 84,
+        "likeCount": 34
+      }
+    ]
+  }
+}

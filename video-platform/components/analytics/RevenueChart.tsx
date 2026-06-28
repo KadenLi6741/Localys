@@ -45,7 +45,7 @@ export function RevenueChart({ data }: RevenueChartProps) {
   return (
     <div>
       <div className="flex items-center justify-between mb-3">
-        <h4 className="text-sm font-semibold text-[#F5F0E8]/80">💰 Revenue Over Time</h4>
+        <h4 className="text-sm font-semibold text-[#F5F0E8]/80">Revenue Over Time</h4>
         <div className="flex gap-1">
           {(['week', 'month', 'all'] as const).map(r => (
             <button

@@ -7,10 +7,10 @@ interface FinancialStatCardsProps {
 }
 
 const cards = [
-  { key: 'totalRevenue', icon: '💰', label: 'Total Revenue', prefix: '$' },
-  { key: 'totalOrders', icon: '📦', label: 'Total Orders', prefix: '' },
-  { key: 'completedOrders', icon: '✅', label: 'Completed', prefix: '' },
-  { key: 'cancelledOrders', icon: '❌', label: 'Cancelled', prefix: '' },
+  { key: 'totalRevenue', icon: '', label: 'Total Revenue', prefix: '$' },
+  { key: 'totalOrders', icon: '', label: 'Total Orders', prefix: '' },
+  { key: 'completedOrders', icon: '', label: 'Completed', prefix: '' },
+  { key: 'cancelledOrders', icon: '', label: 'Cancelled', prefix: '' },
 ] as const;
 
 export function FinancialStatCards({ summary }: FinancialStatCardsProps) {

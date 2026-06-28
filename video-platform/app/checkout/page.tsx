@@ -6,11 +6,12 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useCart, CartItem } from '@/contexts/CartContext';
 import { getShopCoupons, Coupon } from '@/lib/supabase/coupons';
 import Link from 'next/link';
+import { ChevronLeft, CalendarClock, Tag, CheckCircle } from 'lucide-react';
 
 function CheckoutContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, session } = useAuth();
   const { items: cartItems, clearCart } = useCart();
 
   const [checkoutItems, setCheckoutItems] = useState<CartItem[]>([]);
@@ -21,109 +22,73 @@ function CheckoutContent() {
   const [error, setError] = useState<string | null>(null);
 
   const source = searchParams.get('source');
+  const scheduledAt = searchParams.get('scheduledAt');
+  const groupOrderId = searchParams.get('groupOrderId');
+  const promoCodeParam = searchParams.get('promoCode');
 
   useEffect(() => {
-    if (!user) {
-      router.push('/login');
-      return;
-    }
-
+    if (!user) { router.push('/login'); return; }
     if (source === 'cart') {
-      // Coming from cart page
       setCheckoutItems(cartItems);
     } else {
-      // Coming from Buy Now - single item from URL params
       const itemId = searchParams.get('itemId');
       const itemName = searchParams.get('itemName');
       const itemPrice = searchParams.get('itemPrice');
       const sellerId = searchParams.get('sellerId');
       const buyerId = searchParams.get('buyerId');
       const itemImage = searchParams.get('itemImage') || undefined;
-
       if (itemId && itemName && itemPrice && sellerId && buyerId) {
-        setCheckoutItems([{
-          itemId,
-          itemName,
-          itemPrice: parseFloat(itemPrice),
-          itemImage,
-          sellerId,
-          buyerId,
-          quantity: 1,
-        }]);
+        setCheckoutItems([{ itemId, itemName, itemPrice: parseFloat(itemPrice), itemImage, sellerId, buyerId, quantity: 1 }]);
       }
     }
     setLoading(false);
   }, [user, source, searchParams, cartItems, router]);
 
-  // Get unique seller IDs and fetch their coupons
   useEffect(() => {
     if (checkoutItems.length === 0) return;
-
     const sellerIds = [...new Set(checkoutItems.map(i => i.sellerId))];
-
     const fetchCoupons = async () => {
-      const allCoupons: Coupon[] = [];
-      for (const sellerId of sellerIds) {
-        const { data } = await getShopCoupons(sellerId);
-        if (data) {
-          allCoupons.push(...data);
-        }
+      const all: Coupon[] = [];
+      for (const sid of sellerIds) {
+        const { data } = await getShopCoupons(sid);
+        if (data) all.push(...data);
       }
-      setCoupons(allCoupons);
+      setCoupons(all);
     };
-
     fetchCoupons();
   }, [checkoutItems]);
 
   const subtotal = checkoutItems.reduce((sum, item) => sum + item.itemPrice * item.quantity, 0);
-
-  const discountAmount = selectedCoupon
-    ? Math.round(subtotal * (selectedCoupon.discount_percentage / 100) * 100) / 100
-    : 0;
-
-  const total = Math.max(0, subtotal - discountAmount);
+  const couponDiscount = selectedCoupon ? Math.round(subtotal * (selectedCoupon.discount_percentage / 100) * 100) / 100 : 0;
+  const total = Math.max(0, subtotal - couponDiscount);
 
   const handleProceedToPayment = async () => {
     if (checkoutItems.length === 0) return;
-
+    if (!session?.access_token) { setError('Your session has expired. Please sign in again.'); return; }
     setProcessing(true);
     setError(null);
-
     try {
       const response = await fetch('/api/checkout-item', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}` },
         body: JSON.stringify({
           items: checkoutItems.map((item) => ({
-            itemId: item.itemId,
-            itemName: item.itemName,
-            itemPrice: item.itemPrice,
-            itemImage: item.itemImage,
-            sellerId: item.sellerId,
-            buyerId: item.buyerId,
-            quantity: item.quantity,
-            specialRequests: item.specialRequests,
+            itemId: item.itemId, itemName: item.itemName, itemImage: item.itemImage,
+            sellerId: item.sellerId, quantity: item.quantity, specialRequests: item.specialRequests,
           })),
           couponCode: selectedCoupon?.code || null,
+          promoCode: promoCodeParam || null,
+          scheduledAt: scheduledAt || null,
+          groupOrderId: groupOrderId || null,
         }),
       });
-
       const data = await response.json();
-
-      if (data.error) {
-        setError(data.error);
-        return;
-      }
-
+      if (data.error) { setError(data.error); return; }
       if (data.url) {
-        // Clear cart if coming from cart
-        if (source === 'cart') {
-          clearCart();
-        }
+        if (source === 'cart') clearCart();
         window.location.href = data.url;
       }
     } catch (err) {
-      console.error('Checkout error:', err);
       setError(err instanceof Error ? err.message : 'Failed to start checkout');
     } finally {
       setProcessing(false);
@@ -131,19 +96,15 @@ function CheckoutContent() {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-transparent text-white flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
-      </div>
-    );
+    return <div className="min-h-screen bg-white flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#f97316]" /></div>;
   }
 
   if (checkoutItems.length === 0) {
     return (
-      <div className="min-h-screen bg-transparent text-white p-4">
-        <div className="w-full px-4 lg:px-12 text-center py-16">
-          <p className="text-white/60 mb-4">No items to checkout</p>
-          <Link href="/feed" className="inline-block bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg px-6 py-2 transition-colors">
+      <div className="min-h-screen bg-white text-gray-900 p-4">
+        <div className="max-w-md mx-auto text-center py-16">
+          <p className="text-gray-500 mb-4">No items to checkout</p>
+          <Link href="/feed" className="inline-block bg-[#f97316] text-white font-semibold rounded-xl px-6 py-3 hover:opacity-90 transition-opacity">
             Browse Services
           </Link>
         </div>
@@ -152,39 +113,59 @@ function CheckoutContent() {
   }
 
   return (
-    <div className="min-h-screen bg-transparent text-white p-4">
-      <div className="w-full px-4 lg:px-12">
+    <div className="min-h-screen bg-[#f8f9fb] text-gray-900 pb-16">
+      <div className="w-full max-w-lg mx-auto px-4 py-6">
         {/* Header */}
         <div className="mb-6">
-          <button onClick={() => router.back()} className="text-white/60 hover:text-white mb-4 inline-flex items-center gap-2">
-            ← Back
+          <button onClick={() => router.back()} className="inline-flex items-center gap-1 text-gray-500 hover:text-gray-900 transition-colors text-sm mb-4">
+            <ChevronLeft className="w-4 h-4" /> Back
           </button>
-          <h1 className="text-2xl font-bold">Checkout</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Checkout</h1>
         </div>
 
+        {/* Scheduled notice */}
+        {scheduledAt && (
+          <div className="bg-orange-50 border border-orange-200 rounded-2xl p-4 mb-4 flex items-start gap-3">
+            <CalendarClock className="h-5 w-5 text-[#f97316] shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-semibold text-gray-900">Scheduled Order</p>
+              <p className="text-sm text-gray-600">
+                {new Date(scheduledAt).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })} at{' '}
+                {new Date(scheduledAt).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Promo code applied */}
+        {promoCodeParam && (
+          <div className="bg-green-50 border border-green-200 rounded-2xl p-3 mb-4 flex items-center gap-2">
+            <Tag className="h-4 w-4 text-green-600 shrink-0" />
+            <p className="text-sm text-green-700">Promo code <strong className="font-mono">{promoCodeParam}</strong> applied</p>
+          </div>
+        )}
+
+        {/* Group order notice */}
+        {groupOrderId && (
+          <div className="bg-gray-100 border border-gray-200 rounded-2xl p-3 mb-4 flex items-center gap-2">
+            <CheckCircle className="h-4 w-4 text-gray-500 shrink-0" />
+            <p className="text-sm text-gray-600">Part of a group order</p>
+          </div>
+        )}
+
         {/* Order Summary */}
-        <div className="bg-white/5 border border-white/10 rounded-lg p-4 mb-6">
-          <h2 className="text-lg font-semibold mb-3">Order Summary</h2>
-          <div className="space-y-3">
+        <div className="bg-white border border-gray-200 rounded-2xl p-5 mb-4 shadow-sm">
+          <h2 className="text-sm font-semibold text-gray-900 mb-3">Order Summary</h2>
+          <div className="space-y-3 divide-y divide-gray-100">
             {checkoutItems.map((item) => (
-              <div key={item.itemId} className="flex items-center gap-3">
-                {item.itemImage && (
-                  <img
-                    src={item.itemImage}
-                    alt={item.itemName}
-                    className="w-12 h-12 rounded-lg object-cover border border-white/20"
-                  />
-                )}
+              <div key={item.itemId} className="flex items-center gap-3 pt-3 first:pt-0">
+                {item.itemImage && <img src={item.itemImage} alt={item.itemName} className="w-12 h-12 rounded-xl object-cover border border-gray-100 shrink-0" />}
                 <div className="flex-1 min-w-0">
-                  <p className="text-white font-medium truncate">{item.itemName}</p>
-                  {item.quantity > 1 && (
-                    <p className="text-white/40 text-xs">x{item.quantity} @ ${item.itemPrice.toFixed(2)}</p>
-                  )}
-                  {item.specialRequests && (
-                    <p className="text-yellow-400/70 text-xs mt-0.5">Note: {item.specialRequests}</p>
-                  )}
+                  <p className="text-gray-900 font-medium truncate">{item.itemName}</p>
+                  {item.quantity > 1 && <p className="text-gray-400 text-xs">×{item.quantity} @ ${item.itemPrice.toFixed(2)}</p>}
+                  {item.specialRequests && <p className="text-gray-500 text-xs mt-0.5">{item.specialRequests}</p>}
                 </div>
-                <p className="text-yellow-400 font-bold">${(item.itemPrice * item.quantity).toFixed(2)}</p>
+                <p className="text-[#f97316] font-bold shrink-0">${(item.itemPrice * item.quantity).toFixed(2)}</p>
               </div>
             ))}
           </div>
@@ -192,8 +173,8 @@ function CheckoutContent() {
 
         {/* Available Coupons */}
         {coupons.length > 0 && (
-          <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-4 mb-6">
-            <h2 className="text-lg font-semibold mb-3">Available Coupons</h2>
+          <div className="bg-white border border-gray-200 rounded-2xl p-5 mb-4 shadow-sm">
+            <h2 className="text-sm font-semibold text-gray-900 mb-3">Available Coupons</h2>
             <div className="space-y-2">
               {coupons.map((coupon) => {
                 const isSelected = selectedCoupon?.id === coupon.id;
@@ -201,31 +182,14 @@ function CheckoutContent() {
                   <button
                     key={coupon.id}
                     onClick={() => setSelectedCoupon(isSelected ? null : coupon)}
-                    className={`w-full p-3 rounded-lg border-2 transition-all text-left ${
-                      isSelected
-                        ? 'border-green-500 bg-green-500/20'
-                        : 'border-green-500/30 bg-green-500/5 hover:border-green-500/50'
-                    }`}
+                    className={`w-full p-3 rounded-xl border-2 transition-all text-left ${isSelected ? 'border-[#f97316] bg-orange-50' : 'border-gray-200 hover:border-orange-300'}`}
                   >
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="font-semibold text-green-400">{coupon.code}</p>
-                        <p className="text-white/60 text-sm">{coupon.discount_percentage}% off</p>
+                        <p className={`font-mono font-semibold text-sm ${isSelected ? 'text-[#f97316]' : 'text-gray-900'}`}>{coupon.code}</p>
+                        <p className="text-gray-500 text-xs">{coupon.discount_percentage}% off</p>
                       </div>
-                      <div className="flex items-center gap-2">
-                        {isSelected && (
-                          <span className="text-green-400 text-sm font-medium">-${discountAmount.toFixed(2)}</span>
-                        )}
-                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                          isSelected ? 'border-green-500 bg-green-500' : 'border-white/30'
-                        }`}>
-                          {isSelected && (
-                            <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                            </svg>
-                          )}
-                        </div>
-                      </div>
+                      {isSelected && <CheckCircle className="h-5 w-5 text-[#f97316] shrink-0" />}
                     </div>
                   </button>
                 );
@@ -235,51 +199,42 @@ function CheckoutContent() {
         )}
 
         {/* Price Breakdown */}
-        <div className="bg-white/5 border border-white/10 rounded-lg p-4 mb-6">
-          <div className="space-y-2">
-            <div className="flex justify-between text-white/60">
-              <span>Subtotal</span>
-              <span>${subtotal.toFixed(2)}</span>
+        <div className="bg-white border border-gray-200 rounded-2xl p-5 mb-4 shadow-sm space-y-2">
+          <div className="flex justify-between text-sm text-gray-600">
+            <span>Subtotal</span><span>${subtotal.toFixed(2)}</span>
+          </div>
+          {selectedCoupon && (
+            <div className="flex justify-between text-sm text-green-600">
+              <span>Coupon ({selectedCoupon.discount_percentage}%)</span>
+              <span>-${couponDiscount.toFixed(2)}</span>
             </div>
-            {selectedCoupon && (
-              <div className="flex justify-between text-green-400">
-                <span>Discount ({selectedCoupon.discount_percentage}%)</span>
-                <span>-${discountAmount.toFixed(2)}</span>
-              </div>
-            )}
-            <div className="border-t border-white/10 pt-2 flex justify-between">
-              <span className="font-semibold">Total</span>
-              <span className="text-xl font-bold text-yellow-400">${total.toFixed(2)}</span>
-            </div>
+          )}
+          <div className="border-t border-gray-100 pt-2 flex justify-between">
+            <span className="font-semibold text-gray-900">Total</span>
+            <span className="text-xl font-bold text-gray-900">${total.toFixed(2)}</span>
           </div>
         </div>
 
         {/* Error */}
         {error && (
-          <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 mb-4">
-            <p className="text-red-400 text-sm">{error}</p>
+          <div className="bg-red-50 border border-red-200 rounded-2xl p-4 mb-4">
+            <p className="text-red-600 text-sm">{error}</p>
           </div>
         )}
 
-        {/* Proceed Button */}
+        {/* Proceed */}
         <button
           onClick={handleProceedToPayment}
           disabled={processing}
-          className="w-full bg-green-500 hover:bg-green-600 disabled:bg-gray-600 text-white font-semibold py-3 rounded-lg transition-colors disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          className="w-full bg-[#f97316] hover:opacity-90 disabled:opacity-50 text-white font-semibold py-3.5 rounded-xl transition-opacity flex items-center justify-center gap-2 min-h-[52px]"
         >
           {processing ? (
-            <>
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-              Processing...
-            </>
+            <><div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />Processing…</>
           ) : (
-            `Proceed to Payment - $${total.toFixed(2)}`
+            `Pay $${total.toFixed(2)}${scheduledAt ? ' (Scheduled)' : ''}`
           )}
         </button>
-
-        <p className="text-white/40 text-xs text-center mt-3">
-          You will be redirected to Stripe for secure payment
-        </p>
+        <p className="text-gray-400 text-xs text-center mt-3">Redirecting to Stripe for secure payment</p>
       </div>
     </div>
   );
@@ -287,11 +242,7 @@ function CheckoutContent() {
 
 export default function CheckoutPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-transparent text-white flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
-      </div>
-    }>
+    <Suspense fallback={<div className="min-h-screen bg-white flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#f97316]" /></div>}>
       <CheckoutContent />
     </Suspense>
   );

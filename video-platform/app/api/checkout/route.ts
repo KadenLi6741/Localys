@@ -1,56 +1,49 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
+import { checkRateLimit, getClientIp, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit';
+import { CoinCheckoutSchema, parseBody } from '@/lib/schemas';
+import { getAuthenticatedUser } from '@/lib/server-auth';
 
-const COIN_PACKAGES: Record<
-  string,
-  { coins: number; price: number; name: string }
-> = {
-  starter: {
-    coins: 1000,
-    price: 1000, // $10 in cents
-    name: '1000 Coins',
-  },
-  pro: {
-    coins: 2500,
-    price: 2000, // $20 in cents
-    name: '2500 Coins',
-  },
-  premium: {
-    coins: 6000,
-    price: 5000, // $50 in cents
-    name: '6000 Coins',
-  },
+const COIN_PACKAGES: Record<string, { coins: number; price: number; name: string }> = {
+  starter: { coins: 1000, price: 1000, name: '1000 Coins' },
+  pro:     { coins: 2500, price: 2000, name: '2500 Coins' },
+  premium: { coins: 6000, price: 5000, name: '6000 Coins' },
 };
 
 export async function POST(request: NextRequest) {
+  // Rate limiting
+  const ip = getClientIp(request);
+  const rl = checkRateLimit(`checkout:${ip}`, RATE_LIMITS.checkout);
+  if (!rl.allowed) return rateLimitResponse(rl.retryAfterMs);
+
+  // Auth — userId comes from verified session, never from client body
+  const auth = await getAuthenticatedUser(request);
+  if (auth.error) return auth.error;
+  const userId = auth.user.id;
+
+  if (!process.env.STRIPE_SECRET_KEY) {
+    console.error('STRIPE_SECRET_KEY is not set');
+    return NextResponse.json({ error: 'Payment system not configured' }, { status: 500 });
+  }
+
+  let body: unknown;
   try {
-    if (!process.env.STRIPE_SECRET_KEY) {
-      console.error('STRIPE_SECRET_KEY is not set in environment variables');
-      return NextResponse.json(
-        { error: 'Payment system not configured' },
-        { status: 500 }
-      );
-    }
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
+  }
 
+  const parsed = parseBody(CoinCheckoutSchema, body);
+  if (!parsed.success) return parsed.response;
+  const { packageId } = parsed.data;
+
+  const pkg = COIN_PACKAGES[packageId];
+  if (!pkg) {
+    return NextResponse.json({ error: 'Invalid package' }, { status: 400 });
+  }
+
+  try {
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-
-    const body = await request.json();
-    const { packageId, userId } = body;
-
-    if (!packageId || !userId) {
-      return NextResponse.json(
-        { error: 'Missing packageId or userId' },
-        { status: 400 }
-      );
-    }
-
-    const pkg = COIN_PACKAGES[packageId];
-    if (!pkg) {
-      return NextResponse.json(
-        { error: 'Invalid package' },
-        { status: 400 }
-      );
-    }
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -78,21 +71,13 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    if (!session || !session.url) {
-      return NextResponse.json(
-        { error: 'Failed to create checkout session' },
-        { status: 500 }
-      );
+    if (!session?.url) {
+      return NextResponse.json({ error: 'Failed to create checkout session' }, { status: 500 });
     }
 
     return NextResponse.json({ url: session.url });
   } catch (error) {
     console.error('Stripe checkout error:', error);
-    const errorMessage =
-      error instanceof Error ? error.message : 'Failed to create checkout session';
-    return NextResponse.json(
-      { error: errorMessage },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to create checkout session' }, { status: 500 });
   }
 }

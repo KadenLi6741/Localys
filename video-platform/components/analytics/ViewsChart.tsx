@@ -21,9 +21,9 @@ function CustomTooltip({ active, payload, label }: { active?: boolean; payload?:
   return (
     <div className="bg-[#1A1A18]/90 border border-white/20 rounded-lg p-3 shadow-lg">
       <p className="text-white/60 text-xs mb-1">{label}</p>
-      <p className="text-blue-400 font-semibold">👁️ {payload[0].value} views</p>
+      <p className="text-blue-400 font-semibold">{payload[0].value} views</p>
       {point.promoted && (
-        <p className="text-yellow-400 text-xs mt-1">⭐ Promotion day</p>
+        <p className="text-yellow-400 text-xs mt-1">Promotion day</p>
       )}
     </div>
   );
@@ -34,7 +34,7 @@ function CustomDot(props: { cx?: number; cy?: number; payload?: ViewsDataPoint }
   if (!payload?.promoted || cx === undefined || cy === undefined) return null;
   return (
     <svg x={cx - 6} y={cy - 6} width={12} height={12}>
-      <text x={6} y={10} textAnchor="middle" fontSize={12}>⭐</text>
+      <text x={6} y={10} textAnchor="middle" fontSize={12}></text>
     </svg>
   );
 }
@@ -43,7 +43,7 @@ export function ViewsChart({ data }: ViewsChartProps) {
   if (data.length < 2) {
     return (
       <div>
-        <h4 className="text-sm font-semibold text-white/80 mb-3">👁️ Views Over Time</h4>
+        <h4 className="text-sm font-semibold text-white/80 mb-3">Views Over Time</h4>
         <div className="h-[200px] flex items-center justify-center text-white/40 text-sm">
           Not enough data to display chart
         </div>
@@ -53,12 +53,12 @@ export function ViewsChart({ data }: ViewsChartProps) {
 
   return (
     <div>
-      <h4 className="text-sm font-semibold text-white/80 mb-3">👁️ Views Over Time</h4>
+      <h4 className="text-sm font-semibold text-white/80 mb-3">Views Over Time</h4>
       <div className="flex items-center gap-4 mb-2 text-xs text-white/40">
         <span className="flex items-center gap-1">
           <span className="w-3 h-0.5 bg-blue-400 inline-block rounded" /> Views
         </span>
-        <span className="flex items-center gap-1">⭐ Promotion day</span>
+        <span className="flex items-center gap-1">Promotion day</span>
       </div>
       <ResponsiveContainer width="100%" height={250}>
         <AreaChart data={data} margin={{ top: 5, right: 10, left: -10, bottom: 5 }}>

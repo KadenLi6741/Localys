@@ -26,7 +26,7 @@ function CustomTooltip({ active, payload }: { active?: boolean; payload?: { payl
   return (
     <div className="bg-[#1A1A18]/90 border border-white/20 rounded-lg p-3 shadow-lg">
       <p className="text-white text-sm font-semibold mb-1">{entry.title}</p>
-      <p className="text-yellow-400 text-xs">🪙 {entry.coinsSpent} coins ({entry.percentage}%)</p>
+      <p className="text-yellow-400 text-xs">{entry.coinsSpent} coins ({entry.percentage}%)</p>
     </div>
   );
 }
@@ -58,7 +58,7 @@ export function CoinDistributionChart({ data }: CoinDistributionChartProps) {
 
   return (
     <div>
-      <h4 className="text-sm font-semibold text-white/80 mb-3">📊 Coin Distribution by Video</h4>
+      <h4 className="text-sm font-semibold text-white/80 mb-3">Coin Distribution by Video</h4>
       <ResponsiveContainer width="100%" height={280}>
         <PieChart>
           <Pie

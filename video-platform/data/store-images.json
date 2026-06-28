@@ -1,0 +1,62 @@
+{
+  "Amy's Fish & Chips": {
+    "slug": "amys-fish-and-chips",
+    "banner": "/stores/amys-fish-and-chips/banner.jpg"
+  },
+  "Holy Smoke Barbecue": {
+    "slug": "holy-smoke-barbecue",
+    "banner": "/stores/holy-smoke-barbecue/banner.jpg"
+  },
+  "Pho Nga Son": {
+    "slug": "pho-nga-son",
+    "banner": "/stores/pho-nga-son/banner.jpg"
+  },
+  "Pho Xe Lua Vietnamese Cuisine": {
+    "slug": "pho-xe-lua",
+    "banner": "/stores/pho-xe-lua/banner.jpg"
+  },
+  "K1 Floral Studio": {
+    "slug": "k1-floral-studio",
+    "banner": "/stores/k1-floral-studio/banner.jpg"
+  },
+  "Flowers Gifts and Balloons": {
+    "slug": "flowers-gifts-and-balloons",
+    "banner": "/stores/flowers-gifts-and-balloons/banner.jpg"
+  },
+  "Waterford Convenience": {
+    "slug": "waterford-convenience",
+    "banner": "/stores/waterford-convenience/banner.jpg"
+  },
+  "Ambrosia Thornhills": {
+    "slug": "ambrosia-thornhills",
+    "banner": "/stores/ambrosia-thornhills/banner.jpg"
+  },
+  "Ashario Pets North York": {
+    "slug": "ashario-pets",
+    "banner": "/stores/ashario-pets/banner.jpg"
+  },
+  "Razi Pharmacy": {
+    "slug": "razi-pharmacy",
+    "banner": "/stores/razi-pharmacy/banner.jpg"
+  },
+  "Express Mart Kingston Road": {
+    "slug": "express-mart",
+    "banner": "/stores/express-mart/banner.jpg"
+  },
+  "Comfort Air HVAC": {
+    "slug": "comfort-air-hvac",
+    "banner": "/stores/hvac.jpg"
+  },
+  "Reliable Flow Plumbing": {
+    "slug": "reliable-flow-plumbing",
+    "banner": "/stores/plumbing.jpg"
+  },
+  "GreenScape Landscaping": {
+    "slug": "greenscape-landscaping",
+    "banner": "/stores/landscaping.jpg"
+  },
+  "Summit Home Renovations": {
+    "slug": "summit-home-renovations",
+    "banner": "/stores/renovation.jpg"
+  }
+}

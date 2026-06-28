@@ -37,7 +37,7 @@ export function AnalyticsDashboard({ userId }: AnalyticsDashboardProps) {
         onClick={() => setIsExpanded(!isExpanded)}
         className="w-full flex items-center justify-between text-xl font-semibold mb-4"
       >
-        <span>📊 Promotion Analytics</span>
+        <span>Promotion Analytics</span>
         <svg
           className={`w-5 h-5 text-white/60 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
           fill="none"

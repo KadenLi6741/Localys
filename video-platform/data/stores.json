@@ -1,0 +1,2535 @@
+[
+  {
+    "storeName": "Amy's Fish & Chips",
+    "type": "food",
+    "category": "Restaurants",
+    "sourceUrl": "https://www.ubereats.com/ca/store/amys-fish-%26-chips/z2eDKEb0TdGGMctMO8LBgA",
+    "heroImage": "/stores/amys-fish-and-chips/banner.jpg",
+    "items": [
+      {
+        "name": "Haddock and Chips",
+        "description": "Buy a Haddock & Chips and get a free Haddock Entree",
+        "price": 16.5,
+        "category": "Featured",
+        "imageUrl": null
+      },
+      {
+        "name": "Haddock Entree",
+        "description": "Free with Haddock and Chips",
+        "price": 11,
+        "category": "Featured",
+        "imageUrl": null
+      },
+      {
+        "name": "Haddock or Cod Fish Dinner",
+        "description": "Includes garden salad and chips",
+        "price": 18,
+        "category": "Haddock or Cod Fish & Chips",
+        "imageUrl": null
+      },
+      {
+        "name": "Haddock or Cod Only",
+        "description": "One piece of Haddock or Cod on it's own",
+        "price": 11,
+        "category": "Haddock or Cod Fish & Chips",
+        "imageUrl": null
+      },
+      {
+        "name": "Haddock or Cod Fish with Garden Salad",
+        "description": "Haddock or Cod Fish with a garden salad",
+        "price": 17,
+        "category": "Haddock or Cod Fish & Chips",
+        "imageUrl": null
+      },
+      {
+        "name": "Halibut Fish (2 pcs)",
+        "description": "Two pieces of Halibut on it's own",
+        "price": 19,
+        "category": "Halibut Fish & Chips",
+        "imageUrl": null
+      },
+      {
+        "name": "Halibut Fish (2 pcs) & Chips",
+        "description": "Two piece Halibut & Chips",
+        "price": 22,
+        "category": "Halibut Fish & Chips",
+        "imageUrl": null
+      },
+      {
+        "name": "Halibut Fish (1 pc) Dinner with Chips & Garden Salad",
+        "description": "One piece Halibut & Chips with a garden salad",
+        "price": 19,
+        "category": "Halibut Fish & Chips",
+        "imageUrl": null
+      },
+      {
+        "name": "Halibut Fish (1 pc) with Garden Salad",
+        "description": "One piece of Halibut with a garden salad",
+        "price": 18.5,
+        "category": "Halibut Fish & Chips",
+        "imageUrl": null
+      },
+      {
+        "name": "Halibut Fish (2 pcs) Dinner with Garden Salad & Chips",
+        "description": "Two piece Halibut & Chips with a garden salad",
+        "price": 24.75,
+        "category": "Halibut Fish & Chips",
+        "imageUrl": null
+      },
+      {
+        "name": "Halibut on a Bun",
+        "description": "Halibut on a sesame bun with lettuce and tartar sauce",
+        "price": 13,
+        "category": "Halibut Fish & Chips",
+        "imageUrl": null
+      },
+      {
+        "name": "Halibut Fish (1 pc) & Chips",
+        "description": "One piece Halibut & Chips",
+        "price": 17,
+        "category": "Halibut Fish & Chips",
+        "imageUrl": null
+      },
+      {
+        "name": "Halibut Fish (2 pcs) with Garden Salad",
+        "description": "Two piece Halibut with a garden salad",
+        "price": 23.5,
+        "category": "Halibut Fish & Chips",
+        "imageUrl": null
+      },
+      {
+        "name": "Grilled Halibut & Chips",
+        "description": "Two pieces of Grilled Halibut & Chips",
+        "price": 22,
+        "category": "From the Grill",
+        "imageUrl": null
+      },
+      {
+        "name": "Grilled Halibut Dinner with Garden Salad & Chips",
+        "description": "Two pieces of Grilled Halibut & Chips with a garden salad",
+        "price": 24.75,
+        "category": "From the Grill",
+        "imageUrl": null
+      },
+      {
+        "name": "Grilled Halibut & Garden Salad",
+        "description": "Two pieces of Grilled Halibut with a garden salad",
+        "price": 23.5,
+        "category": "From the Grill",
+        "imageUrl": null
+      },
+      {
+        "name": "Shrimp",
+        "description": "Shrimps on it's own",
+        "price": 16,
+        "category": "Shrimp & Scallops",
+        "imageUrl": null
+      },
+      {
+        "name": "Shrimp with Chips",
+        "description": "Shrimps & Chips",
+        "price": 19,
+        "category": "Shrimp & Scallops",
+        "imageUrl": null
+      },
+      {
+        "name": "Scallops",
+        "description": "Scallops on it's own",
+        "price": 16,
+        "category": "Shrimp & Scallops",
+        "imageUrl": null
+      },
+      {
+        "name": "Scallops Dinner",
+        "description": "Scallops & Chips with a garden salad",
+        "price": 20,
+        "category": "Shrimp & Scallops",
+        "imageUrl": null
+      },
+      {
+        "name": "Shrimp Dinner",
+        "description": "Shrimp & Chips with a garden salad",
+        "price": 20,
+        "category": "Shrimp & Scallops",
+        "imageUrl": null
+      },
+      {
+        "name": "Scallops with Chips",
+        "description": "Scallops & Chips",
+        "price": 19,
+        "category": "Shrimp & Scallops",
+        "imageUrl": null
+      },
+      {
+        "name": "Shrimp & Garden Salad",
+        "description": "Shrimps with a garden salad",
+        "price": 19.5,
+        "category": "Shrimp & Scallops",
+        "imageUrl": null
+      },
+      {
+        "name": "Scallops & Garden Salad",
+        "description": "Scallops with a garden salad",
+        "price": 19.5,
+        "category": "Shrimp & Scallops",
+        "imageUrl": null
+      },
+      {
+        "name": "Chicken Fingers & Chips",
+        "description": "Chicken Fingers & Chips",
+        "price": 12.5,
+        "category": "Chicken",
+        "imageUrl": null
+      },
+      {
+        "name": "Chicken Fingers Dinner",
+        "description": "Chicken Fingers & Chips with a garden salad",
+        "price": 14,
+        "category": "Chicken",
+        "imageUrl": null
+      },
+      {
+        "name": "Chicken Fingers",
+        "description": "Chicken Fingers on it's own",
+        "price": 10,
+        "category": "Chicken",
+        "imageUrl": null
+      },
+      {
+        "name": "Chicken Fingers with Garden Salad",
+        "description": "Chicken Fingers with a garden salad",
+        "price": 13.5,
+        "category": "Chicken",
+        "imageUrl": null
+      },
+      {
+        "name": "Haddock or Cod Fish (2 pcs) & 1 Order of Chips",
+        "description": "Two pieces of Haddock or Cod & One order of Chips",
+        "price": 27.95,
+        "category": "Family Meals",
+        "imageUrl": null
+      },
+      {
+        "name": "Haddock or Cod Fish (4 pcs) & 3 Orders of Chips",
+        "description": "Four pieces of Haddock or Cod & Three orders of Chips",
+        "price": 55,
+        "category": "Family Meals",
+        "imageUrl": null
+      },
+      {
+        "name": "Haddock or Cod Family Pack",
+        "description": "Five pieces of Haddock or Cod & Three orders of Chips. Includes a Large Gravy",
+        "price": 65,
+        "category": "Family Meals",
+        "imageUrl": null
+      },
+      {
+        "name": "Haddock or Cod Fish (3 pcs) & 2 Orders of Chips",
+        "description": "Three pieces of Haddock or Cod & Two orders of Chips",
+        "price": 40,
+        "category": "Family Meals",
+        "imageUrl": null
+      },
+      {
+        "name": "Halibut Meal for 3",
+        "description": "Six pieces of Halibut & Two order of Chips",
+        "price": 61,
+        "category": "Halibut Family Meals",
+        "imageUrl": null
+      },
+      {
+        "name": "Halibut Family Pack for 5",
+        "description": "Ten pieces of Halibut & Three order of Chips. Includes a Large Gravy & a Large salad",
+        "price": 97,
+        "category": "Halibut Family Meals",
+        "imageUrl": null
+      },
+      {
+        "name": "Halibut Meal for 2",
+        "description": "Four pieces of Halibut & One order of Chips",
+        "price": 42,
+        "category": "Halibut Family Meals",
+        "imageUrl": null
+      },
+      {
+        "name": "Halibut Meal for 4",
+        "description": "Eight pieces of Halibut & Three order of Chips",
+        "price": 82,
+        "category": "Halibut Family Meals",
+        "imageUrl": null
+      },
+      {
+        "name": "House Plate",
+        "description": "Two Pieces of Halibut with Shrimps, Scallops, chips, onion rings and a garden salad",
+        "price": 42,
+        "category": "House Plate",
+        "imageUrl": null
+      },
+      {
+        "name": "Halibut (1 pc) with Shrimp (5 pcs), Garden Salad, & Chips",
+        "description": "One piece of Halibut with Five Shrimps & chips with a garden salad",
+        "price": 23,
+        "category": "Halibut Fish & Shrimp Combos",
+        "imageUrl": null
+      },
+      {
+        "name": "Halibut (1 pc) with Shrimp (5 pcs) & Garden Salad",
+        "description": "One piece of Halibut with Five Shrimps with a garden salad",
+        "price": 22,
+        "category": "Halibut Fish & Shrimp Combos",
+        "imageUrl": null
+      },
+      {
+        "name": "Halibut (1 pc) with Shrimp (5 pcs) & Chips",
+        "description": "One piece of Halibut with Five Shrimps & chips",
+        "price": 20,
+        "category": "Halibut Fish & Shrimp Combos",
+        "imageUrl": null
+      },
+      {
+        "name": "Garden Salad",
+        "description": "Fresh mix of greens.",
+        "price": 8,
+        "category": "Salads",
+        "imageUrl": null
+      },
+      {
+        "name": "Greek Salad",
+        "description": "Fresh mix of tomatoes, cucumbers, feta cheese, and olives.",
+        "price": 10,
+        "category": "Salads",
+        "imageUrl": null
+      },
+      {
+        "name": "Kids' Halibut & Chips with a Pop",
+        "description": "Tender halibut served with crispy chips and a refreshing pop.",
+        "price": 7.75,
+        "category": "Kids' Meal",
+        "imageUrl": null
+      },
+      {
+        "name": "Kids' Chicken Fingers & Chips with a Pop",
+        "description": "Tender chicken fingers served with crispy chips and a refreshing pop.",
+        "price": 7.75,
+        "category": "Kids' Meal",
+        "imageUrl": null
+      },
+      {
+        "name": "Coleslaw",
+        "description": "Crunchy, creamy accompaniment to your meal.",
+        "price": 1.5,
+        "category": "Sides",
+        "imageUrl": null
+      },
+      {
+        "name": "Gravy",
+        "description": "Rich and savory accompaniment to your meal.",
+        "price": 1.5,
+        "category": "Sides",
+        "imageUrl": null
+      },
+      {
+        "name": "Onion Rings",
+        "description": "Crispy onion slices served as a side dish.",
+        "price": 4.95,
+        "category": "Sides",
+        "imageUrl": null
+      },
+      {
+        "name": "Chips",
+        "description": "Crispy fried potato strips served as a side dish.",
+        "price": 5,
+        "category": "Sides",
+        "imageUrl": null
+      },
+      {
+        "name": "Sweet Potato Chips",
+        "description": "Thinly sliced sweet potatoes, crispy on the outside and fluffy within.",
+        "price": 5,
+        "category": "Sides",
+        "imageUrl": null
+      },
+      {
+        "name": "Pop (Canned)",
+        "description": "Fizzy soft drink in a can.",
+        "price": 2.5,
+        "category": "Drinks",
+        "imageUrl": null
+      },
+      {
+        "name": "Bottled Water",
+        "description": "Refreshing and thirst-quenching water.",
+        "price": 1.48,
+        "category": "Drinks",
+        "imageUrl": null
+      }
+    ]
+  },
+  {
+    "storeName": "Holy Smoke Barbecue",
+    "type": "food",
+    "category": "Restaurants",
+    "sourceUrl": "https://www.ubereats.com/ca/store/holy-smoke-barbecue/jw6f4-J5WJCESWacQHJQEQ",
+    "heroImage": "/stores/holy-smoke-barbecue/banner.jpg",
+    "items": [
+      {
+        "name": "Chicken & Pork Rib Combo",
+        "description": "1/2lb of our Famous Smoked Ribs & 1/2lb of Our Seasoned Lightly Smoked Wings",
+        "price": 40,
+        "category": "Mains",
+        "imageUrl": null
+      },
+      {
+        "name": "Jalapeno Cheddar Sausage",
+        "description": "Smoked low and slow Jalapeno Cheddar sausage",
+        "price": 9,
+        "category": "Mains",
+        "imageUrl": null
+      },
+      {
+        "name": "Brisket & Rib Combo",
+        "description": "1/2lb Prime Brisket 1/2lb Smoked Ribs, 2 Small Sides",
+        "price": 29,
+        "category": "Mains",
+        "imageUrl": null
+      },
+      {
+        "name": "BBQ Platter for two",
+        "description": "1/2lb Prime Smoked Brisket, 1/2lb Turkey Breast and choice of 1/2lb Pulled Pork",
+        "price": 80,
+        "category": "Mains",
+        "imageUrl": null
+      },
+      {
+        "name": "Texas Trio",
+        "description": "1/4lb Juicy Pulled Pork - 1/4lb Moist Turkey - 1/2 Link Jalapeno Cheddar Sausage",
+        "price": 36.5,
+        "category": "Mains",
+        "imageUrl": null
+      },
+      {
+        "name": "Chicken Wings 1LB",
+        "description": "Seasoned and lightly smoked wings - choice of sauce - side of house made sauce",
+        "price": 20,
+        "category": "Mains",
+        "imageUrl": null
+      },
+      {
+        "name": "Tipsy Texan Sandwich",
+        "description": "Chopped Brisket - Sliced Turkey - Smoked Jalapeno Cheddar Sausage",
+        "price": 32.5,
+        "category": "Mains",
+        "imageUrl": null
+      },
+      {
+        "name": "Pork Back Ribs",
+        "description": "Our Famous baby back Ribs. Mouthwatering melt in your mouth bbq",
+        "price": 29,
+        "category": "Mains",
+        "imageUrl": null
+      },
+      {
+        "name": "Loaded Brisket Sweet Potato",
+        "description": "Sea salt crusted Sweet potato - chopped smoked brisket - drizzled w/ chipotle",
+        "price": 22,
+        "category": "Mains",
+        "imageUrl": null
+      },
+      {
+        "name": "Smoked Brisket Sandwich",
+        "description": "Legit Central Texas smoked brisket served on a brioche bun, topped with slaw",
+        "price": 17.5,
+        "category": "Mains",
+        "imageUrl": null
+      },
+      {
+        "name": "Smoked Turkey Breast by the 1/2 LB",
+        "description": "Cooked low and slow. Certified 100% central Texas authentic",
+        "price": 20,
+        "category": "Mains",
+        "imageUrl": null
+      },
+      {
+        "name": "Brisket & Pulled Pork Combo",
+        "description": "1/4lb Prime Brisket 1/2lb Pulled Pork, 1 Small Side",
+        "price": 34,
+        "category": "Mains",
+        "imageUrl": null
+      },
+      {
+        "name": "Pulled Pork Sandwich",
+        "description": "Legit Central Texas smoked and Pulled Pork served on a brioche bun",
+        "price": 15,
+        "category": "Mains",
+        "imageUrl": null
+      },
+      {
+        "name": "Three Little Piggys",
+        "description": "1/2 Link Jalapeno Cheddar Sausage - Pork Back Ribs (2 bones) - 1/4 LB Pulled Pork",
+        "price": 37.5,
+        "category": "Mains",
+        "imageUrl": null
+      },
+      {
+        "name": "Pulled Pork 1/2LB",
+        "description": "Smoked low and slow BBQ pulled pork. Served with texas toast, pickles and onion",
+        "price": 15,
+        "category": "Mains",
+        "imageUrl": null
+      },
+      {
+        "name": "BBQ Platter for four",
+        "description": "1lb Prime Smoked Brisket, 1lb Turkey and choice of 1lb Pulled Pork OR 4 Smoked sides",
+        "price": 160,
+        "category": "Mains",
+        "imageUrl": null
+      },
+      {
+        "name": "Smoked Turkey Breast Sandwich",
+        "description": "Legit Central Texas smoked Turkey Breast served on a brioche bun, topped with slaw",
+        "price": 17,
+        "category": "Mains",
+        "imageUrl": null
+      },
+      {
+        "name": "Corn Bread Jalapeno Cheddar",
+        "description": "Moist - delicious - made fresh in house",
+        "price": 6,
+        "category": "Humble Sides",
+        "imageUrl": null
+      },
+      {
+        "name": "Famous Macaroni Salad",
+        "description": "",
+        "price": 7,
+        "category": "Humble Sides",
+        "imageUrl": null
+      },
+      {
+        "name": "Original Creamy Dill Potato Salad",
+        "description": "",
+        "price": 7,
+        "category": "Humble Sides",
+        "imageUrl": null
+      },
+      {
+        "name": "Creamy Coleslaw",
+        "description": "",
+        "price": 7,
+        "category": "Humble Sides",
+        "imageUrl": null
+      },
+      {
+        "name": "Baked Beans",
+        "description": "Slow-cooked just like grandma used to make.",
+        "price": 7,
+        "category": "Humble Sides",
+        "imageUrl": null
+      },
+      {
+        "name": "Crinkle-Cut Pickles",
+        "description": "A Texas favorite.",
+        "price": 7,
+        "category": "Humble Sides",
+        "imageUrl": null
+      },
+      {
+        "name": "Creamed Corn",
+        "description": "Creamy corn kernels in a velvety sauce - classic, comforting, the perfect BBQ side",
+        "price": 7,
+        "category": "Humble Sides",
+        "imageUrl": null
+      },
+      {
+        "name": "Jalapeño Cheese Rice",
+        "description": "Creamy, cheesy rice dotted with jalapeños - classic, comforting",
+        "price": 7,
+        "category": "Humble Sides",
+        "imageUrl": null
+      },
+      {
+        "name": "Macaroni and Cheese",
+        "description": "Elbow macaroni in a creamy cheese sauce - simple, comforting, a classic BBQ side",
+        "price": 7,
+        "category": "Humble Sides",
+        "imageUrl": null
+      },
+      {
+        "name": "Black Cherry Soda",
+        "description": "Fizzy soda with a sweet black cherry twist.",
+        "price": 3.5,
+        "category": "Beverages",
+        "imageUrl": null
+      },
+      {
+        "name": "Coca Cola",
+        "description": "",
+        "price": 3.5,
+        "category": "Beverages",
+        "imageUrl": null
+      },
+      {
+        "name": "Orange Creamcicle",
+        "description": "Creamy and dreamy, a refreshing orange-flavoured drink.",
+        "price": 3.5,
+        "category": "Beverages",
+        "imageUrl": null
+      },
+      {
+        "name": "Root Beer",
+        "description": "Classic American-style soft drink with a sweet, creamy flavour.",
+        "price": 3.5,
+        "category": "Beverages",
+        "imageUrl": null
+      }
+    ]
+  },
+  {
+    "storeName": "Pho Nga Son",
+    "type": "food",
+    "category": "Restaurants",
+    "sourceUrl": "https://www.ubereats.com/ca/store/pho-nga-son/HiKh-Hv1UTuSSGFL2JPn2A",
+    "heroImage": "/stores/pho-nga-son/banner.jpg",
+    "items": [
+      {
+        "name": "S1. Tomato Crab Paste Vermicelli (Bun Rieu)",
+        "description": "Tomato crab paste vermicelli noodle soup, imitation crab meat, shrimp, deep-fried tofu",
+        "price": 19.5,
+        "category": "Special Dishes (Mon Dac Biet)",
+        "imageUrl": null
+      },
+      {
+        "name": "S2. Short Rib Stone Bowl (Pho to Da Suon Bo and Duoi Bo)",
+        "description": "Whole beef short rib, tendon, beef rib eye, flank, and beef bones in a high-heat stone bowl",
+        "price": 26.5,
+        "category": "Special Dishes (Mon Dac Biet)",
+        "imageUrl": null
+      },
+      {
+        "name": "S3. Shrimp Cracker Pork Platter (Sharing)",
+        "description": "Grilled lemongrass pork, roasted peanut, pickle carrot, scallion, and herbs.",
+        "price": 19.5,
+        "category": "Special Dishes (Mon Dac Biet)",
+        "imageUrl": null
+      },
+      {
+        "name": "S4. House Special Wraps Platter (Sharing) (Banh Hoi)",
+        "description": "Grilled chicken, pork, beef, shrimps, fresh vegetable, roasted peanut, fine rice vermicelli",
+        "price": 26.95,
+        "category": "Special Dishes (Mon Dac Biet)",
+        "imageUrl": null
+      },
+      {
+        "name": "S5. Roasted Bone Marrow Steak Tartar (Bo tai chanh tuy nuong) (1pc)",
+        "description": "Rare beef marinated with tartar dressing on roasted bone marrow, crostini",
+        "price": 15.95,
+        "category": "Special Dishes (Mon Dac Biet)",
+        "imageUrl": null
+      },
+      {
+        "name": "C1. House Special Rice (Com Dac Biet)",
+        "description": "Grilled pork chop, chicken, beef, and sunny side egg.",
+        "price": 21,
+        "category": "Broken Steamed Rice (Com Tam)",
+        "imageUrl": null
+      },
+      {
+        "name": "C2. Com Suon Nuong",
+        "description": "Broken rice with grilled lemongrass pork chops.",
+        "price": 17.95,
+        "category": "Broken Steamed Rice (Com Tam)",
+        "imageUrl": null
+      },
+      {
+        "name": "C3. Com Ga Nuong",
+        "description": "Broken rice with grilled chicken.",
+        "price": 18.5,
+        "category": "Broken Steamed Rice (Com Tam)",
+        "imageUrl": null
+      },
+      {
+        "name": "C5. Com Suon Nuong and Ga Nuong",
+        "description": "Broken rice with grilled lemongrass pork and chicken.",
+        "price": 18.5,
+        "category": "Broken Steamed Rice (Com Tam)",
+        "imageUrl": null
+      },
+      {
+        "name": "C6. Com Suon Nuong, Ga Nuong, and Trung Oppla/ Cha Hap",
+        "description": "Broken rice with grilled lemongrass pork chop, chicken, and sunny side egg",
+        "price": 18.95,
+        "category": "Broken Steamed Rice (Com Tam)",
+        "imageUrl": null
+      },
+      {
+        "name": "C4. Com Bo Nuong",
+        "description": "Broken rice with grilled lemongrass beef.",
+        "price": 18.5,
+        "category": "Broken Steamed Rice (Com Tam)",
+        "imageUrl": null
+      },
+      {
+        "name": "P0. Short Rib Pho (Pho Dac Biet Suon Bo)",
+        "description": "Beef short rib, rib-eye beef, and flank.",
+        "price": 22.95,
+        "category": "Beef Noodle Soup (Pho)",
+        "imageUrl": null
+      },
+      {
+        "name": "P1. Pho Combination",
+        "description": "Rib eye beef, flank, tendon, tripe, and beef balls.",
+        "price": 19,
+        "category": "Beef Noodle Soup (Pho)",
+        "imageUrl": null
+      },
+      {
+        "name": "P4. Flank Noodle Soup (Pho Nam)",
+        "description": "Tender beef flank and rice noodles in a rich, flavorful broth.",
+        "price": 18.5,
+        "category": "Beef Noodle Soup (Pho)",
+        "imageUrl": null
+      },
+      {
+        "name": "P7. Rib Eye Beef and Tendon Noodle Soup (Pho Tai Gan)",
+        "description": "Tender beef and tendon in a rich, flavorful noodle soup.",
+        "price": 18.95,
+        "category": "Beef Noodle Soup (Pho)",
+        "imageUrl": null
+      },
+      {
+        "name": "P9. Combination Pho W/ Bone Marrow (Pho Thap Cam Tuy Bo Nuong)",
+        "description": "Rib eye beef, flank, tendon, tripe & beef balls w/ roasted bone marrow",
+        "price": 22.95,
+        "category": "Beef Noodle Soup (Pho)",
+        "imageUrl": null
+      },
+      {
+        "name": "P3. Rib Eye Beef Noodle Soup (Pho Tai)",
+        "description": "Tender beef and noodles in a rich, flavorful broth.",
+        "price": 18.5,
+        "category": "Beef Noodle Soup (Pho)",
+        "imageUrl": null
+      },
+      {
+        "name": "P5. Rib Eye Beef and Flank Noodle Soup (Pho Tai Nam)",
+        "description": "Tender beef and noodles in a rich, flavorful broth.",
+        "price": 18.5,
+        "category": "Beef Noodle Soup (Pho)",
+        "imageUrl": null
+      },
+      {
+        "name": "P6. Rib Eye Beef and Beef Ball Noodle Soup (Pho Tai Vien)",
+        "description": "Tender beef and beef balls served in a flavorful noodle soup.",
+        "price": 18.5,
+        "category": "Beef Noodle Soup (Pho)",
+        "imageUrl": null
+      },
+      {
+        "name": "P8. Rib Eye Beef and Tripe Noodle Soup (Pho Tai Sach)",
+        "description": "Tender beef and tripe in a rich, flavorful noodle soup.",
+        "price": 18.5,
+        "category": "Beef Noodle Soup (Pho)",
+        "imageUrl": null
+      },
+      {
+        "name": "P2. Pho Ga - Chicken Noodle Soup (Chicken Broth)",
+        "description": "Tender chicken and rice noodles in a rich chicken broth.",
+        "price": 18.95,
+        "category": "Beef Noodle Soup (Pho)",
+        "imageUrl": null
+      },
+      {
+        "name": "H1. Traditional Bun Bo Hue (Bun Bo Hue Truyen Thong)",
+        "description": "Beef flank, homemade pork meatballs, pork hock, and blood pudding in spicy broth",
+        "price": 19.5,
+        "category": "Spicy Beef Noodle Soup (Bun Bo Hue)",
+        "imageUrl": null
+      },
+      {
+        "name": "H2. Short Rib/ Oxtail Bun Bo Hue (Bun Bo Hue Suon Bo/ Duoi Bo)",
+        "description": "Short rib/ Oxtail, beef flank, rib eye beef, and homemade pork meatballs in spicy broth",
+        "price": 22.95,
+        "category": "Spicy Beef Noodle Soup (Bun Bo Hue)",
+        "imageUrl": null
+      },
+      {
+        "name": "B1. House Special Vermicelli (Bun Dac Biet)",
+        "description": "Grilled lemongrass pork, chicken, shrimp skewer, deep-fried spring roll, and pork sausage",
+        "price": 21.5,
+        "category": "Bun (Vermicelli)",
+        "imageUrl": null
+      },
+      {
+        "name": "B4. Bun Thit Nuong, Nem Nuong, and Tom Xien",
+        "description": "Vermicelli with salad, grilled lemongrass pork, pork sausage, and shrimp skewer",
+        "price": 18.95,
+        "category": "Bun (Vermicelli)",
+        "imageUrl": null
+      },
+      {
+        "name": "B5. Bun Cha Gio, Nem Nuong, and Chao Tom",
+        "description": "Vermicelli with salad, deep fried spring roll, pork sausage, and shrimp paste",
+        "price": 18.95,
+        "category": "Bun (Vermicelli)",
+        "imageUrl": null
+      },
+      {
+        "name": "B6. Bun Cha Gio, Thit, and Nem",
+        "description": "Vermicelli with salad, grilled pork, pork sausage, and deep-fried spring roll",
+        "price": 18.5,
+        "category": "Bun (Vermicelli)",
+        "imageUrl": null
+      },
+      {
+        "name": "B2. Pork/ Beef/ Chicken Vermicelli (Bun Ga/ Bo/ Thit Nuong)",
+        "description": "Vermicelli with salad and grilled lemongrass option meats.",
+        "price": 18,
+        "category": "Bun (Vermicelli)",
+        "imageUrl": null
+      },
+      {
+        "name": "B3. Bun Thit Nuong, Ga Nuong, or Bo Nuong, and Cha Gio",
+        "description": "Vermicelli with salad, grilled lemongrass pork, chicken, or beef, and deep-fried spring roll",
+        "price": 18.5,
+        "category": "Bun (Vermicelli)",
+        "imageUrl": null
+      },
+      {
+        "name": "BM1. Thit Nuong",
+        "description": "Grilled lemongrass pork sandwich.",
+        "price": 11,
+        "category": "Vietnamese Sandwich (Banh Mi)",
+        "imageUrl": null
+      },
+      {
+        "name": "BM5. Banh Mi Combo",
+        "description": "Choice of sandwich with drink and fries.",
+        "price": 15,
+        "category": "Vietnamese Sandwich (Banh Mi)",
+        "imageUrl": null
+      },
+      {
+        "name": "BM2. Bo Nuong",
+        "description": "Grilled lemongrass beef sandwich.",
+        "price": 11,
+        "category": "Vietnamese Sandwich (Banh Mi)",
+        "imageUrl": null
+      },
+      {
+        "name": "BM3. Ga Nuong",
+        "description": "Grilled lemongrass chicken sandwich.",
+        "price": 11,
+        "category": "Vietnamese Sandwich (Banh Mi)",
+        "imageUrl": null
+      },
+      {
+        "name": "BM4. Nem Nuong",
+        "description": "Grilled pork sausage sandwich.",
+        "price": 11,
+        "category": "Vietnamese Sandwich (Banh Mi)",
+        "imageUrl": null
+      },
+      {
+        "name": "F3. Pad Thai Chicken/Beef/Shrimps",
+        "description": "Chicken, beef, or shrimp Pad Thai. Served with peanuts.",
+        "price": 18.5,
+        "category": "Stir-Fried Dishes",
+        "imageUrl": null
+      },
+      {
+        "name": "F2. Stir Fried Crispy Egg Noodle",
+        "description": "Crispy egg noodles stir-fried to a golden brown.",
+        "price": 18.5,
+        "category": "Stir-Fried Dishes",
+        "imageUrl": null
+      },
+      {
+        "name": "F4. Pineapple Fried Rice in Hot Stone Bowl (Com Chien Thom)",
+        "description": "Savoury pineapple-infused rice served in a hot stone bowl.",
+        "price": 19.5,
+        "category": "Stir-Fried Dishes",
+        "imageUrl": null
+      },
+      {
+        "name": "F1. Stir-Fried Egg Noodle With Beef/ Chicken & Mixed Vegetable",
+        "description": "Stir-fried egg noodles with beef or chicken and mixed vegetables.",
+        "price": 18.5,
+        "category": "Stir-Fried Dishes",
+        "imageUrl": null
+      },
+      {
+        "name": "E1. Extra Rice Noodle (Pho)",
+        "description": "Add-on side of flat rice noodles (banh pho) for pho bowls.",
+        "price": 5.5,
+        "category": "Side Order & Add On",
+        "imageUrl": null
+      },
+      {
+        "name": "E2. Fries",
+        "description": "Crispy, golden potato fries.",
+        "price": 5.5,
+        "category": "Side Order & Add On",
+        "imageUrl": null
+      },
+      {
+        "name": "E3. Grilled Pork Chop/ Chicken/ Beef",
+        "description": "Side order of grilled pork chop, chicken, or beef.",
+        "price": 7.5,
+        "category": "Side Order & Add On",
+        "imageUrl": null
+      },
+      {
+        "name": "E4. Vegetable",
+        "description": "Side of vegetables.",
+        "price": 7.5,
+        "category": "Side Order & Add On",
+        "imageUrl": null
+      },
+      {
+        "name": "E5. Sunny Side Egg/ Rice",
+        "description": "Choice of sunny-side-up egg or rice.",
+        "price": 3.5,
+        "category": "Side Order & Add On",
+        "imageUrl": null
+      },
+      {
+        "name": "E7. Beef Ball",
+        "description": "Side order of beef meatballs.",
+        "price": 6,
+        "category": "Side Order & Add On",
+        "imageUrl": null
+      },
+      {
+        "name": "E8. Rare Beef",
+        "description": "Thinly sliced rare beef add-on.",
+        "price": 7,
+        "category": "Side Order & Add On",
+        "imageUrl": null
+      },
+      {
+        "name": "D1. Vietnamese Hot/ Iced with Condensed Milk (Ca Phe Sua Nong/ Da)",
+        "description": "Vietnamese coffee with condensed milk, served hot or iced.",
+        "price": 6.5,
+        "category": "Dessert & Drink",
+        "imageUrl": null
+      },
+      {
+        "name": "D2. Vietnamese Coconuticed Cappuccino (Ca Phe Dua)",
+        "description": "Espresso with coconut milk over ice, cappuccino-style.",
+        "price": 7,
+        "category": "Dessert & Drink",
+        "imageUrl": null
+      },
+      {
+        "name": "D3. Passion Fruit Juice (Nuoc Chanh Day)",
+        "description": "Passion fruit juice with natural tang.",
+        "price": 6.5,
+        "category": "Dessert & Drink",
+        "imageUrl": null
+      },
+      {
+        "name": "D6. POP",
+        "description": "Carbonated soft drink.",
+        "price": 3,
+        "category": "Dessert & Drink",
+        "imageUrl": null
+      },
+      {
+        "name": "D5. Smoothies",
+        "description": "Cold blended smoothies.",
+        "price": 8.5,
+        "category": "Dessert & Drink",
+        "imageUrl": null
+      }
+    ]
+  },
+  {
+    "storeName": "Pho Xe Lua Vietnamese Cuisine",
+    "type": "food",
+    "category": "Restaurants",
+    "sourceUrl": "https://www.ubereats.com/ca/store/pho-xe-lua-vietnamese-cuisine/zklTx97bRzGrrbTmo8t-aQ",
+    "heroImage": "/stores/pho-xe-lua/banner.jpg",
+    "_note": "Partial menu — only the Offers, Beef Noodle Soup and Noodle/Egg Noodle Soup sections rendered in the screenshot; several names were truncated at the column edge. Other sections (Stir Fry, Vermicelli, Appetizers, Drinks, etc.) did not load — needs a fuller screenshot.",
+    "items": [
+      {
+        "name": "038 - Mango Shake",
+        "description": "Mango blended with milk into a creamy, refreshing shake",
+        "price": 6.5,
+        "category": "Offers",
+        "imageUrl": null
+      },
+      {
+        "name": "312 - BBQ Chicken & Spring Roll",
+        "description": "Served with vermicelli, bean sprouts, cucumber, lettuce, mint, onions",
+        "price": 14,
+        "category": "Offers",
+        "imageUrl": null
+      },
+      {
+        "name": "413 - BBQ Pork Chop and BBQ",
+        "description": "Served with steamed rice",
+        "price": 14,
+        "category": "Offers",
+        "imageUrl": null
+      },
+      {
+        "name": "419 - BBQ Chicken and BBQ Beef",
+        "description": "Served with steamed rice",
+        "price": 12.6,
+        "category": "Offers",
+        "imageUrl": null
+      },
+      {
+        "name": "101 - Special Noodle Soup",
+        "description": "Rare beef, beef balls, tripe, and flank brisket. Served with thick rice noodle or thin noodles",
+        "price": 12.4,
+        "category": "Beef Noodle Soup",
+        "imageUrl": null
+      },
+      {
+        "name": "102 - Rare Beef Noodle Soup",
+        "description": "Served with thick rice noodle or thin noodles",
+        "price": 15.5,
+        "category": "Beef Noodle Soup",
+        "imageUrl": null
+      },
+      {
+        "name": "103 - Rare Beef and Tripe Noodle Soup",
+        "description": "Served with thick rice noodle or thin noodles",
+        "price": 15.5,
+        "category": "Beef Noodle Soup",
+        "imageUrl": null
+      },
+      {
+        "name": "104 - Rare Beef and Tendon Noodle Soup",
+        "description": "Served with thick rice noodle or thin noodles",
+        "price": 15.5,
+        "category": "Beef Noodle Soup",
+        "imageUrl": null
+      },
+      {
+        "name": "106 - Rare Beef, Flank Brisket and Tendon",
+        "description": "Served with thick rice noodle or thin noodles",
+        "price": 15.5,
+        "category": "Beef Noodle Soup",
+        "imageUrl": null
+      },
+      {
+        "name": "110 - Flank Brisket, Tendon and Tripe",
+        "description": "Served with thick rice noodle or thin noodles",
+        "price": 15.5,
+        "category": "Beef Noodle Soup",
+        "imageUrl": null
+      },
+      {
+        "name": "111 - Flank Brisket and Tripe",
+        "description": "Served with thick rice noodle or thin noodles",
+        "price": 15.5,
+        "category": "Beef Noodle Soup",
+        "imageUrl": null
+      },
+      {
+        "name": "115 - Rare Beef, Flank Brisket",
+        "description": "Served with thick rice noodle or thin noodles",
+        "price": 15.5,
+        "category": "Beef Noodle Soup",
+        "imageUrl": null
+      },
+      {
+        "name": "116 - Shredded Chicken Noodle Soup",
+        "description": "Served with thick rice noodle or thin noodles",
+        "price": 15.5,
+        "category": "Beef Noodle Soup",
+        "imageUrl": null
+      },
+      {
+        "name": "117 - Vegetable Noodle Soup",
+        "description": "Served with vegetable pho broth",
+        "price": 15.5,
+        "category": "Beef Noodle Soup",
+        "imageUrl": null
+      },
+      {
+        "name": "118 - Plain Noodle Soup",
+        "description": "Served with thick rice noodle or thin noodles",
+        "price": 11,
+        "category": "Beef Noodle Soup",
+        "imageUrl": null
+      },
+      {
+        "name": "207 - Beef Stew with Tomato Soup",
+        "description": "With rice noodle, egg noodle, and bread or rice",
+        "price": 16,
+        "category": "Noodle/Egg Noodle Soup",
+        "imageUrl": null
+      },
+      {
+        "name": "209 - Tom Yum Shrimp Vermicelli",
+        "description": "Spicy and sour soup with shrimp and vermicelli noodles.",
+        "price": 16.5,
+        "category": "Noodle/Egg Noodle Soup",
+        "imageUrl": null
+      },
+      {
+        "name": "203 - Homemade Pork Dumpling Soup",
+        "description": "Tender pork dumplings served with rice noodles in a savory broth.",
+        "price": 14,
+        "category": "Noodle/Egg Noodle Soup",
+        "imageUrl": null
+      },
+      {
+        "name": "201 - Seafood with Glass Noodle Soup",
+        "description": "Savoury seafood in a light glass noodle soup.",
+        "price": 16,
+        "category": "Noodle/Egg Noodle Soup",
+        "imageUrl": null
+      },
+      {
+        "name": "204 - Seafood with Rice Noodle Soup",
+        "description": "Savoury seafood and rice noodles in a flavorful soup.",
+        "price": 16,
+        "category": "Noodle/Egg Noodle Soup",
+        "imageUrl": null
+      },
+      {
+        "name": "202 - Seafood with Egg Noodle Soup",
+        "description": "Savoury seafood and egg noodles in rich broth.",
+        "price": 16,
+        "category": "Noodle/Egg Noodle Soup",
+        "imageUrl": null
+      },
+      {
+        "name": "233 - Bun Rieu With Fried Soft Shell Crab",
+        "description": "Crab meatballs and soft shell crab in a rich tomato soup served with egg noodle",
+        "price": 22,
+        "category": "Noodle/Egg Noodle Soup",
+        "imageUrl": null
+      },
+      {
+        "name": "205 - Phuc Kien Style Noodle Soup",
+        "description": "Savoury noodle soup with shrimp cracker, Vietnamese sausage, and fish",
+        "price": 16,
+        "category": "Noodle/Egg Noodle Soup",
+        "imageUrl": null
+      },
+      {
+        "name": "206 - Bun Rieu (Crab Pork Meatball)",
+        "description": "A traditional Vietnamese soup with crab pork meat balls, tomatoes, and tofu",
+        "price": 16.5,
+        "category": "Noodle/Egg Noodle Soup",
+        "imageUrl": null
+      },
+      {
+        "name": "208 - Seafood Tom Yum Noodle Soup",
+        "description": "Savory noodle soup with seafood, infused with the tangy and spicy flavor",
+        "price": 17,
+        "category": "Noodle/Egg Noodle Soup",
+        "imageUrl": null
+      },
+      {
+        "name": "232 - Laksa Seafood Noodle Soup",
+        "description": "Aromatic noodle soup with seafood",
+        "price": 16.5,
+        "category": "Noodle/Egg Noodle Soup",
+        "imageUrl": null
+      }
+    ]
+  },
+  {
+    "storeName": "Express Mart Kingston Road",
+    "type": "retail",
+    "category": "Convenience",
+    "sourceUrl": "https://www.ubereats.com/ca/store/express-mart-kingston-road/yMdUq3A2W_yNMed7ryS4Pw",
+    "heroImage": "/stores/express-mart/banner.jpg",
+    "items": [
+      {
+        "name": "Bingo! Mad Angles Achaari Masti Chips",
+        "description": "",
+        "price": 2.99,
+        "category": "Chips",
+        "imageUrl": null
+      },
+      {
+        "name": "Kurkure Puffcorn Cheese (70 g)",
+        "description": "70 g",
+        "price": 2.99,
+        "category": "Chips",
+        "imageUrl": null
+      },
+      {
+        "name": "Kurkure Green Chutney Style (70 g)",
+        "description": "70 g",
+        "price": 2.99,
+        "category": "Chips",
+        "imageUrl": null
+      },
+      {
+        "name": "Lay's West Indies Hot N' Sweet Chilli Chips (60 g)",
+        "description": "60 g",
+        "price": 2.99,
+        "category": "Chips",
+        "imageUrl": null
+      },
+      {
+        "name": "Pringles Jalapeno Poppers Chips (156 g)",
+        "description": "156 g",
+        "price": 5.99,
+        "category": "Chips",
+        "imageUrl": null
+      },
+      {
+        "name": "Bikaji Mast Masala Chips (60 g)",
+        "description": "60 g",
+        "price": 2.99,
+        "category": "Chips",
+        "imageUrl": null
+      },
+      {
+        "name": "Pokemon Scarlet & Violet 151",
+        "description": "",
+        "price": 65,
+        "category": "Toys",
+        "imageUrl": null
+      },
+      {
+        "name": "The Monsters Labubu Big Into Energy",
+        "description": "",
+        "price": 50,
+        "category": "Toys",
+        "imageUrl": null
+      },
+      {
+        "name": "Pokemon Surging Sparks Booster",
+        "description": "",
+        "price": 30,
+        "category": "Toys",
+        "imageUrl": null
+      },
+      {
+        "name": "The Monsters Labubu Coca-Cola",
+        "description": "",
+        "price": 50,
+        "category": "Toys",
+        "imageUrl": null
+      },
+      {
+        "name": "Pokemon TCG: Scarlet & Violet White Flare",
+        "description": "",
+        "price": 20,
+        "category": "Toys",
+        "imageUrl": null
+      },
+      {
+        "name": "UNO \"No Mercy\" Playing Cards",
+        "description": "",
+        "price": 24.99,
+        "category": "Toys",
+        "imageUrl": null
+      },
+      {
+        "name": "Mogu Mogu Lychee Drink (320 ml)",
+        "description": "320 ml",
+        "price": 2.99,
+        "category": "Juices & Drinks",
+        "imageUrl": null
+      },
+      {
+        "name": "Mogu Mogu Mango Drink (320 ml)",
+        "description": "320 ml",
+        "price": 2.99,
+        "category": "Juices & Drinks",
+        "imageUrl": null
+      },
+      {
+        "name": "Del Monte Pear Juice (1 L)",
+        "description": "1 L",
+        "price": 3.99,
+        "category": "Juices & Drinks",
+        "imageUrl": null
+      },
+      {
+        "name": "Del Monte Peach Juice (1 L)",
+        "description": "1 L",
+        "price": 3.99,
+        "category": "Juices & Drinks",
+        "imageUrl": null
+      },
+      {
+        "name": "Del Monte Passion Fruit Juice (1 L)",
+        "description": "1 L",
+        "price": 3.99,
+        "category": "Juices & Drinks",
+        "imageUrl": null
+      },
+      {
+        "name": "Mogu Mogu Pineapple Drink (320 ml)",
+        "description": "320 ml",
+        "price": 2.99,
+        "category": "Juices & Drinks",
+        "imageUrl": null
+      },
+      {
+        "name": "Nongshim Shin Spicy Noodle Soup (120 g)",
+        "description": "120 g",
+        "price": 3.49,
+        "category": "Noodles",
+        "imageUrl": null
+      },
+      {
+        "name": "Samyang Buldak Cheese Stir Fried Artificial Chicken Noodles",
+        "description": "",
+        "price": 15.99,
+        "category": "Noodles",
+        "imageUrl": null
+      },
+      {
+        "name": "Samyang Buldak Hot Artificial Chicken Fire Noodles Bowl (105 g)",
+        "description": "105 g",
+        "price": 4.79,
+        "category": "Noodles",
+        "imageUrl": null
+      },
+      {
+        "name": "Nongshim Shin Spicy Noodle Soup (4 Pack)",
+        "description": "4 pack",
+        "price": 11.99,
+        "category": "Noodles",
+        "imageUrl": null
+      },
+      {
+        "name": "Samyang Buldak Carbonara Artificial Chicken Noodles Bowl",
+        "description": "",
+        "price": 4.79,
+        "category": "Noodles",
+        "imageUrl": null
+      },
+      {
+        "name": "Nongshim Shin Spicy Noodle Soup Bowl (114 g)",
+        "description": "114 g",
+        "price": 5.29,
+        "category": "Noodles",
+        "imageUrl": null
+      }
+    ]
+  },
+  {
+    "storeName": "K1 Floral Studio",
+    "type": "retail",
+    "category": "Flowers",
+    "sourceUrl": "https://www.ubereats.com/ca/store/k1-floral-studio/sDmmZZjeVFGfWLa5r7ZBAg",
+    "heroImage": "/stores/k1-floral-studio/banner.jpg",
+    "items": [
+      {
+        "name": "Amazing Blue",
+        "description": "",
+        "price": 65,
+        "category": "Bouquets & Flowers",
+        "imageUrl": null
+      },
+      {
+        "name": "Dancing Purple",
+        "description": "",
+        "price": 75,
+        "category": "Bouquets & Flowers",
+        "imageUrl": null
+      },
+      {
+        "name": "Endless Love",
+        "description": "",
+        "price": 65,
+        "category": "Bouquets & Flowers",
+        "imageUrl": null
+      },
+      {
+        "name": "Sweet Smile",
+        "description": "",
+        "price": 95,
+        "category": "Bouquets & Flowers",
+        "imageUrl": null
+      },
+      {
+        "name": "Garden Flowers",
+        "description": "",
+        "price": 95,
+        "category": "Bouquets & Flowers",
+        "imageUrl": null
+      },
+      {
+        "name": "Breath Taking",
+        "description": "",
+        "price": 70,
+        "category": "Bouquets & Flowers",
+        "imageUrl": null
+      },
+      {
+        "name": "Box of Love",
+        "description": "",
+        "price": 140,
+        "category": "Trending Products",
+        "imageUrl": null
+      },
+      {
+        "name": "Peaceful Thought",
+        "description": "",
+        "price": 85,
+        "category": "Trending Products",
+        "imageUrl": null
+      },
+      {
+        "name": "Purple Violets",
+        "description": "",
+        "price": 25,
+        "category": "Trending Products",
+        "imageUrl": null
+      },
+      {
+        "name": "Happy Holiday",
+        "description": "",
+        "price": 65,
+        "category": "Trending Products",
+        "imageUrl": null
+      },
+      {
+        "name": "Bold & Beautiful",
+        "description": "",
+        "price": 240,
+        "category": "Trending Products",
+        "imageUrl": null
+      },
+      {
+        "name": "Holiday Blessings",
+        "description": "",
+        "price": 120,
+        "category": "Trending Products",
+        "imageUrl": null
+      },
+      {
+        "name": "Celebration of Life",
+        "description": "",
+        "price": 140,
+        "category": "Sympathy & Funeral",
+        "imageUrl": null
+      },
+      {
+        "name": "Heavens Gate",
+        "description": "",
+        "price": 160,
+        "category": "Sympathy & Funeral",
+        "imageUrl": null
+      },
+      {
+        "name": "Peaceful Thought",
+        "description": "",
+        "price": 85,
+        "category": "Sympathy & Funeral",
+        "imageUrl": null
+      },
+      {
+        "name": "Bold & Beautiful",
+        "description": "",
+        "price": 240,
+        "category": "Sympathy & Funeral",
+        "imageUrl": null
+      },
+      {
+        "name": "Joy of Christmas",
+        "description": "",
+        "price": 65,
+        "category": "Christmas Selection",
+        "imageUrl": null
+      },
+      {
+        "name": "Happy Holiday",
+        "description": "",
+        "price": 65,
+        "category": "Christmas Selection",
+        "imageUrl": null
+      },
+      {
+        "name": "Holiday Blessings",
+        "description": "",
+        "price": 120,
+        "category": "Christmas Selection",
+        "imageUrl": null
+      }
+    ]
+  },
+  {
+    "storeName": "Flowers Gifts and Balloons",
+    "type": "retail",
+    "category": "Flowers",
+    "sourceUrl": "https://www.ubereats.com/ca/store/flowers-gifts-and-balloons/-diUXrleWzO-wxbmF2YxRQ",
+    "heroImage": "/stores/flowers-gifts-and-balloons/banner.jpg",
+    "items": [
+      {
+        "name": "Classic Bouquet (FGB502)",
+        "description": "",
+        "price": 69.94,
+        "category": "Flowers And Balloons",
+        "imageUrl": null
+      },
+      {
+        "name": "Celebrating Special Moments (FGB531)",
+        "description": "",
+        "price": 59.95,
+        "category": "Flowers And Balloons",
+        "imageUrl": null
+      },
+      {
+        "name": "Birthday Celebration Shine (FGB627)",
+        "description": "",
+        "price": 44.99,
+        "category": "Flowers And Balloons",
+        "imageUrl": null
+      },
+      {
+        "name": "Happy Birthday Celebration (FGB574)",
+        "description": "",
+        "price": 49.99,
+        "category": "Flowers And Balloons",
+        "imageUrl": null
+      },
+      {
+        "name": "Enchanting Elegance (FGB259)",
+        "description": "",
+        "price": 89.99,
+        "category": "Flowers And Balloons",
+        "imageUrl": null
+      },
+      {
+        "name": "Happy Birthday (FGB605)",
+        "description": "",
+        "price": 89.99,
+        "category": "Flowers And Balloons",
+        "imageUrl": null
+      },
+      {
+        "name": "Charming White & Lavender Daisy Bouquet (FGB629)",
+        "description": "",
+        "price": 49.59,
+        "category": "Deal of the Day",
+        "imageUrl": null
+      },
+      {
+        "name": "Serene Symphony (FGB112)",
+        "description": "",
+        "price": 67.99,
+        "category": "Deal of the Day",
+        "imageUrl": null
+      },
+      {
+        "name": "Happy Birthday Helium Balloons (FGB80)",
+        "description": "",
+        "price": 49.99,
+        "category": "Deal of the Day",
+        "imageUrl": null
+      },
+      {
+        "name": "Roses & Fruit Delight (FGB345)",
+        "description": "",
+        "price": 124.99,
+        "category": "Deal of the Day",
+        "imageUrl": null
+      },
+      {
+        "name": "1 Red Rose Wrapped and Tied with Ribbon (FGB326)",
+        "description": "1 red rose wrapped and tied with ribbon",
+        "price": 16.99,
+        "category": "Deal of the Day",
+        "imageUrl": null
+      },
+      {
+        "name": "Pink Blush Delight: 6-Piece Balloon Bouquet (FGB138)",
+        "description": "",
+        "price": 25.6,
+        "category": "Deal of the Day",
+        "imageUrl": null
+      },
+      {
+        "name": "Special Graduation Moment (FGB634)",
+        "description": "",
+        "price": 129.99,
+        "category": "Graduation Flowers And Balloons",
+        "imageUrl": null
+      },
+      {
+        "name": "Gold and White Balloons Bouquet",
+        "description": "",
+        "price": 25,
+        "category": "Graduation Flowers And Balloons",
+        "imageUrl": null
+      },
+      {
+        "name": "24 White Roses with Congratulations Balloon",
+        "description": "",
+        "price": 131.95,
+        "category": "Graduation Flowers And Balloons",
+        "imageUrl": null
+      },
+      {
+        "name": "Blue Dreams Graduation Bouquet",
+        "description": "",
+        "price": 94.99,
+        "category": "Graduation Flowers And Balloons",
+        "imageUrl": null
+      },
+      {
+        "name": "Sunshine Serenade (FGB422)",
+        "description": "",
+        "price": 84.99,
+        "category": "Balloons Bouquet",
+        "imageUrl": null
+      },
+      {
+        "name": "Elegant Heart (FGB429)",
+        "description": "",
+        "price": 39.95,
+        "category": "Balloons Bouquet",
+        "imageUrl": null
+      },
+      {
+        "name": "Elegance in Bloom",
+        "description": "",
+        "price": 84.99,
+        "category": "Trending Products",
+        "imageUrl": null
+      },
+      {
+        "name": "Pure Love Blooms (FGB580)",
+        "description": "",
+        "price": 69.99,
+        "category": "Trending Products",
+        "imageUrl": null
+      },
+      {
+        "name": "Red & White Rose Harmony Bouquet",
+        "description": "",
+        "price": 84.99,
+        "category": "Trending Products",
+        "imageUrl": null
+      },
+      {
+        "name": "36 Pink Roses with Butterflies (FGB541)",
+        "description": "",
+        "price": 199.99,
+        "category": "Trending Products",
+        "imageUrl": null
+      },
+      {
+        "name": "Pink & White Rose Elegance Bouquet (FGB801)",
+        "description": "",
+        "price": 134.99,
+        "category": "Trending Products",
+        "imageUrl": null
+      },
+      {
+        "name": "Blue Oasis (FGB66)",
+        "description": "",
+        "price": 74.99,
+        "category": "Trending Products",
+        "imageUrl": null
+      }
+    ]
+  },
+  {
+    "storeName": "Waterford Convenience",
+    "type": "retail",
+    "category": "Convenience",
+    "sourceUrl": "https://www.ubereats.com/ca/store/waterford-convenience-richmond-hill/TK6DIf63Rci4FQGd7a2D2Q",
+    "heroImage": "/stores/waterford-convenience/banner.jpg",
+    "items": [
+      {
+        "name": "Maltesers 100g",
+        "description": "100 g",
+        "price": 6.49,
+        "category": "Chocolate & Candy",
+        "imageUrl": null
+      },
+      {
+        "name": "Maltesers Stand Up Pouch (165 g)",
+        "description": "165 g",
+        "price": 8.99,
+        "category": "Chocolate & Candy",
+        "imageUrl": null
+      },
+      {
+        "name": "Reese's Miniatures 185g",
+        "description": "185 g",
+        "price": 8.99,
+        "category": "Chocolate & Candy",
+        "imageUrl": null
+      },
+      {
+        "name": "Brookside Cherry Flavour 200g",
+        "description": "200 g",
+        "price": 8.99,
+        "category": "Chocolate & Candy",
+        "imageUrl": null
+      },
+      {
+        "name": "Brookside Blood Orange & Peach 235g",
+        "description": "235 g",
+        "price": 8.99,
+        "category": "Chocolate & Candy",
+        "imageUrl": null
+      },
+      {
+        "name": "M & M's Caramel 155g",
+        "description": "155 g",
+        "price": 9.49,
+        "category": "Chocolate & Candy",
+        "imageUrl": null
+      },
+      {
+        "name": "A & W Cream Soda Zero Sugar 355 ml (Pack of 12)",
+        "description": "Pack of 12",
+        "price": 26.99,
+        "category": "Beverages",
+        "imageUrl": null
+      },
+      {
+        "name": "Ocean Spray Original Juice Cocktail, Cranberry (1.89 L)",
+        "description": "1.89 L",
+        "price": 7.99,
+        "category": "Beverages",
+        "imageUrl": null
+      },
+      {
+        "name": "Ocean Spray Cran-Raspberry (1.89 L)",
+        "description": "1.89 L",
+        "price": 7.99,
+        "category": "Beverages",
+        "imageUrl": null
+      },
+      {
+        "name": "Allen's Apple Juice 1.89L",
+        "description": "1.89 L",
+        "price": 6.99,
+        "category": "Beverages",
+        "imageUrl": null
+      },
+      {
+        "name": "Sunny D Juice Drink, Tangy Original (1.89 L)",
+        "description": "1.89 L",
+        "price": 7.49,
+        "category": "Beverages",
+        "imageUrl": null
+      },
+      {
+        "name": "Dasani 591ml",
+        "description": "591 ml",
+        "price": 2.99,
+        "category": "Beverages",
+        "imageUrl": null
+      },
+      {
+        "name": "Pokemon Sword & Shield Rebel Clash",
+        "description": "",
+        "price": 16.99,
+        "category": "Pokemon And Hockey, Basketball Cards",
+        "imageUrl": null
+      },
+      {
+        "name": "Hockey SP 2020-21",
+        "description": "",
+        "price": 6.99,
+        "category": "Pokemon And Hockey, Basketball Cards",
+        "imageUrl": null
+      },
+      {
+        "name": "Hockey SP 2021-22",
+        "description": "",
+        "price": 6.99,
+        "category": "Pokemon And Hockey, Basketball Cards",
+        "imageUrl": null
+      },
+      {
+        "name": "Hockey SP 2022-23",
+        "description": "",
+        "price": 8.49,
+        "category": "Pokemon And Hockey, Basketball Cards",
+        "imageUrl": null
+      },
+      {
+        "name": "Hockey SP 2023-24",
+        "description": "",
+        "price": 8.49,
+        "category": "Pokemon And Hockey, Basketball Cards",
+        "imageUrl": null
+      },
+      {
+        "name": "Hockey SP 2024-2025",
+        "description": "",
+        "price": 8.49,
+        "category": "Pokemon And Hockey, Basketball Cards",
+        "imageUrl": null
+      },
+      {
+        "name": "Saporito Vegetable Oil (3 L)",
+        "description": "3 L",
+        "price": 15.99,
+        "category": "Grocery",
+        "imageUrl": null
+      },
+      {
+        "name": "Unico Vegetable Oil (3 L)",
+        "description": "3 L",
+        "price": 16.99,
+        "category": "Grocery",
+        "imageUrl": null
+      },
+      {
+        "name": "Kirkland Honey 750g",
+        "description": "750 g",
+        "price": 14.99,
+        "category": "Grocery",
+        "imageUrl": null
+      },
+      {
+        "name": "Kraft Peanut Butter Smooth 500g",
+        "description": "500 g",
+        "price": 8.99,
+        "category": "Grocery",
+        "imageUrl": null
+      },
+      {
+        "name": "Smuckers Pure Concord Grape Jelly 500ml",
+        "description": "500 ml",
+        "price": 9.99,
+        "category": "Grocery",
+        "imageUrl": null
+      },
+      {
+        "name": "Smuckers' Pure Strawberry Jam 500ml",
+        "description": "500 ml",
+        "price": 9.99,
+        "category": "Grocery",
+        "imageUrl": null
+      },
+      {
+        "name": "Maxwell House Original Roast 150g",
+        "description": "150 g",
+        "price": 9.99,
+        "category": "Tea And Coffee",
+        "imageUrl": null
+      },
+      {
+        "name": "Tetley Tea, Orange Pekoe (227 g, 72 ct)",
+        "description": "227 g, 72 ct",
+        "price": 9.99,
+        "category": "Tea And Coffee",
+        "imageUrl": null
+      },
+      {
+        "name": "China Green Tea",
+        "description": "",
+        "price": 3.99,
+        "category": "Tea And Coffee",
+        "imageUrl": null
+      },
+      {
+        "name": "China Green Tea 100 Teabags",
+        "description": "100 teabags",
+        "price": 9.99,
+        "category": "Tea And Coffee",
+        "imageUrl": null
+      },
+      {
+        "name": "Jasmine Tea 100 Teabags",
+        "description": "100 teabags",
+        "price": 9.99,
+        "category": "Tea And Coffee",
+        "imageUrl": null
+      },
+      {
+        "name": "MiO Cherry Blackberry Liquid Water Enhancer (48 ml)",
+        "description": "48 ml",
+        "price": 6.99,
+        "category": "Tea And Coffee",
+        "imageUrl": null
+      },
+      {
+        "name": "Nestle Kit Kat Frozen Dessert Bar (80 g)",
+        "description": "80 g",
+        "price": 5.99,
+        "category": "Ice Cream",
+        "imageUrl": null
+      },
+      {
+        "name": "Magnum Double Raspberry 3x90ml",
+        "description": "3 x 90 ml",
+        "price": 12.99,
+        "category": "Ice Cream",
+        "imageUrl": null
+      },
+      {
+        "name": "Magnum Classic Milk Chocolate Ice Cream Bars, Vanilla Bean (300 ml)",
+        "description": "300 ml",
+        "price": 12.99,
+        "category": "Ice Cream",
+        "imageUrl": null
+      },
+      {
+        "name": "Magnum Chocolate Duet Iced Bars (255 ml, 3 ct)",
+        "description": "255 ml, 3 ct",
+        "price": 12.99,
+        "category": "Ice Cream",
+        "imageUrl": null
+      },
+      {
+        "name": "Magnum Ice Cream Bars, Strawberries-Cream (3 x 100 ml)",
+        "description": "3 x 100 ml",
+        "price": 12.99,
+        "category": "Ice Cream",
+        "imageUrl": null
+      },
+      {
+        "name": "Haagen Dazs Caramel Almond Crunch 3x88ml",
+        "description": "3 x 88 ml",
+        "price": 12.99,
+        "category": "Ice Cream",
+        "imageUrl": null
+      }
+    ]
+  },
+  {
+    "storeName": "Razi Pharmacy",
+    "type": "retail",
+    "category": "Pharmacy",
+    "sourceUrl": "https://www.ubereats.com/ca/store/razi-pharmacy/KfaDgFJgWdiDzcwpwtxkQA",
+    "heroImage": "/stores/razi-pharmacy/banner.jpg",
+    "items": [],
+    "_note": "Screenshot showed only the store banner and footer — no menu items rendered. Need a menu/product list for this store."
+  },
+  {
+    "storeName": "Ambrosia Thornhills",
+    "type": "retail",
+    "category": "Grocery",
+    "sourceUrl": "https://www.ubereats.com/store/ambrosia-thornhills/fj5orzBrX_2vSmPJTNv0Fw",
+    "heroImage": "/stores/ambrosia-thornhills/banner.jpg",
+    "items": [
+      {
+        "name": "Produce - Organic Bananas - ~2.50 lbs",
+        "description": "~2.50 lbs",
+        "price": 3.72,
+        "category": "Featured Items",
+        "imageUrl": null
+      },
+      {
+        "name": "Produce - Organic Sweet Potatoes - ~1.00 lbs",
+        "description": "~1.00 lbs",
+        "price": 3.99,
+        "category": "Featured Items",
+        "imageUrl": null
+      },
+      {
+        "name": "Bluapple - Bluapple - 2 Apples",
+        "description": "",
+        "price": 12.29,
+        "category": "Featured Items",
+        "imageUrl": null
+      },
+      {
+        "name": "Produce - Organic Cilantro - ea",
+        "description": "each",
+        "price": 2.99,
+        "category": "Featured Items",
+        "imageUrl": null
+      },
+      {
+        "name": "Ambrosia - Organic Dandelion Leaf - 28g",
+        "description": "28 g",
+        "price": 3.49,
+        "category": "Featured Items",
+        "imageUrl": null
+      },
+      {
+        "name": "Organic Berries Blueberries (170 g)",
+        "description": "170 g",
+        "price": 6.79,
+        "category": "Featured Items",
+        "imageUrl": null
+      },
+      {
+        "name": "Produce - Organic Mini Cucumber - 6pk",
+        "description": "6 pk",
+        "price": 4.69,
+        "category": "Best Sellers",
+        "imageUrl": null
+      },
+      {
+        "name": "Produce - Organic Green Zucchini - ~0.50 lbs",
+        "description": "~0.50 lbs",
+        "price": 1.5,
+        "category": "Best Sellers",
+        "imageUrl": null
+      },
+      {
+        "name": "Produce - Organic English Cucumber - ea",
+        "description": "each",
+        "price": 2.99,
+        "category": "Best Sellers",
+        "imageUrl": null
+      },
+      {
+        "name": "Mighty Protein - Original Chicken Stick - 32g",
+        "description": "32 g",
+        "price": 2.69,
+        "category": "Snacks",
+        "imageUrl": null
+      },
+      {
+        "name": "Bulk - Dry Roasted Cashews Unsalted - ~1.00 lbs",
+        "description": "~1.00 lbs",
+        "price": 7.77,
+        "category": "Snacks",
+        "imageUrl": null
+      },
+      {
+        "name": "Beretta Mild Beef Sticks (100 g)",
+        "description": "100 g",
+        "price": 5.39,
+        "category": "Snacks",
+        "imageUrl": null
+      },
+      {
+        "name": "Que Pasa Foods Organic Tortilla Chips (350 g)",
+        "description": "350 g",
+        "price": 4.44,
+        "category": "Snacks",
+        "imageUrl": null
+      },
+      {
+        "name": "Ambrosia - Organic Raw Pumpkin Seeds - 454g",
+        "description": "454 g",
+        "price": 7.49,
+        "category": "Snacks",
+        "imageUrl": null
+      },
+      {
+        "name": "17 Cooks Tzatziki Dip (227 g)",
+        "description": "227 g",
+        "price": 6.49,
+        "category": "Snacks",
+        "imageUrl": null
+      },
+      {
+        "name": "Feast - Souk Salad - 385g",
+        "description": "385 g",
+        "price": 9.99,
+        "category": "Salads",
+        "imageUrl": null
+      },
+      {
+        "name": "Feast - Vegan Ontario Harvest Salad - 350g",
+        "description": "350 g",
+        "price": 9.79,
+        "category": "Salads",
+        "imageUrl": null
+      },
+      {
+        "name": "Feast - Greek Salad - 1 salad",
+        "description": "",
+        "price": 10.49,
+        "category": "Salads",
+        "imageUrl": null
+      },
+      {
+        "name": "Feast - Green Goddess Salad - 1 salad",
+        "description": "",
+        "price": 9.99,
+        "category": "Salads",
+        "imageUrl": null
+      },
+      {
+        "name": "17 Cooks - Spicy Mexican 7 Layer Dip - 272g",
+        "description": "272 g",
+        "price": 7.39,
+        "category": "Salads",
+        "imageUrl": null
+      },
+      {
+        "name": "Kimchi Quinoa (300 g)",
+        "description": "300 g",
+        "price": 11.99,
+        "category": "Salads",
+        "imageUrl": null
+      },
+      {
+        "name": "Nutri Spring Farms Certified Organic Eggs, L (700 g, 12 ct)",
+        "description": "700 g, 12 ct",
+        "price": 11.69,
+        "category": "Eggs",
+        "imageUrl": null
+      },
+      {
+        "name": "Rowe Farms Greenvalley Free Run Brown Eggs, Large",
+        "description": "",
+        "price": 7.29,
+        "category": "Eggs",
+        "imageUrl": null
+      },
+      {
+        "name": "Vanderpol Organic Egg Whites (500 g)",
+        "description": "500 g",
+        "price": 7.89,
+        "category": "Eggs",
+        "imageUrl": null
+      },
+      {
+        "name": "Nutri Spring Farms Pastured Brown Eggs, L (672 g, 12 ct)",
+        "description": "672 g, 12 ct",
+        "price": 9.29,
+        "category": "Eggs",
+        "imageUrl": null
+      },
+      {
+        "name": "Nutri Spring Farms Pastured Brown Eggs (30 ct)",
+        "description": "30 ct",
+        "price": 22.89,
+        "category": "Eggs",
+        "imageUrl": null
+      },
+      {
+        "name": "Homestead Farm Free Run Duck Eggs (2 kg)",
+        "description": "2 kg",
+        "price": 4.89,
+        "category": "Eggs",
+        "imageUrl": null
+      }
+    ]
+  },
+  {
+    "storeName": "Ashario Pets North York",
+    "type": "retail",
+    "category": "Pets",
+    "sourceUrl": "https://www.ubereats.com/store/ashario-pets-north-york/-RCxQI2wV6GBJegDY-9XCw",
+    "heroImage": "/stores/ashario-pets/banner.jpg",
+    "items": [
+      {
+        "name": "Raw Performance Pure Beef Raw Dog Food (907 g)",
+        "description": "907 g",
+        "price": 11.1,
+        "category": "Featured",
+        "imageUrl": null
+      },
+      {
+        "name": "Farmina N&D Quinoa Skin & Coat Dog Dental Treats",
+        "description": "",
+        "price": 8.09,
+        "category": "Featured",
+        "imageUrl": null
+      },
+      {
+        "name": "Caru - Wild Boar Bites Dog Treats - 3.75 Oz",
+        "description": "3.75 oz",
+        "price": 9.09,
+        "category": "Featured",
+        "imageUrl": null
+      },
+      {
+        "name": "The New Zealand Natural Pet Food Co. Chicken & Salmon",
+        "description": "",
+        "price": 10.17,
+        "category": "Featured",
+        "imageUrl": null
+      },
+      {
+        "name": "Open Farm Dehydrated Dog Treats, Turkey (127 g)",
+        "description": "127 g",
+        "price": 12.35,
+        "category": "Featured",
+        "imageUrl": null
+      },
+      {
+        "name": "Raw Performance - Pure Duck Raw Dog Food - 4 lb",
+        "description": "4 lb",
+        "price": 23.85,
+        "category": "Featured",
+        "imageUrl": null
+      },
+      {
+        "name": "ACANA Adult Chicken Dry Dog Food - 24 lbs",
+        "description": "24 lbs",
+        "price": 119.81,
+        "category": "Dog Food",
+        "imageUrl": null
+      },
+      {
+        "name": "Big Country Raw - Turkey Dinner Carton Raw Dog Food - 4 lb",
+        "description": "4 lb",
+        "price": 27.16,
+        "category": "Dog Food",
+        "imageUrl": null
+      },
+      {
+        "name": "Royal Canin Yorkshire Terrier Adult Dog Food, Chicken (85 g)",
+        "description": "85 g",
+        "price": 3.81,
+        "category": "Dog Food",
+        "imageUrl": null
+      },
+      {
+        "name": "ZIWI Peak Beef Air Dried Dog Food, Beef (454 g)",
+        "description": "454 g",
+        "price": 54.92,
+        "category": "Dog Food",
+        "imageUrl": null
+      },
+      {
+        "name": "The Honest Kitchen Grain Free Dehydrated Dog Food, Fruit & Veggie - 3 lbs",
+        "description": "3 lbs",
+        "price": 53.68,
+        "category": "Dog Food",
+        "imageUrl": null
+      },
+      {
+        "name": "Stella & Chewy's Freeze-Dried Raw Chicken Dinner Patties (156 g)",
+        "description": "156 g",
+        "price": 26.48,
+        "category": "Dog Food",
+        "imageUrl": null
+      },
+      {
+        "name": "Benko Mini Beef Bite Knuckle Dog Treat",
+        "description": "",
+        "price": 6.08,
+        "category": "Dog Treats",
+        "imageUrl": null
+      },
+      {
+        "name": "Caru - Alligator Bites for Dogs - 3.75 Oz",
+        "description": "3.75 oz",
+        "price": 11.04,
+        "category": "Dog Treats",
+        "imageUrl": null
+      },
+      {
+        "name": "Crumps' Naturals Mini Trainers Dog Treats, Lamb (132 g)",
+        "description": "132 g",
+        "price": 10.47,
+        "category": "Dog Treats",
+        "imageUrl": null
+      },
+      {
+        "name": "Crumps' Naturals Dog Treats, Chicken (100 g)",
+        "description": "100 g",
+        "price": 19.11,
+        "category": "Dog Treats",
+        "imageUrl": null
+      },
+      {
+        "name": "NZPF Woof Venison Lung Air Dried Dog Treats (50 g)",
+        "description": "50 g",
+        "price": 14.8,
+        "category": "Dog Treats",
+        "imageUrl": null
+      },
+      {
+        "name": "Redbarn Collagen Sticks Dog Treat (17 g)",
+        "description": "17 g",
+        "price": 3.92,
+        "category": "Dog Treats",
+        "imageUrl": null
+      },
+      {
+        "name": "Ashario Pets - Dispenser Dog Toy - Teeth Cleaning Ring - Large",
+        "description": "",
+        "price": 18.5,
+        "category": "Dog Supplies",
+        "imageUrl": null
+      },
+      {
+        "name": "Ashario Pets - \"BreezyVest\" Summer Lightweight Reflective Vest",
+        "description": "",
+        "price": 22.05,
+        "category": "Dog Supplies",
+        "imageUrl": null
+      },
+      {
+        "name": "Bergamo - Gipsy Eco Metal Door Carrier For Large Pets - Green",
+        "description": "",
+        "price": 57.33,
+        "category": "Dog Supplies",
+        "imageUrl": null
+      },
+      {
+        "name": "Conairpro - Replacement Grinding Bands And Drum",
+        "description": "",
+        "price": 9.85,
+        "category": "Dog Supplies",
+        "imageUrl": null
+      },
+      {
+        "name": "Advantage II - Flea & Tick Medicine - Large Dog",
+        "description": "",
+        "price": 59.14,
+        "category": "Dog Supplies",
+        "imageUrl": null
+      },
+      {
+        "name": "Aikiou - Hexa Blue Slow Feeder",
+        "description": "",
+        "price": 24.05,
+        "category": "Dog Supplies",
+        "imageUrl": null
+      }
+    ]
+  },
+  {
+    "storeName": "Comfort Air HVAC",
+    "type": "service",
+    "category": "Home Services",
+    "heroImage": "/stores/hvac.jpg",
+    "items": [
+      {
+        "name": "Furnace Tune-Up & 21-Point Inspection",
+        "description": "Seasonal safety + efficiency check",
+        "price": 99,
+        "category": "Heating",
+        "imageUrl": null
+      },
+      {
+        "name": "Furnace Installation (High-Efficiency)",
+        "description": "Supply + install, includes haul-away",
+        "price": 3800,
+        "category": "Heating",
+        "imageUrl": null
+      },
+      {
+        "name": "Central A/C Installation",
+        "description": "Condenser + coil, professionally installed",
+        "price": 3200,
+        "category": "Cooling",
+        "imageUrl": null
+      },
+      {
+        "name": "A/C Repair & Diagnostic Visit",
+        "description": "Full diagnostic, applied to repair",
+        "price": 129,
+        "category": "Cooling",
+        "imageUrl": null
+      },
+      {
+        "name": "Ductless Mini-Split Install (Single Zone)",
+        "description": "Heat + cool one room",
+        "price": 2900,
+        "category": "Cooling",
+        "imageUrl": null
+      },
+      {
+        "name": "Whole-Home Duct Cleaning",
+        "description": "All supply + return vents",
+        "price": 349,
+        "category": "Air Quality",
+        "imageUrl": null
+      },
+      {
+        "name": "Smart Thermostat Installation",
+        "description": "Supply + setup",
+        "price": 189,
+        "category": "Air Quality",
+        "imageUrl": null
+      },
+      {
+        "name": "Annual Maintenance Plan",
+        "description": "2 seasonal visits + priority service",
+        "price": 199,
+        "category": "Plans",
+        "imageUrl": null
+      }
+    ]
+  },
+  {
+    "storeName": "Reliable Flow Plumbing",
+    "type": "service",
+    "category": "Home Services",
+    "heroImage": "/stores/plumbing.jpg",
+    "items": [
+      {
+        "name": "Drain Cleaning & Snaking",
+        "description": "Clears most clogged drains",
+        "price": 149,
+        "category": "Drains",
+        "imageUrl": null
+      },
+      {
+        "name": "Leak Detection & Repair",
+        "description": "Locate + fix hidden leaks",
+        "price": 199,
+        "category": "Repairs",
+        "imageUrl": null
+      },
+      {
+        "name": "Faucet Installation",
+        "description": "Kitchen or bathroom, parts extra",
+        "price": 129,
+        "category": "Fixtures",
+        "imageUrl": null
+      },
+      {
+        "name": "Toilet Repair or Replacement",
+        "description": "Labour; fixture extra",
+        "price": 189,
+        "category": "Fixtures",
+        "imageUrl": null
+      },
+      {
+        "name": "Water Heater Installation (Tank)",
+        "description": "40-50 gal, supply + install",
+        "price": 1650,
+        "category": "Water Heaters",
+        "imageUrl": null
+      },
+      {
+        "name": "Tankless Water Heater Install",
+        "description": "On-demand hot water",
+        "price": 3400,
+        "category": "Water Heaters",
+        "imageUrl": null
+      },
+      {
+        "name": "Sump Pump Installation",
+        "description": "Basement flood protection",
+        "price": 650,
+        "category": "Repairs",
+        "imageUrl": null
+      },
+      {
+        "name": "Emergency Service Call",
+        "description": "Same-day priority dispatch",
+        "price": 99,
+        "category": "Plans",
+        "imageUrl": null
+      }
+    ]
+  },
+  {
+    "storeName": "GreenScape Landscaping",
+    "type": "service",
+    "category": "Home Services",
+    "heroImage": "/stores/landscaping.jpg",
+    "items": [
+      {
+        "name": "Lawn Mowing & Edging (per visit)",
+        "description": "Mow, trim, blow",
+        "price": 55,
+        "category": "Lawn Care",
+        "imageUrl": null
+      },
+      {
+        "name": "Spring / Fall Yard Cleanup",
+        "description": "Leaves, debris, beds",
+        "price": 220,
+        "category": "Lawn Care",
+        "imageUrl": null
+      },
+      {
+        "name": "Sod Installation (per 100 sq ft)",
+        "description": "Soil prep + fresh sod",
+        "price": 180,
+        "category": "Planting",
+        "imageUrl": null
+      },
+      {
+        "name": "Tree & Shrub Planting (per tree)",
+        "description": "Supply + planting",
+        "price": 120,
+        "category": "Planting",
+        "imageUrl": null
+      },
+      {
+        "name": "Garden Bed Mulching",
+        "description": "Premium mulch, per bed",
+        "price": 160,
+        "category": "Planting",
+        "imageUrl": null
+      },
+      {
+        "name": "Interlock Paver Walkway (per sq ft)",
+        "description": "Design + install",
+        "price": 28,
+        "category": "Hardscape",
+        "imageUrl": null
+      },
+      {
+        "name": "Retaining Wall Build (per linear ft)",
+        "description": "Natural stone or block",
+        "price": 95,
+        "category": "Hardscape",
+        "imageUrl": null
+      },
+      {
+        "name": "Seasonal Maintenance Package",
+        "description": "Full-season lawn + garden care",
+        "price": 499,
+        "category": "Plans",
+        "imageUrl": null
+      }
+    ]
+  },
+  {
+    "storeName": "Summit Home Renovations",
+    "type": "service",
+    "category": "Home Services",
+    "heroImage": "/stores/renovation.jpg",
+    "items": [
+      {
+        "name": "Free In-Home Design Consultation",
+        "description": "Scope, ideas, quote",
+        "price": 0,
+        "category": "Consultation",
+        "imageUrl": null
+      },
+      {
+        "name": "Full Kitchen Renovation",
+        "description": "Cabinets, counters, fixtures",
+        "price": 24000,
+        "category": "Kitchen",
+        "imageUrl": null
+      },
+      {
+        "name": "Bathroom Remodel",
+        "description": "Tile, vanity, plumbing",
+        "price": 12500,
+        "category": "Bathroom",
+        "imageUrl": null
+      },
+      {
+        "name": "Basement Finishing",
+        "description": "Framing to finishes",
+        "price": 32000,
+        "category": "Whole Home",
+        "imageUrl": null
+      },
+      {
+        "name": "Custom Cabinetry (per linear ft)",
+        "description": "Built + installed",
+        "price": 320,
+        "category": "Kitchen",
+        "imageUrl": null
+      },
+      {
+        "name": "Quartz Countertop Installation",
+        "description": "Template, supply, install",
+        "price": 3600,
+        "category": "Kitchen",
+        "imageUrl": null
+      },
+      {
+        "name": "Hardwood / Laminate Flooring (per sq ft)",
+        "description": "Supply + install",
+        "price": 9,
+        "category": "Whole Home",
+        "imageUrl": null
+      },
+      {
+        "name": "Interior Painting (per room)",
+        "description": "Walls, ceiling, trim",
+        "price": 450,
+        "category": "Whole Home",
+        "imageUrl": null
+      }
+    ]
+  }
+]

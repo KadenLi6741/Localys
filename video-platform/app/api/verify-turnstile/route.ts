@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { checkRateLimit, getClientIp, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit';
 
 interface TurnstileVerifyResponse {
 	success: boolean;
@@ -8,6 +9,11 @@ interface TurnstileVerifyResponse {
 }
 
 export async function POST(request: NextRequest) {
+	// Rate limiting
+	const ip = getClientIp(request);
+	const rl = checkRateLimit(`verifyTurnstile:${ip}`, RATE_LIMITS.verifyTurnstile);
+	if (!rl.allowed) return rateLimitResponse(rl.retryAfterMs);
+
 	try {
 		const isProduction = process.env.NODE_ENV === 'production';
 		const turnstileEnabledInDev = process.env.TURNSTILE_ENABLED_IN_DEV === 'true';

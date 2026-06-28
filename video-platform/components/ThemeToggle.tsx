@@ -13,7 +13,7 @@ export function ThemeToggle() {
       aria-label="Toggle light and dark theme"
       title={`Switch to ${resolvedTheme === 'dark' ? 'light' : 'dark'} theme`}
     >
-      {resolvedTheme === 'dark' ? '🌙' : '☀️'}
+      {resolvedTheme === 'dark' ? '' : ''}
       <span>{resolvedTheme === 'dark' ? 'Dark' : 'Light'}</span>
     </button>
   );

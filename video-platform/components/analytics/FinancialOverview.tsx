@@ -52,7 +52,7 @@ export function FinancialOverview({ userId }: FinancialOverviewProps) {
         onClick={() => setIsExpanded(!isExpanded)}
         className="w-full flex items-center justify-between bg-[#242420] border border-[#3A3A34] rounded-2xl px-5 py-4 transition-colors duration-200 hover:bg-[#2E2E28]"
       >
-        <span className="text-[18px] font-semibold text-[#F5F0E8]">📊 Financial Overview</span>
+        <span className="text-[18px] font-semibold text-[#F5F0E8]">Financial Overview</span>
         <svg
           className={`w-5 h-5 text-[#F5A623] transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}
           fill="none"

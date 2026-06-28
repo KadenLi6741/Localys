@@ -1,7 +1,10 @@
 import { createHmac, timingSafeEqual } from 'crypto';
 
-const getSecret = () =>
-  process.env.ORDER_VERIFICATION_SECRET || 'dev-secret-change-in-production';
+const getSecret = () => {
+  const secret = process.env.ORDER_VERIFICATION_SECRET;
+  if (!secret) throw new Error('ORDER_VERIFICATION_SECRET environment variable is not set');
+  return secret;
+};
 
 export function generateToken(orderId: string): string {
   return createHmac('sha256', getSecret()).update(orderId).digest('hex');

@@ -22,7 +22,7 @@ function ConversionTooltip({ active, payload, label }: { active?: boolean; paylo
       <p className="text-[#F5F0E8] text-sm font-semibold mb-1">{label}</p>
       {payload.map((p, idx) => (
         <p key={idx} className="text-xs" style={{ color: p.name === 'views' ? '#F5A623' : '#6BAF7A' }}>
-          {p.name === 'views' ? '👁️' : '🛒'} {p.name}: {p.value}
+          {p.name === 'views' ? '' : ''} {p.name}: {p.value}
         </p>
       ))}
     </div>
@@ -40,7 +40,7 @@ export function VideoConversionChart({ data }: VideoConversionChartProps) {
 
   return (
     <div>
-      <h4 className="text-sm font-semibold text-[#F5F0E8]/80 mb-3">🎯 Video Performance</h4>
+      <h4 className="text-sm font-semibold text-[#F5F0E8]/80 mb-3">Video Performance</h4>
       <ResponsiveContainer width="100%" height={250}>
         <BarChart data={chartData} margin={{ top: 5, right: 10, left: -10, bottom: 5 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#ffffff08" />

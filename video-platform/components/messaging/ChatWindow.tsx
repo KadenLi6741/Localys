@@ -419,7 +419,7 @@ export default function ChatWindow({ conversationId, onBack }: ChatWindowProps) 
                           )}
                           {isOwn && (
                             <span className={`text-xs ${isOwn ? 'text-black/60' : 'text-white/60'}`}>
-                              {message.is_read ? '✓✓' : '✓'}
+                              {message.is_read ? 'Read' : 'Sent'}
                             </span>
                           )}
                         </div>
@@ -443,7 +443,7 @@ export default function ChatWindow({ conversationId, onBack }: ChatWindowProps) 
                               }}
                               className="w-full text-left px-4 py-2 text-sm text-white hover:bg-white/20 flex items-center gap-2 hover:text-blue-400 transition-colors"
                             >
-                              ✏️ Edit
+                              Edit
                             </button>
                             <button
                               onClick={() => {
@@ -452,7 +452,7 @@ export default function ChatWindow({ conversationId, onBack }: ChatWindowProps) 
                               }}
                               className="w-full text-left px-4 py-2 text-sm text-white hover:bg-white/20 flex items-center gap-2 hover:text-red-400 transition-colors border-t border-white/10"
                             >
-                              🗑️ Delete
+                              Delete
                             </button>
                           </div>
                         )}

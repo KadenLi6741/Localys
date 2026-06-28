@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { OrderQRCode } from '@/components/QRCode';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface OrderInfo {
   orderId: string;
@@ -27,6 +28,7 @@ export default function PurchaseSuccessPage() {
 }
 
 function PurchaseSuccessContent() {
+  const { session } = useAuth();
   const searchParams = useSearchParams();
   const sessionId = searchParams.get('session_id');
   const [confirmationNumber, setConfirmationNumber] = useState('');
@@ -43,9 +45,17 @@ function PurchaseSuccessContent() {
       try {
         const response = await fetch('/api/verify-item-purchase', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            ...(session?.access_token ? { 'Authorization': `Bearer ${session.access_token}` } : {}),
+          },
           body: JSON.stringify({ sessionId }),
         });
+
+        if (!response.ok) {
+          console.error('Verify item purchase failed:', response.status);
+          return;
+        }
 
         const data = await response.json();
         if (data.confirmationNumber) {
@@ -62,7 +72,7 @@ function PurchaseSuccessContent() {
     };
 
     verifyPurchase();
-  }, [sessionId]);
+  }, [sessionId, session?.access_token]);
 
   return (
     <div className="min-h-screen bg-transparent text-white pb-20">
@@ -117,7 +127,13 @@ function PurchaseSuccessContent() {
                 ))}
               </div>
             </div>
-          ) : null}
+          ) : (
+            <div className="bg-white/5 border border-white/10 rounded-lg p-6 mb-6">
+              <p className="text-white/60 text-sm">
+                Your order is confirmed. Check Order History in your profile for QR codes.
+              </p>
+            </div>
+          )}
 
           {sessionId && (
             <div className="bg-[#1A1A18]/40 rounded-lg p-4 mb-6 text-left">

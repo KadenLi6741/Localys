@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
 import { updatePassword } from '@/lib/supabase/auth';
+import { Logo } from '@/components/Logo';
 
 export default function ResetPasswordPage() {
   const router = useRouter();
@@ -15,8 +16,17 @@ export default function ResetPasswordPage() {
   const [success, setSuccess] = useState(false);
 
   useEffect(() => {
+    // PKCE recovery links arrive as ?code=… — exchange it for a recovery session.
+    const code = new URLSearchParams(window.location.search).get('code');
+    if (code) {
+      supabase.auth.exchangeCodeForSession(code).then(({ error }) => {
+        if (!error) setReady(true);
+      });
+    }
+
+    // Fallback: implicit/hash recovery links fire PASSWORD_RECOVERY.
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (event === 'PASSWORD_RECOVERY') {
+      if (event === 'PASSWORD_RECOVERY' || event === 'SIGNED_IN') {
         setReady(true);
       }
     });
@@ -59,7 +69,7 @@ export default function ResetPasswordPage() {
     <div className="min-h-screen bg-transparent text-white flex items-center justify-center px-4">
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
-          <h1 className="text-4xl font-bold mb-2">Localy</h1>
+          <Logo href={null} className="mb-2 justify-center text-white" iconClassName="h-8 w-8" textClassName="text-4xl" />
           <p className="text-white/60">Set your new password</p>
         </div>
 

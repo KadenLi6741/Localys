@@ -58,7 +58,7 @@ async function ensureOwnProfile({ id, email, name, username }: EnsureProfileInpu
  * Sign up a new user
  * Creates auth user and profile in public.profiles table
  */
-export async function signUp({ email, password, name, username, accountType, businessType }: SignUpData) {
+export async function signUp({ email, password, name, username, accountType, businessType, captchaToken }: SignUpData) {
   try {
     if (accountType === 'business' && !businessType) {
       throw new Error('Business type is required for business accounts');
@@ -89,6 +89,7 @@ export async function signUp({ email, password, name, username, accountType, bus
       password,
       options: {
         emailRedirectTo,
+        captchaToken,
         data: {
           full_name: name,
           username,
@@ -141,7 +142,7 @@ export async function signUp({ email, password, name, username, accountType, bus
 /**
  * Sign in existing user
  */
-export async function signIn({ identifier, password }: SignInData) {
+export async function signIn({ identifier, password, captchaToken }: SignInData) {
   const normalizedIdentifier = identifier.trim();
   if (!normalizedIdentifier) {
     return { data: null, error: new Error('Email is required') };
@@ -152,6 +153,7 @@ export async function signIn({ identifier, password }: SignInData) {
   const { data, error } = await supabase.auth.signInWithPassword({
     email: resolvedEmail,
     password,
+    options: captchaToken ? { captchaToken } : undefined,
   });
 
   if (!error && data.user) {
@@ -169,6 +171,42 @@ export async function signIn({ identifier, password }: SignInData) {
   }
 
   return { data, error };
+}
+
+/**
+ * Sign in with Google (OAuth). Uses the existing browser client so the PKCE
+ * code_verifier is stored in localStorage and the /auth/callback page can finish
+ * the exchange with this same client.
+ */
+export async function signInWithGoogle(next?: string) {
+  const origin = typeof window !== 'undefined' ? window.location.origin : '';
+  const redirectTo = `${origin}/auth/callback${next ? `?next=${encodeURIComponent(next)}` : ''}`;
+  return supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo,
+      queryParams: { prompt: 'select_account' },
+    },
+  });
+}
+
+/**
+ * Ensure a profiles row exists for the currently authenticated user.
+ * Reuses ensureOwnProfile; account_type falls back to the DB default ('customer').
+ * Used by the OAuth callback for first-time Google sign-ins.
+ */
+export async function ensureProfileForCurrentUser() {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    return { error: new Error('No authenticated user') };
+  }
+  const metadata = (user.user_metadata ?? {}) as Record<string, unknown>;
+  return ensureOwnProfile({
+    id: user.id,
+    email: user.email ?? null,
+    name: (metadata.full_name as string | undefined) ?? (metadata.name as string | undefined) ?? null,
+    username: (metadata.username as string | undefined) ?? null,
+  });
 }
 
 /**
@@ -198,9 +236,9 @@ export async function getCurrentUser() {
 /**
  * Send password reset email
  */
-export async function resetPasswordForEmail(email: string) {
+export async function resetPasswordForEmail(email: string, captchaToken?: string) {
   const redirectTo = `${window.location.origin}/reset-password`;
-  const { data, error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo });
+  const { data, error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo, captchaToken });
   return { data, error };
 }
 

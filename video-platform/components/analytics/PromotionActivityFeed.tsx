@@ -39,7 +39,7 @@ export function PromotionActivityFeed({ history }: PromotionActivityFeedProps) {
 
   return (
     <div>
-      <h4 className="text-sm font-semibold text-white/80 mb-3">🚀 Recent Promotions</h4>
+      <h4 className="text-sm font-semibold text-white/80 mb-3">Recent Promotions</h4>
       <div className="space-y-0">
         {displayed.map((entry) => (
           <div
@@ -47,7 +47,7 @@ export function PromotionActivityFeed({ history }: PromotionActivityFeedProps) {
             className="flex gap-3 items-start py-3 border-b border-white/5 last:border-b-0"
           >
             <div className="w-8 h-8 bg-yellow-500/20 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-              <span className="text-sm">🚀</span>
+              <span className="text-sm"></span>
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm text-white">

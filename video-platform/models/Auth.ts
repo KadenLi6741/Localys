@@ -5,9 +5,11 @@ export interface SignUpData {
   username: string;
   accountType: 'business' | 'user';
   businessType?: 'food' | 'retail' | 'service';
+  captchaToken?: string;
 }
 
 export interface SignInData {
   identifier: string;
   password: string;
+  captchaToken?: string;
 }

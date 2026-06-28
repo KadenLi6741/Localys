@@ -2,16 +2,18 @@
 
 import { usePathname } from "next/navigation";
 import { ActivityPanel } from "@/components/ActivityPanel";
-import { AppBottomNav } from "@/components/AppBottomNav";
-import { CursorOrb } from "@/components/CursorOrb";
-import { DesktopSidebar } from "@/components/DesktopSidebar";
 import { PersistentVideoFeed } from "@/components/PersistentVideoFeed";
+import { TopHeader } from "@/components/shell/TopHeader";
+import { SecondaryNav } from "@/components/shell/SecondaryNav";
 
 export function AppChrome({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isMarketingHome = pathname === "/";
+  // Auth screens render bare (no app chrome).
+  const isAuthRoute =
+    pathname === "/login" || pathname === "/signup" || pathname === "/reset-password";
 
-  if (isMarketingHome) {
+  if (isMarketingHome || isAuthRoute) {
     return (
       <main id="main-content" className="min-h-screen">
         {children}
@@ -19,24 +21,18 @@ export function AppChrome({ children }: { children: React.ReactNode }) {
     );
   }
 
+  // Global Walmart-style shell: top header + secondary nav, white/orange/Inter,
+  // light + dark. Replaces the old left sidebar + mobile bottom nav app-wide.
   return (
-    <>
+    <div className="font-[family-name:var(--font-inter)]">
       <a href="#main-content" className="skip-to-main">
         Skip to main content
       </a>
-      <div className="premium-blob premium-blob--amber" aria-hidden="true" />
-      <div className="premium-blob premium-blob--sage" aria-hidden="true" />
-      <div className="premium-blob premium-blob--warm" aria-hidden="true" />
-      <CursorOrb />
       <PersistentVideoFeed />
-      <div className="app-layout">
-        <DesktopSidebar />
-        <main id="main-content" className="responsive-container">
-          {children}
-        </main>
-      </div>
-      <AppBottomNav />
+      <TopHeader />
+      <SecondaryNav />
+      <main id="main-content">{children}</main>
       <ActivityPanel />
-    </>
+    </div>
   );
 }

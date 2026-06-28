@@ -28,6 +28,9 @@ export interface Business {
   business_type?: string;
   business_hours?: BusinessHours;
   custom_messages?: string[];
+  phone?: string;
+  address?: string;
+  misc_info?: string;
 }
 
 export interface ProfileUpdateData {
@@ -42,4 +45,7 @@ export interface BusinessUpdateData {
   business_type?: string;
   custom_messages?: string[];
   business_hours?: BusinessHours;
+  phone?: string;
+  address?: string;
+  misc_info?: string;
 }

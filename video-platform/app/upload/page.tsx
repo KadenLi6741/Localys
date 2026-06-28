@@ -286,7 +286,7 @@ function UploadContent() {
                   </svg>
                 </div>
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-2xl">🚀</span>
+                  <span className="text-2xl"></span>
                 </div>
               </div>
             </div>
@@ -300,17 +300,17 @@ function UploadContent() {
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
                   <span className="text-[#9E9A90]">Boost Applied</span>
-                  <span className="font-semibold text-[#6BAF7A]">✓ Confirmed</span>
+                  <span className="font-semibold text-[#6BAF7A]">Confirmed</span>
                 </div>
                 <div className="h-px bg-[#3A3A34]"></div>
                 <div className="flex justify-between items-center">
                   <span className="text-[#9E9A90]">Coins Spent</span>
-                  <span className="text-2xl font-bold text-[#F5A623]">🪙 {boostCoinsSpent}</span>
+                  <span className="text-2xl font-bold text-[#F5A623]">{boostCoinsSpent}</span>
                 </div>
                 <div className="h-px bg-[#3A3A34]"></div>
                 <div className="flex justify-between items-center">
                   <span className="text-[#9E9A90]">Remaining Coins</span>
-                  <span className="text-2xl font-bold text-[#F5A623]">🪙 {userCoins}</span>
+                  <span className="text-2xl font-bold text-[#F5A623]">{userCoins}</span>
                 </div>
               </div>
             </div>
@@ -335,7 +335,7 @@ function UploadContent() {
                 }}
                 className="px-6 py-3 bg-[#F5A623] hover:bg-[#F5A623]/90 text-black rounded-xl font-semibold transition-all flex items-center gap-2 min-h-[48px] active:scale-[0.98]"
               >
-                <span>👀</span>
+                <span></span>
                 <span>View Feed</span>
               </button>
             </div>
@@ -364,7 +364,7 @@ function UploadContent() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-[#9E9A90] text-sm">Your Coins</p>
-                  <p className="text-3xl font-bold text-[#F5A623]">🪙 {userCoins}</p>
+                  <p className="text-3xl font-bold text-[#F5A623]">{userCoins}</p>
                 </div>
                 <svg className="w-12 h-12 text-[#F5A623]/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 10h-2m0 0h-2m2 0v-2m0 2v2m0-6h4v4m0 0h-2m2 0v-2m0 2v2" />
@@ -385,7 +385,7 @@ function UploadContent() {
                 onClick={() => setShowPromotionModal(true)}
                 className="px-6 py-3 bg-[#F5A623] hover:bg-[#F5A623]/90 text-black rounded-xl font-semibold transition-all flex items-center gap-2 min-h-[48px] active:scale-[0.98] shadow-lg shadow-[#F5A623]/20"
               >
-                <span>🚀</span>
+                <span></span>
                 <span>Boost Video</span>
               </button>
             </div>
@@ -526,7 +526,7 @@ function UploadContent() {
               }}
               className="w-full mt-4 bg-[#F5A623]/20 hover:bg-[#F5A623]/30 border border-[#F5A623]/50 text-[#F5A623] font-semibold py-3 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 min-h-[48px]"
             >
-              <span>🚀</span>
+              <span></span>
               <span>Learn About Boosting</span>
             </button>
           </div>

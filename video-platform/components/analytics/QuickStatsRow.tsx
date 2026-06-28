@@ -11,7 +11,7 @@ export function QuickStatsRow({ stats }: QuickStatsRowProps) {
 
   return (
     <div>
-      <h4 className="text-sm font-semibold text-[#F5F0E8]/80 mb-3">⚡ Quick Stats</h4>
+      <h4 className="text-sm font-semibold text-[#F5F0E8]/80 mb-3">Quick Stats</h4>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <div className="bg-[#1A1A18] rounded-xl p-3">
           <p className="text-[11px] text-[#9E9A90] mb-1">Avg Order Value</p>
