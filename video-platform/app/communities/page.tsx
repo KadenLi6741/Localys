@@ -13,11 +13,11 @@ import { FieldError } from '@/components/forms/FieldError';
 import { validateRequired, validateMaxLength, firstError } from '@/lib/utils/validation';
 
 const COMMUNITY_IMAGES: Record<string, string> = {
-  'richmondhill-eats': '/Communities/Richmond Hill.jpg',
-  'local-services': '/Communities/Local services.jpg',
-  'support-local': '/Communities/SupportLocal.png',
-  'markham': '/Communities/Markham.png',
-  'vaughan': '/Communities/Vaughan.jpg',
+  'richmondhill-eats': '/community-media/richmond-hill.jpg',
+  'local-services': '/community-media/local-services.jpg',
+  'support-local': '/community-media/support-local.png',
+  'markham': '/community-media/markham.png',
+  'vaughan': '/community-media/vaughan.jpg',
 };
 
 function timeAgo(iso: string): string {
@@ -259,7 +259,7 @@ function CommunitiesContent() {
                   <button
                     onClick={(e) => { e.stopPropagation(); vote(t.id, 1); }}
                     aria-label="Upvote"
-                    className={`flex h-8 w-8 items-center justify-center rounded-full transition-colors ${
+                    className={`flex h-8 w-8 items-center justify-center rounded-full p-0 transition-colors ${
                       t.userVote === 1 ? 'text-[#f97316]' : 'text-black dark:text-white hover:text-[#f97316]'
                     }`}
                   >
@@ -271,7 +271,7 @@ function CommunitiesContent() {
                   <button
                     onClick={(e) => { e.stopPropagation(); vote(t.id, -1); }}
                     aria-label="Downvote"
-                    className={`flex h-8 w-8 items-center justify-center rounded-full transition-colors ${
+                    className={`flex h-8 w-8 items-center justify-center rounded-full p-0 transition-colors ${
                       t.userVote === -1 ? 'text-[#f97316]' : 'text-black dark:text-white hover:text-[#f97316]'
                     }`}
                   >

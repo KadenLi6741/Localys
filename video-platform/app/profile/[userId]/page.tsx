@@ -43,7 +43,7 @@ export default function UserProfilePage() {
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-/** Build a StoreMenu from Supabase items for stores without a public/Menu folder. */
+/** Build a StoreMenu from Supabase items for stores without a public/menu folder. */
 function buildFallbackMenu(business: Business, items: any[]): StoreMenu {
   const mapped: StoreItem[] = (items || []).map((it, i) => ({
     id: it.id || `${business.owner_id}-${i}`,

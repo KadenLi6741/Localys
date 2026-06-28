@@ -6,7 +6,7 @@
  * flagged `demoOnly` is injected into the home feed (see lib/supabase/featured.ts)
  * because Supabase has no profile row for it.
  *
- * `manifestKey` keys into data/store-menus.json (built from public/Menu).
+ * `manifestKey` keys into data/store-menus.json (built from public/menu).
  */
 export interface DemoStore {
   /** URL slug → /profile/<slug>. */

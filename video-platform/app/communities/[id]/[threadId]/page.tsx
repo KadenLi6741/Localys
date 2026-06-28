@@ -81,7 +81,7 @@ function ThreadContent() {
             <button
               onClick={() => vote(thread.id, 1)}
               aria-label="Upvote"
-              className={`flex h-8 w-8 items-center justify-center rounded-lg transition-colors ${
+              className={`flex h-8 w-8 items-center justify-center rounded-lg p-0 transition-colors ${
                 thread.userVote === 1
                   ? 'text-[#f97316]'
                   : 'text-black dark:text-white hover:text-[#f97316]'
@@ -103,7 +103,7 @@ function ThreadContent() {
             <button
               onClick={() => vote(thread.id, -1)}
               aria-label="Downvote"
-              className={`flex h-8 w-8 items-center justify-center rounded-lg transition-colors ${
+              className={`flex h-8 w-8 items-center justify-center rounded-lg p-0 transition-colors ${
                 thread.userVote === -1
                   ? 'text-[#f97316]'
                   : 'text-black dark:text-white hover:text-[#f97316]'
@@ -193,7 +193,7 @@ function ThreadContent() {
                     <button
                       onClick={() => voteComment(c.id, 1)}
                       aria-label="Upvote comment"
-                      className={`h-5 w-5 flex items-center justify-center rounded text-xs transition-colors ${
+                      className={`h-5 w-5 flex items-center justify-center rounded p-0 text-xs transition-colors ${
                         c.userVote === 1 ? 'text-[#f97316]' : 'text-black dark:text-white hover:text-[#f97316]'
                       }`}
                     >
@@ -205,7 +205,7 @@ function ThreadContent() {
                     <button
                       onClick={() => voteComment(c.id, -1)}
                       aria-label="Downvote comment"
-                      className={`h-5 w-5 flex items-center justify-center rounded text-xs transition-colors ${
+                      className={`h-5 w-5 flex items-center justify-center rounded p-0 text-xs transition-colors ${
                         c.userVote === -1 ? 'text-[#f97316]' : 'text-black dark:text-white hover:text-[#f97316]'
                       }`}
                     >

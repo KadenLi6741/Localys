@@ -19,7 +19,7 @@ export const ItemCheckoutSchema = z.object({
         // non-UUID id never lets the client dictate a price.
         itemId:          z.string().min(1).max(120),
         itemName:        z.string().min(1).max(200),
-        // Demo-store items carry relative paths ("/Menu/...") not absolute URLs, and
+        // Demo-store items carry relative paths ("/menu/...") not absolute URLs, and
         // the image is display-only (not used to build the Stripe request), so accept
         // any short string rather than requiring a URL.
         itemImage:       z.string().max(500).optional().nullable(),

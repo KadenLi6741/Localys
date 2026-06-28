@@ -362,7 +362,7 @@ function DashboardContent() {
                 </div>
               ) : (
                 <div className="flex items-center gap-3">
-                  <img src="/Menu/Jays%20Burger/Classic%20Burger.jpg" alt="Classic Burger" className="w-14 h-14 rounded-xl object-cover shrink-0" onError={(e) => { (e.target as HTMLImageElement).style.display='none'; }} />
+                  <img src="/menu/jays-burger/classic-burger.jpg" alt="Classic Burger" className="w-14 h-14 rounded-xl object-cover shrink-0" onError={(e) => { (e.target as HTMLImageElement).style.display='none'; }} />
                   <div>
                     <p className="font-semibold text-foreground">Classic Burger</p>
                     <p className="text-xs text-gray-400">47 orders &middot; $11.99 avg</p>

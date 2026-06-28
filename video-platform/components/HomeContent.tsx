@@ -373,7 +373,7 @@ export function HomeContent({ isActive }: HomeContentProps) {
   }, [isActive]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const loadVideos = async () => {
-    // Built-in local videos (public/Videos linked to businesses) shown first, ALWAYS
+    // Built-in local videos (public/videos linked to businesses) shown first, ALWAYS
     // present so every "Featured in Videos" card is watchable in Discover — even if the
     // Supabase feed is empty or errors. Local ids are `local:`-prefixed and excluded
     // from all Supabase id-based lookups below.
