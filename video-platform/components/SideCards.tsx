@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
 import { X, RefreshCw, Tag, Store, Users } from 'lucide-react';
@@ -26,19 +26,65 @@ export function SideCards({ userId }: SideCardsProps) {
   const [showLeft, setShowLeft] = useState(true);
   const [showRight, setShowRight] = useState(true);
   const [lastOrder, setLastOrder] = useState<LastOrder | null>(null);
+  const [isSuggestion, setIsSuggestion] = useState(false);
   const [leftIdx, setLeftIdx] = useState(0);
   const [rightIdx, setRightIdx] = useState(0);
 
-  useEffect(() => {
-    supabase
+  const isValidName = (name?: string | null) =>
+    !!name && name.trim().length > 0 && name.trim().toLowerCase() !== 'unknown order';
+
+  const loadOrderCard = useCallback(async () => {
+    // Prefer the user's most recent real purchase. Skip blank or legacy
+    // "Unknown Order" rows so that string never reaches the card.
+    const { data: purchases } = await supabase
       .from('item_purchases')
       .select('item_name, item_id, seller_id, price')
       .eq('buyer_id', userId)
       .order('purchased_at', { ascending: false })
-      .limit(1)
-      .maybeSingle()
-      .then(({ data }) => { if (data) setLastOrder(data as LastOrder); });
+      .limit(5);
+
+    const recent = (purchases ?? []).find((p) => isValidName(p.item_name));
+    if (recent) {
+      setLastOrder(recent as LastOrder);
+      setIsSuggestion(false);
+      return;
+    }
+
+    // No order history → suggest a random available item instead of "Unknown Order".
+    const { data: items } = await supabase
+      .from('menu_items')
+      .select('id, user_id, item_name, price')
+      .eq('is_available', true)
+      .limit(30);
+
+    const pool = (items ?? []).filter((i) => isValidName(i.item_name));
+    if (pool.length > 0) {
+      const pick = pool[Math.floor(Math.random() * pool.length)];
+      setLastOrder({
+        item_name: pick.item_name,
+        item_id: pick.id,
+        seller_id: pick.user_id,
+        price: pick.price,
+      });
+      setIsSuggestion(true);
+    } else {
+      setLastOrder(null);
+    }
   }, [userId]);
+
+  useEffect(() => {
+    loadOrderCard();
+    // Refresh the card whenever this user places a new order.
+    const ch = supabase
+      .channel(`sidecards-orders-${userId}`)
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'item_purchases', filter: `buyer_id=eq.${userId}` },
+        () => loadOrderCard()
+      )
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, [userId, loadOrderCard]);
 
   useEffect(() => {
     const id = setInterval(() => {
@@ -71,7 +117,9 @@ export function SideCards({ userId }: SideCardsProps) {
 
             {showOrderCard ? (
               <>
-                <p className="text-xs font-bold text-black uppercase tracking-widest mb-3 pr-8">Order Again</p>
+                <p className="text-xs font-bold text-black uppercase tracking-widest mb-3 pr-8">
+                  {isSuggestion ? 'Try This' : 'Order Again'}
+                </p>
                 <p className="text-sm font-semibold text-black mb-0.5 line-clamp-2 leading-snug">
                   {lastOrder!.item_name}
                 </p>
@@ -85,7 +133,7 @@ export function SideCards({ userId }: SideCardsProps) {
                   className="w-full bg-[#f97316] text-white text-sm font-semibold py-2.5 rounded-xl hover:opacity-90 transition-opacity flex items-center justify-center gap-1.5"
                 >
                   <RefreshCw className="h-3.5 w-3.5" />
-                  Re-order
+                  {isSuggestion ? 'Order Now' : 'Re-order'}
                 </button>
               </>
             ) : (

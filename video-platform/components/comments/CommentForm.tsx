@@ -227,10 +227,7 @@ export default function CommentForm({
         {/* Star Rating */}
         {!compact && (
           <div className="mt-3 mb-2">
-            <p className="text-sm font-semibold text-black">Rate this business from 1 to 5 stars</p>
-            <p className="text-xs text-gray-500 mb-1.5">
-              Select the number of stars that matches your experience. 1 star means poor, and 5 stars means excellent.
-            </p>
+            <p className="text-sm font-semibold text-black mb-1.5">Rate this business from 1–5</p>
             <div className="flex items-center gap-2">
               <div className="flex gap-1">
                 {[1, 2, 3, 4, 5].map((star) => (
