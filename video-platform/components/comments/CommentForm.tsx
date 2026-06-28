@@ -226,31 +226,38 @@ export default function CommentForm({
 
         {/* Star Rating */}
         {!compact && (
-          <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mt-3 mb-2">
-            <span className="text-xs text-gray-500">Rate:</span>
-            <div className="flex gap-1">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <button
-                  key={star}
-                  type="button"
-                  onClick={() => setRating(rating === star ? null : star)}
-                  className="shrink-0 focus:outline-none transition-transform hover:scale-110"
-                  disabled={loading}
-                >
-                  <svg
-                    className={`w-5 h-5 ${
-                      rating && rating >= star ? 'fill-[#f97316] text-[#f97316]' : 'text-gray-500'
-                    }`}
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
+          <div className="mt-3 mb-2">
+            <p className="text-sm font-semibold text-black">Rate this business from 1 to 5 stars</p>
+            <p className="text-xs text-gray-500 mb-1.5">
+              Select the number of stars that matches your experience. 1 star means poor, and 5 stars means excellent.
+            </p>
+            <div className="flex items-center gap-2">
+              <div className="flex gap-1">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    type="button"
+                    onClick={() => setRating(rating === star ? null : star)}
+                    className="p-0 shrink-0 focus:outline-none transition-transform hover:scale-110"
+                    disabled={loading}
+                    aria-label={`${star} star${star > 1 ? 's' : ''}`}
+                    aria-pressed={rating === star}
                   >
-                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                  </svg>
-                </button>
-              ))}
+                    <svg
+                      className={`w-6 h-6 ${
+                        rating && rating >= star ? 'fill-[#f97316] text-[#f97316]' : 'fill-none text-gray-400'
+                      }`}
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                    >
+                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                    </svg>
+                  </button>
+                ))}
+              </div>
+              {rating && <span className="text-xs font-medium text-gray-600">{rating}/5</span>}
             </div>
-            {rating && <span className="text-xs text-gray-500">{rating}/5</span>}
           </div>
         )}
 
