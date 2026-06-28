@@ -245,7 +245,7 @@ export function MenuList({ userId, businessId, isOwnProfile, layout = 'grid', on
                         <div className="flex gap-1">
                           <button
                             onClick={(e) => { e.stopPropagation(); handleEditItem(item); }}
-                            className="w-7 h-7 shrink-0 flex items-center justify-center rounded-lg bg-[#f97316] text-white hover:bg-[#ea580c] transition-colors"
+                            className="w-7 h-7 p-0 shrink-0 flex items-center justify-center rounded-lg bg-[#f97316] text-white hover:bg-[#ea580c] transition-colors"
                             aria-label={`Edit ${item.item_name}`}
                           >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" aria-hidden="true">
@@ -254,7 +254,7 @@ export function MenuList({ userId, businessId, isOwnProfile, layout = 'grid', on
                           </button>
                           <button
                             onClick={(e) => { e.stopPropagation(); setDeletingItemId(item.id); }}
-                            className="w-7 h-7 shrink-0 flex items-center justify-center rounded-lg bg-[#ef4444] text-white hover:bg-[#dc2626] transition-colors"
+                            className="w-7 h-7 p-0 shrink-0 flex items-center justify-center rounded-lg bg-[#ef4444] text-white hover:bg-[#dc2626] transition-colors"
                             aria-label={`Delete ${item.item_name}`}
                           >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" aria-hidden="true">
