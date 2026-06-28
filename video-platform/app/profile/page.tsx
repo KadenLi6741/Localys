@@ -20,6 +20,7 @@ import {
 } from '@/lib/supabase/profiles';
 import { OrderHistory } from '@/components/OrderHistory';
 import { RankSection } from '@/components/RankSection';
+import { CommunityLeaderboard } from '@/components/CommunityLeaderboard';
 import { getUserCoins } from '@/lib/supabase/profiles';
 import { getUserBookmarkedVideos } from '@/lib/supabase/videos';
 import { getSavedItems, getLikedItemIds, getLikedMenuItems, subscribeEngagement, type LikedMenuItem } from '@/lib/clientEngagement';
@@ -589,6 +590,9 @@ function ProfileView({ profile, user, onEditClick, onSignOut, onProfileUpdated }
       {!statsLoading && (
         <RankSection moneySpent={moneySpent} points={points} bizCount={bizCount} />
       )}
+
+      {/* Community leaderboard (mock 5km data) */}
+      <CommunityLeaderboard youName={profile?.full_name || profile?.username || 'You'} />
 
       {/* Impact stats */}
       {!statsLoading && (bizCount > 0 || moneySpent > 0) && (

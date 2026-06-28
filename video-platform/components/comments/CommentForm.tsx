@@ -188,7 +188,7 @@ export default function CommentForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex gap-3">
+    <form onSubmit={handleSubmit} className="flex gap-2.5">
       {/* Avatar */}
       <div className="flex-shrink-0">
         {user.user_metadata?.avatar_url ? (
@@ -206,8 +206,10 @@ export default function CommentForm({
         )}
       </div>
 
-      {/* Input */}
-      <div className="flex-1">
+      {/* Input — min-w-0 lets this flex column shrink below its content's
+          intrinsic width so the star row + Post button never overflow (and get
+          clipped) inside a narrow container like the Discover reviews panel. */}
+      <div className="min-w-0 flex-1">
         <textarea
           ref={textareaRef}
           value={content}
@@ -224,7 +226,7 @@ export default function CommentForm({
 
         {/* Star Rating */}
         {!compact && (
-          <div className="flex items-center gap-2 mt-3 mb-2">
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mt-3 mb-2">
             <span className="text-xs text-gray-500">Rate:</span>
             <div className="flex gap-1">
               {[1, 2, 3, 4, 5].map((star) => (
@@ -232,7 +234,7 @@ export default function CommentForm({
                   key={star}
                   type="button"
                   onClick={() => setRating(rating === star ? null : star)}
-                  className="focus:outline-none transition-transform hover:scale-110"
+                  className="shrink-0 focus:outline-none transition-transform hover:scale-110"
                   disabled={loading}
                 >
                   <svg
@@ -286,7 +288,7 @@ export default function CommentForm({
         )}
 
         {/* Image Upload Button and Submit */}
-        <div className="flex justify-between items-center mt-2 gap-2">
+        <div className="flex flex-wrap justify-between items-center mt-2 gap-2">
           <div className="flex items-center gap-2">
             <input
               type="file"
@@ -300,7 +302,7 @@ export default function CommentForm({
               type="button"
               onClick={() => fileInputRef.current?.click()}
               disabled={uploading || loading}
-              className="px-3 py-1.5 rounded-lg font-semibold text-sm bg-white/10 text-white hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              className="shrink-0 px-3 py-1.5 rounded-lg font-semibold text-sm bg-black/5 text-gray-700 hover:bg-black/10 dark:bg-white/10 dark:text-white dark:hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
               title="Add image"
             >
               Photo
@@ -309,7 +311,7 @@ export default function CommentForm({
           <button
             type="submit"
             disabled={!content.trim() || loading || uploading}
-            className={`px-4 py-1.5 rounded-lg font-semibold text-sm bg-[#f97316] text-white hover:bg-[#ea6a0c] disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed transition-all duration-200 ${
+            className={`shrink-0 px-4 py-1.5 rounded-lg font-semibold text-sm bg-[#f97316] text-white hover:bg-[#ea6a0c] disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed transition-all duration-200 ${
               compact ? 'active:scale-95' : ''
             }`}
           >
