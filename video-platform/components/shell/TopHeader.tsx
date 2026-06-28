@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { MapPin, ChevronDown, Coins, User, ShoppingCart, Settings, LogOut, Building2, Sun, Moon } from 'lucide-react';
+import { MapPin, ChevronDown, Coins, ShoppingCart, LogOut, Building2, Sun, Moon, Menu } from 'lucide-react';
 import { Logo } from '@/components/Logo';
 import { SearchDropdown } from './SearchDropdown';
 import { useCart } from '@/contexts/CartContext';
@@ -144,27 +144,38 @@ export function TopHeader() {
           <span className="text-[11px] font-medium">Points</span>
         </Link>
 
-        {/* Profile */}
+        {/* Cart */}
+        <Link href="/cart" aria-label={`Cart, ${cartCount} items`} className="relative shrink-0 flex flex-col items-center px-2 text-black transition hover:text-[#f97316] dark:text-white">
+          <ShoppingCart className="h-5 w-5" />
+          <span className="hidden text-[11px] font-medium lg:block">Cart</span>
+          {cartCount > 0 && (
+            <span
+              key={cartCount}
+              className="cart-badge-bump absolute -right-0.5 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-[#f97316] px-1 text-[10px] font-bold text-white"
+            >
+              {cartCount > 99 ? '99+' : cartCount}
+            </span>
+          )}
+        </Link>
+
+        {/* Menu (hamburger) — pinned top-right; opens the account dropdown.
+            Profile + Settings are intentionally omitted (Profile lives in the
+            bottom/secondary nav; Settings link removed). */}
         <div className="relative shrink-0">
           <button
             type="button"
             onClick={() => setOpenMenu(openMenu === 'profile' ? null : 'profile')}
-            aria-label="Account menu"
-            className="flex flex-col items-center px-2 text-black transition hover:text-[#f97316] dark:text-white"
+            aria-label="Open menu"
+            aria-haspopup="menu"
+            aria-expanded={openMenu === 'profile'}
+            className="flex items-center justify-center rounded-full p-2 text-black transition hover:bg-gray-50 hover:text-[#f97316] dark:text-white dark:hover:bg-gray-800"
           >
-            <User className="h-5 w-5" />
-            <span className="hidden text-[11px] font-medium lg:block">Account</span>
+            <Menu className="h-6 w-6" />
           </button>
           {openMenu === 'profile' && (
             <div className="absolute right-0 top-full mt-2 w-48 rounded-2xl border border-gray-200 bg-white p-2 shadow-lg dark:border-gray-700 dark:bg-gray-900">
-              <Link href="/profile" onClick={() => setOpenMenu(null)} className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-black transition hover:bg-gray-50 dark:text-white dark:hover:bg-gray-800">
-                <User className="h-4 w-4" /> Profile
-              </Link>
               <Link href="/dashboard" onClick={() => setOpenMenu(null)} className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-black transition hover:bg-gray-50 dark:text-white dark:hover:bg-gray-800">
                 <Building2 className="h-4 w-4" /> Business Manager
-              </Link>
-              <Link href="/profile?tab=settings" onClick={() => setOpenMenu(null)} className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-black transition hover:bg-gray-50 dark:text-white dark:hover:bg-gray-800">
-                <Settings className="h-4 w-4" /> Settings
               </Link>
               <div className="my-1 h-px bg-gray-100 dark:bg-gray-800" />
               {/* Dark/Light theme toggle — flips the app-wide theme (persisted via ThemeContext) */}
@@ -203,20 +214,6 @@ export function TopHeader() {
             </div>
           )}
         </div>
-
-        {/* Cart */}
-        <Link href="/cart" aria-label={`Cart, ${cartCount} items`} className="relative shrink-0 flex flex-col items-center px-2 text-black transition hover:text-[#f97316] dark:text-white">
-          <ShoppingCart className="h-5 w-5" />
-          <span className="hidden text-[11px] font-medium lg:block">Cart</span>
-          {cartCount > 0 && (
-            <span
-              key={cartCount}
-              className="cart-badge-bump absolute -right-0.5 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-[#f97316] px-1 text-[10px] font-bold text-white"
-            >
-              {cartCount > 99 ? '99+' : cartCount}
-            </span>
-          )}
-        </Link>
       </div>
     </header>
   );
