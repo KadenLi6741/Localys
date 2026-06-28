@@ -6,6 +6,7 @@ import {
   RANKS,
   computeImpactScore,
   getRankProgress,
+  rankPointsRange,
   resolveImpactInputs,
   type ImpactInputs,
 } from '@/lib/ranks';
@@ -66,22 +67,36 @@ export function RankSection({ moneySpent, points, bizCount }: ImpactInputs) {
           <p className="mt-0.5 text-sm text-gray-500">Impact Score {score.toLocaleString()}</p>
 
           {isMax ? (
-            <div className="mt-3 inline-flex items-center rounded-full bg-[#f97316] px-4 py-1.5 text-sm font-semibold text-white">
-              Max rank reached
-            </div>
+            <>
+              <div className="mt-3 inline-flex items-center rounded-full bg-[#f97316] px-4 py-1.5 text-sm font-semibold text-white">
+                Max rank reached
+              </div>
+              {/* Reward held at the top rank */}
+              <div className="mt-3 w-full rounded-xl border border-[#f97316] bg-[#f97316]/10 px-3 py-2 text-left">
+                <p className="text-[11px] font-bold uppercase tracking-wider text-[#f97316]">Your reward</p>
+                <p className="mt-0.5 text-sm font-medium text-gray-900">{current.reward}</p>
+              </div>
+            </>
           ) : (
-            <div className="mt-3 w-full">
-              <div className="mb-1.5 flex items-center justify-between text-sm">
-                <span className="font-semibold text-[#f97316]">{pctToNext}% to {next!.name}</span>
-                <span className="text-gray-400">{score.toLocaleString()} / {next!.threshold.toLocaleString()}</span>
+            <>
+              <div className="mt-3 w-full">
+                <div className="mb-1.5 flex items-center justify-between text-sm">
+                  <span className="font-semibold text-[#f97316]">{(next!.threshold - score).toLocaleString()} pts to {next!.name}</span>
+                  <span className="text-gray-400">{score.toLocaleString()} / {next!.threshold.toLocaleString()}</span>
+                </div>
+                <div className="h-3 w-full overflow-hidden rounded-full bg-gray-200">
+                  <div
+                    className="h-full rounded-full bg-[#f97316] transition-[width] duration-500"
+                    style={{ width: `${pctToNext}%` }}
+                  />
+                </div>
               </div>
-              <div className="h-3 w-full overflow-hidden rounded-full bg-gray-200">
-                <div
-                  className="h-full rounded-full bg-[#f97316] transition-[width] duration-500"
-                  style={{ width: `${pctToNext}%` }}
-                />
+              {/* Reward unlocked at the next rank */}
+              <div className="mt-3 w-full rounded-xl border border-[#f97316] bg-[#f97316]/10 px-3 py-2 text-left">
+                <p className="text-[11px] font-bold uppercase tracking-wider text-[#f97316]">Next reward · {next!.name}</p>
+                <p className="mt-0.5 text-sm font-medium text-gray-900">{next!.reward}</p>
               </div>
-            </div>
+            </>
           )}
         </div>
       </div>
@@ -121,7 +136,7 @@ function RanksModal({ currentId, score, onClose }: { currentId: string; score: n
         {/* Tiers — lowest to highest */}
         <div className="overflow-y-auto px-5 py-5">
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-            {RANKS.map((rank) => {
+            {RANKS.map((rank, i) => {
               const isCurrent = rank.id === currentId;
               const unlocked = score >= rank.threshold;
               // Localy Philanthropist shows with no box/outline — just image + label on white.
@@ -163,7 +178,13 @@ function RanksModal({ currentId, score, onClose }: { currentId: string; score: n
                     )}
                   </div>
 
-                  <p className="mt-2 text-[11px] leading-snug text-gray-500">{rank.requirement}</p>
+                  {/* Points range to reach this rank */}
+                  <p className={`mt-2 text-[11px] font-semibold ${unlocked ? 'text-gray-900' : 'text-gray-400'}`}>
+                    {rankPointsRange(i)}
+                  </p>
+
+                  {/* Reward unlocked at this rank */}
+                  <p className="mt-1 text-[11px] leading-snug text-gray-500">{rank.reward}</p>
 
                   {isCurrent ? (
                     <span className="mt-2 rounded-full bg-[#f97316] px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">

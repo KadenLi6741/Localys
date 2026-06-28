@@ -245,7 +245,7 @@ export function MenuList({ userId, businessId, isOwnProfile, layout = 'grid', on
                         <div className="flex gap-1">
                           <button
                             onClick={(e) => { e.stopPropagation(); handleEditItem(item); }}
-                            className="w-7 h-7 flex items-center justify-center rounded-lg bg-black text-white hover:opacity-75 transition-opacity"
+                            className="w-7 h-7 flex items-center justify-center rounded-lg bg-black text-white hover:bg-[#f97316] transition-colors"
                             aria-label={`Edit ${item.item_name}`}
                           >
                             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -302,7 +302,7 @@ export function MenuList({ userId, businessId, isOwnProfile, layout = 'grid', on
                       </button>
                       <button
                         onClick={(e) => { e.stopPropagation(); setDeletingItemId(item.id); }}
-                        className="w-8 h-8 flex items-center justify-center rounded-lg bg-black/60 backdrop-blur-sm text-red-400 hover:bg-black/80 transition-colors"
+                        className="w-8 h-8 flex items-center justify-center rounded-lg bg-black/60 backdrop-blur-sm text-white hover:bg-red-600 transition-colors"
                         aria-label={`Delete ${item.item_name}`}
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
