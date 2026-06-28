@@ -512,7 +512,7 @@ function ProfileContent() {
         />
       ) : (
         <>
-          {user && <SideCards userId={user.id} />}
+          {user && <SideCards />}
           <ProfileView
             profile={profile}
             user={user}
