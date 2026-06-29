@@ -9,6 +9,7 @@ import { QRScanner } from '@/components/QRScanner';
 import { PostedVideos } from '@/components/PostedVideos';
 import { MenuList } from '@/components/MenuList';
 import { BusinessReports } from '@/components/dashboard/BusinessReports';
+import { CommunityFeedbackPanel } from '@/components/dashboard/CommunityFeedbackPanel';
 import {
   ensureUserBusiness,
   updateBusinessInfo,
@@ -622,6 +623,9 @@ function DashboardContent() {
                 })}
               </div>
             </div>
+
+            {/* Community Feedback — customer wishlist/requests, owner-managed */}
+            <CommunityFeedbackPanel businessId={business?.id} />
           </div>
         )}
 
