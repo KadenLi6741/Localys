@@ -28,6 +28,7 @@ import { useStoreDistance } from '@/lib/utils/useStoreDistance';
 import { ItemImage, Stars } from './StorePrimitives';
 import { useAddToCart, FeaturedItemCard, MenuItemRow } from './StoreItemCards';
 import { InfoModal } from './InfoModal';
+import { StoreInfoSections } from './StoreInfoSections';
 import type { StoreItem, StoreMenu } from './types';
 import { isItemBookmarked, toggleItemBookmark } from '@/lib/clientEngagement';
 
@@ -288,6 +289,12 @@ export function StorePage({ storeName, sellerId, menu }: { storeName: string; se
 
           {/* main content */}
           <div className="min-w-0 flex-1">
+            {/* Store info — Founder Story, Things to Look Out For, Common Questions.
+                Placed at the TOP of the content area, above Featured / Picked + menu. */}
+            <div className="mb-8">
+              <StoreInfoSections slug={menu.slug} />
+            </div>
+
             {/* Savings and more */}
             <section>
               <h2 className="mb-3 text-2xl font-bold text-black">Savings and more</h2>
