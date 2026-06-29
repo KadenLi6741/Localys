@@ -1,5 +1,12 @@
 'use client';
 
+/**
+ * Purchase success page (/purchase-success) — Stripe redirect after an item order.
+ * Purpose: Confirms the item order from the Stripe session (via /api/verify-item-purchase), shows the
+ *   order confirmation with its pickup QR code, and records it locally so it appears in order history.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import Link from 'next/link';
 import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';

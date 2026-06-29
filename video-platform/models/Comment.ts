@@ -1,3 +1,10 @@
+/**
+ * Comment.ts — TypeScript types for video comments/replies and their realtime callbacks.
+ * Purpose: Shapes the comment data + create/update payloads used by the comments UI and data layer.
+ *   Types only — no runtime code.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 export interface Comment {
   id: string;
   video_id: string;

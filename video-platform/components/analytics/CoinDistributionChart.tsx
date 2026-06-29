@@ -1,5 +1,12 @@
 'use client';
 
+/**
+ * CoinDistributionChart — pie chart of how a creator's promotion coins are split across videos.
+ * Purpose: Shows which videos a creator has invested the most promotion coins in. Renders nothing
+ *   when there's no data. Uses an on-brand orange/grey palette only.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import {
   ResponsiveContainer,
   PieChart,
@@ -32,6 +39,8 @@ function CustomTooltip({ active, payload }: { active?: boolean; payload?: { payl
   );
 }
 
+// Draws the percentage label centred inside each pie slice; hides labels for tiny (<5%) slices
+// to avoid cluttered, overlapping text.
 function CustomLabel(props: PieLabelRenderProps) {
   const cx = Number(props.cx);
   const cy = Number(props.cy);

@@ -4,6 +4,7 @@
  * Matched by filename to a store in data/store-menus.json. These power BOTH the
  * "Featured in Videos" home section (hover-play cards) and the Discover feed
  * (buildFeedVideos prepends them so they're watchable full-screen). No Supabase.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
  */
 import storeMenus from '@/data/store-menus.json';
 import { getAliasItems, type AliasItem } from '@/lib/businessAliases';

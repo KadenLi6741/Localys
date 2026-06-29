@@ -1,5 +1,12 @@
 'use client';
 
+/**
+ * ViewsChart — area chart of video views over time, highlighting promotion days.
+ * Purpose: Lets a creator see how views trended and which days had a promotion running (so they can
+ *   judge whether boosting paid off). Needs at least two points to render a line.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import {
   ResponsiveContainer,
   AreaChart,
@@ -29,6 +36,7 @@ function CustomTooltip({ active, payload, label }: { active?: boolean; payload?:
   );
 }
 
+// Renders a marker only on data points that were promotion days, leaving other points unmarked.
 function CustomDot(props: { cx?: number; cy?: number; payload?: ViewsDataPoint }) {
   const { cx, cy, payload } = props;
   if (!payload?.promoted || cx === undefined || cy === undefined) return null;

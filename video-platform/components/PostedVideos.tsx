@@ -1,5 +1,13 @@
 'use client';
 
+/**
+ * PostedVideos — list of videos a user has uploaded, shown on their profile.
+ * Purpose: Displays each video with its engagement stats (views/likes/comments) and, for the owner,
+ *   lets them delete a video or jump to upload. Aggregates likes/comments per video since those live
+ *   in separate tables from the videos themselves.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
@@ -19,6 +27,7 @@ interface PostedVideosProps {
   isOwnProfile?: boolean;
 }
 
+// Renders the user's uploaded-videos list with per-video stats and owner controls.
 export function PostedVideos({ userId, isOwnProfile = true }: PostedVideosProps) {
   const router = useRouter();
   const [videos, setVideos] = useState<PostedVideo[]>([]);
@@ -29,6 +38,8 @@ export function PostedVideos({ userId, isOwnProfile = true }: PostedVideosProps)
     loadPostedVideos();
   }, [userId, isOwnProfile]);
 
+  // Loads the user's videos, then tallies likes and comments per video (each stored in its own table)
+  // and merges those counts in. Views come straight from the videos table.
   const loadPostedVideos = async () => {
     try {
       setLoading(true);
@@ -41,6 +52,7 @@ export function PostedVideos({ userId, isOwnProfile = true }: PostedVideosProps)
       if (videosError) throw videosError;
       if (!userVideos || userVideos.length === 0) { setVideos([]); return; }
 
+      // Tally likes per video id into a lookup map.
       const { data: allLikes } = await supabase.from('likes').select('video_id');
       const likesMap: { [key: string]: number } = {};
       if (allLikes) {
@@ -58,6 +70,8 @@ export function PostedVideos({ userId, isOwnProfile = true }: PostedVideosProps)
         }
       } catch { /* silently fail */ }
 
+      // Fallback: if the filtered query returned nothing (e.g. RLS quirks on the `.in` filter),
+      // fetch top-level comments broadly and filter to this user's videos client-side.
       if (allComments.length === 0 && videoIds.length > 0) {
         try {
           const { data } = await supabase.from('comments').select('id, video_id').is('parent_comment_id', null);
@@ -87,6 +101,8 @@ export function PostedVideos({ userId, isOwnProfile = true }: PostedVideosProps)
     }
   };
 
+  // Permanently deletes a video after confirmation, then removes it from local state so the list
+  // updates immediately without a refetch.
   const deleteVideo = async (videoId: string) => {
     if (!confirm('Delete this video? This cannot be undone.')) return;
     try {

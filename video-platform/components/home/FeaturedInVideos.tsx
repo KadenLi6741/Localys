@@ -1,5 +1,13 @@
 'use client';
 
+/**
+ * FeaturedInVideos — home-page carousel of businesses that have a linked video.
+ * Purpose: Drives traffic from the home page into the video feed. Each card previews its clip muted
+ *   on hover/focus and, on click, opens the Discover feed jumped to that exact video. Uses built-in
+ *   (public/videos) content so it always renders.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Play } from 'lucide-react';
@@ -17,12 +25,14 @@ export function FeaturedInVideos() {
 
   if (FEATURED_VIDEOS.length === 0) return null;
 
+  // Start a card's muted preview from the beginning on hover/focus.
   const play = (id: string) => {
     const el = refs.current[id];
     if (!el) return;
     el.currentTime = 0;
     void el.play().catch(() => {});
   };
+  // Pause and rewind the preview when the pointer/focus leaves the card.
   const stop = (id: string) => {
     const el = refs.current[id];
     if (!el) return;

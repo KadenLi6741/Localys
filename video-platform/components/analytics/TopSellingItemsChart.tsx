@@ -1,5 +1,12 @@
 'use client';
 
+/**
+ * TopSellingItemsChart — horizontal bar list of a business's best-selling menu items.
+ * Purpose: Ranks items by units sold using simple proportional bars (each bar relative to the top
+ *   seller). Lightweight custom bars rather than a chart library. Renders nothing without data.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import type { TopSellingItem } from '@/models/Analytics';
 
 interface TopSellingItemsChartProps {

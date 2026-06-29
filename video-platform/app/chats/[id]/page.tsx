@@ -1,5 +1,12 @@
 'use client';
 
+/**
+ * Single conversation page (/chats/[id]) — a full-screen view of one chat thread.
+ * Purpose: The mobile/full-page version of an open conversation: shows the thread (useMessages) with a
+ *   header and message input. Gated behind ProtectedRoute.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { useState, useRef, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';

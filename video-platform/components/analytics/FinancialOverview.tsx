@@ -1,5 +1,13 @@
 'use client';
 
+/**
+ * FinancialOverview — collapsible business financial dashboard (revenue, orders, top items, etc.).
+ * Purpose: The business counterpart to the promotion AnalyticsDashboard. It lazily fetches financial
+ *   analytics only when expanded, animates its height open/closed, and lays out the KPI cards plus
+ *   code-split charts (revenue, orders breakdown, top items, video conversions).
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { useState, useRef, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { useFinancialAnalytics } from '@/hooks/useFinancialAnalytics';
@@ -32,6 +40,8 @@ export function FinancialOverview({ userId }: FinancialOverviewProps) {
   const contentRef = useRef<HTMLDivElement>(null);
   const [contentHeight, setContentHeight] = useState(0);
 
+  // Measure the inner content's height with a ResizeObserver so the max-height open/close animation
+  // can transition to the exact rendered height (which changes as charts load in).
   useEffect(() => {
     if (isExpanded && contentRef.current) {
       const observer = new ResizeObserver((entries) => {

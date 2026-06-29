@@ -1,5 +1,12 @@
 'use client';
 
+/**
+ * PromotionActivityFeed — chronological log of a creator's recent promotions.
+ * Purpose: Shows each promotion (coins spent, video, boost before→after, when) so creators have a
+ *   history of their spending. Shows the latest 5 with a "show all" toggle to expand the rest.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { useState } from 'react';
 import type { PromotionEntry } from '@/models/Analytics';
 
@@ -7,6 +14,8 @@ interface PromotionActivityFeedProps {
   history: PromotionEntry[];
 }
 
+// Formats a timestamp as a compact relative label (Just now / 5m / 3h / 2d / 1w), falling back to a
+// full date once it's older than a month.
 function relativeTime(dateStr: string): string {
   const now = Date.now();
   const then = new Date(dateStr).getTime();

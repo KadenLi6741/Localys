@@ -1,3 +1,11 @@
+/**
+ * cache.ts — tiny client-side TTL cache backed by sessionStorage.
+ * Purpose: Caches fetched data (with expiry) in memory and mirrors it to sessionStorage, so repeated
+ *   reads within a session avoid redundant network calls and survive page navigations until the tab
+ *   closes. Corrupt/quota-exceeded storage is handled silently.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 const STORAGE_KEY = 'localys-cache';
 
 const cache = new Map<string, { data: unknown; expiresAt: number }>();

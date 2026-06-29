@@ -10,6 +10,9 @@
  * - User search/selection
  * - Create conversation with first message
  * - Navigate to new conversation
+ *
+ * Note: legacy messaging implementation; the active chats UI lives in components/chats/.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
  */
 
 import { useState } from 'react';

@@ -1,5 +1,15 @@
 'use client';
 
+/**
+ * HomeContent — the TikTok-style vertical video feed ("Discover" / For You) and its overlays.
+ * Purpose: The core discovery experience. It loads a weighted video feed (mixing built-in local demo
+ *   videos with Supabase videos), handles swipe/scroll/keyboard navigation, video playback, likes,
+ *   bookmarks, follows, comments, sharing, distance/ETA to each business, and an admin display mode.
+ *   A guiding principle throughout: demo/local content (no DB row) must never crash real DB calls, so
+ *   engagement for those items is persisted client-side instead. Kept mounted by PersistentVideoFeed.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { useState, useRef, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -111,6 +121,8 @@ interface HomeContentProps {
 
 
 
+// The Discover feed component. `isActive` is true only when the user is actually on /feed, which
+// gates playback/audio so videos don't keep playing while the feed is hidden but still mounted.
 export function HomeContent({ isActive }: HomeContentProps) {
   const { user } = useAuth();
   const { location: deliveryLocation } = useDeliveryLocation();
@@ -372,6 +384,9 @@ export function HomeContent({ isActive }: HomeContentProps) {
     }
   }, [isActive]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Loads the feed: always includes built-in local videos, then fetches the weighted Supabase feed
+  // and, in parallel, the like/comment counts, business locations and menu price ranges needed to
+  // render each card. Falls back to local-only videos if Supabase errors so Discover is never empty.
   const loadVideos = async () => {
     // Built-in local videos (public/videos linked to businesses) shown first, ALWAYS
     // present so every "Featured in Videos" card is watchable in Discover — even if the
@@ -574,6 +589,8 @@ export function HomeContent({ isActive }: HomeContentProps) {
     }
   };
 
+  // Loads which videos/businesses the current user has liked and bookmarked, merging the real DB
+  // rows with client-side demo engagement so the heart/bookmark icons reflect both.
   const loadUserInteractions = async () => {
     if (!user) return;
 
@@ -612,6 +629,8 @@ export function HomeContent({ isActive }: HomeContentProps) {
     }
   };
 
+  // Loads the user's coin balance and header profile. The coin badge is only shown for accounts that
+  // have a profile "type" (business-style accounts) — regular users don't see a coin balance.
   const loadUserCoins = async () => {
     if (!user) return;
 
@@ -686,6 +705,7 @@ export function HomeContent({ isActive }: HomeContentProps) {
     });
   }, [currentIndex, videos, volume, playbackSpeed, isActive]);
 
+  // Plays or pauses the current video (tap-to-toggle), keeping isPlaying in sync for the overlay icon.
   const togglePlayPause = async () => {
     const currentVideo = videoRefs.current[currentIndex];
     if (!currentVideo) return;
@@ -703,6 +723,7 @@ export function HomeContent({ isActive }: HomeContentProps) {
     }
   };
 
+  // Mutes by dropping volume to 0 while remembering the prior level, so unmuting restores it.
   const toggleMute = useCallback(() => {
     if (volume > 0) {
       prevVolumeRef.current = volume;
@@ -724,16 +745,20 @@ export function HomeContent({ isActive }: HomeContentProps) {
     }
   }, [currentIndex, videos, user?.id, isActive]);
 
+  // Advance to the next video, wrapping around to the first when at the end.
   const goToNext = () => {
     if (videos.length === 0) return;
     setCurrentIndex((i) => (i < videos.length - 1 ? i + 1 : 0));
   };
 
+  // Go to the previous video, wrapping around to the last when at the start.
   const goToPrev = () => {
     if (videos.length === 0) return;
     setCurrentIndex((i) => (i > 0 ? i - 1 : videos.length - 1));
   };
 
+  // Mouse-wheel navigation. The isScrolling lock + timeout debounces a single wheel gesture so one
+  // scroll moves exactly one video instead of flying through several.
   const handleScroll = (e: React.WheelEvent) => {
     if (isScrolling || videos.length === 0) return;
 
@@ -768,6 +793,7 @@ export function HomeContent({ isActive }: HomeContentProps) {
     setTouchEnd(e.targetTouches[0].clientY);
   };
 
+  // Touch swipe navigation: a vertical drag over the 50px threshold moves one video up/down (wrapping).
   const handleTouchEnd = () => {
     if (!touchStart || !touchEnd || videos.length === 0) return;
 
@@ -790,6 +816,9 @@ export function HomeContent({ isActive }: HomeContentProps) {
     }
   };
 
+  // Toggles a like on a video, with optimistic count updates. Handles three cases so the UI never
+  // breaks: admin display mode (count-only bump), demo/slug content (persisted client-side, no DB),
+  // and real videos (Supabase like/unlike). Reverts/reports on error.
   const toggleLike = async (videoId: string, businessId?: string, event?: React.MouseEvent) => {
     if (!user) {
       setToastMessage('Please sign in to like posts');
@@ -857,6 +886,8 @@ export function HomeContent({ isActive }: HomeContentProps) {
     setTimeout(() => setLikeAnimating(null), 300);
   };
 
+  // Toggles a bookmark (save) on a video. Like toggleLike, demo/slug videos are saved client-side
+  // (storing a small snapshot so they can render in the profile's Saved tab) while real videos hit DB.
   const toggleBookmark = async (video: Video, event?: React.MouseEvent) => {
     if (!user) {
       setToastMessage('Please sign in to bookmark videos');
@@ -907,6 +938,7 @@ export function HomeContent({ isActive }: HomeContentProps) {
     setTimeout(() => setBookmarkAnimating(null), 300);
   };
 
+  // Follows/unfollows the creator behind the current video from the right-rail avatar button.
   const toggleVideoFollow = async (userId: string | undefined) => {
     if (!user || !userId) {
       setToastMessage('Please sign in to follow');
@@ -929,6 +961,7 @@ export function HomeContent({ isActive }: HomeContentProps) {
   };
 
 
+  // Navigates to a creator's profile, preferring the username (prettier URL) over the raw id.
   const handleProfileClick = (userId?: string, username?: string) => {
     if (!userId && !username) {
       console.warn('Profile click: userId is missing');
@@ -937,11 +970,13 @@ export function HomeContent({ isActive }: HomeContentProps) {
     router.push(`/profile/${username || userId}`);
   };
 
+  // Opens the comments modal for a given video.
   const handleCommentClick = (postId: string) => {
     setCommentPostId(postId);
     setCommentModalOpen(true);
   };
 
+  // After a comment is added, re-query the exact comment count so the displayed number stays accurate.
   const handleCommentAdded = async () => {
     // Refresh the comment count for the current video
     if (commentPostId) {
@@ -962,6 +997,7 @@ export function HomeContent({ isActive }: HomeContentProps) {
     }
   };
 
+  // Shares a video via the native share sheet when available, otherwise copies the link (and toasts).
   const handleShareClick = async (video: Video) => {
     const businessName = video.businesses?.business_name || video.profiles?.full_name || 'Business';
     const url = `${window.location.origin}/video/${video.id}`;
@@ -1031,6 +1067,8 @@ export function HomeContent({ isActive }: HomeContentProps) {
   const saveCount = stableCount(currentVideo.id, 'save', 80, 940) + (isBookmarked ? 1 : 0);
   const shareCount = stableCount(currentVideo.id, 'share', 30, 880);
 
+  // Picks the closest known location for a video's business to the user (or the first one if the
+  // user's position is unknown), falling back to the business's own lat/lng. Drives the distance label.
   const getNearestLocationForVideo = (video: Video) => {
     const profileId = video.user_id;
     if (profileId && locationsByProfile[profileId] && locationsByProfile[profileId].length > 0) {
@@ -1056,6 +1094,7 @@ export function HomeContent({ isActive }: HomeContentProps) {
     return null;
   };
 
+  // Straight-line distance (km) from the user to a video's nearest business location, or null.
   const getDistanceForVideo = (video: Video) => {
     if (!userLocation) return null;
     const nearestLocation = getNearestLocationForVideo(video);

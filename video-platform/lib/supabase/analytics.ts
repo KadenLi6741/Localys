@@ -1,3 +1,10 @@
+/**
+ * supabase/analytics.ts — data-access + aggregation for the promotion analytics dashboard.
+ * Purpose: Pulls a creator's videos, promotions, views and coin balance and shapes them into the
+ *   summary/series the AnalyticsDashboard renders (spend over time, views, coin distribution, etc.).
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { supabase } from './client';
 
 export async function getAnalyticsSummary(userId: string) {

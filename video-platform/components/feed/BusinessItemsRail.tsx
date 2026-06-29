@@ -1,5 +1,13 @@
 'use client';
 
+/**
+ * BusinessItemsRail — the vertical strip of a business's menu item cards shown on the Discover feed.
+ * Purpose: While watching a business's video, this rail surfaces a few of its purchasable items (image,
+ *   rating, price, quick-add) so viewers can buy without leaving the feed. Items come from props (alias
+ *   demo content) or are loaded from the business's menu.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { useEffect, useState } from 'react';
 import { Plus, Check, ShoppingCart, Star } from 'lucide-react';
 import { getUserMenu } from '@/lib/supabase/profiles';

@@ -1,5 +1,13 @@
 'use client';
 
+/**
+ * Checkout page (/checkout) — review an order and pay.
+ * Purpose: Final order step. It assembles the order (from the cart or a single "buy now" item via URL
+ *   params), lets the user apply a coupon/promo and pick a schedule, then starts Stripe Checkout. The
+ *   server re-derives prices, so this page is for review/UX, not the source of truth for amounts.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';

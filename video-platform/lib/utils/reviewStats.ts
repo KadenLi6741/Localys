@@ -6,6 +6,7 @@
  * This mirrors the deterministic "stableCount" approach already used for the
  * feed's review counts in components/HomeContent.tsx — there is no per-order
  * review table, so demo/local content relies on this shared helper.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
  */
 
 /** FNV-1a hash → unsigned 32-bit int (stable across reloads). */

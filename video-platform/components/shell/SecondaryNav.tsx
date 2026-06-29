@@ -1,5 +1,12 @@
 'use client';
 
+/**
+ * SecondaryNav — the second-tier navigation bar under the header (Home, Discover, Communities, etc.).
+ * Purpose: Primary section switcher shown beneath TopHeader. Icon-only on mobile (to fit), icon+label on
+ *   desktop, with the active section underlined in the brand orange.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Home, Compass, Users, MessageCircle, User } from 'lucide-react';
@@ -16,6 +23,7 @@ const items = [
 export function SecondaryNav() {
   const pathname = usePathname();
 
+  // Home matches exactly; other tabs match by prefix so their sub-routes keep the tab highlighted.
   const isActive = (href: string) =>
     href === '/home' ? pathname === '/home' : pathname?.startsWith(href);
 

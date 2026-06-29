@@ -8,6 +8,7 @@
  * drifting apart. Centralising them here keeps every "3.2 km" / "8 min" label
  * consistent. Callers append their own suffix (e.g. " away") so wording stays
  * exactly as each surface had it.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
  */
 
 /** Average city driving speed (km/h) used to estimate delivery/arrival time. */

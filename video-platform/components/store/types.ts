@@ -2,6 +2,7 @@
  * types.ts — shared data shapes for the store (restaurant/shop) page and its
  * sub-components. Kept in one place so the page, the item cards, and the info
  * modal all agree on the structure of a menu, an item, and a deal.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
  */
 
 /** A promotional badge attached to a menu item (e.g. "20% off", "Buy 1 Get 1"). */

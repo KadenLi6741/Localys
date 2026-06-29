@@ -1,5 +1,13 @@
 'use client';
 
+/**
+ * useAnalytics — hook that loads a creator's promotion analytics for the dashboard.
+ * Purpose: Fetches and assembles the analytics dataset (summary, spend/views timelines, coin
+ *   distribution, per-video performance, promotion history) for a given user, with loading state.
+ *   Passing `undefined` skips fetching (used so data loads only when the panel is expanded).
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { useState, useEffect, useCallback } from 'react';
 import {
   getAnalyticsSummary,

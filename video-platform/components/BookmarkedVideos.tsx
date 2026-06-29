@@ -1,5 +1,12 @@
 'use client';
 
+/**
+ * BookmarkedVideos — grid of videos the user has saved/bookmarked.
+ * Purpose: Renders on a user's own profile to show their saved videos. Bookmarks are private, so it
+ *   only loads them when the logged-in user is viewing their own profile; otherwise it shows nothing.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { getUserBookmarkedVideos } from '@/lib/supabase/videos';
@@ -31,6 +38,7 @@ interface BookmarkedVideosProps {
   userId: string;
 }
 
+// Loads and displays the bookmarked-videos grid for the given profile owner.
 export function BookmarkedVideos({ userId }: BookmarkedVideosProps) {
   const { user } = useAuth();
   const [videos, setVideos] = useState<Video[]>([]);
@@ -41,6 +49,8 @@ export function BookmarkedVideos({ userId }: BookmarkedVideosProps) {
     loadBookmarkedVideos();
   }, [userId]);
 
+  // Fetches saved videos — but only for the owner. Bookmarks are private, so viewing someone
+  // else's profile (or being logged out) returns an empty list rather than exposing their saves.
   const loadBookmarkedVideos = async () => {
     if (!user || user.id !== userId) {
       setVideos([]);

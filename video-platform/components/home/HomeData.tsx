@@ -1,5 +1,14 @@
 'use client';
 
+/**
+ * HomeData — shared data provider + feed composition for the entire home page.
+ * Purpose: Fetches all seeded businesses + menu items ONCE and exposes them (plus a pre-composed,
+ *   image-deduped, themed "feed") via context, so every home section renders from one source of truth.
+ *   Centralising this guarantees no photo/business repeats across rows and the hero agrees with the rows.
+ *   Also exports small selector helpers used by the ranked-list sections.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { getLocalBusinesses, type LocalBusiness } from '@/lib/supabase/featured';
 import type { Product } from '@/lib/home-data';
@@ -74,6 +83,7 @@ export function HomeDataProvider({ children }: { children: React.ReactNode }) {
 /* ----------------------------- feed composition ----------------------------- */
 
 type Theme = 'food' | 'flowers' | 'pets' | 'grocery' | 'pharmacy' | 'services' | 'other';
+// Classifies a business into a themed row bucket based on its type/category.
 function themeOf(b: LocalBusiness): Theme {
   if (b.type === 'food') return 'food';
   if (b.category === 'Flowers') return 'flowers';

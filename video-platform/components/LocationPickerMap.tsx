@@ -1,5 +1,13 @@
 'use client';
 
+/**
+ * LocationPickerMap — interactive map for choosing a delivery address by tapping/dragging a pin.
+ * Purpose: Lets users set exactly where they want delivery. It loads the full (JS) Google Maps,
+ *   reverse-geocodes the pin to a human-readable address as it moves, and reports the chosen
+ *   {lat,lng,address} on confirm. Used in the delivery-location flow.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { useEffect, useRef, useState } from 'react';
 import { Crosshair, MapPin } from 'lucide-react';
 import { loadGoogleMaps, hasGoogleMapsKey } from '@/lib/utils/googleMapsLoader';
@@ -113,6 +121,7 @@ export function LocationPickerMap({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Re-detects the device's current position (via the parent callback) and recenters the map/pin on it.
   const handleUseCurrent = async () => {
     if (!onUseCurrent) return;
     const loc = await onUseCurrent();

@@ -1,3 +1,10 @@
+/**
+ * API route: POST /api/verify-turnstile — server-side verification of a Cloudflare Turnstile token.
+ * Purpose: Confirms a Turnstile challenge token with Cloudflare (using the secret key) so bot protection
+ *   can't be bypassed from the client. Rate-limited, and can be toggled off in dev.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { NextRequest, NextResponse } from 'next/server';
 import { checkRateLimit, getClientIp, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit';
 

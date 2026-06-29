@@ -1,5 +1,13 @@
 'use client';
 
+/**
+ * ThemeContext — light/dark theme state for the whole app.
+ * Purpose: Tracks the user's theme preference ('light' | 'dark' | 'system'), resolves 'system' against
+ *   the OS setting, persists the choice to localStorage, and toggles the `.light`/`.dark` class on
+ *   <html> that the CSS theme tokens (in globals.css) key off. Exposed via useTheme().
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 type Theme = 'light' | 'dark' | 'system';

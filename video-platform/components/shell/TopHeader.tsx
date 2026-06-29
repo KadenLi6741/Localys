@@ -1,5 +1,13 @@
 'use client';
 
+/**
+ * TopHeader — the global top navigation bar (logo, delivery location, search, points, cart, menu).
+ * Purpose: The persistent app header on every non-auth/non-marketing screen. It exposes the location
+ *   picker, the search dropdown, the user's coin/points balance and cart count, plus an account menu
+ *   with the theme toggle, Business Manager link and sign-out.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -36,6 +44,7 @@ function useClickOutside(ref: React.RefObject<HTMLDivElement | null>, onClose: (
   }, [ref, onClose]);
 }
 
+// Renders the sticky top header and wires up its popover menus (location/language/account).
 export function TopHeader() {
   const router = useRouter();
   const { getCartCount } = useCart();

@@ -1,3 +1,10 @@
+/**
+ * Stars — reusable star-rating display with review count.
+ * Purpose: Renders a 0–5 rating as filled/half/empty stars plus the number of reviews. Used on cards
+ *   across the home/discovery screens so ratings look identical everywhere.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { Star } from 'lucide-react';
 
 /** Star rating row with the review count shown to the right of the stars. */
@@ -6,6 +13,8 @@ export function Stars({ rating, reviewCount }: { rating: number; reviewCount: nu
     <div className="flex items-center gap-1.5">
       <div className="flex items-center" aria-label={`Rated ${rating} out of 5`}>
         {[0, 1, 2, 3, 4].map((i) => {
+          // For star i: it's full if the rating reaches its right edge, half if it lands partway
+          // through it. The half star is drawn by clipping the filled star to 50% width below.
           const filled = rating - i >= 1;
           const half = !filled && rating - i > 0;
           return (

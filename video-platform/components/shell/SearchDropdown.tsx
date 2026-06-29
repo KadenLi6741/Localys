@@ -1,5 +1,13 @@
 'use client';
 
+/**
+ * SearchDropdown — the header search box with a live results + filters dropdown.
+ * Purpose: Lets users find local businesses by name/username, narrowed by filters (category, distance,
+ *   price, deals-only). It debounces queries, sanitises input before the PostgREST query, applies
+ *   client-side distance/price/deal filtering, and routes to the chosen business's profile.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Search } from 'lucide-react';
@@ -20,6 +28,7 @@ interface Suggestion {
 const FOOD_CATS = new Set(['Restaurants', 'Bakery', 'Café', 'Grocery']);
 const SERVICE_CATS = new Set(['Services']);
 
+// Maps a user-facing category label to the Supabase profile `type` used for filtering.
 function mapCategory(cat: string): string {
   if (FOOD_CATS.has(cat)) return 'food';
   if (SERVICE_CATS.has(cat)) return 'service';
@@ -140,6 +149,7 @@ export function SearchDropdown() {
     return () => clearTimeout(t);
   }, [query, filters, location]);
 
+  // Navigate to a selected suggestion's profile (username preferred for a cleaner URL).
   const go = (s: Suggestion) => {
     setOpen(false);
     router.push(`/profile/${s.username || s.id}`);

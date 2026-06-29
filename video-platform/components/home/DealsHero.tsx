@@ -1,5 +1,13 @@
 'use client';
 
+/**
+ * DealsHero — the large auto-rotating "Featured near you" hero block at the top of the home page.
+ * Purpose: Spotlights local businesses: one big slide auto-advances every ~5s (pauses on hover),
+ *   flanked by smaller business tiles with quick-add buttons. Uses the shared feed's reserved hero
+ *   set so its photos are unique and never repeat in rows below.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -41,6 +49,7 @@ export function DealsHero() {
   const featuredLenRef = useRef(featured.length);
   featuredLenRef.current = featured.length;
 
+  // Quick-add a business's cheapest item to the cart from a hero tile, with brief "Added" feedback.
   const handleAdd = (e: React.MouseEvent, biz: LocalBusiness) => {
     e.preventDefault();
     const cheapest = biz.products.length

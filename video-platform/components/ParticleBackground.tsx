@@ -1,5 +1,12 @@
 'use client';
 
+/**
+ * ParticleBackground — ambient animated backdrop (floating particles + gradient blobs).
+ * Purpose: Adds subtle depth/motion behind content. Particles drift on their own and gently
+ *   parallax toward the mouse. Motion is disabled for users who prefer reduced motion (accessibility).
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { useEffect, useRef, useMemo } from 'react';
 
 const PARTICLE_COUNT = 12;
@@ -13,6 +20,8 @@ interface Particle {
   delay: number;
 }
 
+// Builds a fixed set of randomly-positioned/sized particles once. Every third particle uses the
+// green accent and the rest amber, with randomized animation timing so they don't move in lockstep.
 function generateParticles(): Particle[] {
   const particles: Particle[] = [];
   for (let i = 0; i < PARTICLE_COUNT; i++) {
@@ -28,14 +37,19 @@ function generateParticles(): Particle[] {
   return particles;
 }
 
+// Renders the fixed, non-interactive background layer. Memoizes the particle set so they aren't
+// regenerated (and visually jump) on every re-render.
 export function ParticleBackground() {
   const containerRef = useRef<HTMLDivElement>(null);
   const particles = useMemo(() => generateParticles(), []);
   const mouseRef = useRef({ x: 50, y: 50 });
 
   useEffect(() => {
+    // Respect the OS "reduce motion" setting — skip the mouse parallax entirely for those users.
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (prefersReduced) return;
+
+    // Feed the cursor position into CSS variables; the particles read these to parallax via `translate`.
 
     const handleMouseMove = (e: MouseEvent) => {
       mouseRef.current = {

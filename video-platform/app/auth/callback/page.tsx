@@ -1,5 +1,12 @@
 'use client';
 
+/**
+ * OAuth callback page (/auth/callback) — finishes an external (e.g. Google) sign-in.
+ * Purpose: The redirect target after OAuth: it completes the Supabase session, ensures the user has a
+ *   profile row, and forwards them into the app. Transient — shows a brief "Signing you in…" state.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';

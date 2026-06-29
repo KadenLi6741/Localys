@@ -1,3 +1,10 @@
+/**
+ * supabase/coupons.ts — data-access layer for shop/global coupons.
+ * Purpose: Reads and manages store coupons (codes, percentage discounts, usage limits, expiry) used at
+ *   checkout and shown in the cart. Distinct from seller promo codes (see promo-codes.ts).
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { supabase } from './client';
 
 export interface Coupon {

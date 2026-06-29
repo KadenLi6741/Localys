@@ -1,3 +1,11 @@
+/**
+ * supabase/client.ts — the shared browser Supabase client.
+ * Purpose: Creates the single Supabase instance the whole app imports for auth and database/storage
+ *   access. Configured for PKCE auth with session persistence + auto-refresh. Throws at startup if the
+ *   required env vars are missing, so misconfiguration fails loudly rather than silently.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;

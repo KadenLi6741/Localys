@@ -1,5 +1,13 @@
 'use client';
 
+/**
+ * Signup page (/signup) — create a new Localy account (user or business).
+ * Purpose: Registers new accounts with inline-validated fields (email, password, username, account type),
+ *   a Turnstile bot check, and a Google sign-up option. On success a profile (and welcome coupon) is
+ *   created via the auth data layer.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';

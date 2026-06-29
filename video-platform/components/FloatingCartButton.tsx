@@ -1,15 +1,24 @@
 'use client';
 
+/**
+ * FloatingCartButton — persistent shortcut to the cart that floats above the UI.
+ * Purpose: Lets shoppers jump to checkout from anywhere with a live item count, without scrolling
+ *   to find a cart link. It hides itself when irrelevant (empty cart, or already on cart/checkout)
+ *   to avoid clutter and redundancy.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useCart } from '@/contexts/CartContext';
 
+// Floating "go to cart" pill shown app-wide; reads the live count from CartContext.
 export function FloatingCartButton() {
   const { getCartCount } = useCart();
   const pathname = usePathname();
   const cartCount = getCartCount();
 
-  // Hide on the cart and checkout pages themselves
+  // Hide on the cart and checkout pages themselves (the button would just link to the current page)
   if (pathname === '/cart' || pathname === '/checkout') return null;
 
   // Only show when there are items in the cart

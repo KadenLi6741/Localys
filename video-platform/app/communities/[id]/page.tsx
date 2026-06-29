@@ -1,5 +1,12 @@
 'use client';
 
+/**
+ * Single community page (/communities/[id]) — one community's thread list.
+ * Purpose: Shows a community's details and its threads with voting, posting and sharing; tapping a thread
+ *   opens it. Uses CommunitiesContext; gated behind ProtectedRoute.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import React, { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';

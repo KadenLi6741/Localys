@@ -12,6 +12,9 @@
  * - Mark messages as read when viewing
  * - Message input with send button
  * - Displays sender info and timestamps
+ *
+ * Note: legacy messaging implementation; the active chats UI lives in components/chats/.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
  */
 
 import { useEffect, useState, useRef, useCallback } from 'react';

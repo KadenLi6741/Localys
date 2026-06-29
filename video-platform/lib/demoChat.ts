@@ -7,6 +7,7 @@
  * chat_members (the uuid columns reject a slug). Instead we keep a lightweight
  * conversation + its messages in localStorage, shaped like the real Supabase types
  * so the existing Messages UI renders them with zero special-casing beyond id checks.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
  */
 import type { ChatWithDetails, Message } from '@/models/Message';
 

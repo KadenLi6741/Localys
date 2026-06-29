@@ -1,5 +1,13 @@
 'use client';
 
+/**
+ * LocalysAssistant — floating AI help chat bubble available across the app.
+ * Purpose: Answers user questions about how Localy works. It shows quick-pick suggestions, sends the
+ *   message plus recent history to the /api/assistant endpoint, and renders the AI reply. Designed to
+ *   degrade gracefully — on any error it apologises and re-offers the suggested questions.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { useState, useRef, useEffect } from 'react';
 import { MessageCircle, X, Send } from 'lucide-react';
 
@@ -31,6 +39,7 @@ const GREETING: Message = {
   showSuggestions: true,
 };
 
+// Three bouncing dots shown while the assistant is "thinking" (waiting on the API response).
 function TypingIndicator() {
   return (
     <div className="flex justify-start">
@@ -43,6 +52,7 @@ function TypingIndicator() {
   );
 }
 
+// The assistant widget: a floating button that toggles a chat panel.
 export function LocalysAssistant() {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([GREETING]);
@@ -50,10 +60,13 @@ export function LocalysAssistant() {
   const [isLoading, setIsLoading] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
+  // Auto-scroll to the latest message whenever the conversation grows or the panel opens.
   useEffect(() => {
     if (open) bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, open, isLoading]);
 
+  // Sends a question to the assistant API and appends the reply. Ignores empty input or sends made
+  // while a request is already in flight (prevents double-submits).
   const send = async (text: string) => {
     const trimmed = text.trim();
     if (!trimmed || isLoading) return;
@@ -90,6 +103,7 @@ export function LocalysAssistant() {
     }
   };
 
+  // Form submit handler for the text input — sends whatever the user typed.
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     send(input);

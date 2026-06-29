@@ -1,3 +1,11 @@
+/**
+ * supabase/videos.ts — data-access layer for videos (the feed, likes, bookmarks, views, promotion).
+ * Purpose: All video-related database/storage operations live here: uploading metadata, building the
+ *   weighted "For You" feed, like/unlike, bookmark/unbookmark, view tracking and coin-funded promotion.
+ *   Centralising these keeps query logic out of components and lets results be cached.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { supabase } from './client';
 import { cacheGet, cacheSet, cacheInvalidate } from '../cache';
 import type { VideoMetadata } from '../../models/Video';

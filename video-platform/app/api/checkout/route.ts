@@ -1,8 +1,19 @@
+/**
+ * API route: POST /api/checkout — start a Stripe Checkout session to buy coins.
+ * Purpose: Creates a Stripe payment session for a fixed coin package. Security-first: the buyer's id
+ *   comes from the verified auth token (never the request body), the package price is looked up server-
+ *   side, the request is rate-limited, and the body is schema-validated. The coins are credited later by
+ *   the Stripe webhook, not here.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { checkRateLimit, getClientIp, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit';
 import { CoinCheckoutSchema, parseBody } from '@/lib/schemas';
 import { getAuthenticatedUser } from '@/lib/server-auth';
+
+// Coin packages and their prices (in cents) — defined server-side so the client can't set its own price.
 
 const COIN_PACKAGES: Record<string, { coins: number; price: number; name: string }> = {
   starter: { coins: 1000, price: 1000, name: '1000 Coins' },
@@ -77,7 +88,13 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ url: session.url });
   } catch (error) {
-    console.error('Stripe checkout error:', error);
-    return NextResponse.json({ error: 'Failed to create checkout session' }, { status: 500 });
+    // Surface the REAL Stripe error (e.g. bad key, invalid amount, bad URL) instead
+    // of a generic message, so failures are diagnosable from the log and the client.
+    const message = error instanceof Error ? error.message : String(error);
+    console.error('Stripe checkout error:', message);
+    return NextResponse.json(
+      { error: message || 'Failed to create checkout session' },
+      { status: 500 }
+    );
   }
 }

@@ -1,5 +1,13 @@
 'use client';
 
+/**
+ * ProductsRow — a home-page product carousel wired to the real home data.
+ * Purpose: Derives which real menu items to show (via a `select` function or a pre-composed `items`
+ *   array) and renders them as a ProductCarousel. Shows nothing while loading or when empty — it
+ *   never falls back to placeholder products.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { ProductCarousel } from './ProductCarousel';
 import { useHomeData } from './HomeData';
 import type { Product } from '@/lib/home-data';

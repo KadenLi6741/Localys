@@ -100,6 +100,51 @@ async function nodeToImage(node: HTMLElement | null): Promise<CapturedImage | nu
   }
 }
 
+/**
+ * Rasterize a rendered recharts node to a PNG by serializing its inner <svg>
+ * directly (NOT html2canvas — that throws on Tailwind v4's `oklch()` colors,
+ * which was making every chart export as "(chart unavailable)"). Recharts emits
+ * plain hex fills/strokes, so the serialized SVG draws cleanly onto a canvas.
+ */
+async function nodeToImage(node: HTMLElement | null): Promise<CapturedImage | null> {
+  if (!node) return null;
+  const svg = node.querySelector('svg');
+  if (!svg) return null;
+  try {
+    const rect = svg.getBoundingClientRect();
+    const w = Math.max(1, Math.round(rect.width || Number(svg.getAttribute('width')) || 744));
+    const h = Math.max(1, Math.round(rect.height || Number(svg.getAttribute('height')) || 284));
+    const clone = svg.cloneNode(true) as SVGSVGElement;
+    clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+    clone.setAttribute('width', String(w));
+    clone.setAttribute('height', String(h));
+    const xml = new XMLSerializer().serializeToString(clone);
+    const src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(xml);
+
+    const scale = 2;
+    const canvas = document.createElement('canvas');
+    canvas.width = w * scale;
+    canvas.height = h * scale;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return null;
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    await new Promise<void>((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => { ctx.drawImage(img, 0, 0, canvas.width, canvas.height); resolve(); };
+      img.onerror = () => reject(new Error('SVG image load failed'));
+      img.src = src;
+    });
+    return { dataUrl: canvas.toDataURL('image/png'), w: canvas.width, h: canvas.height };
+  } catch (e) {
+    console.error('Chart capture failed:', e instanceof Error ? e.message : e);
+    return null;
+  }
+}
+
+// Renders the reports UI. `orders`/`reviews` are the real data; everything below derives filtered
+// metrics from them and renders charts/tables plus the export buttons.
 export function BusinessReports({
   orders, reviews, businessName = 'Your Business',
 }: {
@@ -108,6 +153,8 @@ export function BusinessReports({
   businessName?: string;
 }) {
   const now = useMemo(() => Date.now(), []);
+  // Use real orders only when there are enough to be meaningful (>=5); otherwise show demo data so the
+  // reports look populated for new businesses.
   const allOrders = useMemo(() => {
     const real = normalizeOrders(orders);
     return real.length >= 5 ? real : generateDemoOrders(now);
@@ -667,6 +714,7 @@ export function BusinessReports({
   );
 }
 
+// Reusable card wrapper for an on-screen chart (title + optional subtitle + fixed-height body).
 function ChartCard({ title, subtitle, children }: { title: string; subtitle?: string; children: React.ReactNode }) {
   return (
     <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
@@ -679,6 +727,7 @@ function ChartCard({ title, subtitle, children }: { title: string; subtitle?: st
   );
 }
 
+// Reusable data table with a header row, body rows, an optional bold footer (totals), and an empty state.
 function TableCard({ headers, rows, footer }: { headers: string[]; rows: string[][]; footer?: string[] }) {
   return (
     <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
@@ -717,6 +766,7 @@ function TableCard({ headers, rows, footer }: { headers: string[]; rows: string[
   );
 }
 
+// Small labelled stat tile used in the customer report's summary row.
 function MiniStat({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-2xl border border-border bg-card p-4 text-center shadow-sm">

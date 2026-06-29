@@ -1,5 +1,12 @@
 'use client';
 
+/**
+ * CommunitiesContext — in-app state for the Communities feature (communities, threads, votes).
+ * Purpose: Holds the demo communities and their discussion threads/media plus voting state, shared
+ *   across the communities pages via context so list and detail views stay in sync.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { createContext, useContext, useState, ReactNode } from 'react';
 
 export interface Community {

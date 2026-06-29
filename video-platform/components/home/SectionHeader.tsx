@@ -1,3 +1,10 @@
+/**
+ * SectionHeader — titled heading for a home-page section with an optional "See all" link.
+ * Purpose: Standardises the heading row above each carousel/row on the home screen so spacing and
+ *   the See-all affordance are consistent across sections.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import Link from 'next/link';
 
 /** Reusable titled section header (title + optional "see all" link). */

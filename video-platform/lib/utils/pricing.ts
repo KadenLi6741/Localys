@@ -1,8 +1,19 @@
+/**
+ * pricing.ts — derive a clean "from $X–$Y" price range for a business from its item prices.
+ * Purpose: Turns a list of raw menu prices into a tidy, rounded range to display on cards/feed, so
+ *   businesses show an approachable price band (e.g. "$20–$30") instead of exact min/max. Centralised
+ *   so every surface rounds the same way.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 export interface PriceRange {
   min: number;
   max: number;
 }
 
+// Computes a rounded, presentation-friendly price band from a set of prices. Uses the average and
+// spread (std-dev) to pick sensible round steps ($10 below ~$70, $25 above) and widen the band when
+// prices vary a lot, while keeping the lower bound from being unrealistically far below the upper.
 export function computeRoundedPriceRange(prices: number[]): PriceRange | null {
   if (!prices.length) return null;
 
@@ -44,6 +55,7 @@ export function computeRoundedPriceRange(prices: number[]): PriceRange | null {
   return { min: minPrice, max: maxPrice };
 }
 
+// Midpoint of a price range, rounded — a single representative price when one number is needed.
 export function computeAveragePrice(range: PriceRange | null): number | null {
   if (!range) return null;
   return Math.round((range.min + range.max) / 2);

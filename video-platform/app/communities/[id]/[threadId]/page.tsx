@@ -1,5 +1,12 @@
 'use client';
 
+/**
+ * Community thread page (/communities/[id]/[threadId]) — a single discussion thread + replies.
+ * Purpose: Shows one thread's post (with media) and its replies, with voting and replying. Uses
+ *   CommunitiesContext; gated behind ProtectedRoute.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';

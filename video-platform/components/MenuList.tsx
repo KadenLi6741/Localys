@@ -1,10 +1,19 @@
 'use client';
 
+/**
+ * MenuList — a business's menu of items, shown on its profile.
+ * Purpose: Renders a business's menu in two modes — a public grid (customers can buy items) and an
+ *   owner list view (inline price editing, add/edit/delete items). Owners manage their menu in place;
+ *   customers browse and purchase. Keeps the UI in sync with Supabase as items change.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { Fragment, useState, useEffect, useRef } from 'react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAuth } from '@/contexts/AuthContext';
 import { Menu, MenuItem, getUserMenus, getUserMenu, deleteMenu, updateMenuItem, deleteMenuItem } from '@/lib/supabase/profiles';
 import dynamic from 'next/dynamic';
+// Load the heavy edit/create modal lazily (and client-only) so it doesn't bloat the initial menu render.
 const MenuModal = dynamic(() => import('./MenuModal').then(mod => mod.MenuModal), { ssr: false });
 import { MenuItemPurchaseButton } from './MenuItemPurchaseButton';
 
@@ -16,6 +25,8 @@ interface MenuListProps {
   onMenusLoaded?: (menus: Menu[]) => void;
 }
 
+// Displays and (for the owner) manages a business's menu. `isOwnProfile` switches between the
+// editable owner experience and the read-only/purchasable customer experience.
 export function MenuList({ userId, businessId, isOwnProfile, layout = 'grid', onMenusLoaded }: MenuListProps) {
   const { t } = useTranslation();
   const { user } = useAuth();
@@ -35,16 +46,19 @@ export function MenuList({ userId, businessId, isOwnProfile, layout = 'grid', on
   const [toastColor, setToastColor] = useState<'sage' | 'red' | 'amber'>('sage');
   const priceInputRef = useRef<HTMLInputElement>(null);
 
+  // Auto-dismiss the inline toast after a couple of seconds whenever a new message is set.
   useEffect(() => {
     if (!toastMessage) return;
     const timer = setTimeout(() => setToastMessage(''), 2500);
     return () => clearTimeout(timer);
   }, [toastMessage]);
 
+  // Reload the menu whenever we switch to a different business/user profile.
   useEffect(() => {
     loadMenus();
   }, [userId]);
 
+  // Fetches the business's primary menu (this app uses a single menu per business) and expands it.
   const loadMenus = async () => {
     setLoading(true);
     try {
@@ -88,6 +102,8 @@ export function MenuList({ userId, businessId, isOwnProfile, layout = 'grid', on
     setEditingItem(item); setSelectedMenu(primaryMenu); setIsModalOpen(true);
   };
 
+  // Deletes a menu item after the user confirms. Triggers a brief fade-out first, then removes it
+  // from the database and local state so the card animates away rather than vanishing abruptly.
   const handleDeleteItemConfirm = async (itemId: string) => {
     setFadingOutItemId(itemId);
     setTimeout(async () => {
@@ -105,12 +121,15 @@ export function MenuList({ userId, businessId, isOwnProfile, layout = 'grid', on
     }, 200);
   };
 
+  // Starts inline price editing for an item, pre-filling and selecting the current price for quick overwrite.
   const handlePriceEdit = (item: MenuItem) => {
     setEditingPriceId(item.id);
     setEditingPriceValue(item.price.toFixed(2));
     setTimeout(() => priceInputRef.current?.select(), 0);
   };
 
+  // Validates and saves an edited price. Rejects non-numbers/negatives, updates DB + local state,
+  // then briefly "glows" the price so the owner can see the change took effect.
   const handlePriceSave = async (itemId: string) => {
     const newPrice = parseFloat(editingPriceValue);
     if (isNaN(newPrice) || newPrice < 0) { setEditingPriceId(null); return; }
@@ -182,6 +201,8 @@ export function MenuList({ userId, businessId, isOwnProfile, layout = 'grid', on
           /* ── List layout (owner view) ── */
           <div className="divide-y divide-gray-100">
             {menus[0].menu_items.map((item, index) => {
+              // Show a category heading only when this item's category differs from the previous
+              // item's, so consecutive items in the same category share a single header.
               const allItems = menus[0].menu_items!;
               const prevCat = index > 0 ? allItems[index - 1].category : null;
               const showHeader = !!item.category && item.category !== prevCat;

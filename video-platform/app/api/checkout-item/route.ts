@@ -1,3 +1,12 @@
+/**
+ * API route: POST /api/checkout-item — start a Stripe Checkout session for buying menu item(s).
+ * Purpose: Creates the payment session for an item order. Like the coin checkout, it's security-first:
+ *   buyer id from the auth token, prices resolved authoritatively server-side (DB row for real items,
+ *   the bundled manifest for demo-store items), rate-limited and schema-validated — so the client can
+ *   never dictate what it pays. Fulfilment happens later via the Stripe webhook.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
@@ -191,7 +200,24 @@ export async function POST(request: NextRequest) {
     return {
       price_data: {
         currency: 'usd',
-        product_data: { name: `${item.itemName}${discLabel}`, description: 'Purchase from local business' },
+        product_data: {
+          name: `${item.itemName}${discLabel}`,
+          description: 'Purchase from local business',
+          // Per-item details ride along on EACH line item's product metadata (small,
+          // well under Stripe's 500-char-per-value limit) instead of one giant
+          // session-metadata blob. The webhook + verify route read these back by
+          // expanding line_items, so an order of any size never overflows metadata.
+          // `price` is the ORIGINAL (pre-discount) server-trusted price; the discount
+          // is re-applied downstream so original_price/strikethrough still work.
+          metadata: {
+            id: item.itemId,
+            name: mi.name,
+            sid: item.sellerId,
+            price: String(mi.price),
+            qty: String(item.quantity),
+            ...(item.specialRequests ? { sr: item.specialRequests } : {}),
+          },
+        },
         unit_amount: Math.round(unitPrice * 100),
       },
       quantity: item.quantity,
@@ -225,10 +251,11 @@ export async function POST(request: NextRequest) {
       mode: 'payment',
       success_url: `${origin}/purchase-success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/profile/${firstSellerId}?canceled=true`,
+      // Session-level metadata is kept TINY (only short scalars) — never the cart.
+      // Per-item details live on each line item's product_data.metadata (above).
       metadata: {
         buyerId,
         sellerId: firstSellerId,
-        items: JSON.stringify(itemsMetadata),
         ...(appliedCouponCode && {
           couponCode: appliedCouponCode,
           discountPercentage: discountPercentage.toString(),
@@ -250,7 +277,13 @@ export async function POST(request: NextRequest) {
     console.log(`Checkout session created: ${session.id} for buyer ${buyerId}`);
     return NextResponse.json({ url: session.url });
   } catch (error) {
-    console.error('Stripe checkout-item error:', error);
-    return NextResponse.json({ error: 'Failed to create checkout session' }, { status: 500 });
+    // Surface the REAL Stripe error (e.g. bad key, invalid amount, bad URL) instead
+    // of a generic message, so failures are diagnosable from the log and the client.
+    const message = error instanceof Error ? error.message : String(error);
+    console.error('Stripe checkout-item error:', message);
+    return NextResponse.json(
+      { error: message || 'Failed to create checkout session' },
+      { status: 500 }
+    );
   }
 }

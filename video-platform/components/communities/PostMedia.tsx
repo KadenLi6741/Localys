@@ -7,6 +7,7 @@ import type { ThreadMedia } from '@/contexts/CommunitiesContext';
  * Renders a community post's attached photo or video. Hides itself if the media
  * fails to load (e.g. missing file) so a post never shows a broken image.
  * Palette: black framing only.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
  */
 export function PostMedia({ media, className = '' }: { media?: ThreadMedia; className?: string }) {
   const [failed, setFailed] = useState(false);

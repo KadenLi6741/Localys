@@ -1,7 +1,16 @@
+/**
+ * Challenges — daily and monthly gamified goals with progress + coin rewards on the home page.
+ * Purpose: Encourages repeat engagement by showing the user trackable challenges (e.g. "order from
+ *   3 businesses") and how close they are to each reward. Data comes from lib/home-data.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { Coins } from 'lucide-react';
 import { dailyChallenges, monthlyChallenges, type Challenge } from '@/lib/home-data';
 
+// One challenge row: title, coin reward, and a progress bar derived from current/goal.
 function ChallengeCard({ challenge }: { challenge: Challenge }) {
+  // Clamp to 100% so an over-achieved challenge never overflows the bar.
   const pct = Math.min(100, Math.round((challenge.current / challenge.goal) * 100));
   return (
     <div className="rounded-md border border-gray-200 bg-white px-2 py-0.5 shadow-sm dark:border-gray-700 dark:bg-gray-900">

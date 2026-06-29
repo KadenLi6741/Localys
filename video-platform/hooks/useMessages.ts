@@ -1,3 +1,11 @@
+/**
+ * useMessages — hook managing the messages of one open conversation.
+ * Purpose: Loads a chat's messages, sends new ones, subscribes to realtime updates, and marks messages
+ *   read. Transparently handles demo chats (client-side) vs real Supabase chats so the chat window code
+ *   stays the same for both.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { getMessages, sendMessage, subscribeToMessages, markMessagesAsRead, Message } from '@/lib/supabase/messaging';
 import { supabase } from '@/lib/supabase/client';

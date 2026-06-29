@@ -1,5 +1,11 @@
 'use client';
 
+/**
+ * not-found.tsx — the global 404 page.
+ * Purpose: Rendered for unknown routes; shows a friendly "page not found" message with a link back home.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import Link from 'next/link';
 
 export default function NotFound() {

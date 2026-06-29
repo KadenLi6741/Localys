@@ -1,3 +1,10 @@
+/**
+ * ProductCarousel — a titled CarouselRow pre-filled with ProductCards.
+ * Purpose: Convenience wrapper so home sections can render a labelled, scrollable row of products
+ *   from a single array prop, instead of wiring up CarouselRow + ProductCard each time.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { CarouselRow } from './CarouselRow';
 import { ProductCard } from './ProductCard';
 import type { Product } from '@/lib/home-data';

@@ -1,5 +1,13 @@
 'use client';
 
+/**
+ * ActivityPanel — slide-in notifications drawer (likes, comments, follows, mentions).
+ * Purpose: Gives users one place to see who interacted with their content. It computes an unread
+ *   badge count, subscribes to realtime inserts so notifications arrive live, groups items by time,
+ *   and lets users follow back or jump to the related video/profile.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
@@ -31,6 +39,7 @@ const FILTERS: { key: FilterType; label: string }[] = [
   { key: 'followers', label: 'Followers' },
 ];
 
+// Buckets a timestamp into the section header it belongs under (This Week / This Month / Previous).
 function getTimeGroup(dateStr: string): string {
   const diffDays = (Date.now() - new Date(dateStr).getTime()) / 86400000;
   if (diffDays < 7) return 'This Week';
@@ -38,6 +47,7 @@ function getTimeGroup(dateStr: string): string {
   return 'Previous';
 }
 
+// Renders a relative "time ago" label (Just now / 5m / 3h / 2d), falling back to a date past a week.
 function formatTimestamp(dateStr: string): string {
   const diffMs = Date.now() - new Date(dateStr).getTime();
   const mins = Math.floor(diffMs / 60000);
@@ -50,8 +60,10 @@ function formatTimestamp(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 
+// localStorage key holding the last time the user opened the panel; anything newer counts as "unread".
 const LAST_SEEN_KEY = 'activity_last_seen_at';
 
+// The notifications drawer. Owns loading/grouping activity and maintaining the unread badge count.
 export function ActivityPanel() {
   const router = useRouter();
   const { user } = useAuth();
@@ -60,6 +72,8 @@ export function ActivityPanel() {
   const [loading, setLoading] = useState(false);
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
 
+  // Refs (not state) cache the user's own ids so realtime callbacks can decide relevance without
+  // re-subscribing on every render. isOpenRef lets those long-lived callbacks read the latest open state.
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
   const myVideoIdsRef = useRef<string[]>([]);
   const myBusinessIdRef = useRef<string | null>(null);
@@ -76,7 +90,8 @@ export function ActivityPanel() {
     }
   }, [isOpen, user]);
 
-  // Setup on mount
+  // On mount/user change: cache the user's videos, username and business id, compute the unread
+  // count, and open realtime subscriptions. Done once so per-notification handling stays cheap.
   useEffect(() => {
     if (!user) return;
 
@@ -111,6 +126,8 @@ export function ActivityPanel() {
     };
   }, [user]);
 
+  // Counts notifications (follows + comments/likes on my content) created since the last time the
+  // panel was opened, to drive the unread badge. First-ever visit seeds the marker and shows zero.
   const computeUnreadCount = async () => {
     if (!user) return;
     const lastSeen = localStorage.getItem(LAST_SEEN_KEY);
@@ -160,6 +177,8 @@ export function ActivityPanel() {
     setUnreadCount(count);
   };
 
+  // Opens realtime listeners for new follows/comments/likes. Each handler filters to events that
+  // concern THIS user (their videos, their business, them as the followed) before bumping the badge.
   const setupSubscriptions = () => {
     if (!user) return;
 
@@ -203,11 +222,14 @@ export function ActivityPanel() {
     channelRef.current = channel;
   };
 
+  // Marks everything as read by advancing the last-seen marker to now and clearing the badge.
   const markAsRead = () => {
     localStorage.setItem(LAST_SEEN_KEY, new Date().toISOString());
     setUnreadCount(0);
   };
 
+  // Fetches all activity types in parallel, joins in the actors' profiles, works out follow-back
+  // state, then merges everything into one timestamp-sorted list for display.
   const loadActivity = useCallback(async () => {
     if (!user) return;
     setLoading(true);
@@ -242,7 +264,8 @@ export function ActivityPanel() {
         businessLikes = data ?? [];
       }
 
-      // Dedup likes by id
+      // Merge video-level and business-level likes, de-duping by id so a like that matches both
+      // (e.g. a business video) is only shown once.
       const allLikesMap = new Map<string, any>();
       [...videoLikes, ...businessLikes].forEach(l => allLikesMap.set(l.id, l));
       const allLikes = Array.from(allLikesMap.values());
@@ -278,6 +301,7 @@ export function ActivityPanel() {
           .neq('user_id', user.id)
           .order('created_at', { ascending: false })
           .limit(50);
+        // Drop any mention that's already counted as a comment-on-my-video to avoid double entries.
         const commentIds = new Set(commentsData.map(c => c.id));
         mentionsData = (data ?? []).filter(m => !commentIds.has(m.id));
       }
@@ -298,7 +322,8 @@ export function ActivityPanel() {
         profileMap = new Map((profiles ?? []).map(p => [p.id, p]));
       }
 
-      // Check follow-back status
+      // Work out which new followers the user already follows, so we can show "Follow Back" only
+      // for the ones they don't.
       const followerIds = (followsData ?? []).map(f => f.follower_id);
       let followingBackSet = new Set<string>();
       if (followerIds.length > 0) {
@@ -391,6 +416,8 @@ export function ActivityPanel() {
     }
   }, [user]);
 
+  // Follows the given user back and optimistically flips their item to "following" so the button
+  // updates instantly without a full reload.
   const handleFollowBack = async (targetUserId: string) => {
     if (!user) return;
     try {
@@ -409,6 +436,8 @@ export function ActivityPanel() {
     }
   };
 
+  // Navigates to the relevant destination for a tapped notification: the video if there is one,
+  // otherwise the follower's profile. Closes the panel first so the drawer isn't left open over it.
   const handleItemClick = (item: ActivityItem) => {
     if (item.videoId) {
       closePanel();
@@ -429,7 +458,7 @@ export function ActivityPanel() {
     return true;
   });
 
-  // Group by time
+  // Bucket the filtered items into time sections and emit them in a fixed order (newest group first).
   const groups: { label: string; items: ActivityItem[] }[] = [];
   const groupMap = new Map<string, ActivityItem[]>();
   filtered.forEach(item => {

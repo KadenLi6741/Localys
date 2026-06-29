@@ -1,3 +1,11 @@
+/**
+ * API route: POST /api/orders/complete — mark an order fulfilled after a merchant scans its QR.
+ * Purpose: The redemption endpoint for in-person pickup. It verifies the order's signed token (so only a
+ *   genuine QR can complete an order) and updates the order status. Runs with the Supabase service role
+ *   because it acts on the merchant's behalf via the verified token, not a logged-in session.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { verifyToken } from '@/lib/verification';

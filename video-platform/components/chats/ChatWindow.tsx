@@ -1,5 +1,12 @@
 'use client';
 
+/**
+ * ChatWindow — the message transcript pane for an open conversation.
+ * Purpose: Renders the list of messages (sender-aligned bubbles) and lets the user edit or delete
+ *   their own messages inline. Auto-scroll is handled by the parent via messagesEndRef.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { Message } from '@/lib/supabase/messages';
 import Link from 'next/link';
 import { useState } from 'react';

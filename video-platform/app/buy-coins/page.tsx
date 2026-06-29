@@ -1,5 +1,12 @@
 'use client';
 
+/**
+ * Buy-coins page (/buy-coins) — purchase coin packages used to promote videos.
+ * Purpose: Shows the available coin packages (and the user's balance/coupons) and starts a Stripe
+ *   Checkout session for the chosen package via /api/checkout. Coins are credited on payment success.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { getUserCoins } from '@/lib/supabase/profiles';

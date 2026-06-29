@@ -1,8 +1,21 @@
+/**
+ * API route: POST /api/webhooks/stripe — Stripe webhook that fulfills paid orders.
+ * Purpose: The trusted server-side completion step for payments. It verifies the Stripe signature, then
+ *   on a completed checkout credits coins / records the item purchase (and generates the order's
+ *   verification token for the pickup QR). Uses the Supabase service-role key since it acts as the system,
+ *   not a logged-in user. Fulfilling here (not on the client) prevents users from faking payment.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 import { generateToken } from '@/lib/verification';
 
+// Real DB items have UUID ids; demo/built-in items use slug ids (e.g. "jays-burger-0").
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+// Handles incoming Stripe events; only acts on verified, completed-checkout events.
 export async function POST(request: NextRequest) {
   const stripeKey = process.env.STRIPE_SECRET_KEY;
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
@@ -135,7 +148,7 @@ export async function POST(request: NextRequest) {
         });
 
         return NextResponse.json({ success: true });
-      } else if (metadata.items && metadata.buyerId) {
+      } else if (metadata.buyerId) {
         // --- ITEM PURCHASE (multi-item) ---
         const buyerId = metadata.buyerId;
         const couponCode = metadata.couponCode || null;
@@ -144,6 +157,7 @@ export async function POST(request: NextRequest) {
         const groupOrderId = metadata.groupOrderId || null;
         const promoCodeId = metadata.promoCodeId || null;
         const promoUsedCount = metadata.promoUsedCount ? parseInt(metadata.promoUsedCount) : null;
+        const sellerId = metadata.sellerId || '';
 
         // Check if already processed (deduplication)
         const { data: existingItem } = await supabase
@@ -175,14 +189,12 @@ export async function POST(request: NextRequest) {
         (menuItems || []).forEach((mi: { id: string; name: string; price: number; user_id: string }) => {
           menuMap.set(mi.id, mi);
         });
-
-        const purchaseRecords = items.map((item) => {
-          const menuItem = menuMap.get(item.id);
-          const originalPrice = menuItem?.price || 0;
-          const paidPrice = discountPercentage > 0
-            ? Math.max(0, originalPrice - originalPrice * (discountPercentage / 100))
-            : originalPrice;
-
+        const items = (lineItems.data ?? []).map((li) => {
+          const product = li.price && typeof li.price.product !== 'string'
+            ? (li.price.product as Stripe.Product)
+            : null;
+          const meta = (product?.metadata ?? {}) as Record<string, string>;
+          const price = meta.price ? parseFloat(meta.price) : 0;
           return {
             item_id: item.id,
             seller_id: menuItem?.user_id || sellerId,
@@ -203,6 +215,45 @@ export async function POST(request: NextRequest) {
             ...(groupOrderId && { group_order_id: groupOrderId }),
           };
         });
+
+        // Only real (UUID) items become DB rows. Demo/built-in items use slug ids
+        // (e.g. "jays-burger-0") that the uuid columns reject; they're shown
+        // synthetically on the success page, so skipping them keeps the webhook from
+        // 500-ing on a demo cart.
+        const purchaseRecords = items
+          .filter((item) => UUID_RE.test(item.id))
+          .map((item) => {
+            const originalPrice = item.price;
+            const paidPrice = discountPercentage > 0
+              ? Math.max(0, originalPrice - originalPrice * (discountPercentage / 100))
+              : originalPrice;
+
+            return {
+              item_id: item.id,
+              seller_id: UUID_RE.test(item.sid) ? item.sid : sellerId,
+              buyer_id: buyerId,
+              item_name: item.name,
+              price: paidPrice,
+              quantity: item.qty || 1,
+              ...(couponCode && {
+                original_price: originalPrice,
+                coupon_code: couponCode,
+                discount_percentage: discountPercentage,
+              }),
+              stripe_session_id: session.id,
+              status: 'paid',
+              purchased_at: new Date().toISOString(),
+              ...(scheduledAt && { scheduled_at: scheduledAt }),
+              ...(item.sr && { special_requests: item.sr }),
+              ...(groupOrderId && { group_order_id: groupOrderId }),
+            };
+          });
+
+        if (purchaseRecords.length === 0) {
+          // Cart was entirely demo/built-in items — nothing to persist server-side.
+          console.log(`Webhook: no real (UUID) items to record for session ${session.id}`);
+          return NextResponse.json({ received: true });
+        }
 
         const { data: inserted, error } = await supabase
           .from('item_purchases')

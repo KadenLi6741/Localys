@@ -1,3 +1,9 @@
+/**
+ * Marketing home page (/) — the public landing route.
+ * Purpose: Sets SEO/social metadata and renders the LandingScreen. This is the first page visitors see
+ *   before signing in.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
 import type { Metadata } from "next";
 import LandingScreen from "./LandingScreen";
 

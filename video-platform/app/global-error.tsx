@@ -1,5 +1,12 @@
 'use client';
 
+/**
+ * global-error.tsx — top-level error boundary for failures in the root layout itself.
+ * Purpose: Catches errors that escape the normal error.tsx boundary (i.e. in the root layout), rendering
+ *   its own minimal <html>/<body> fallback with a retry. Last line of defence against a fully blank app.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { useEffect } from 'react';
 
 export default function GlobalError({

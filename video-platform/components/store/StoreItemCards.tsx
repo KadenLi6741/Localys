@@ -4,6 +4,7 @@
  * StoreItemCards.tsx — the item-level UI for the store page: a hook that adds an
  * item to the cart (with a brief "added" confirmation) and the two card layouts
  * that present items (a wide featured card and a compact list row).
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
  */
 import { useState } from 'react';
 import { Check, Plus, ThumbsUp } from 'lucide-react';

@@ -7,6 +7,7 @@
  * `invalid input syntax for type uuid` or foreign-key violations. Engagement
  * actions therefore branch on `isDemoId` and stay fully client-side for demo
  * content while using the normal Supabase path for real rows.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
  */
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;

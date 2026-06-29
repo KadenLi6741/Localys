@@ -1,5 +1,12 @@
 'use client';
 
+/**
+ * Premium success page (/premium/success) — Stripe redirect after subscribing to Premium.
+ * Purpose: Confirms the subscription from the Stripe session id (activating Premium via
+ *   /api/verify-premium as a safety net beside the webhook) and shows a welcome confirmation.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { Suspense, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
