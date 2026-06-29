@@ -157,7 +157,7 @@ export async function POST(request: NextRequest) {
           return NextResponse.json({ received: true });
         }
 
-        const items = JSON.parse(metadata.items) as { id: string; qty?: number }[];
+        const items = JSON.parse(metadata.items) as { id: string; qty?: number; sr?: string }[];
         const sellerId = metadata.sellerId || '';
 
         // Look up full item details from Supabase menu_items table
@@ -199,6 +199,7 @@ export async function POST(request: NextRequest) {
             status: 'paid',
             purchased_at: new Date().toISOString(),
             ...(scheduledAt && { scheduled_at: scheduledAt }),
+            ...(item.sr && { special_requests: item.sr }),
             ...(groupOrderId && { group_order_id: groupOrderId }),
           };
         });

@@ -17,7 +17,7 @@ import { Feedback } from '@/components/home/Feedback';
  */
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-gray-50 text-black dark:bg-[#1A1A18] dark:text-white">
+    <div className="min-h-screen bg-background text-foreground">
       <HomeDataProvider>
         <HomeBody />
       </HomeDataProvider>

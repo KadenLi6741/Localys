@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { ChevronLeft, Send } from 'lucide-react';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { useAuth } from '@/contexts/AuthContext';
@@ -24,15 +25,30 @@ function ChatContent() {
   const chatId = params.id as string;
   const [newMessage, setNewMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const didInitialScrollRef = useRef(false);
 
   const { messages, loading, sending, send } = useMessages(chatId, user?.id);
   const { chats } = useChats(user?.id);
   const chat = chats.find((c) => c.id === chatId);
   const other = chat?.other_user;
   const displayName = other?.full_name || other?.username || 'Chat';
+  // Link the chat participant to their store/profile. Business profiles render
+  // the store page at /profile/[id]; regular customers render their profile.
+  // Prefer username (matches the message-avatar link), fall back to id.
+  const otherHref = other ? `/profile/${other.username || other.id}` : null;
 
+  // Auto-scroll to the newest message. Runs in requestAnimationFrame so it fires
+  // AFTER the messages paint (lands on the true bottom, not a stale position).
+  // Instant jump on first load; smooth for later sent/received messages.
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    const el = messagesEndRef.current;
+    if (!el || messages.length === 0) return;
+    const instant = !didInitialScrollRef.current;
+    const raf = requestAnimationFrame(() => {
+      el.scrollIntoView({ behavior: instant ? 'auto' : 'smooth', block: 'end' });
+      didInitialScrollRef.current = true;
+    });
+    return () => cancelAnimationFrame(raf);
   }, [messages]);
 
   const handleSend = async (e: React.FormEvent) => {
@@ -57,30 +73,52 @@ function ChatContent() {
           <ChevronLeft className="h-5 w-5" />
         </button>
 
-        {/* Avatar */}
-        <div className="h-9 w-9 shrink-0 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
-          {other?.profile_picture_url ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={other.profile_picture_url}
-              alt={displayName}
-              className="h-full w-full object-cover"
-            />
-          ) : (
-            <div className="flex h-full w-full items-center justify-center text-sm font-medium text-gray-500">
-              {displayName[0]?.toUpperCase()}
+        {otherHref ? (
+          <Link
+            href={otherHref}
+            className="group flex min-w-0 items-center gap-3 rounded-full transition-colors"
+            aria-label={`View ${displayName}'s store`}
+          >
+            {/* Avatar */}
+            <div className="h-9 w-9 shrink-0 overflow-hidden rounded-full bg-gray-200 ring-0 transition group-hover:ring-2 group-hover:ring-[#f97316]/40 dark:bg-gray-700">
+              {other?.profile_picture_url ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={other.profile_picture_url}
+                  alt={displayName}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center text-sm font-medium text-gray-500">
+                  {displayName[0]?.toUpperCase()}
+                </div>
+              )}
             </div>
-          )}
-        </div>
 
-        <div className="min-w-0">
-          <p className="truncate text-[14px] font-semibold text-gray-900 dark:text-white">
-            {displayName}
-          </p>
-          {other?.username && other.full_name && (
-            <p className="text-[12px] text-gray-400">@{other.username}</p>
-          )}
-        </div>
+            <div className="min-w-0">
+              <p className="truncate text-[14px] font-semibold text-gray-900 transition-colors group-hover:text-[#f97316] dark:text-white dark:group-hover:text-[#f97316]">
+                {displayName}
+              </p>
+              {other?.username && other.full_name && (
+                <p className="text-[12px] text-gray-400">@{other.username}</p>
+              )}
+            </div>
+          </Link>
+        ) : (
+          <>
+            {/* Avatar */}
+            <div className="h-9 w-9 shrink-0 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
+              <div className="flex h-full w-full items-center justify-center text-sm font-medium text-gray-500">
+                {displayName[0]?.toUpperCase()}
+              </div>
+            </div>
+            <div className="min-w-0">
+              <p className="truncate text-[14px] font-semibold text-gray-900 dark:text-white">
+                {displayName}
+              </p>
+            </div>
+          </>
+        )}
       </div>
 
       {/* Messages */}

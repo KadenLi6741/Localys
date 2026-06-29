@@ -15,6 +15,8 @@ export interface Comment {
   reply_count?: number;
   replies?: Comment[];
   rating: number | null;
+  /** True when the reviewer has a real order from the reviewed business. */
+  verified?: boolean;
 }
 
 export interface CreateCommentPayload {

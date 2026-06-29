@@ -71,7 +71,7 @@ function CallbackInner() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#1A1A18] px-4 text-white">
       <div className="flex flex-col items-center gap-4">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-white/20 border-t-[#F5A623]" />
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-white/20 border-t-[#f97316]" />
         <p className="text-white/70">{message}</p>
       </div>
     </div>

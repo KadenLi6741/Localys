@@ -75,7 +75,7 @@ export default function ResetPasswordPage() {
 
         {success ? (
           <div className="space-y-6">
-            <div className="bg-green-500/20 border border-green-500 text-green-200 px-4 py-3 rounded-lg">
+            <div className="bg-[#f97316]/20 border border-[#f97316] text-[#f97316] px-4 py-3 rounded-lg">
               Password updated successfully. Redirecting to sign in...
             </div>
           </div>

@@ -210,6 +210,27 @@ export async function ensureProfileForCurrentUser() {
 }
 
 /**
+ * Apply a session that was held server-side during the login email-code step.
+ * Called only AFTER a valid verification code (emailed code or 77777 backup) so
+ * the browser becomes logged in at this point and not before. Also syncs the
+ * user's profile row, mirroring the behavior of the direct password sign-in.
+ */
+export async function applyVerifiedSession(accessToken: string, refreshToken: string) {
+  const { data, error } = await supabase.auth.setSession({
+    access_token: accessToken,
+    refresh_token: refreshToken,
+  });
+  if (!error && data.user) {
+    try {
+      await ensureProfileForCurrentUser();
+    } catch (profileError) {
+      console.warn('Profile sync after code verification failed:', profileError);
+    }
+  }
+  return { data, error };
+}
+
+/**
  * Sign out current user
  */
 export async function signOut() {

@@ -58,7 +58,11 @@ ALTER TABLE group_orders      ENABLE ROW LEVEL SECURITY;
 ALTER TABLE group_order_items ENABLE ROW LEVEL SECURITY;
 ALTER TABLE promo_codes       ENABLE ROW LEVEL SECURITY;
 
--- group_orders: any authenticated user can read (join by code)
+-- group_orders
+DROP POLICY IF EXISTS "go_select"  ON group_orders;
+DROP POLICY IF EXISTS "go_insert"  ON group_orders;
+DROP POLICY IF EXISTS "go_update"  ON group_orders;
+
 CREATE POLICY "go_select"
   ON group_orders FOR SELECT TO authenticated USING (true);
 
@@ -70,7 +74,11 @@ CREATE POLICY "go_update"
   ON group_orders FOR UPDATE TO authenticated
   USING (auth.uid() = creator_id OR auth.uid() = seller_id);
 
--- group_order_items: all authenticated can select; own rows for write
+-- group_order_items
+DROP POLICY IF EXISTS "goi_select" ON group_order_items;
+DROP POLICY IF EXISTS "goi_insert" ON group_order_items;
+DROP POLICY IF EXISTS "goi_delete" ON group_order_items;
+
 CREATE POLICY "goi_select"
   ON group_order_items FOR SELECT TO authenticated USING (true);
 
@@ -82,7 +90,10 @@ CREATE POLICY "goi_delete"
   ON group_order_items FOR DELETE TO authenticated
   USING (auth.uid() = user_id);
 
--- promo_codes: seller manages own; authenticated customers read active
+-- promo_codes
+DROP POLICY IF EXISTS "pc_seller_all"     ON promo_codes;
+DROP POLICY IF EXISTS "pc_customer_read"  ON promo_codes;
+
 CREATE POLICY "pc_seller_all"
   ON promo_codes FOR ALL TO authenticated
   USING (auth.uid() = seller_id)

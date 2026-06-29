@@ -72,15 +72,14 @@ const SEED_COMMUNITIES: Community[] = [
 ];
 
 /* ----------------------------- media (matched to posts by filename) ----------------------------- */
-const M = (p: string): string => encodeURI(p);
 const THREAD_MEDIA: Record<string, ThreadMedia> = {
-  t1: { type: 'image', src: M('/Communities/images.jpg') },
-  t2: { type: 'video', src: M('/Communities/Franklin BBQ vs the new Austin pop-ups.mp4') },
-  t3: { type: 'image', src: '/Communities/Best$1.50slice' },
-  t5: { type: 'image', src: M('/Communities/Lou Malnati’s vs Giordano’s — settle it.jpg') },
-  t6: { type: 'image', src: M('/Communities/Bestfriedchicekninnashvile.jpg') },
-  t7: { type: 'image', src: M('/Communities/Independant coffee shop.jpg') },
-  t8: { type: 'video', src: M('/Communities/Independant coffee shop video.mp4') },
+  t1: { type: 'image', src: '/community-media/images.jpg' },
+  t2: { type: 'video', src: '/community-media/franklin-bbq-vs-austin-popups.mp4' },
+  t3: { type: 'image', src: '/community-media/best-150-slice.jpg' },
+  t5: { type: 'image', src: '/community-media/lou-malnati-vs-giordano-settle-it.jpg' },
+  t6: { type: 'image', src: '/community-media/best-fried-chicken-nashville.jpg' },
+  t7: { type: 'image', src: '/community-media/independent-coffee-shop.jpg' },
+  t8: { type: 'video', src: '/community-media/independent-coffee-shop-video.mp4' },
 };
 
 const BASE_THREADS: Omit<Thread, 'commentCount' | 'media'>[] = [
@@ -150,6 +149,14 @@ const COMMENT_POOL = [
   'Took a chance based on this thread and was not let down.',
   'The owner is super welcoming, makes you want to come back.',
   'Perfect for a casual night out without breaking the bank.',
+  'Went last Friday with the whole family and we were absolutely blown away — the quality has gone up significantly since the last time we visited. Would recommend calling ahead on weekends because the wait can be 20 to 30 minutes.',
+  'Honestly the best version of this I have had in years. The owner clearly puts real care into every detail, from sourcing to presentation. I have already sent three friends and they all came back with the same reaction.',
+  'Hard to find spots like this anymore. The prices are fair for what you get, the staff remembered my order on my second visit, and nothing felt rushed.',
+  'Tried it based on this thread and it exceeded the hype. Showed up at opening on a Saturday and there was already a small line — totally worth it. The staff moved quickly and everyone seemed to know what they were doing.',
+  'What makes this place stand out is consistency. I have been probably fifteen times over the past year and it has never had an off day — same quality every single time, which is rarer than it should be.',
+  'First time visiting and I was genuinely impressed. The portions were larger than I expected, the flavour was dialled in, and I appreciated that they use quality ingredients without charging you extra for it.',
+  'Came for the first time based on this recommendation and will absolutely be back. It is the kind of place where you can tell the people running it actually care about what they are serving.',
+  'The location is not ideal for parking but once you are in, the experience makes you forget about it completely. Everything we ordered came out perfectly and the staff were attentive without being overbearing.',
 ];
 
 function generateComments(): ThreadComment[] {

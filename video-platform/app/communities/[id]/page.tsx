@@ -11,11 +11,11 @@ import { CommunityAvatar } from '@/components/communities/CommunityAvatar';
 import { PostMedia } from '@/components/communities/PostMedia';
 
 const COMMUNITY_IMAGES: Record<string, string> = {
-  'richmondhill-eats': '/Communities/Richmond Hill.jpg',
-  'local-services': '/Communities/Local services.jpg',
-  'support-local': '/Communities/SupportLocal.png',
-  'markham': '/Communities/Markham.png',
-  'vaughan': '/Communities/Vaughan.jpg',
+  'richmondhill-eats': '/community-media/richmond-hill.jpg',
+  'local-services': '/community-media/local-services.jpg',
+  'support-local': '/community-media/support-local.png',
+  'markham': '/community-media/markham.png',
+  'vaughan': '/community-media/vaughan.jpg',
 };
 
 function timeAgo(iso: string): string {
@@ -74,7 +74,7 @@ function CommunityContent() {
 
   if (!community) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-100 dark:bg-[#1A1A18]">
+      <div className="flex min-h-screen items-center justify-center bg-gray-100 dark:bg-[#121212]">
         <div className="text-center">
           <p className="text-gray-500 dark:text-gray-400 mb-4">Community not found.</p>
           <Link href="/communities" className="text-sm font-semibold text-[#f97316] hover:underline">
@@ -86,7 +86,7 @@ function CommunityContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-[#1A1A18] text-gray-900 dark:text-white">
+    <div className="min-h-screen bg-gray-100 dark:bg-[#121212] text-gray-900 dark:text-white">
       {/* Community header */}
       <div className="border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
         <div className="mx-auto max-w-3xl px-4 py-4">
@@ -202,23 +202,23 @@ function CommunityContent() {
                     <button
                       onClick={(e) => { e.stopPropagation(); vote(t.id, 1); }}
                       aria-label="Upvote"
-                      className={`flex h-8 w-8 items-center justify-center rounded-full transition-colors ${
-                        t.userVote === 1 ? 'text-[#f97316]' : 'text-gray-500 dark:text-gray-400 hover:text-[#f97316]'
+                      className={`flex h-8 w-8 items-center justify-center rounded-full p-0 transition-colors ${
+                        t.userVote === 1 ? 'text-[#f97316]' : 'text-black dark:text-white hover:text-[#f97316]'
                       }`}
                     >
-                      <ChevronUp className="h-4 w-4" />
+                      <ChevronUp className="h-4 w-4" strokeWidth={2.5} />
                     </button>
                     <span className={`min-w-[20px] text-center text-xs font-bold tabular-nums ${
-                      t.userVote === 1 ? 'text-[#f97316]' : t.userVote === -1 ? 'text-gray-500' : 'text-gray-700 dark:text-gray-300'
+                      t.userVote === 1 ? 'text-[#f97316]' : t.userVote === -1 ? 'text-[#f97316]' : 'text-black dark:text-white'
                     }`}>{t.votes}</span>
                     <button
                       onClick={(e) => { e.stopPropagation(); vote(t.id, -1); }}
                       aria-label="Downvote"
-                      className={`flex h-8 w-8 items-center justify-center rounded-full transition-colors ${
-                        t.userVote === -1 ? 'text-gray-500' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                      className={`flex h-8 w-8 items-center justify-center rounded-full p-0 transition-colors ${
+                        t.userVote === -1 ? 'text-[#f97316]' : 'text-black dark:text-white hover:text-[#f97316]'
                       }`}
                     >
-                      <ChevronDown className="h-4 w-4" />
+                      <ChevronDown className="h-4 w-4" strokeWidth={2.5} />
                     </button>
                   </div>
 

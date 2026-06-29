@@ -35,7 +35,7 @@ export function ExpressDelivery() {
       <div className="relative hidden shrink-0 sm:block" style={{ width: '176px' }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/Refrences%20of%20ui%20I%20like/Teddybear.jpg"
+          src="/ui-references/teddybear.jpg"
           alt=""
           className="h-full w-full object-cover object-top"
         />

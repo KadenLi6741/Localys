@@ -21,7 +21,7 @@ function BreakdownTooltip({ active, payload }: { active?: boolean; payload?: { p
   return (
     <div className="bg-[#1A1A18]/90 border border-[#3A3A34] rounded-lg p-3 shadow-lg">
       <p className="text-[#F5F0E8] text-sm font-semibold mb-1">{entry.status}</p>
-      <p className="text-[#F5A623] text-xs">{entry.count} orders</p>
+      <p className="text-[#f97316] text-xs">{entry.count} orders</p>
     </div>
   );
 }

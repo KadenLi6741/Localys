@@ -198,8 +198,8 @@ export default function BuyCoinsPage() {
 
         {/* Stripe Configuration Warning */}
         {!stripeConfigured && (
-          <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4 mb-8">
-            <p className="text-yellow-400 text-sm">
+          <div className="bg-[#f97316]/10 border border-[#f97316]/30 rounded-lg p-4 mb-8">
+            <p className="text-[#f97316] text-sm">
               <strong>Payment system not configured.</strong> The administrator needs to set up Stripe API keys.
             </p>
           </div>
@@ -207,7 +207,7 @@ export default function BuyCoinsPage() {
 
         {/* Available Coupons */}
         {availableCoupons.length > 0 && (
-          <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-6 mb-8">
+          <div className="bg-[#f97316]/10 border border-[#f97316]/30 rounded-lg p-6 mb-8">
             <h3 className="text-lg font-semibold mb-4">Available Coupons</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {availableCoupons.map((coupon) => {
@@ -220,17 +220,17 @@ export default function BuyCoinsPage() {
                     onClick={() => handleApplyCoupon(coupon)}
                     className={`p-4 rounded-lg border-2 transition-all text-left ${
                       isSelected
-                        ? 'border-green-500 bg-green-500/20'
-                        : 'border-green-500/30 bg-green-500/5 hover:border-green-500/50'
+                        ? 'border-[#f97316] bg-[#f97316]/20'
+                        : 'border-[#f97316]/30 bg-[#f97316]/5 hover:border-[#f97316]/50'
                     }`}
                   >
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="font-semibold text-green-400">{couponData.code}</p>
+                        <p className="font-semibold text-[#f97316]">{couponData.code}</p>
                         <p className="text-white/60 text-sm">{couponData.discount_percentage}% Off</p>
                       </div>
                       {isSelected && (
-                        <span className="text-green-400 text-lg"></span>
+                        <span className="text-[#f97316] text-lg"></span>
                       )}
                     </div>
                   </button>
@@ -242,8 +242,8 @@ export default function BuyCoinsPage() {
 
         {/* Coupon Applied Not */}
         {selectedCoupon && (
-          <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 mb-8">
-            <p className="text-blue-400 text-sm">
+          <div className="bg-[#f97316]/10 border border-[#f97316]/30 rounded-lg p-4 mb-8">
+            <p className="text-[#f97316] text-sm">
               Coupon applied! You&apos;ll save ${discountAmount} on your purchase.
             </p>
           </div>
@@ -273,13 +273,13 @@ export default function BuyCoinsPage() {
               key={pkg.id}
               className={`relative rounded-lg border transition-all ${
                 pkg.popular
-                  ? 'border-yellow-500 bg-yellow-500/5 ring-2 ring-yellow-500/30'
+                  ? 'border-[#f97316] bg-[#f97316]/5 ring-2 ring-[#f97316]/30'
                   : 'border-white/10 bg-white/5 hover:border-white/20'
               }`}
             >
               {pkg.popular && (
                 <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                  <span className="bg-yellow-500 text-black px-3 py-1 rounded-full text-xs font-bold">
+                  <span className="bg-[#f97316] text-black px-3 py-1 rounded-full text-xs font-bold">
                     MOST POPULAR
                   </span>
                 </div>
@@ -289,7 +289,7 @@ export default function BuyCoinsPage() {
                 {/* Coins */}
                 <div className="text-center mb-4">
                   <div className="text-5xl font-bold mb-2"></div>
-                  <p className="text-3xl font-bold text-yellow-400">{pkg.coins.toLocaleString()}</p>
+                  <p className="text-3xl font-bold text-[#f97316]">{pkg.coins.toLocaleString()}</p>
                   <p className="text-white/60 text-sm mt-2">{pkg.description}</p>
                 </div>
 
@@ -314,7 +314,7 @@ export default function BuyCoinsPage() {
                   disabled={processing || selectedPackage === pkg.id || !stripeConfigured}
                   className={`w-full py-3 rounded-lg font-semibold transition-all ${
                     pkg.popular
-                      ? 'bg-yellow-500 text-black hover:bg-yellow-400 disabled:bg-yellow-500/50'
+                      ? 'bg-[#f97316] text-black hover:bg-[#f97316] disabled:bg-[#f97316]/50'
                       : 'bg-white/10 text-white hover:bg-white/20 disabled:bg-white/5'
                   } disabled:cursor-not-allowed`}
                 >

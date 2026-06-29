@@ -88,7 +88,16 @@ function CheckoutContent() {
   }, 0) * 100) / 100;
 
   const couponDiscount = selectedCoupon ? Math.round((subtotal - dealSavings) * (selectedCoupon.discount_percentage / 100) * 100) / 100 : 0;
-  const total = Math.max(0, subtotal - dealSavings - couponDiscount);
+
+  // Tax is added to the customer's total; Localy's 5% platform fee is taken from
+  // the BUSINESS's portion (shown for transparency, NOT charged to the customer).
+  const TAX_RATE = 0.0825;
+  const LOCALY_FEE_RATE = 0.05;
+  const taxableBase = Math.max(0, subtotal - dealSavings - couponDiscount);
+  const tax = Math.round(taxableBase * TAX_RATE * 100) / 100;
+  const localyFee = Math.round(taxableBase * LOCALY_FEE_RATE * 100) / 100;
+  const businessNet = Math.round(taxableBase * (1 - LOCALY_FEE_RATE) * 100) / 100;
+  const total = Math.round((taxableBase + tax) * 100) / 100;
 
   const handleProceedToPayment = async () => {
     if (checkoutItems.length === 0) return;
@@ -132,12 +141,12 @@ function CheckoutContent() {
   };
 
   if (loading) {
-    return <div className="min-h-screen bg-white flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#f97316]" /></div>;
+    return <div className="min-h-screen bg-background flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#f97316]" /></div>;
   }
 
   if (checkoutItems.length === 0) {
     return (
-      <div className="min-h-screen bg-white text-gray-900 p-4">
+      <div className="min-h-screen bg-background text-foreground p-4">
         <div className="max-w-md mx-auto text-center py-16">
           <p className="text-gray-500 mb-4">No items to checkout</p>
           <Link href="/feed" className="inline-block bg-[#f97316] text-white font-semibold rounded-xl px-6 py-3 hover:opacity-90 transition-opacity">
@@ -149,7 +158,7 @@ function CheckoutContent() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f8f9fb] text-gray-900 pb-16">
+    <div className="min-h-screen bg-background text-foreground pb-16">
       <div className="w-full max-w-lg mx-auto px-4 py-6">
         {/* Header */}
         <div className="mb-6">
@@ -251,9 +260,24 @@ function CheckoutContent() {
               <span>-${couponDiscount.toFixed(2)}</span>
             </div>
           )}
+          <div className="flex justify-between text-sm text-gray-600">
+            <span>Tax (8.25%)</span><span>${tax.toFixed(2)}</span>
+          </div>
           <div className="border-t border-gray-100 pt-2 flex justify-between">
             <span className="font-semibold text-gray-900">Total</span>
             <span className="text-xl font-bold text-gray-900">${total.toFixed(2)}</span>
+          </div>
+
+          {/* Transparency: Localy's 5% platform fee comes out of the business's
+              portion — it is NOT added to the customer's total. */}
+          <div className="mt-2 border-t border-dashed border-gray-200 pt-3 space-y-1">
+            <div className="flex justify-between text-sm">
+              <span className="font-medium text-gray-900">Localy fee (5%)</span>
+              <span className="font-medium text-[#f97316]">${localyFee.toFixed(2)}</span>
+            </div>
+            <p className="text-xs text-gray-500">
+              Localy only takes 5% — the business keeps 95% (${businessNet.toFixed(2)}). This isn&apos;t added to your total.
+            </p>
           </div>
         </div>
 
@@ -284,7 +308,7 @@ function CheckoutContent() {
 
 export default function CheckoutPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-white flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#f97316]" /></div>}>
+    <Suspense fallback={<div className="min-h-screen bg-background flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#f97316]" /></div>}>
       <CheckoutContent />
     </Suspense>
   );

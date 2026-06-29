@@ -20,9 +20,12 @@ import {
 } from '@/lib/supabase/profiles';
 import { OrderHistory } from '@/components/OrderHistory';
 import { RankSection } from '@/components/RankSection';
+import { CommunityLeaderboard } from '@/components/CommunityLeaderboard';
+import { computeImpactScore, resolveImpactInputs } from '@/lib/ranks';
 import { getUserCoins } from '@/lib/supabase/profiles';
 import { getUserBookmarkedVideos } from '@/lib/supabase/videos';
-import { getSavedItems, getLikedItemIds, subscribeEngagement, type SavedItem } from '@/lib/clientEngagement';
+import { getSavedItems, getLikedItemIds, getLikedMenuItems, subscribeEngagement, type LikedMenuItem } from '@/lib/clientEngagement';
+import { getUserLikedItems } from '@/lib/supabase/likedItems';
 import { isDemoId } from '@/lib/utils/ids';
 import { DEMO_VIDEOS, buildFeedVideos } from '@/lib/demoVideos';
 import { ChevronRight, Store, DollarSign, MapPin, ShoppingBag, Heart, Trophy, Star, MessageCircle, Award, Play, Crown } from 'lucide-react';
@@ -83,22 +86,22 @@ function BadgesSection({ userId }: { userId: string }) {
   return (
     <div className="bg-white border border-gray-200 rounded-2xl p-4 mb-4">
       <h3 className="text-xs font-bold text-gray-900 uppercase tracking-widest mb-2.5">Achievements</h3>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
         {BADGE_DEFS.map(({ id, Icon, name, desc, check }) => {
           const earned = check(stats);
           return (
             <div
               key={id}
-              className={`flex items-center gap-2.5 px-2.5 py-2 rounded-xl border transition-colors ${
+              className={`flex items-center gap-2.5 px-2.5 py-1.5 rounded-xl border transition-colors ${
                 earned ? 'border-[#f97316]/20 bg-[#f97316]/5' : 'border-gray-100 bg-gray-50 opacity-50'
               }`}
             >
-              <div className={`w-8 h-8 shrink-0 rounded-lg flex items-center justify-center ${earned ? 'bg-[#f97316]' : 'bg-gray-200'}`}>
-                <Icon className={`h-4 w-4 ${earned ? 'text-white' : 'text-gray-400'}`} />
+              <div className={`w-7 h-7 shrink-0 rounded-lg flex items-center justify-center ${earned ? 'bg-[#f97316]' : 'bg-gray-200'}`}>
+                <Icon className={`h-3.5 w-3.5 ${earned ? 'text-white' : 'text-gray-400'}`} />
               </div>
               <div className="min-w-0">
-                <p className={`text-xs font-bold leading-tight truncate ${earned ? 'text-gray-900' : 'text-gray-400'}`}>{name}</p>
-                <p className={`text-[10px] leading-tight truncate ${earned ? 'text-gray-500' : 'text-gray-300'}`}>{desc}</p>
+                <p className={`text-xs font-bold leading-none mb-0 truncate ${earned ? 'text-gray-900' : 'text-gray-400'}`}>{name}</p>
+                <p className={`text-[10px] leading-none mb-0 mt-0.5 truncate ${earned ? 'text-gray-500' : 'text-gray-300'}`}>{desc}</p>
               </div>
             </div>
           );
@@ -215,47 +218,42 @@ function MediaCard({
 
 function SavedLikedSection({ userId }: { userId: string }) {
   const router = useRouter();
-  const [tab, setTab] = useState<'saved' | 'liked'>('saved');
+  const [tab, setTab] = useState<'saved' | 'stores' | 'items'>('saved');
 
-  // — Saved tab state —
+  // — Saved (videos) tab state —
   const [savedItems, setSavedItems] = useState<MediaCardData[]>([]);
   const [savedLoading, setSavedLoading] = useState(true);
 
-  // — Liked tab state —
+  // — Liked Stores tab state —
   const [likedBiz, setLikedBiz] = useState<LikedBusiness[]>([]);
-  const [likedLoading, setLikedLoading] = useState(true);
 
-  // Map a saved/bookmarked entry to a full media card (cover + caption + rating).
+  // — Liked Items tab state —
+  const [likedItems, setLikedItems] = useState<LikedMenuItem[]>([]);
+
+  // Saved VIDEOS only, and only those with real preview data (demo/local feed).
+  // Supabase-only videos with no demo preview are skipped — no blank cards.
   const buildSavedList = (realVideos: BookmarkedVideo[]): MediaCardData[] => {
-    const real: MediaCardData[] = realVideos.map((v) => ({
-      id: v.id,
-      videoUrl: v.video_url || undefined,
-      image: v.businesses?.profile_picture_url || undefined,
-      title: v.businesses?.business_name || v.caption || 'Saved video',
-      subtitle: v.caption || undefined,
-      rating: v.businesses?.average_rating ?? undefined,
-      reviews: v.businesses?.total_reviews ?? undefined,
-    }));
-    const seen = new Set(real.map((r) => r.id));
-    const demo: MediaCardData[] = getSavedItems()
-      .filter((d) => !seen.has(d.id))
-      .map((d) => {
-        const feed = DEMO_FEED_BY_ID.get(d.id); // local/demo video → reuse feed data
-        if (feed) {
-          return {
-            id: d.id,
-            videoUrl: feed.video_url,
-            image: feed.businesses.profile_picture_url,
-            title: feed.businesses.business_name,
-            subtitle: feed.caption,
-            rating: feed.businesses.average_rating,
-            reviews: feed.businesses.total_reviews,
-          };
-        }
-        // Non-video saved item (e.g. a business) — show what we have, never blank.
-        return { id: d.id, image: d.image, title: d.name };
+    const out: MediaCardData[] = [];
+    const seen = new Set<string>();
+    const pushFromFeed = (id: string) => {
+      const feed = DEMO_FEED_BY_ID.get(id);
+      if (!feed || seen.has(id)) return;
+      seen.add(id);
+      out.push({
+        id,
+        videoUrl: feed.video_url,
+        image: feed.businesses.profile_picture_url,
+        title: feed.businesses.business_name,
+        subtitle: feed.caption,
+        rating: feed.businesses.average_rating,
+        reviews: feed.businesses.total_reviews,
       });
-    return [...real, ...demo];
+    };
+    // Real bookmarked videos: only if they resolve to demo preview data.
+    realVideos.forEach((v) => pushFromFeed(v.id));
+    // Client-saved videos (type 'video') that resolve to demo preview data.
+    getSavedItems().filter((d) => d.type === 'video').forEach((d) => pushFromFeed(d.id));
+    return out;
   };
 
   // Load saved (bookmarked) videos
@@ -276,113 +274,94 @@ function SavedLikedSection({ userId }: { userId: string }) {
     return () => { active = false; unsub(); };
   }, [userId]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Load liked businesses (real from Supabase + demo from localStorage)
+  // Liked STORES — client-only, previewable demo stores only (Supabase-only
+  // businesses have no demo preview, so they are intentionally hidden).
   useEffect(() => {
-    let active = true;
-    const load = async () => {
-      const results: LikedBusiness[] = [];
-
-      // Real liked businesses from Supabase
-      const { data: likeRows } = await supabase
-        .from('likes')
-        .select('business_id')
-        .eq('user_id', userId)
-        .not('business_id', 'is', null);
-
-      const realBizIds = (likeRows || [])
-        .map((r: { business_id: string | null }) => r.business_id)
-        .filter((id): id is string => !!id && !isDemoId(id));
-
-      if (realBizIds.length > 0) {
-        const { data: bizRows } = await supabase
-          .from('businesses')
-          .select('id, business_name, profile_picture_url, owner_id')
-          .in('id', realBizIds);
-
-        const ownerIds = [...new Set((bizRows || []).map((b: any) => b.owner_id).filter(Boolean))];
-        let profileMap: Record<string, string> = {};
-        if (ownerIds.length > 0) {
-          const { data: profRows } = await supabase
-            .from('profiles')
-            .select('id, username')
-            .in('id', ownerIds);
-          profileMap = Object.fromEntries((profRows || []).map((p: any) => [p.id, p.username]));
-        }
-
-        (bizRows || []).forEach((b: any) => {
-          results.push({
-            id: b.id,
-            title: b.business_name || 'Business',
-            image: b.profile_picture_url || undefined,
-            rating: b.average_rating ?? undefined,
-            reviews: b.total_reviews ?? undefined,
-            slug: profileMap[b.owner_id] || b.id,
-          });
-        });
-      }
-
-      // Demo liked businesses from localStorage — enrich with that store's video
-      // cover + rating from the same demo feed the Home featured cards use.
-      const demoLikedIds = getLikedItemIds().filter((id) => isDemoId(id));
+    const buildLikedStores = (): LikedBusiness[] => {
+      const out: LikedBusiness[] = [];
+      const seen = new Set<string>();
       const demoBizSlugs = new Set(DEMO_VIDEOS.map((v) => v.businessSlug));
-      const seenSlugs = new Set<string>();
-      demoLikedIds.forEach((id) => {
-        if (!demoBizSlugs.has(id) || seenSlugs.has(id)) return;
-        seenSlugs.add(id);
+      // (a) liked business ids that are demo store slugs
+      getLikedItemIds().filter((id) => isDemoId(id) && demoBizSlugs.has(id)).forEach((id) => {
+        if (seen.has(id)) return;
+        seen.add(id);
         const dv = DEMO_VIDEOS.find((v) => v.businessSlug === id);
+        const feed = DEMO_FEED_BY_SLUG.get(id);
         if (dv) {
-          const feed = DEMO_FEED_BY_SLUG.get(dv.businessSlug);
-          results.push({
-            id,
-            title: dv.businessName,
-            videoUrl: feed?.video_url,
-            image: feed?.businesses.profile_picture_url,
-            subtitle: feed?.caption,
-            rating: feed?.businesses.average_rating,
-            reviews: feed?.businesses.total_reviews,
-            slug: dv.businessSlug,
+          out.push({
+            id, slug: id, title: dv.businessName,
+            videoUrl: feed?.video_url, image: feed?.businesses.profile_picture_url,
+            subtitle: feed?.caption, rating: feed?.businesses.average_rating, reviews: feed?.businesses.total_reviews,
           });
         }
       });
+      // (b) saved businesses (StorePage banner save) with a usable preview
+      getSavedItems().filter((s) => s.type === 'business').forEach((s) => {
+        if (seen.has(s.id)) return;
+        const feed = DEMO_FEED_BY_SLUG.get(s.id);
+        if (feed) {
+          seen.add(s.id);
+          out.push({
+            id: s.id, slug: s.id, title: feed.businesses.business_name,
+            videoUrl: feed.video_url, image: feed.businesses.profile_picture_url,
+            subtitle: feed.caption, rating: feed.businesses.average_rating, reviews: feed.businesses.total_reviews,
+          });
+        } else if (s.image) {
+          seen.add(s.id);
+          out.push({ id: s.id, slug: s.href ? slugOf(s.href) : s.id, title: s.name, image: s.image });
+        }
+      });
+      return out;
+    };
+    let active = true;
+    const refresh = () => { if (active) setLikedBiz(buildLikedStores()); };
+    const unsub = subscribeEngagement(refresh);
+    Promise.resolve().then(refresh); // defer off the synchronous effect tick
+    return () => { active = false; unsub(); };
+  }, [userId]); // eslint-disable-line react-hooks/exhaustive-deps
 
-      if (active) {
-        setLikedBiz(results);
-        setLikedLoading(false);
-      }
+  // Liked ITEMS — real (liked_items table) merged with client demo snapshots.
+  useEffect(() => {
+    let active = true;
+    const load = async () => {
+      const real = await getUserLikedItems(userId);
+      if (!active) return;
+      const byId = new Map<string, LikedMenuItem>();
+      real.forEach((r) => byId.set(r.id, r));
+      getLikedMenuItems().forEach((c) => byId.set(c.id, c)); // client snapshot wins (latest)
+      setLikedItems([...byId.values()]);
     };
     load();
-    // Re-check when demo likes change
     const unsub = subscribeEngagement(() => { if (active) load(); });
     return () => { active = false; unsub(); };
   }, [userId]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  if (savedLoading && likedLoading) return null;
+  if (savedLoading) return null;
 
   return (
     <section className="mb-6">
       <h3 className="text-base font-semibold text-gray-900 mb-3">My Activity</h3>
-      {/* Tab toggle */}
+      {/* Tab switcher */}
       <div className="flex gap-1 mb-3 rounded-xl bg-gray-100 p-1">
-        <button
-          onClick={() => setTab('saved')}
-          className={`flex-1 py-1.5 text-sm font-semibold rounded-lg transition-colors ${
-            tab === 'saved' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
-          }`}
-        >
-          Saved
-        </button>
-        <button
-          onClick={() => setTab('liked')}
-          className={`flex-1 py-1.5 text-sm font-semibold rounded-lg transition-colors ${
-            tab === 'liked' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
-          }`}
-        >
-          Liked
-        </button>
+        {([
+          { key: 'saved', label: 'Saved' },
+          { key: 'stores', label: 'Liked Stores' },
+          { key: 'items', label: 'Liked Items' },
+        ] as const).map((t) => (
+          <button
+            key={t.key}
+            onClick={() => setTab(t.key)}
+            className={`flex-1 py-1.5 text-sm font-semibold rounded-lg transition-colors ${
+              tab === t.key ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            {t.label}
+          </button>
+        ))}
       </div>
 
       <div className="bg-white border border-gray-200 rounded-2xl p-4">
-        {tab === 'saved' ? (
+        {tab === 'saved' && (
           savedItems.length === 0 ? (
             <p className="text-sm text-gray-500">
               Nothing saved yet. Tap the bookmark on a video to save it here.
@@ -399,7 +378,9 @@ function SavedLikedSection({ userId }: { userId: string }) {
               ))}
             </div>
           )
-        ) : (
+        )}
+
+        {tab === 'stores' && (
           likedBiz.length === 0 ? (
             <p className="text-sm text-gray-500">
               No liked stores yet. Tap the heart on a business in Discover to add it here.
@@ -417,8 +398,57 @@ function SavedLikedSection({ userId }: { userId: string }) {
             </div>
           )
         )}
+
+        {tab === 'items' && (
+          likedItems.length === 0 ? (
+            <p className="text-sm text-gray-500">
+              No liked items yet. Tap the heart on a menu item to add it here.
+            </p>
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {likedItems.map((it) => (
+                <ItemCard key={it.id} item={it} onClick={() => router.push(it.href || '/feed')} />
+              ))}
+            </div>
+          )
+        )}
       </div>
     </section>
+  );
+}
+
+/** Helper: last path segment of a store href (e.g. "/profile/jays-burger" → "jays-burger"). */
+function slugOf(href: string): string {
+  const parts = href.split('?')[0].split('/').filter(Boolean);
+  return parts[parts.length - 1] || href;
+}
+
+/** Compact liked-item card: image (→ store banner → placeholder), name, price, store. */
+function ItemCard({ item, onClick }: { item: LikedMenuItem; onClick: () => void }) {
+  const [imgFailed, setImgFailed] = useState(false);
+  const bannerFallback = DEMO_FEED_BY_SLUG.get(slugOf(item.href || ''))?.businesses.profile_picture_url;
+  const src = (!imgFailed && item.image) || bannerFallback;
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="group flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white text-left transition active:scale-95 hover:border-[#f97316]/40 focus:outline-none focus:ring-2 focus:ring-[#f97316]"
+      aria-label={`View ${item.name}`}
+    >
+      <div className="aspect-square w-full overflow-hidden bg-gray-100">
+        {src ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={src} alt="" className="h-full w-full object-cover" onError={() => setImgFailed(true)} />
+        ) : (
+          <span className="grid h-full w-full place-items-center"><Heart className="h-6 w-6 text-[#f97316]" /></span>
+        )}
+      </div>
+      <div className="p-2">
+        <p className="truncate text-xs font-semibold text-gray-900">{item.name}</p>
+        <p className="text-xs font-bold text-[#f97316]">${item.price.toFixed(2)}</p>
+        {item.storeName ? <p className="truncate text-[10px] text-gray-500">{item.storeName}</p> : null}
+      </div>
+    </button>
   );
 }
 
@@ -458,18 +488,18 @@ function ProfileContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#f97316]" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900 pb-20">
+    <div className="min-h-screen bg-background text-foreground pb-20">
       {/* Page header */}
-      <div className="sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-gray-200">
+      <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b border-border">
         <div className="w-full px-4 lg:px-12 py-4 flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-gray-900">{t('profile.title')}</h1>
+          <h1 className="text-2xl font-bold text-foreground">{t('profile.title')}</h1>
           <LanguageSettings />
         </div>
       </div>
@@ -483,7 +513,7 @@ function ProfileContent() {
         />
       ) : (
         <>
-          {user && <SideCards userId={user.id} />}
+          {user && <SideCards />}
           <ProfileView
             profile={profile}
             user={user}
@@ -562,6 +592,14 @@ function ProfileView({ profile, user, onEditClick, onSignOut, onProfileUpdated }
         <RankSection moneySpent={moneySpent} points={points} bizCount={bizCount} />
       )}
 
+      {/* Community leaderboard (mock 5km neighbors, real "you" score) */}
+      {!statsLoading && (
+        <CommunityLeaderboard
+          youName={profile?.full_name || profile?.username || 'You'}
+          youScore={computeImpactScore(resolveImpactInputs({ moneySpent, points, bizCount }))}
+        />
+      )}
+
       {/* Impact stats */}
       {!statsLoading && (bizCount > 0 || moneySpent > 0) && (
         <div className="bg-white border border-gray-200 rounded-2xl p-4 mb-4">
@@ -572,8 +610,8 @@ function ProfileView({ profile, user, onEditClick, onSignOut, onProfileUpdated }
                 <Store className="h-3.5 w-3.5 text-[#f97316]" />
               </div>
               <div>
-                <p className="text-lg font-bold text-gray-900 leading-none">{bizCount}</p>
-                <p className="text-[10px] text-gray-500 leading-none mt-px">
+                <p className="text-lg font-bold text-gray-900 leading-none mb-0">{bizCount}</p>
+                <p className="text-[10px] text-gray-500 leading-none mb-0 mt-0.5">
                   {bizCount === 1 ? 'business' : 'businesses'} supported
                 </p>
               </div>
@@ -583,8 +621,8 @@ function ProfileView({ profile, user, onEditClick, onSignOut, onProfileUpdated }
                 <DollarSign className="h-3.5 w-3.5 text-[#f97316]" />
               </div>
               <div>
-                <p className="text-lg font-bold text-gray-900 leading-none">${moneySpent.toFixed(0)}</p>
-                <p className="text-[10px] text-gray-500 leading-none mt-px">kept in community</p>
+                <p className="text-lg font-bold text-gray-900 leading-none mb-0">${moneySpent.toFixed(0)}</p>
+                <p className="text-[10px] text-gray-500 leading-none mb-0 mt-0.5">kept in community</p>
               </div>
             </div>
           </div>

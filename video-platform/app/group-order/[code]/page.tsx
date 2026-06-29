@@ -133,7 +133,7 @@ function GroupOrderContent() {
           <div className="flex items-center gap-2">
             <span className="text-xs text-gray-400">Code:</span>
             <span className="font-mono font-bold text-sm text-gray-900 tracking-wider">{code}</span>
-            <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${groupOrder.status === 'open' ? 'bg-green-50 text-green-700' : 'bg-gray-100 text-gray-500'}`}>{groupOrder.status}</span>
+            <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${groupOrder.status === 'open' ? 'bg-orange-50 text-[#f97316]' : 'bg-gray-100 text-gray-500'}`}>{groupOrder.status}</span>
           </div>
         </div>
         <button onClick={handleCopyLink} className="flex items-center gap-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-medium px-3 py-2 rounded-xl transition-colors shrink-0">

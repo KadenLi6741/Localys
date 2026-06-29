@@ -9,7 +9,7 @@ import { FEATURED_VIDEOS } from '@/lib/demoVideos';
 /**
  * "Featured in Videos" — businesses with a linked video. Each card auto-plays a
  * muted preview on hover and opens the Discover feed to that clip on click.
- * Built-in (public/Videos), so it always renders. Palette: black / #f97316 / white.
+ * Built-in (public/videos), so it always renders. Palette: black / #f97316 / white.
  */
 export function FeaturedInVideos() {
   const router = useRouter();

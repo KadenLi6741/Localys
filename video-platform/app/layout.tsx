@@ -54,10 +54,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full">
+    <html lang="en" className="h-full" suppressHydrationWarning>
       <body
-        className={`${outfit.variable} ${jetbrainsMono.variable} ${anton.variable} ${inter.variable} antialiased h-full bg-[#1A1A18] text-[#F5F0E8]`}
+        className={`${outfit.variable} ${jetbrainsMono.variable} ${anton.variable} ${inter.variable} antialiased h-full bg-background text-foreground`}
       >
+        {/* Inline script prevents flash of wrong theme before React hydrates */}
+        <script dangerouslySetInnerHTML={{ __html: `(function(){try{var t=localStorage.getItem('localy-theme');var r=t==='light'?'light':t==='dark'?'dark':(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.classList.add(r);}catch(e){document.documentElement.classList.add('dark');}})();` }} />
         <ThemeProvider>
           <AuthProvider>
             <LanguageProvider>

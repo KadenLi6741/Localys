@@ -37,15 +37,26 @@ function ChatsLayout() {
   const [query, setQuery] = useState('');
   const [newMessage, setNewMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const lastScrolledChatRef = useRef<string | null>(null);
 
   const { messages, loading: msgLoading, sending, send } = useMessages(
     activeChatId ?? undefined,
     user?.id
   );
 
+  // Auto-scroll to the newest message after it paints (requestAnimationFrame so we
+  // land on the true bottom). Instant jump when opening/switching a conversation;
+  // smooth for messages sent/received within the open conversation.
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+    const el = messagesEndRef.current;
+    if (!el || messages.length === 0) return;
+    const isNewChat = lastScrolledChatRef.current !== activeChatId;
+    const raf = requestAnimationFrame(() => {
+      el.scrollIntoView({ behavior: isNewChat ? 'auto' : 'smooth', block: 'end' });
+      lastScrolledChatRef.current = activeChatId ?? null;
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [messages, activeChatId]);
 
   const filteredChats = useMemo(() => {
     const s = query.trim().toLowerCase();

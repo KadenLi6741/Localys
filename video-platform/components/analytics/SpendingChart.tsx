@@ -20,7 +20,7 @@ function CustomTooltip({ active, payload, label }: { active?: boolean; payload?:
   return (
     <div className="bg-[#1A1A18]/90 border border-white/20 rounded-lg p-3 shadow-lg">
       <p className="text-white/60 text-xs mb-1">{label}</p>
-      <p className="text-yellow-400 font-semibold">{payload[0].value} coins</p>
+      <p className="text-[#f97316] font-semibold">{payload[0].value} coins</p>
     </div>
   );
 }
@@ -44,8 +44,8 @@ export function SpendingChart({ data }: SpendingChartProps) {
         <AreaChart data={data} margin={{ top: 5, right: 10, left: -10, bottom: 5 }}>
           <defs>
             <linearGradient id="spendingGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#eab308" stopOpacity={0.3} />
-              <stop offset="95%" stopColor="#eab308" stopOpacity={0} />
+              <stop offset="5%" stopColor="#f97316" stopOpacity={0.3} />
+              <stop offset="95%" stopColor="#f97316" stopOpacity={0} />
             </linearGradient>
           </defs>
           <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" />
@@ -63,7 +63,7 @@ export function SpendingChart({ data }: SpendingChartProps) {
           <Area
             type="monotone"
             dataKey="coinsSpent"
-            stroke="#eab308"
+            stroke="#f97316"
             strokeWidth={2}
             fill="url(#spendingGradient)"
           />

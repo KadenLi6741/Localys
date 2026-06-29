@@ -1,7 +1,11 @@
 /**
  * Build a folder-driven store-menu manifest for the Uber-Eats-style store page.
  *
- * Scans public/Menu/<folder> (filenames ARE the item names), filters out Uber Eats
+ * Asset files on disk are normalized to lowercase-hyphen-ASCII (deploy-safe). The
+ * ORIGINAL filename for each asset is read from data/menu-name-map.json, and the
+ * item name is derived from that original (so display names are unchanged).
+ *
+ * Scans public/menu/<folder>, filters out Uber Eats
  * UI junk, and DETERMINISTICALLY makes up the data the folders don't contain
  * (prices, descriptions, categories, "like %", reviews, rating, address) so each
  * store page can render the full layout. Output: data/store-menus.json keyed by the
@@ -19,8 +23,16 @@ import { dirname, join } from 'node:path';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
 const PUBLIC = join(ROOT, 'public');
-const MENU_DIR = join(ROOT, 'public', 'Menu');
+const MENU_DIR = join(ROOT, 'public', 'menu');
 const HQ_MIN = 320; // images whose smaller side is below this read as blurry on the home cards
+
+// Maps each NEW (deploy-safe) public path -> the ORIGINAL filename, so item names
+// and junk detection match what the un-normalized filenames produced.
+const NAME_MAP = existsSync(join(ROOT, 'data', 'menu-name-map.json'))
+  ? JSON.parse(readFileSync(join(ROOT, 'data', 'menu-name-map.json'), 'utf8'))
+  : {};
+/** Original filename for a slugged asset (fallback: the slug filename itself). */
+const origName = (folder, file) => NAME_MAP[encPath(folder, file)] || file;
 
 /* ----------------------------- helpers ----------------------------- */
 const norm = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, '');
@@ -35,18 +47,20 @@ const JUNK = [
   // competitor / other-store logo tiles that Uber Eats injects into a store page
   'burger king', 'dairy queen', 'popeyes', 'tondo',
 ];
-const isJunk = (file, bannerFile) => {
+// `name` is the ORIGINAL filename (pre-normalization) so the keyword/hex/uuid
+// rules match exactly as they did before assets were renamed.
+const isJunk = (file, name, bannerFile) => {
   if (file === bannerFile) return true;
-  const lower = file.toLowerCase();
+  const lower = (name || file).toLowerCase();
   if (JUNK.some((j) => lower.includes(j))) return true;
-  const base = file.replace(/\.[^.]+$/, '');
+  const base = (name || file).replace(/\.[^.]+$/, '');
   // 32-hex (md5-ish) or uuid filenames -> not items
   if (/^[0-9a-f]{32}(-\d+)?$/i.test(base)) return true;
   if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(base)) return true;
   return false;
 };
 
-const encPath = (folder, file) => `/Menu/${encodeURIComponent(folder)}/${encodeURIComponent(file)}`;
+const encPath = (folder, file) => `/menu/${encodeURIComponent(folder)}/${encodeURIComponent(file)}`;
 
 // price within [min,max], snapped to a cents style, deterministic per name
 const priceFor = (name, [min, max], style) => {
@@ -175,10 +189,10 @@ const categorize = (rawName, kind) => {
 
 /* ----------------------------- stores ----------------------------- */
 const STORES = [
-  { folder: "Amy's Fish & Chips", name: "Amy's Fish & Chips", slug: 'amys-fish-and-chips', kind: 'restaurant' },
-  { folder: 'Holy smoke Ribs', name: 'Holy Smoke Barbecue', slug: 'holy-smoke-barbecue', kind: 'bbq' },
+  { folder: 'amys-fish-and-chips', name: "Amy's Fish & Chips", slug: 'amys-fish-and-chips', kind: 'restaurant' },
+  { folder: 'holy-smoke-barbecue', name: 'Holy Smoke Barbecue', slug: 'holy-smoke-barbecue', kind: 'bbq' },
   {
-    folder: 'Pho Xelua resaturant', name: 'Pho Nga Son', slug: 'pho-nga-son', kind: 'pho',
+    folder: 'pho-nga-son', name: 'Pho Nga Son', slug: 'pho-nga-son', kind: 'pho',
     overrides: {
       rating: 4.8, ratingCount: '500+', address: '10909 Yonge St, Richmond Hill, ON L4C 3E3',
       availability: 'Available Saturday 11:00 a.m.', hoursLabel: 'Sat 11:00 a.m. – 9:45 p.m.', deliveryTime: '11 min',
@@ -197,32 +211,32 @@ const STORES = [
       ],
     },
   },
-  { folder: 'Express Mart', name: 'Express Mart Kingston Road', slug: 'express-mart', kind: 'convenience' },
-  { folder: 'Florio Studio', name: 'K1 Floral Studio', slug: 'k1-floral-studio', kind: 'flowers' },
-  { folder: 'Flowers Gifts and Baloons', name: 'Flowers Gifts and Balloons', slug: 'flowers-gifts-and-balloons', kind: 'flowers' },
-  { folder: 'Waterford Convience', name: 'Waterford Convenience', slug: 'waterford-convenience', kind: 'convenience' },
-  { folder: 'RAZI pharmacy', name: 'Razi Pharmacy', slug: 'razi-pharmacy', kind: 'pharmacy' },
-  { folder: 'Ambrosia', name: 'Ambrosia Thornhills', slug: 'ambrosia-thornhills', kind: 'grocery' },
-  { folder: 'Ashario Pets', name: 'Ashario Pets North York', slug: 'ashario-pets', kind: 'pets' },
-  { folder: 'Jays Burger', name: "Jay's Burger", slug: 'jays-burger', kind: 'restaurant' },
-  // 'Johnson supermarket' folder intentionally skipped (no seeded business).
+  { folder: 'express-mart', name: 'Express Mart Kingston Road', slug: 'express-mart', kind: 'convenience' },
+  { folder: 'k1-floral-studio', name: 'K1 Floral Studio', slug: 'k1-floral-studio', kind: 'flowers' },
+  { folder: 'flowers-gifts-and-balloons', name: 'Flowers Gifts and Balloons', slug: 'flowers-gifts-and-balloons', kind: 'flowers' },
+  { folder: 'waterford-convenience', name: 'Waterford Convenience', slug: 'waterford-convenience', kind: 'convenience' },
+  { folder: 'razi-pharmacy', name: 'Razi Pharmacy', slug: 'razi-pharmacy', kind: 'pharmacy' },
+  { folder: 'ambrosia-thornhills', name: 'Ambrosia Thornhills', slug: 'ambrosia-thornhills', kind: 'grocery' },
+  { folder: 'ashario-pets', name: 'Ashario Pets North York', slug: 'ashario-pets', kind: 'pets' },
+  { folder: 'jays-burger', name: "Jay's Burger", slug: 'jays-burger', kind: 'restaurant' },
+  // 'johnson-supermarket' folder intentionally skipped (no seeded business).
 ];
 
 /* ----------------------------- services (photo-only, single item) ----------------------------- */
 // Each service business is one item whose image IS the service photo in
 // public/Menu/Services photos. Banner = same photo.
-const SERVICES_DIR = 'Services photos';
+const SERVICES_DIR = 'services-photos';
 const SERVICES = [
-  { name: 'Comfort Air HVAC', slug: 'comfort-air-hvac', photo: 'hvac business photo.jpg', item: 'HVAC Service Call', cat: 'Home Services', price: 99 },
-  { name: 'Reliable Flow Plumbing', slug: 'reliable-flow-plumbing', photo: 'Plumbing buissness photo.jpg', item: 'Plumbing Service Call', cat: 'Home Services', price: 89 },
-  { name: 'GreenScape Landscaping', slug: 'greenscape-landscaping', photo: 'landscaping business.jpg', item: 'Lawn & Garden Service', cat: 'Home Services', price: 79 },
-  { name: 'Summit Home Renovations', slug: 'summit-home-renovations', photo: 'renovation buisness.jpg', item: 'Renovation Consultation', cat: 'Home Services', price: 150 },
-  { name: 'Sharp Fade Barbershop', slug: 'sharp-fade-barbershop', photo: 'Barber.jpg', item: "Men's Haircut & Beard Trim", cat: 'Grooming', price: 35 },
+  { name: 'Comfort Air HVAC', slug: 'comfort-air-hvac', photo: 'hvac-business-photo.jpg', item: 'HVAC Service Call', cat: 'Home Services', price: 99 },
+  { name: 'Reliable Flow Plumbing', slug: 'reliable-flow-plumbing', photo: 'plumbing-buissness-photo.jpg', item: 'Plumbing Service Call', cat: 'Home Services', price: 89 },
+  { name: 'GreenScape Landscaping', slug: 'greenscape-landscaping', photo: 'landscaping-business.jpg', item: 'Lawn & Garden Service', cat: 'Home Services', price: 79 },
+  { name: 'Summit Home Renovations', slug: 'summit-home-renovations', photo: 'renovation-buisness.jpg', item: 'Renovation Consultation', cat: 'Home Services', price: 150 },
+  { name: 'Sharp Fade Barbershop', slug: 'sharp-fade-barbershop', photo: 'barber.jpg', item: "Men's Haircut & Beard Trim", cat: 'Grooming', price: 35 },
   { name: 'Polished Nail Studio', slug: 'polished-nail-studio', photo: 'nails.jpg', item: 'Manicure & Pedicure', cat: 'Beauty', price: 55 },
-  { name: 'Serenity Massage Therapy', slug: 'serenity-massage-therapy', photo: 'Massage.jpg', item: '60-Minute Relaxation Massage', cat: 'Wellness', price: 95 },
-  { name: 'Peak Personal Training', slug: 'peak-personal-training', photo: 'personal fitnes instructor.jpg', item: '1-on-1 Personal Training Session', cat: 'Fitness', price: 70 },
-  { name: 'Sparkle Home Cleaning', slug: 'sparkle-home-cleaning', photo: 'Home-Cleaning-Services-Richmond-Hill.jpg', item: 'Standard Home Cleaning', cat: 'Cleaning', price: 120 },
-  { name: 'ClearWash Pressure Washing', slug: 'clearwash-pressure-washing', photo: 'Pressure washing.jpg', item: 'Driveway & Exterior Pressure Wash', cat: 'Home Services', price: 150 },
+  { name: 'Serenity Massage Therapy', slug: 'serenity-massage-therapy', photo: 'massage.jpg', item: '60-Minute Relaxation Massage', cat: 'Wellness', price: 95 },
+  { name: 'Peak Personal Training', slug: 'peak-personal-training', photo: 'personal-fitnes-instructor.jpg', item: '1-on-1 Personal Training Session', cat: 'Fitness', price: 70 },
+  { name: 'Sparkle Home Cleaning', slug: 'sparkle-home-cleaning', photo: 'home-cleaning-services-richmond-hill.jpg', item: 'Standard Home Cleaning', cat: 'Cleaning', price: 120 },
+  { name: 'ClearWash Pressure Washing', slug: 'clearwash-pressure-washing', photo: 'pressure-washing.jpg', item: 'Driveway & Exterior Pressure Wash', cat: 'Home Services', price: 150 },
   { name: 'FreshCoat Painting', slug: 'freshcoat-painting', photo: 'home-painting-service-main-thumbnail.webp', item: 'Interior Room Painting', cat: 'Home Services', price: 300 },
 ];
 
@@ -262,13 +276,13 @@ async function build(store) {
   // (e.g. "Amy's Fish & Chips.jpg", "PHO NGA SON.jpg"); otherwise fall back to the
   // clean public/stores collage so we don't pick a random product as the header.
   const bannerFile = files.find((f) => {
-    const fn = norm(f.replace(/\.[^.]+$/, ''));
+    const fn = norm(origName(store.folder, f).replace(/\.[^.]+$/, ''));
     return fn === norm(store.name) || fn === nameKey || fn === norm('pho nga son');
   });
   let banner = bannerFile ? encPath(store.folder, bannerFile)
     : (storeImages[store.name]?.banner || null);
 
-  const itemFiles = files.filter((f) => !isJunk(f, bannerFile));
+  const itemFiles = files.filter((f) => !isJunk(f, origName(store.folder, f), bannerFile));
   if (!banner && itemFiles[0]) banner = encPath(store.folder, itemFiles[0]);
 
   const [range, style] = PRICE[store.kind] || PRICE.restaurant;
@@ -277,7 +291,7 @@ async function build(store) {
   const itemDims = await Promise.all(itemFiles.map((f) => imgDims(encPath(store.folder, f))));
 
   const items = itemFiles.map((file, i) => {
-    const rawName = file.replace(/\.[^.]+$/, '').replace(/_/g, ' ').trim();
+    const rawName = origName(store.folder, file).replace(/\.[^.]+$/, '').replace(/_/g, ' ').trim();
     let description = descFor(rawName, store.kind);
     if (ov.descriptions) { const hit = ov.descriptions.find(([p]) => rawName.startsWith(p) || rawName.includes(p)); if (hit) description = hit[1]; }
     const h = hash(rawName);

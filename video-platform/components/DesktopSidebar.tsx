@@ -142,7 +142,7 @@ export function DesktopSidebar() {
                 </svg>
                 <span>{item.label}</span>
                 {unreadCount > 0 && (
-                  <span className="ml-auto flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[#F5A623] text-xs font-bold text-[#1A1A18] px-1">
+                  <span className="ml-auto flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[#f97316] text-xs font-bold text-[#1A1A18] px-1">
                     {unreadCount > 9 ? '9+' : unreadCount}
                   </span>
                 )}
@@ -156,7 +156,7 @@ export function DesktopSidebar() {
               href={item.href}
               className={`flex items-center gap-3 rounded-xl px-3 py-3 text-[15px] font-medium transition-all duration-200 hover-lift ${
                 active
-                  ? 'bg-[#F5A623]/10 text-[#F5A623] border-l-4 border-[#F5A623]'
+                  ? 'bg-[#f97316]/10 text-[#f97316] border-l-4 border-[#f97316]'
                   : 'text-[#9E9A90] hover:text-[#F5F0E8] hover:bg-[#242420]'
               }`}
             >
@@ -165,12 +165,12 @@ export function DesktopSidebar() {
               </svg>
               <span>{item.label}</span>
               {'cart' in item && cartCount > 0 && (
-                <span className="ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-[#F5A623] text-[10px] font-bold text-[#1A1A18]">
+                <span className="ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-[#f97316] text-[10px] font-bold text-[#1A1A18]">
                   {cartCount > 9 ? '9+' : cartCount}
                 </span>
               )}
               {'badge' in item && typeof item.badge === 'number' && item.badge > 0 && (
-                <span className="ml-auto flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[#F5A623] text-[10px] font-bold text-[#1A1A18] px-1">
+                <span className="ml-auto flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[#f97316] text-[10px] font-bold text-[#1A1A18] px-1">
                   {item.badge > 9 ? '9+' : item.badge}
                 </span>
               )}
@@ -190,7 +190,7 @@ export function DesktopSidebar() {
                 key={account.id}
                 href="#"
                 onClick={(e) => { e.preventDefault(); router.push(`/profile/${account.id}`); }}
-                className="flex items-center gap-2 rounded-lg px-3 py-1.5 transition-all duration-150 hover:bg-[#242420] hover:border-l-2 hover:border-[#F5A623] border-l-2 border-transparent"
+                className="flex items-center gap-2 rounded-lg px-3 py-1.5 transition-all duration-150 hover:bg-[#242420] hover:border-l-2 hover:border-[#f97316] border-l-2 border-transparent"
               >
                 {account.profile_picture_url ? (
                   <Image
@@ -228,9 +228,9 @@ export function DesktopSidebar() {
       <div className="px-3">
         <div className="border-t border-[#3A3A34] my-2" />
         <div className="px-3 py-4 space-y-1.5">
-          <a href="#" className="block text-[11px] text-[#9E9A90] hover:text-[#F5A623] transition-colors">Company</a>
-          <a href="#" className="block text-[11px] text-[#9E9A90] hover:text-[#F5A623] transition-colors">Program</a>
-          <a href="#" className="block text-[11px] text-[#9E9A90] hover:text-[#F5A623] transition-colors">Terms &amp; Policies</a>
+          <a href="#" className="block text-[11px] text-[#9E9A90] hover:text-[#f97316] transition-colors">Company</a>
+          <a href="#" className="block text-[11px] text-[#9E9A90] hover:text-[#f97316] transition-colors">Program</a>
+          <a href="#" className="block text-[11px] text-[#9E9A90] hover:text-[#f97316] transition-colors">Terms &amp; Policies</a>
           <p className="text-[11px] text-[#9E9A90] pt-2">&copy; 2026 Localy</p>
         </div>
       </div>

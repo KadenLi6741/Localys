@@ -52,7 +52,7 @@ export function AnalyticsDashboard({ userId }: AnalyticsDashboardProps) {
         <div className="bg-white/5 border border-white/10 rounded-lg p-6">
           {loading ? (
             <div className="flex items-center justify-center py-12">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-400" />
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#f97316]" />
             </div>
           ) : !data || data.summary.totalPromotions === 0 ? (
             <EmptyAnalytics />

@@ -21,9 +21,9 @@ function CustomTooltip({ active, payload, label }: { active?: boolean; payload?:
   return (
     <div className="bg-[#1A1A18]/90 border border-white/20 rounded-lg p-3 shadow-lg">
       <p className="text-white/60 text-xs mb-1">{label}</p>
-      <p className="text-blue-400 font-semibold">{payload[0].value} views</p>
+      <p className="text-[#f97316] font-semibold">{payload[0].value} views</p>
       {point.promoted && (
-        <p className="text-yellow-400 text-xs mt-1">Promotion day</p>
+        <p className="text-[#f97316] text-xs mt-1">Promotion day</p>
       )}
     </div>
   );
@@ -56,7 +56,7 @@ export function ViewsChart({ data }: ViewsChartProps) {
       <h4 className="text-sm font-semibold text-white/80 mb-3">Views Over Time</h4>
       <div className="flex items-center gap-4 mb-2 text-xs text-white/40">
         <span className="flex items-center gap-1">
-          <span className="w-3 h-0.5 bg-blue-400 inline-block rounded" /> Views
+          <span className="w-3 h-0.5 bg-[#f97316] inline-block rounded" /> Views
         </span>
         <span className="flex items-center gap-1">Promotion day</span>
       </div>
@@ -64,8 +64,8 @@ export function ViewsChart({ data }: ViewsChartProps) {
         <AreaChart data={data} margin={{ top: 5, right: 10, left: -10, bottom: 5 }}>
           <defs>
             <linearGradient id="viewsGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
-              <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+              <stop offset="5%" stopColor="#f97316" stopOpacity={0.3} />
+              <stop offset="95%" stopColor="#f97316" stopOpacity={0} />
             </linearGradient>
           </defs>
           <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" />
@@ -83,7 +83,7 @@ export function ViewsChart({ data }: ViewsChartProps) {
           <Area
             type="monotone"
             dataKey="views"
-            stroke="#3b82f6"
+            stroke="#f97316"
             strokeWidth={2}
             fill="url(#viewsGradient)"
             dot={<CustomDot />}

@@ -1,11 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Heart, Plus, Check } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
 import type { Product } from '@/lib/home-data';
+import { isMenuItemLiked, toggleMenuItemLike, subscribeEngagement } from '@/lib/clientEngagement';
+import { likeMenuItem, unlikeMenuItem } from '@/lib/supabase/likedItems';
+import { isDemoId } from '@/lib/utils/ids';
 import { Stars } from './Stars';
 import { Thumb } from './Thumb';
 
@@ -21,6 +24,39 @@ export function ProductCard({ product }: { product: Product }) {
   const { user } = useAuth();
   const [liked, setLiked] = useState(false);
   const [added, setAdded] = useState(false);
+
+  // Reflect persisted like state (client snapshot covers demo + real items),
+  // and stay in sync if the same item is liked/unliked elsewhere.
+  useEffect(() => {
+    let active = true;
+    const sync = () => { if (active) setLiked(isMenuItemLiked(product.id)); };
+    const unsub = subscribeEngagement(sync);
+    Promise.resolve().then(sync); // defer off the synchronous effect tick
+    return () => { active = false; unsub(); };
+  }, [product.id]);
+
+  const handleLike = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    const snapshot = {
+      id: product.id,
+      name: product.title,
+      price: product.price,
+      image: product.image,
+      storeName: product.businessName,
+      href: product.href,
+    };
+    const next = toggleMenuItemLike(snapshot); // optimistic + localStorage
+    setLiked(next);
+    // Real (UUID) items also persist to Supabase; demo/slug items stay client-side.
+    try {
+      if (user && !isDemoId(product.id)) {
+        if (next) await likeMenuItem(user.id, snapshot);
+        else await unlikeMenuItem(user.id, product.id);
+      }
+    } catch (err) {
+      console.error('Item like failed:', err instanceof Error ? err.message : err);
+    }
+  };
 
   const handleAdd = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -61,7 +97,7 @@ export function ProductCard({ product }: { product: Product }) {
           type="button"
           aria-label={liked ? 'Unlike' : 'Like'}
           aria-pressed={liked}
-          onClick={(e) => { e.preventDefault(); setLiked((v) => !v); }}
+          onClick={handleLike}
           className="absolute right-2 top-2 grid h-8 w-8 place-items-center rounded-full p-0 bg-white/90 text-black shadow-sm backdrop-blur transition hover:bg-white dark:bg-gray-900/80 dark:text-white"
         >
           <Heart className={`h-4 w-4 ${liked ? 'fill-[#f97316] text-[#f97316]' : ''}`} strokeWidth={1.8} />

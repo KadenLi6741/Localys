@@ -135,7 +135,7 @@ export function EditableProfilePicture({
             type="button"
             onClick={() => fileInputRef.current?.click()}
             disabled={loading}
-            className="absolute bottom-0 right-0 bg-blue-500 hover:bg-blue-600 disabled:bg-blue-500/50 rounded-full p-2 transition-colors"
+            className="absolute bottom-0 right-0 bg-[#f97316] hover:bg-[#ea6a0c] disabled:bg-[#f97316]/50 rounded-full p-2 transition-colors"
             title="Change profile picture"
           >
             <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">

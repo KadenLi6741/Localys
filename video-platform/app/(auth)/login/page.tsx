@@ -3,7 +3,7 @@
 import { Suspense, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { signIn, resetPasswordForEmail, signInWithGoogle } from '@/lib/supabase/auth';
+import { resetPasswordForEmail, signInWithGoogle, applyVerifiedSession } from '@/lib/supabase/auth';
 import TurnstileWidget from '@/components/TurnstileWidget';
 import AuthSplitLayout from '@/components/auth/AuthSplitLayout';
 import { FieldError } from '@/components/forms/FieldError';
@@ -37,7 +37,7 @@ function resolveTurnstileSiteKey(): string {
 }
 
 const inputClass =
-  'w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 placeholder-gray-400 transition focus:border-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900/10';
+  'w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground transition focus:border-[#f97316] focus:outline-none focus:ring-2 focus:ring-[#f97316]/20';
 
 function GoogleIcon() {
   return (
@@ -54,7 +54,7 @@ export default function LoginPage() {
   return (
     <Suspense
       fallback={
-        <div className="flex min-h-screen items-center justify-center bg-white px-4 text-gray-500">Loading login…</div>
+        <div className="flex min-h-screen items-center justify-center bg-background px-4 text-muted-foreground">Loading login…</div>
       }
     >
       <LoginPageContent />
@@ -79,6 +79,15 @@ function LoginPageContent() {
   const [resetSent, setResetSent] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const [turnstileResetKey, setTurnstileResetKey] = useState(0);
+
+  // Email verification-code step (shown after a correct email + password).
+  const [stage, setStage] = useState<'login' | 'code'>('login');
+  const [ticket, setTicket] = useState('');
+  const [code, setCode] = useState('');
+  const [codeError, setCodeError] = useState('');
+  const [codeNote, setCodeNote] = useState('');
+  const [codeLoading, setCodeLoading] = useState(false);
+  const [resendLoading, setResendLoading] = useState(false);
 
   const resetTurnstile = () => {
     setTurnstileToken(null);
@@ -127,25 +136,127 @@ function LoginPageContent() {
 
     setLoading(true);
 
-    const { data, error: signInError } = await signIn({
-      identifier,
-      password,
-      captchaToken: turnstileEnabled ? turnstileToken ?? undefined : undefined,
-    });
+    // Password is checked server-side first. On success we do NOT log in yet —
+    // an email code (or the 77777 backup) is required on the next screen.
+    try {
+      const res = await fetch('/api/auth/login-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'send',
+          email: identifier.trim().toLowerCase(),
+          password,
+          captchaToken: turnstileEnabled ? turnstileToken ?? undefined : undefined,
+        }),
+      });
+      const result = await res.json();
 
-    if (signInError) {
-      setError(signInError.message || 'Failed to sign in');
+      if (!res.ok || !result.ticket) {
+        setError(result.error || 'Failed to sign in');
+        resetTurnstile();
+        setLoading(false);
+        return;
+      }
+
+      setTicket(result.ticket);
+      setCode('');
+      setCodeError('');
+      setCodeNote(
+        result.sent
+          ? 'We emailed a 6-digit code to your email address.'
+          : 'Could not send the email — enter your backup code 77777 to continue.',
+      );
+      setStage('code');
+      setLoading(false);
+    } catch {
+      setError('Failed to sign in. Please try again.');
       resetTurnstile();
       setLoading(false);
+    }
+  };
+
+  const handleVerifyCode = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setCodeError('');
+
+    // Do NOT gate on a 6-digit shape here: the backup code 77777 is 5 digits and
+    // must never be blocked client-side. Only block an empty entry; the server
+    // decides what is valid (and always accepts 77777).
+    const entered = code.trim();
+    if (!entered) {
+      setCodeError('Enter your code, or use your backup code 77777.');
       return;
     }
 
-    if (data?.session) {
+    setCodeLoading(true);
+    try {
+      const res = await fetch('/api/auth/login-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'verify', ticket, code: code.trim() }),
+      });
+      const result = await res.json();
+
+      if (!res.ok || !result.access_token) {
+        setCodeError(result.error || 'Incorrect code, try again or use your backup code.');
+        setCodeLoading(false);
+        return;
+      }
+
+      // Valid code — now actually establish the session and enter the app.
+      const { error: sessionError } = await applyVerifiedSession(result.access_token, result.refresh_token);
+      if (sessionError) {
+        setCodeError(sessionError.message || 'Could not complete sign-in. Please try again.');
+        setCodeLoading(false);
+        return;
+      }
+
       router.push(isEmailVerified ? '/onboarding' : '/home');
       router.refresh();
-    } else {
-      setLoading(false);
+    } catch {
+      setCodeError('Could not verify the code. Please try again.');
+      setCodeLoading(false);
     }
+  };
+
+  const handleResendCode = async () => {
+    setCodeError('');
+    setCodeNote('');
+    setResendLoading(true);
+    try {
+      const res = await fetch('/api/auth/login-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'resend', ticket, email: identifier.trim().toLowerCase() }),
+      });
+      const result = await res.json();
+
+      if (!res.ok || !result.ticket) {
+        setCodeError(result.error || 'Could not resend the code. Use your backup code if needed.');
+        setResendLoading(false);
+        return;
+      }
+
+      setTicket(result.ticket);
+      setCodeNote(
+        result.sent
+          ? 'A new code is on its way to your email.'
+          : 'Could not send the email — enter your backup code 77777 to continue.',
+      );
+      setResendLoading(false);
+    } catch {
+      setCodeError('Could not resend the code. Use your backup code if needed.');
+      setResendLoading(false);
+    }
+  };
+
+  const backToLoginFromCode = () => {
+    setStage('login');
+    setCode('');
+    setCodeError('');
+    setCodeNote('');
+    setTicket('');
+    resetTurnstile();
   };
 
   const handleResetPassword = async (e: React.FormEvent) => {
@@ -182,6 +293,71 @@ function LoginPageContent() {
     setLoading(false);
   };
 
+  // ----- Email verification-code mode (after correct email + password) -----
+  if (stage === 'code') {
+    return (
+      <AuthSplitLayout>
+        <div className="space-y-6 text-gray-900">
+          <div className="text-center">
+            <h1 className="text-3xl font-bold">Enter your verification code</h1>
+            <p className="mt-2 text-sm text-gray-500">Enter the verification code we emailed you to finish signing in.</p>
+          </div>
+
+          <form onSubmit={handleVerifyCode} className="space-y-5">
+            {codeNote && (
+              <div className="rounded-lg border border-orange-200 bg-orange-50 px-4 py-3 text-center text-[#f97316]">
+                {codeNote}
+              </div>
+            )}
+            {codeError && (
+              <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-red-700">{codeError}</div>
+            )}
+
+            <div>
+              <label htmlFor="login-code" className="sr-only">6-digit verification code</label>
+              <input
+                id="login-code"
+                type="text"
+                inputMode="numeric"
+                autoComplete="one-time-code"
+                maxLength={6}
+                value={code}
+                onChange={(e) => { setCode(e.target.value.replace(/\D/g, '').slice(0, 6)); setCodeError(''); }}
+                required
+                autoFocus
+                className={`${inputClass} text-center text-2xl font-bold tracking-[0.5em]`}
+                placeholder="------"
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={codeLoading}
+              className="w-full rounded-lg py-3 font-semibold text-white transition hover:opacity-90 disabled:opacity-50"
+              style={{ backgroundColor: ORANGE }}
+            >
+              {codeLoading ? 'Verifying…' : 'Verify'}
+            </button>
+
+            <div className="flex items-center justify-between text-sm">
+              <button type="button" onClick={backToLoginFromCode} className="font-medium text-gray-500 transition hover:text-gray-900">
+                Back to Sign in
+              </button>
+              <button
+                type="button"
+                onClick={handleResendCode}
+                disabled={resendLoading}
+                className="font-semibold text-[#f97316] transition hover:opacity-70 disabled:opacity-50"
+              >
+                {resendLoading ? 'Resending…' : 'Resend code'}
+              </button>
+            </div>
+          </form>
+        </div>
+      </AuthSplitLayout>
+    );
+  }
+
   // ----- Reset password mode -----
   if (resetMode) {
     return (
@@ -194,7 +370,7 @@ function LoginPageContent() {
 
           {resetSent ? (
             <div className="space-y-6">
-              <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-center text-green-700">
+              <div className="rounded-lg border border-orange-200 bg-orange-50 px-4 py-3 text-center text-[#f97316]">
                 Check your email for a password reset link.
               </div>
               <button
@@ -258,7 +434,7 @@ function LoginPageContent() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {isEmailVerified && (
-            <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-center text-green-700">
+            <div className="rounded-lg border border-orange-200 bg-orange-50 px-4 py-3 text-center text-[#f97316]">
               Email verified. Please sign in to continue.
             </div>
           )}

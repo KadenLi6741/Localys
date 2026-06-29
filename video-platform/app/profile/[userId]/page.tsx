@@ -43,7 +43,7 @@ export default function UserProfilePage() {
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-/** Build a StoreMenu from Supabase items for stores without a public/Menu folder. */
+/** Build a StoreMenu from Supabase items for stores without a public/menu folder. */
 function buildFallbackMenu(business: Business, items: any[]): StoreMenu {
   const mapped: StoreItem[] = (items || []).map((it, i) => ({
     id: it.id || `${business.owner_id}-${i}`,
@@ -602,7 +602,7 @@ function UserProfileContent() {
       {/* Toast */}
       {toastMessage && (
         <div className={`fixed top-6 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-lg text-sm font-medium shadow-lg transition-all duration-300 ${
-          toastColor === 'sage' ? 'bg-[#6BAF7A] text-white' :
+          toastColor === 'sage' ? 'bg-[#f97316] text-white' :
           toastColor === 'red' ? 'bg-[#E05C3A] text-white' :
           'bg-[#f97316] text-black'
         }`}>

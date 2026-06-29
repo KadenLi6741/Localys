@@ -68,7 +68,7 @@ export function BusinessItemsRail({
       {shown.map((item, i) => (
         <div
           key={item.id}
-          className={`overflow-hidden rounded-2xl border border-black/8 bg-white ${cardVisibility(i)}`}
+          className={`overflow-hidden rounded-2xl border border-black/8 bg-white dark:border-white/10 dark:bg-[#1e1e1e] ${cardVisibility(i)}`}
         >
           {item.image ? (
             // eslint-disable-next-line @next/next/no-img-element
@@ -89,8 +89,8 @@ export function BusinessItemsRail({
             </div>
           )}
           <div className="px-2.5 pb-2 pt-1 lg:px-3 lg:pb-2.5">
-            <p className="text-sm font-bold leading-tight text-black">{item.name}</p>
-            <div className="mt-1 flex items-center gap-1 text-xs font-semibold text-black">
+            <p className="text-sm font-bold leading-tight text-black dark:text-white">{item.name}</p>
+            <div className="mt-1 flex items-center gap-1 text-xs font-semibold text-black dark:text-white">
               <Star className="h-3.5 w-3.5 fill-[#f97316] text-[#f97316]" />
               {itemRating(item.id).toFixed(1)}
             </div>

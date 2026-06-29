@@ -17,7 +17,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
-  Heart, MoreHorizontal, Search, Users, ChevronLeft, ChevronRight,
+  Heart, Share2, Search, Users, ChevronLeft, ChevronRight,
   Info, Clock, Star, DollarSign, MapPin, MessageCircle,
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
@@ -163,25 +163,26 @@ export function StorePage({ storeName, sellerId, menu }: { storeName: string; se
         {/* 1. Banner */}
         <div className="relative mt-3 overflow-hidden rounded-xl">
           <ItemImage src={menu.banner || undefined} alt={storeName} className="h-[170px] w-full object-cover sm:h-[210px]" />
-          <div className="absolute right-3 top-3 flex items-center gap-2">
+          <div className="absolute right-3 top-3 z-10 flex items-center gap-2">
             <button
               onClick={handleToggleSave}
               aria-label={saved ? 'Remove from saved' : 'Save'}
               aria-pressed={saved}
-              className="flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-black shadow backdrop-blur transition hover:text-[#f97316]"
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-white p-0 ring-1 ring-black/10 shadow-lg transition hover:bg-gray-50"
             >
               <Heart
-                className={`h-5 w-5 ${saved ? 'text-[#f97316]' : ''}`}
-                fill={saved ? '#f97316' : 'none'}
-                strokeWidth={2}
+                className="h-5 w-5"
+                color={saved ? '#ef4444' : '#000000'}
+                fill={saved ? '#ef4444' : 'none'}
+                strokeWidth={2.2}
               />
             </button>
             <button
               onClick={handleShare}
               aria-label="Share"
-              className="relative flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-black shadow backdrop-blur transition hover:text-[#f97316]"
+              className="relative flex h-10 w-10 items-center justify-center rounded-full bg-white p-0 ring-1 ring-black/10 shadow-lg transition hover:bg-gray-50"
             >
-              <MoreHorizontal className="h-5 w-5" strokeWidth={2} />
+              <Share2 className="h-5 w-5" color="#000000" strokeWidth={2.2} />
               {shareCopied && (
                 <span className="absolute -bottom-7 right-0 whitespace-nowrap rounded-md bg-black px-2 py-0.5 text-[11px] font-semibold text-white">
                   Link copied

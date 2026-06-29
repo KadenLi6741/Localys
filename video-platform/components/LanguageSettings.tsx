@@ -45,7 +45,7 @@ export function LanguageSettings() {
                 onClick={() => handleLanguageChange(code)}
                 className={`w-full text-left px-3 py-2 rounded-lg transition-colors ${
                   language === code
-                    ? 'bg-blue-500 text-white'
+                    ? 'bg-[#f97316] text-white'
                     : 'text-white/80 hover:bg-white/10'
                 }`}
               >

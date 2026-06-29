@@ -159,7 +159,7 @@ export default function SignUpPage() {
 
         {verificationEmail ? (
           <div className="space-y-4">
-            <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-green-700">
+            <div className="rounded-lg border border-orange-200 bg-orange-50 px-4 py-3 text-[#f97316]">
               Account created. Check <span className="font-semibold">{verificationEmail}</span> to verify your account before signing in.
             </div>
             <p className="text-sm text-gray-500">If you don&apos;t see the email, check spam/junk and try again in a minute.</p>

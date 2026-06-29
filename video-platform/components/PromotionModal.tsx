@@ -97,7 +97,7 @@ export function PromotionModal({ isOpen, onClose, videoId, userCoins, onSuccess,
         <div className="mb-6 p-3 bg-white/5 border border-white/10 rounded-lg">
           <div className="flex justify-between items-center">
             <span className="text-white/80">Your Coins</span>
-            <span className="text-2xl font-bold text-yellow-400">{userCoins}</span>
+            <span className="text-2xl font-bold text-[#f97316]">{userCoins}</span>
           </div>
         </div>
 
@@ -105,7 +105,7 @@ export function PromotionModal({ isOpen, onClose, videoId, userCoins, onSuccess,
         <div className="mb-6">
           <div className="flex justify-between mb-2">
             <label className="text-white text-sm font-semibold">Coins to Spend</label>
-            <span className="text-yellow-400 font-bold">{coinsToSpend}</span>
+            <span className="text-[#f97316] font-bold">{coinsToSpend}</span>
           </div>
           <input
             type="range"
@@ -114,7 +114,7 @@ export function PromotionModal({ isOpen, onClose, videoId, userCoins, onSuccess,
             value={coinsToSpend}
             onChange={(e) => setCoinsToSpend(Number(e.target.value))}
             disabled={loading}
-            className="w-full h-2 bg-white/20 rounded-lg appearance-none cursor-pointer accent-yellow-400"
+            className="w-full h-2 bg-white/20 rounded-lg appearance-none cursor-pointer accent-[#f97316]"
           />
           <div className="flex justify-between text-xs text-white/50 mt-1">
             <span>{MIN_COINS}</span>
@@ -131,7 +131,7 @@ export function PromotionModal({ isOpen, onClose, videoId, userCoins, onSuccess,
               disabled={loading || amount > userCoins}
               className={`py-2 rounded-lg font-semibold transition-all ${
                 coinsToSpend === amount
-                  ? 'bg-yellow-500 text-black'
+                  ? 'bg-[#f97316] text-black'
                   : amount > userCoins
                   ? 'bg-white/5 text-white/50 cursor-not-allowed'
                   : 'bg-white/10 text-white hover:bg-white/20'
@@ -143,9 +143,9 @@ export function PromotionModal({ isOpen, onClose, videoId, userCoins, onSuccess,
         </div>
 
         {/* Estimated Boost */}
-        <div className="mb-6 p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+        <div className="mb-6 p-4 bg-[#f97316]/10 border border-[#f97316]/30 rounded-lg">
           <div className="text-sm text-white/80 mb-1">Estimated Boost Increase</div>
-          <div className="text-3xl font-bold text-blue-400">+{estimatedBoost}</div>
+          <div className="text-3xl font-bold text-[#f97316]">+{estimatedBoost}</div>
           <div className="text-xs text-white/60 mt-2">
             Videos with higher boost appear more often in the feed
           </div>
@@ -179,7 +179,7 @@ export function PromotionModal({ isOpen, onClose, videoId, userCoins, onSuccess,
 
         {/* Not Enough Coins Warning */}
         {!canAfford && !isPreviewMode && (
-          <div className="mb-4 p-3 bg-yellow-500/20 border border-yellow-500/50 rounded-lg text-yellow-200 text-sm">
+          <div className="mb-4 p-3 bg-[#f97316]/20 border border-[#f97316]/50 rounded-lg text-[#f97316] text-sm">
             You need {coinsToSpend - userCoins} more coins
           </div>
         )}
@@ -197,7 +197,7 @@ export function PromotionModal({ isOpen, onClose, videoId, userCoins, onSuccess,
             <button
               onClick={handleConfirmUpload}
               disabled={loading}
-              className="flex-1 py-3 rounded-lg font-semibold transition-all bg-green-500 hover:bg-green-600 text-white disabled:opacity-50"
+              className="flex-1 py-3 rounded-lg font-semibold transition-all bg-[#f97316] hover:bg-[#ea6a0c] text-white disabled:opacity-50"
             >
               {loading ? 'Uploading...' : `Confirm (${coinsToSpend} coins)`}
             </button>
@@ -207,7 +207,7 @@ export function PromotionModal({ isOpen, onClose, videoId, userCoins, onSuccess,
               disabled={loading || !canAfford}
               className={`flex-1 py-3 rounded-lg font-semibold transition-all ${
                 canAfford
-                  ? 'bg-yellow-500 hover:bg-yellow-600 text-black'
+                  ? 'bg-[#f97316] hover:bg-[#ea6a0c] text-black'
                   : 'bg-gray-600 text-gray-300 cursor-not-allowed'
               } disabled:opacity-50`}
             >

@@ -7,9 +7,36 @@ import { supabase } from '@/lib/supabase/client';
 import type { CoinPurchase, ItemPurchase } from '@/models/Order';
 import { useTranslation } from '@/hooks/useTranslation';
 import { OrderQRCode } from '@/components/QRCode';
-import { RefreshCw, Star } from 'lucide-react';
+import { RefreshCw, Star, CalendarClock } from 'lucide-react';
 import { getLocalOrders, type LocalOrder } from '@/lib/clientEngagement';
 import { getReviewStats } from '@/lib/utils/reviewStats';
+
+/** "Sat, Jun 28 at 6:30 PM" from an ISO string, or null when absent/invalid. */
+function formatScheduleLabel(iso?: string | null): string | null {
+  if (!iso) return null;
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return null;
+  return `${d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })} at ${d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}`;
+}
+
+/** Buyer-chosen pickup/delivery time + special concerns, shown on an order card. */
+function OrderDetails({ scheduledAt, specialRequests }: { scheduledAt?: string | null; specialRequests?: string | null }) {
+  const schedule = formatScheduleLabel(scheduledAt);
+  if (!schedule && !specialRequests) return null;
+  return (
+    <div className="mt-2 space-y-1">
+      {schedule && (
+        <p className="flex items-center gap-1.5 text-xs font-medium text-gray-700">
+          <CalendarClock className="h-3.5 w-3.5 text-[#f97316] shrink-0" />
+          {schedule}
+        </p>
+      )}
+      {specialRequests && (
+        <p className="text-xs text-gray-500">Note: {specialRequests}</p>
+      )}
+    </div>
+  );
+}
 
 /** Star rating + review count shown under an order name. */
 function OrderReviews({ statsKey }: { statsKey: string }) {
@@ -248,6 +275,7 @@ function OrderItem({ order, onReorder }: { order: CoinPurchase | ItemPurchase; o
           <p className="text-gray-400 text-xs mt-0.5">{formattedDate}</p>
         </div>
       </div>
+      <OrderDetails scheduledAt={item.scheduled_at} specialRequests={item.special_requests} />
       <div className="mt-3 flex items-center gap-2 pt-3 border-t border-gray-100">
         <StatusBadge status={item.status} />
         {isPaid && item.verification_token && (
@@ -279,13 +307,16 @@ function OrderItem({ order, onReorder }: { order: CoinPurchase | ItemPurchase; o
 }
 
 function LocalOrderItem({ order }: { order: LocalOrder }) {
+  const [showQR, setShowQR] = useState(false);
   const date = new Date(order.purchased_at);
   const formattedDate = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   return (
     <div className="bg-white border border-gray-200 rounded-xl p-4">
       <div className="flex justify-between items-start gap-3">
         <div className="flex-1 min-w-0">
-          <p className="font-semibold text-gray-900 truncate">{order.itemName}</p>
+          <p className="font-semibold text-gray-900 truncate">
+            {order.itemName}{order.quantity && order.quantity > 1 ? <span className="text-gray-500 font-normal"> ×{order.quantity}</span> : null}
+          </p>
           <OrderReviews statsKey={order.itemName} />
           <p className="text-gray-700 text-xs font-semibold mt-0.5">Order #{order.confirmationNumber}</p>
         </div>
@@ -294,11 +325,26 @@ function LocalOrderItem({ order }: { order: LocalOrder }) {
           <p className="text-gray-400 text-xs mt-0.5">{formattedDate}</p>
         </div>
       </div>
-      <div className="mt-3 pt-3 border-t border-gray-100">
+      <OrderDetails scheduledAt={order.scheduledAt} specialRequests={order.specialRequests} />
+      <div className="mt-3 flex items-center gap-2 pt-3 border-t border-gray-100">
         <span className="inline-flex items-center text-xs px-3 py-1 rounded-full font-semibold capitalize border bg-[#f97316]/10 text-[#f97316] border-[#f97316]/30">
           paid
         </span>
+        {order.token && (
+          <button
+            onClick={() => setShowQR(!showQR)}
+            className="text-xs px-3 py-1 rounded-full border border-gray-200 text-gray-600 hover:border-gray-400 transition-colors font-medium"
+          >
+            {showQR ? 'Hide QR' : 'Show QR'}
+          </button>
+        )}
       </div>
+      {showQR && order.token && (
+        <div className="mt-3 flex flex-col items-center py-3 border-t border-gray-100">
+          <p className="text-gray-400 text-xs mb-2">Show at pickup</p>
+          <OrderQRCode orderId={order.id} token={order.token} size={160} />
+        </div>
+      )}
     </div>
   );
 }

@@ -47,7 +47,7 @@ export default function AuthSplitLayout({ children }: { children: React.ReactNod
       </div>
 
       {/* RIGHT — form */}
-      <div className="flex w-full items-center justify-center overflow-y-auto bg-white px-6 py-12 lg:w-1/2">
+      <div className="flex w-full items-center justify-center overflow-y-auto bg-background px-6 py-12 lg:w-1/2">
         <div className="w-full max-w-md">{children}</div>
       </div>
     </div>

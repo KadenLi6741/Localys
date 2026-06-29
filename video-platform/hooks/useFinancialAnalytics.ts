@@ -78,9 +78,9 @@ export function useFinancialAnalytics(userId: string | undefined) {
         statusCounts[status] = (statusCounts[status] || 0) + 1;
       });
       const STATUS_COLORS: Record<string, string> = {
-        completed: '#6BAF7A',
-        paid: '#6BAF7A',
-        pending: '#F5A623',
+        completed: '#f97316',
+        paid: '#f97316',
+        pending: '#f97316',
         cancelled: '#E05C3A',
         failed: '#E05C3A',
       };

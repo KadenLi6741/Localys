@@ -5,13 +5,29 @@ import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { OrderQRCode } from '@/components/QRCode';
 import { useAuth } from '@/contexts/AuthContext';
-import { saveLocalOrder } from '@/lib/clientEngagement';
+import { saveLocalOrder, getLocalOrders } from '@/lib/clientEngagement';
 
 interface OrderInfo {
   orderId: string;
   token: string;
   itemName: string;
   price: number;
+  quantity?: number;
+  scheduledAt?: string | null;
+  specialRequests?: string | null;
+}
+
+/** Last-resort order number when verification is unavailable (demo/offline). */
+function fallbackOrderNumber(sessionId: string): string {
+  return `ORD-${sessionId.slice(-8).toUpperCase()}`;
+}
+
+/** "Sat, Jun 28 at 6:30 PM" from an ISO string, or null. */
+function formatSchedule(iso?: string | null): string | null {
+  if (!iso) return null;
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return null;
+  return `${d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })} at ${d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}`;
 }
 
 export default function PurchaseSuccessPage() {
@@ -32,6 +48,8 @@ function PurchaseSuccessContent() {
   const sessionId = searchParams.get('session_id');
   const [confirmationNumber, setConfirmationNumber] = useState('');
   const [orders, setOrders] = useState<OrderInfo[]>([]);
+  const [serverTotal, setServerTotal] = useState<number | null>(null);
+  const [notice, setNotice] = useState('');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -52,12 +70,27 @@ function PurchaseSuccessContent() {
         });
 
         if (!response.ok) {
-          console.error('[purchase-success] Verify failed:', response.status);
+          let serverErr = '';
+          try { const e = await response.json(); serverErr = e?.detail || e?.error || ''; } catch { /* no body */ }
+          console.error('[purchase-success] Verify failed:', response.status, serverErr);
+
+          // Never show a blank/error screen: fall back to any orders saved for an
+          // earlier visit, and always present an order number + friendly message.
+          const saved = getLocalOrders();
+          if (saved.length > 0) {
+            setOrders(saved.slice(0, 5).map((o) => ({ orderId: o.id, token: '', itemName: o.itemName, price: o.price })));
+            setConfirmationNumber(saved[0].confirmationNumber || fallbackOrderNumber(sessionId));
+          } else {
+            setConfirmationNumber(fallbackOrderNumber(sessionId));
+          }
+          setNotice('Your payment went through. We are finalizing your order details — they will appear in your order history shortly.');
+          setLoading(false);
           return;
         }
 
         const data = await response.json();
         if (data.confirmationNumber) setConfirmationNumber(data.confirmationNumber);
+        if (typeof data.total === 'number') setServerTotal(data.total);
         if (data.orders?.length > 0) {
           setOrders(data.orders);
           // Save to localStorage so demo/local orders appear in order history
@@ -70,6 +103,10 @@ function PurchaseSuccessContent() {
                 itemName: o.itemName,
                 price: o.price,
                 purchased_at: now,
+                scheduledAt: o.scheduledAt ?? null,
+                specialRequests: o.specialRequests ?? null,
+                token: o.token || null,
+                quantity: o.quantity,
               });
             } catch (err) {
               console.error('[purchase-success] Could not save local order:', err);
@@ -78,6 +115,9 @@ function PurchaseSuccessContent() {
         }
       } catch (err) {
         console.error('[purchase-success] Verification error:', err);
+        // Graceful, never-blank fallback on network/parse failure too.
+        setConfirmationNumber((prev) => prev || fallbackOrderNumber(sessionId));
+        setNotice('Your payment went through. We are finalizing your order details — they will appear in your order history shortly.');
       } finally {
         setLoading(false);
       }
@@ -86,7 +126,10 @@ function PurchaseSuccessContent() {
     verifyPurchase();
   }, [sessionId, session?.access_token, authLoading]);
 
-  const total = orders.reduce((sum, o) => sum + o.price, 0);
+  const computedTotal = orders.reduce((sum, o) => sum + o.price * (o.quantity ?? 1), 0);
+  const total = serverTotal ?? computedTotal;
+  const qrOrders = orders.filter((o) => o.token);
+  const scheduledLabel = formatSchedule(orders.find((o) => o.scheduledAt)?.scheduledAt);
 
   return (
     <div className="min-h-screen bg-white pb-20">
@@ -112,6 +155,13 @@ function PurchaseSuccessContent() {
           </div>
         )}
 
+        {/* Friendly notice when details are still finalizing (never a blank/error screen) */}
+        {!loading && notice && (
+          <div className="border border-[#f97316]/30 bg-[#f97316]/5 rounded-2xl p-4 mb-4">
+            <p className="text-sm text-black">{notice}</p>
+          </div>
+        )}
+
         {/* Loading while verifying */}
         {loading && (
           <div className="border border-gray-100 rounded-2xl p-6 mb-4 flex flex-col items-center gap-3">
@@ -126,28 +176,39 @@ function PurchaseSuccessContent() {
             <h2 className="text-sm font-semibold text-black mb-3">Order summary</h2>
             <div className="space-y-3 divide-y divide-gray-100">
               {orders.map((o) => (
-                <div key={o.orderId} className="flex items-center justify-between pt-3 first:pt-0">
-                  <span className="text-sm text-black font-medium">{o.itemName}</span>
-                  <span className="text-sm font-bold text-[#f97316]">${o.price.toFixed(2)}</span>
+                <div key={o.orderId} className="flex items-start justify-between pt-3 first:pt-0">
+                  <div className="min-w-0 pr-3">
+                    <span className="text-sm text-black font-medium">
+                      {o.itemName}{o.quantity && o.quantity > 1 ? <span className="text-gray-500 font-normal"> ×{o.quantity}</span> : null}
+                    </span>
+                    {o.specialRequests && (
+                      <p className="text-xs text-gray-500 mt-0.5">Note: {o.specialRequests}</p>
+                    )}
+                  </div>
+                  <span className="text-sm font-bold text-[#f97316] shrink-0">${(o.price * (o.quantity ?? 1)).toFixed(2)}</span>
                 </div>
               ))}
             </div>
-            {orders.length > 1 && (
-              <div className="flex justify-between pt-3 mt-3 border-t border-gray-100">
-                <span className="text-sm font-semibold text-black">Total</span>
-                <span className="text-sm font-bold text-black">${total.toFixed(2)}</span>
+            {scheduledLabel && (
+              <div className="flex justify-between items-center pt-3 mt-3 border-t border-gray-100">
+                <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Scheduled for</span>
+                <span className="text-sm font-semibold text-black">{scheduledLabel}</span>
               </div>
             )}
+            <div className="flex justify-between pt-3 mt-3 border-t border-gray-100">
+              <span className="text-sm font-semibold text-black">Total</span>
+              <span className="text-sm font-bold text-black">${total.toFixed(2)}</span>
+            </div>
           </div>
         )}
 
         {/* QR codes for pickup */}
-        {!loading && orders.length > 0 && (
+        {!loading && qrOrders.length > 0 && (
           <div className="border border-gray-200 rounded-2xl p-5 mb-6">
             <p className="text-sm font-semibold text-black mb-1">Pickup QR code</p>
             <p className="text-xs text-gray-400 mb-4">Show this at the business when you arrive</p>
             <div className="space-y-4">
-              {orders.map((order) => (
+              {qrOrders.map((order) => (
                 <div key={order.orderId} className="flex flex-col items-center">
                   <OrderQRCode orderId={order.orderId} token={order.token} size={160} />
                   <p className="text-sm font-medium text-black mt-2">{order.itemName}</p>

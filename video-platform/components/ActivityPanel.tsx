@@ -488,8 +488,8 @@ export function ActivityPanel() {
                 onClick={() => setActiveFilter(f.key)}
                 className={`whitespace-nowrap px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 shrink-0 ${
                   activeFilter === f.key
-                    ? 'bg-[#F5A623] text-black'
-                    : 'border border-[#F5A623] text-[#F5A623] hover:bg-[#F5A623]/10'
+                    ? 'bg-[#f97316] text-black'
+                    : 'border border-[#f97316] text-[#f97316] hover:bg-[#f97316]/10'
                 }`}
               >
                 {f.label}
@@ -502,11 +502,11 @@ export function ActivityPanel() {
         <div className="flex-1 overflow-y-auto">
           {loading ? (
             <div className="flex items-center justify-center py-12">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#F5A623]" />
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#f97316]" />
             </div>
           ) : filtered.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 px-6">
-              <svg className="w-12 h-12 text-[#6BAF7A] mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-12 h-12 text-[#f97316] mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
               </svg>
               <p className="text-[#F5F0E8] font-medium mb-1">No activity yet</p>
@@ -533,7 +533,7 @@ export function ActivityPanel() {
                     >
                       {/* Avatar */}
                       <div className={`w-12 h-12 rounded-full overflow-hidden shrink-0 ${
-                        item.isBusinessUser ? 'ring-2 ring-[#F5A623]' : 'ring-1 ring-[#3A3A34]'
+                        item.isBusinessUser ? 'ring-2 ring-[#f97316]' : 'ring-1 ring-[#3A3A34]'
                       }`}>
                         {item.avatarUrl ? (
                           <img src={item.avatarUrl} alt={item.fullName} className="w-full h-full object-cover" />
@@ -557,7 +557,7 @@ export function ActivityPanel() {
                       {item.type === 'follow' && !item.isFollowingBack ? (
                         <button
                           onClick={(e) => { e.stopPropagation(); handleFollowBack(item.userId); }}
-                          className="shrink-0 border border-[#F5A623] text-[#F5A623] text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-[#F5A623]/10 transition-colors"
+                          className="shrink-0 border border-[#f97316] text-[#f97316] text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-[#f97316]/10 transition-colors"
                         >
                           Follow Back
                         </button>

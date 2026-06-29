@@ -55,7 +55,7 @@ export function MenuItemPurchaseButton({
     <div className="flex gap-2">
       <button
         onClick={handleBuyNow}
-        className="flex-1 bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+        className="flex-1 bg-[#f97316] hover:bg-[#ea6a0c] text-white font-semibold py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
       >
         <span>Buy Now</span>
         <span className="text-sm">${itemPrice.toFixed(2)}</span>
@@ -63,7 +63,7 @@ export function MenuItemPurchaseButton({
       <button
         onClick={handleAddToCart}
         disabled={added}
-        className="bg-blue-500 hover:bg-blue-600 disabled:bg-blue-400 text-white font-semibold py-2 px-3 rounded-lg transition-colors disabled:cursor-default flex items-center justify-center gap-1"
+        className="bg-[#f97316] hover:bg-[#ea6a0c] disabled:bg-[#f97316]/50 text-white font-semibold py-2 px-3 rounded-lg transition-colors disabled:cursor-default flex items-center justify-center gap-1"
       >
         {added ? (
           <span className="text-sm">Added!</span>

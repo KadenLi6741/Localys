@@ -16,6 +16,7 @@ import { supabase } from '@/lib/supabase/client';
 import dynamic from 'next/dynamic';
 import { GoogleMap } from '@/components/GoogleMap';
 const CommentModal = dynamic(() => import('@/components/CommentModal').then(mod => mod.CommentModal), { ssr: false });
+const CommentSection = dynamic(() => import('@/components/comments/CommentSection'), { ssr: false });
 import { Toast } from '@/components/Toast';
 import { sharePost } from '@/lib/utils/share';
 import { haversineDistance } from '@/lib/utils/geo';
@@ -28,6 +29,13 @@ import {
   getLikedItemIds,
   getSavedItems,
 } from '@/lib/clientEngagement';
+
+/**
+ * Creator whose videos are hidden from the Discover "For You" feed (lowercase
+ * username). Their videos still exist in the DB and still show in Business
+ * Manager → Videos — this only removes them from the feed render.
+ */
+const HIDDEN_FROM_DISCOVER_USERNAME = 'likaden726';
 
 /** Compact count display: 11100 → "11.1K", 2_300_000 → "2.3M". */
 function formatCount(n: number): string {
@@ -119,6 +127,8 @@ export function HomeContent({ isActive }: HomeContentProps) {
   const [likeCounts, setLikeCounts] = useState<{ [key: string]: number }>({});
   const [commentCounts, setCommentCounts] = useState<{ [key: string]: number }>({});
   const [commentModalOpen, setCommentModalOpen] = useState(false);
+  // Inline reviews/comments side panel — CLOSED by default; opens only on tap.
+  const [reviewsOpen, setReviewsOpen] = useState(false);
   const [commentPostId, setCommentPostId] = useState<string>('');
   const [locationModalOpen, setLocationModalOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string>('');
@@ -149,13 +159,19 @@ export function HomeContent({ isActive }: HomeContentProps) {
   const [followedUsers, setFollowedUsers] = useState<Set<string>>(new Set());
   const [followAnimating, setFollowAnimating] = useState<string | null>(null);
 
+  // A video opened directly by id (e.g. from Business Manager → Videos). It must
+  // ALWAYS stay playable in Discover even if its author is excluded from the For You
+  // feed, so we keep it here and re-inject it whenever the feed reloads (the feed
+  // exclusion is applied only to the listing, never to this single-video request).
+  const pinnedVideoRef = useRef<Video | null>(null);
+
   useEffect(() => {
     loadVideos();
     if (user) {
       loadUserInteractions();
       loadUserCoins();
     }
-  }, [user]);
+  }, [user?.id]); // key off the stable id so the feed doesn't reload on every auth re-render
 
   // Real-time subscription for comment counts
   useEffect(() => {
@@ -262,7 +278,10 @@ export function HomeContent({ isActive }: HomeContentProps) {
       // Built-in local video — always already in the feed; nothing to fetch.
       router.replace('/feed', { scroll: false });
     } else {
-      // Video not in feed — fetch and prepend it
+      // Video not in the (possibly filtered) feed — fetch it directly and prepend so
+      // it plays. This is how a creator's video that's HIDDEN from the For You feed
+      // (e.g. @likaden726) still opens in Discover when clicked from Business Manager →
+      // Videos. The direct fetch ignores the feed filter on purpose.
       (async () => {
         try {
           const { data } = await supabase
@@ -272,8 +291,11 @@ export function HomeContent({ isActive }: HomeContentProps) {
             .single();
 
           if (data) {
-            setVideos(prev => [data as Video, ...prev]);
+            // Pin it so a later feed reload re-injects it instead of filtering it out.
+            pinnedVideoRef.current = data as Video;
+            setVideos(prev => (prev.some(v => v.id === targetVideoId) ? prev : [data as Video, ...prev]));
             setCurrentIndex(0);
+            setIsPlaying(true);
           }
         } catch (err) {
           console.error('Error fetching video by ID:', err);
@@ -330,6 +352,7 @@ export function HomeContent({ isActive }: HomeContentProps) {
         }
       });
       setCommentModalOpen(false);
+      setReviewsOpen(false);
       return;
     }
 
@@ -350,7 +373,7 @@ export function HomeContent({ isActive }: HomeContentProps) {
   }, [isActive]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const loadVideos = async () => {
-    // Built-in local videos (public/Videos linked to businesses) shown first, ALWAYS
+    // Built-in local videos (public/videos linked to businesses) shown first, ALWAYS
     // present so every "Featured in Videos" card is watchable in Discover — even if the
     // Supabase feed is empty or errors. Local ids are `local:`-prefixed and excluded
     // from all Supabase id-based lookups below.
@@ -359,8 +382,19 @@ export function HomeContent({ isActive }: HomeContentProps) {
       const { data, error } = await getWeightedVideoFeed(20, 0);
       if (error) throw error;
       {
-        const realData = (Array.isArray(data) ? data : []) as Video[];
-        const videosData = [...localVideos, ...realData];
+        const realDataRaw = (Array.isArray(data) ? data : []) as Video[];
+        // Hide a specific creator's videos from the Discover "For You" feed ONLY.
+        // The videos are NOT deleted/unpublished — they still exist in the DB and
+        // still appear in Business Manager → Videos for that account. This is purely
+        // a render-time filter on the feed, keyed by the author's username.
+        const realData = realDataRaw.filter(
+          (v) => (v.profiles?.username || '').toLowerCase() !== HIDDEN_FROM_DISCOVER_USERNAME,
+        );
+        // Re-inject a directly-opened (pinned) video so a feed reload never drops it,
+        // even when its author is excluded from the listing above.
+        const base = [...localVideos, ...realData];
+        const pinned = pinnedVideoRef.current;
+        const videosData = pinned && !base.some((v) => v.id === pinned.id) ? [pinned, ...base] : base;
         setVideos(videosData);
 
         const counts: { [key: string]: number } = {};
@@ -763,8 +797,10 @@ export function HomeContent({ isActive }: HomeContentProps) {
     }
 
     setLikeAnimating(videoId);
-    const likeKey = businessId || videoId;
-    const itemType = businessId ? 'business' : 'video';
+    // Like state is keyed by the unique VIDEO id (not business) so liking one video
+    // never marks other videos from the same business as liked.
+    const likeKey = videoId;
+    const itemType = 'video' as const;
     const isLiked = likedVideos.has(likeKey);
 
     // Admin Mode: every click adds +1 display-only
@@ -987,7 +1023,8 @@ export function HomeContent({ isActive }: HomeContentProps) {
     );
   }
   const currentBusiness = currentVideo.businesses;
-  const likeKey = currentBusiness?.id || currentVideo.id;
+  // Per-video like key (see toggleLike) — must match so each video's heart is independent.
+  const likeKey = currentVideo.id;
   const isLiked = likedVideos.has(likeKey);
   const isBookmarked = bookmarkedVideos.has(currentVideo.id);
   // Stable (deterministic) save/share counts — no backend store for these.
@@ -1069,8 +1106,90 @@ export function HomeContent({ isActive }: HomeContentProps) {
           60% { transform: translate(-50%, 0) scale(1.2); }
           100% { transform: translate(-50%, 0) scale(1); }
         }
+        /* Action rail — mobile: overlaid at right edge; sm+: tight beside the video.
+           Anchored to the BOTTOM so the bottom icons (share/send) sit near the screen bottom. */
+        .feed-action-rail {
+          position: absolute;
+          right: 0;
+          bottom: 16px;
+          top: auto;
+          transform: none;
+          z-index: 20;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 6px;
+          padding-right: 6px;
+        }
+        @media (min-width: 640px) {
+          .feed-action-rail {
+            right: auto;
+            left: calc(50% + min(50%, (100dvh - 112px) * 9 / 32) + 4px);
+            bottom: 20px;
+            padding-right: 0;
+            gap: 8px;
+          }
+        }
+        @media (min-width: 768px) {
+          .feed-action-rail {
+            left: calc(50% + min(50%, (100dvh - 112px) * 9 / 32) + 6px);
+            gap: 10px;
+          }
+        }
+        /* Up/Down nav circles — hidden on mobile; on sm+ pinned to the RIGHT edge,
+           vertically centered. When the reviews panel opens they slide LEFT to sit
+           just beside it (still fully visible). */
+        .feed-nav-arrows {
+          display: none;
+          position: absolute;
+          right: 16px;
+          top: 50%;
+          transform: translateY(-50%);
+          z-index: 30;
+          flex-direction: column;
+          gap: 14px;
+          transition: right 260ms ease;
+        }
+        @media (min-width: 640px) {
+          .feed-nav-arrows {
+            display: flex;
+          }
+        }
+        .feed-nav-arrows.shifted {
+          right: calc(min(360px, 80vw) + 28px);
+        }
+        /* Reviews/comments side panel — CLOSED by default (slid off the right edge);
+           gently slides in when opened. Mounted on sm+ so the slide can animate. */
+        .feed-reviews {
+          display: none;
+          position: absolute;
+          /* Start below the top-right coins/Get App bar so the panel's stars and
+             first review are never hidden behind it. */
+          top: 64px;
+          bottom: 16px;
+          /* Shift further from the right edge and cap the width to the viewport so the
+             whole panel — right edge + the comment form's Post button — is on-screen. */
+          right: 24px;
+          width: min(340px, calc(100vw - 48px));
+          z-index: 25;
+          border-radius: 16px;
+          overflow: hidden;
+          box-shadow: 0 8px 30px rgba(0,0,0,0.18);
+          transform: translateX(calc(100% + 24px));
+          transition: transform 260ms ease;
+          pointer-events: none;
+        }
+        @media (min-width: 640px) {
+          .feed-reviews {
+            display: flex;
+          }
+        }
+        .feed-reviews.open {
+          transform: translateX(0);
+          pointer-events: auto;
+        }
       `}</style>
-      <div className="home-content-root fixed top-[112px] left-0 right-0 bottom-0 z-10 overflow-hidden overscroll-none bg-white text-foreground">
+      <div className="home-content-root fixed top-[112px] left-0 right-0 bottom-0 z-10 overflow-hidden overscroll-none bg-white text-foreground dark:bg-[#121212]">
       {/* Ambient Particle Background - CSS shimmer effect */}
       <div className="home-feed-particles" aria-hidden="true" />
 
@@ -1267,8 +1386,46 @@ export function HomeContent({ isActive }: HomeContentProps) {
           </div>
       </div>
 
-      {/* Right Side - Interaction Buttons */}
-      <div className="absolute right-0 top-1/2 -translate-y-1/2 z-20 flex flex-col items-center gap-2 pr-2 sm:gap-3 md:gap-4 md:pr-4">
+      {/* Up/Down Navigation Circles — right edge (prev/next). Visible chevrons,
+          theme-aware. Shift left when the reviews panel opens so they stay beside it. */}
+      <div className={`feed-nav-arrows${reviewsOpen ? ' shifted' : ''}`}>
+        <button
+          type="button"
+          onClick={goToPrev}
+          aria-label="Previous video"
+          className="p-0 w-12 h-12 rounded-full bg-white dark:bg-[#1e1e1e] border border-black/10 dark:border-white/15 shadow-lg flex items-center justify-center transition-colors duration-150 hover:bg-black/5 dark:hover:bg-white/10"
+        >
+          <svg className="w-6 h-6 text-black dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 15l7-7 7 7" />
+          </svg>
+        </button>
+        <button
+          type="button"
+          onClick={goToNext}
+          aria-label="Next video"
+          className="p-0 w-12 h-12 rounded-full bg-white dark:bg-[#1e1e1e] border border-black/10 dark:border-white/15 shadow-lg flex items-center justify-center transition-colors duration-150 hover:bg-black/5 dark:hover:bg-white/10"
+        >
+          <svg className="w-6 h-6 text-black dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+      </div>
+
+      {/* Reviews/comments side panel — slides in from the right when opened. */}
+      <div className={`feed-reviews${reviewsOpen ? ' open' : ''}`} aria-hidden={!reviewsOpen}>
+        <button
+          type="button"
+          onClick={() => setReviewsOpen(false)}
+          aria-label="Close reviews"
+          className="absolute right-2 top-2 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-black/10 p-0 text-black transition hover:bg-black/20 dark:bg-white/10 dark:text-white dark:hover:bg-white/20"
+        >
+          <X className="h-4 w-4" color="currentColor" strokeWidth={2.5} />
+        </button>
+        <CommentSection videoId={currentVideo.id} className="h-full w-full overflow-y-auto" />
+      </div>
+
+      {/* Engagement Action Rail — beside the video on its right (see .feed-action-rail CSS above) */}
+      <div className="feed-action-rail">
         {/* Profile Picture */}
         <div className="relative">
           <button
@@ -1301,18 +1458,18 @@ export function HomeContent({ isActive }: HomeContentProps) {
           )}
         </div>
 
-        {/* Like Button - show for all videos */}
+        {/* Like Button — active = RED. Hover only shades the circle (no size change). */}
         <button
           onClick={(e) => toggleLike(currentVideo.id, currentBusiness?.id, e)}
           onKeyDown={(e) => handleKeyDown(e, () => toggleLike(currentVideo.id, currentBusiness?.id))}
-          className="action-button-animate flex flex-col items-center gap-1 transition-transform duration-200 active:scale-95"
+          className="group flex flex-col items-center gap-1"
           aria-label={isLiked ? 'Unlike video' : 'Like video'}
         >
-          <div className={`w-9 h-9 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center shadow-lg transition-all duration-300 ${
-            isLiked ? 'bg-[#f97316] shadow-[#f97316]/40' : 'bg-white'
+          <div className={`w-9 h-9 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center shadow-lg transition group-hover:brightness-95 dark:group-hover:brightness-110 ${
+            isLiked ? 'bg-[#ef4444] shadow-[#ef4444]/40' : 'bg-white dark:bg-[#1e1e1e]'
           } ${likeAnimating === currentVideo.id ? 'like-icon-pop' : ''}`}>
             <svg
-              className={`w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 transition-all duration-300 ${isLiked ? 'text-white' : 'text-black'} ${likeAnimating === currentVideo.id ? 'scale-110' : ''}`}
+              className={`w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 transition-colors duration-300 ${isLiked ? 'text-white' : 'text-black dark:text-white'}`}
               fill={isLiked ? 'currentColor' : 'none'}
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -1320,24 +1477,31 @@ export function HomeContent({ isActive }: HomeContentProps) {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
             </svg>
           </div>
-          <span className="text-black text-[10px] sm:text-xs font-semibold">
+          <span className="text-black dark:text-white text-[10px] sm:text-xs font-semibold">
             {formatCount(likeCounts[likeKey] ?? stableLikeCount(currentVideo.id))}
           </span>
         </button>
 
-        {/* Reviews Button */}
+        {/* Reviews Button — toggles the slide-in side panel on sm+, modal on mobile. */}
         <button
-          onClick={() => handleCommentClick(currentVideo.id)}
-          onKeyDown={(e) => handleKeyDown(e, () => handleCommentClick(currentVideo.id))}
-          className="action-button-animate flex flex-col items-center gap-1 transition-transform duration-200 hover:scale-110 active:scale-95"
-          aria-label="Add a review or comment"
+          onClick={() => {
+            if (typeof window !== 'undefined' && window.innerWidth < 640) {
+              handleCommentClick(currentVideo.id);
+            } else {
+              setReviewsOpen((o) => !o);
+            }
+          }}
+          onKeyDown={(e) => handleKeyDown(e, () => setReviewsOpen((o) => !o))}
+          className="group flex flex-col items-center gap-1"
+          aria-label={reviewsOpen ? 'Close reviews' : 'Open reviews'}
+          aria-expanded={reviewsOpen}
         >
-          <div className="flex h-9 w-9 sm:h-10 sm:w-10 md:h-12 md:w-12 items-center justify-center rounded-full bg-white shadow-lg transition-all duration-300 active:scale-95">
-            <svg className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-black transition-colors duration-300 hover:text-[#f97316]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="flex h-9 w-9 sm:h-10 sm:w-10 md:h-12 md:w-12 items-center justify-center rounded-full bg-white dark:bg-[#1e1e1e] shadow-lg transition group-hover:brightness-95 dark:group-hover:brightness-110">
+            <svg className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-black dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
             </svg>
           </div>
-          <span className="text-black text-[10px] sm:text-xs font-semibold">{formatCount(commentCounts[currentVideo.id] || stableCount(currentVideo.id, 'cmt', 12, 520))}</span>
+          <span className="text-black dark:text-white text-[10px] sm:text-xs font-semibold">{formatCount(commentCounts[currentVideo.id] || stableCount(currentVideo.id, 'cmt', 12, 520))}</span>
         </button>
 
         {/* Location Button — computes distance and opens map modal */}
@@ -1352,29 +1516,29 @@ export function HomeContent({ isActive }: HomeContentProps) {
             }
             setLocationModalOpen(true);
           }}
-          className="action-button-animate flex flex-col items-center gap-1 transition-transform duration-200 hover:scale-110 active:scale-95"
+          className="group flex flex-col items-center gap-1"
           aria-label={distance ? `Distance: ${distance}` : 'Location'}
         >
-          <div className="flex h-9 w-9 sm:h-10 sm:w-10 md:h-12 md:w-12 items-center justify-center rounded-full bg-white shadow-lg transition-all duration-300 active:scale-95">
-            <svg className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-black transition-colors duration-300 hover:text-[#f97316]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="flex h-9 w-9 sm:h-10 sm:w-10 md:h-12 md:w-12 items-center justify-center rounded-full bg-white dark:bg-[#1e1e1e] shadow-lg transition group-hover:brightness-95 dark:group-hover:brightness-110">
+            <svg className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-black dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
           </div>
-          <span className="text-black text-[10px] sm:text-xs font-semibold">{distanceLabel}</span>
+          <span className="text-black dark:text-white text-[10px] sm:text-xs font-semibold">{distanceLabel}</span>
         </button>
 
-        {/* Bookmark Button */}
+        {/* Bookmark / Favorite Button — active = ORANGE (never yellow). */}
         <button
           onClick={(e) => toggleBookmark(currentVideo, e)}
-          className="action-button-animate flex flex-col items-center gap-1 transition-transform duration-200 active:scale-95"
+          className="group flex flex-col items-center gap-1"
           aria-label={isBookmarked ? 'Remove bookmark' : 'Bookmark video'}
         >
-          <div className={`w-9 h-9 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center shadow-lg transition-all duration-300 ${
-            isBookmarked ? 'bg-[#f97316] shadow-[#f97316]/40' : 'bg-white'
+          <div className={`w-9 h-9 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center shadow-lg transition group-hover:brightness-95 dark:group-hover:brightness-110 ${
+            isBookmarked ? 'bg-[#f97316] shadow-[#f97316]/40' : 'bg-white dark:bg-[#1e1e1e]'
           } ${bookmarkAnimating === currentVideo.id ? 'bookmark-icon-pop' : ''}`}>
             <svg
-              className={`w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 transition-all duration-300 ${isBookmarked ? 'text-white' : 'text-black'} ${bookmarkAnimating === currentVideo.id ? 'scale-110' : ''}`}
+              className={`w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 transition-colors duration-300 ${isBookmarked ? 'text-white' : 'text-black dark:text-white'}`}
               fill={isBookmarked ? 'currentColor' : 'none'}
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -1382,22 +1546,22 @@ export function HomeContent({ isActive }: HomeContentProps) {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
             </svg>
           </div>
-          <span className="text-black text-[10px] sm:text-xs font-semibold">{formatCount(saveCount)}</span>
+          <span className="text-black dark:text-white text-[10px] sm:text-xs font-semibold">{formatCount(saveCount)}</span>
         </button>
 
         {/* Share Button */}
         <button
           onClick={() => handleShareClick(currentVideo)}
           onKeyDown={(e) => handleKeyDown(e, () => handleShareClick(currentVideo))}
-          className="action-button-animate flex flex-col items-center gap-1 transition-transform duration-200 hover:scale-110 active:scale-95"
+          className="group flex flex-col items-center gap-1"
           aria-label="Share this video"
         >
-          <div className="flex h-9 w-9 sm:h-10 sm:w-10 md:h-12 md:w-12 items-center justify-center rounded-full bg-white shadow-lg transition-all duration-300 active:scale-95">
-            <svg className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-black transition-colors duration-300 hover:text-[#f97316]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="flex h-9 w-9 sm:h-10 sm:w-10 md:h-12 md:w-12 items-center justify-center rounded-full bg-white dark:bg-[#1e1e1e] shadow-lg transition group-hover:brightness-95 dark:group-hover:brightness-110">
+            <svg className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-black dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
             </svg>
           </div>
-          <span className="text-black text-[10px] sm:text-xs font-semibold">{formatCount(shareCount)}</span>
+          <span className="text-black dark:text-white text-[10px] sm:text-xs font-semibold">{formatCount(shareCount)}</span>
         </button>
 
         {/* Send to User Button — opens Chats with this video pre-filled */}
@@ -1407,15 +1571,15 @@ export function HomeContent({ isActive }: HomeContentProps) {
             const videoUrl = `${window.location.origin}/feed?videoId=${encodeURIComponent(currentVideo.id)}`;
             router.push(`/chats?shareVideo=${encodeURIComponent(videoUrl)}&shareTitle=${encodeURIComponent(bizName)}`);
           }}
-          className="action-button-animate flex flex-col items-center gap-1 transition-transform duration-200 hover:scale-110 active:scale-95"
+          className="group flex flex-col items-center gap-1"
           aria-label="Send video to a user"
         >
-          <div className="flex h-9 w-9 sm:h-10 sm:w-10 md:h-12 md:w-12 items-center justify-center rounded-full bg-white shadow-lg transition-all duration-300 active:scale-95">
-            <svg className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-black transition-colors duration-300 hover:text-[#f97316]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="flex h-9 w-9 sm:h-10 sm:w-10 md:h-12 md:w-12 items-center justify-center rounded-full bg-white dark:bg-[#1e1e1e] shadow-lg transition group-hover:brightness-95 dark:group-hover:brightness-110">
+            <svg className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-black dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
             </svg>
           </div>
-          <span className="text-black text-[10px] sm:text-xs font-semibold">Send</span>
+          <span className="text-black dark:text-white text-[10px] sm:text-xs font-semibold">Send</span>
         </button>
 
       </div>

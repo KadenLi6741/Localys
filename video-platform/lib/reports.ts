@@ -195,6 +195,22 @@ export function topItems(orders: ReportOrder[]): TopItem[] {
     .map((it, i) => ({ ...it, rank: i + 1, pctOfSales: Math.round((it.revenue / total) * 100) }));
 }
 
+export interface CategorySlice { category: string; revenue: number; units: number; pct: number }
+/** Revenue + units grouped by category, sorted by revenue. Totals reconcile with the report. */
+export function categoryBreakdown(orders: ReportOrder[]): CategorySlice[] {
+  const map = new Map<string, { revenue: number; units: number }>();
+  for (const o of orders) {
+    const cur = map.get(o.category) || { revenue: 0, units: 0 };
+    cur.revenue = round2(cur.revenue + o.lineTotal);
+    cur.units += o.quantity;
+    map.set(o.category, cur);
+  }
+  const total = orders.reduce((s, o) => s + o.lineTotal, 0) || 1;
+  return Array.from(map.entries())
+    .map(([category, v]) => ({ category, ...v, pct: Math.round((v.revenue / total) * 100) }))
+    .sort((a, b) => b.revenue - a.revenue);
+}
+
 export interface CustomerStats {
   total: number;
   returning: number;

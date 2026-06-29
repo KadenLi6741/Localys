@@ -203,6 +203,17 @@ function DashboardContent() {
 
   const hasRevenue = totalRevenue > 0;
   const displayRevenue = hasRevenue ? totalRevenue : 3500.45;
+
+  // Localy keeps 5% of gross sales; the business keeps 95%. Tax (8.25%) is
+  // collected from customers and remitted — consistent with the checkout breakdown.
+  const LOCALY_FEE_RATE = 0.05;
+  const TAX_RATE = 0.0825;
+  const grossSales = displayRevenue;
+  const localyFee = grossSales * LOCALY_FEE_RATE;
+  const netEarnings = grossSales * (1 - LOCALY_FEE_RATE);
+  const taxCollected = grossSales * TAX_RATE;
+  const money = (n: number) => n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
   const avgRating = reviews.length > 0 ? reviews.reduce((s, r) => s + r.rating, 0) / reviews.length : 0;
 
   const mostPopularOrder = useMemo(() => {
@@ -216,21 +227,21 @@ function DashboardContent() {
   }, [completedOrders]);
 
   if (isBusiness === null || loading) {
-    return <div className="min-h-screen bg-white flex items-center justify-center"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#f97316]" /></div>;
+    return <div className="min-h-screen bg-card flex items-center justify-center"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#f97316]" /></div>;
   }
 
   return (
-    <div className="min-h-screen bg-[#f8f9fb] text-gray-900 pb-24">
+    <div className="min-h-screen bg-background text-foreground pb-24">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-4 lg:px-10 pt-6 pb-0">
+      <div className="bg-card border-b border-border px-4 lg:px-10 pt-6 pb-0">
         <div className="max-w-screen-2xl mx-auto">
           <div className="flex items-end justify-between mb-4">
             <div>
-              <p className="text-xs text-gray-600 font-medium uppercase tracking-wide mb-1">Business Manager</p>
-              <p className="text-3xl font-bold text-gray-900">${displayRevenue.toLocaleString('en-US', { minimumFractionDigits: 2 })}</p>
+              <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide mb-1">Business Manager</p>
+              <p className="text-3xl font-bold text-foreground">${displayRevenue.toLocaleString('en-US', { minimumFractionDigits: 2 })}</p>
               <div className="flex items-center gap-1.5 mt-1">
-                {revenueChange >= 0 ? <ArrowUpRight className="h-3.5 w-3.5 text-green-500" /> : <ArrowDownRight className="h-3.5 w-3.5 text-red-500" />}
-                <span className={`text-xs font-medium ${revenueChange >= 0 ? 'text-green-600' : 'text-red-500'}`}>{Math.abs(revenueChange).toFixed(1)}%</span>
+                {revenueChange >= 0 ? <ArrowUpRight className="h-3.5 w-3.5 text-[#f97316]" /> : <ArrowDownRight className="h-3.5 w-3.5 text-red-500" />}
+                <span className={`text-xs font-medium ${revenueChange >= 0 ? 'text-[#f97316]' : 'text-red-500'}`}>{Math.abs(revenueChange).toFixed(1)}%</span>
                 <span className="text-xs text-gray-400">vs last period</span>
               </div>
             </div>
@@ -241,7 +252,7 @@ function DashboardContent() {
           {/* Tabs */}
           <div className="flex gap-0.5 overflow-x-auto">
             {TABS.map(t => (
-              <button key={t.key} onClick={() => setActiveTab(t.key)} className={`flex items-center gap-1.5 px-3 py-2.5 text-sm font-medium rounded-t-lg border-b-2 transition-colors whitespace-nowrap ${activeTab === t.key ? 'text-[#f97316] border-[#f97316] bg-orange-50/60' : 'text-gray-500 border-transparent hover:text-gray-900 hover:bg-gray-50'}`}>
+              <button key={t.key} onClick={() => setActiveTab(t.key)} className={`flex items-center gap-1.5 px-3 py-2.5 text-sm font-medium rounded-t-lg border-b-2 transition-colors whitespace-nowrap ${activeTab === t.key ? 'text-[#f97316] border-[#f97316] bg-orange-50/60' : 'text-muted-foreground border-transparent hover:text-foreground hover:bg-muted'}`}>
                 {t.icon}<span>{t.label}</span>
               </button>
             ))}
@@ -251,9 +262,9 @@ function DashboardContent() {
 
       <div className="max-w-screen-2xl mx-auto px-4 lg:px-10 py-6">
         {scanResult && (
-          <div className={`mb-4 p-4 rounded-2xl border flex items-start justify-between ${scanResult.success ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
-            <p className={`font-medium text-sm ${scanResult.success ? 'text-green-700' : 'text-red-600'}`}>{scanResult.message}</p>
-            <button onClick={() => setScanResult(null)} className="text-gray-400 hover:text-gray-600 ml-4 shrink-0"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg></button>
+          <div className={`mb-4 p-4 rounded-2xl border flex items-start justify-between ${scanResult.success ? 'bg-orange-50 border-orange-200' : 'bg-red-50 border-red-200'}`}>
+            <p className={`font-medium text-sm ${scanResult.success ? 'text-[#f97316]' : 'text-red-600'}`}>{scanResult.message}</p>
+            <button onClick={() => setScanResult(null)} className="text-gray-400 hover:text-muted-foreground ml-4 shrink-0"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg></button>
           </div>
         )}
 
@@ -261,12 +272,12 @@ function DashboardContent() {
         {activeTab === 'overview' && (
           <div className="space-y-5">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-              <div className="lg:col-span-2 bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
+              <div className="lg:col-span-2 bg-card border border-border rounded-2xl p-5 shadow-sm">
                 <div className="flex items-center justify-between mb-1">
-                  <p className="text-sm font-semibold text-gray-700">Cash Flow</p>
-                  <span className="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded-lg">Last 7 days</span>
+                  <p className="text-sm font-semibold text-foreground">Cash Flow</p>
+                  <span className="text-xs text-gray-400 bg-muted px-2 py-1 rounded-lg">Last 7 days</span>
                 </div>
-                <p className="text-xs text-gray-600 mb-4">Revenue performance</p>
+                <p className="text-xs text-muted-foreground mb-4">Revenue performance</p>
                 <div className="h-44">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={hasRevenue ? chartData : DEMO_CHART} barSize={20}>
@@ -280,17 +291,46 @@ function DashboardContent() {
                 </div>
               </div>
               <div className="flex flex-col gap-4">
-                <div className="flex-1 bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
-                  <div className="flex items-center gap-2 mb-3"><div className="w-6 h-6 rounded-md bg-green-100 flex items-center justify-center"><TrendingUp className="h-3.5 w-3.5 text-green-600" /></div><p className="text-xs font-medium text-gray-700">Income</p></div>
-                  <p className="text-2xl font-bold text-gray-900">${displayRevenue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
-                  <span className="text-[11px] font-semibold text-green-600 bg-green-50 px-1.5 py-0.5 rounded mt-1 inline-block">+{Math.abs(revenueChange).toFixed(1)}%</span>
+                <div className="flex-1 bg-card border border-border rounded-2xl p-5 shadow-sm">
+                  <div className="flex items-center gap-2 mb-3"><div className="w-6 h-6 rounded-md bg-orange-100 flex items-center justify-center"><TrendingUp className="h-3.5 w-3.5 text-[#f97316]" /></div><p className="text-xs font-medium text-foreground">Income</p></div>
+                  <p className="text-2xl font-bold text-foreground">${displayRevenue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                  <span className="text-[11px] font-semibold text-[#f97316] bg-orange-50 px-1.5 py-0.5 rounded mt-1 inline-block">+{Math.abs(revenueChange).toFixed(1)}%</span>
                 </div>
-                <div className="flex-1 bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
-                  <div className="flex items-center gap-2 mb-3"><div className="w-6 h-6 rounded-md bg-red-100 flex items-center justify-center"><TrendingDown className="h-3.5 w-3.5 text-red-500" /></div><p className="text-xs font-medium text-gray-700">Expense</p></div>
-                  <p className="text-2xl font-bold text-gray-900">${(displayRevenue * 0.32).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                <div className="flex-1 bg-card border border-border rounded-2xl p-5 shadow-sm">
+                  <div className="flex items-center gap-2 mb-3"><div className="w-6 h-6 rounded-md bg-red-100 flex items-center justify-center"><TrendingDown className="h-3.5 w-3.5 text-red-500" /></div><p className="text-xs font-medium text-foreground">Expense</p></div>
+                  <p className="text-2xl font-bold text-foreground">${(displayRevenue * 0.32).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                   <span className="text-[11px] font-semibold text-red-500 bg-red-50 px-1.5 py-0.5 rounded mt-1 inline-block">-12.5%</span>
                 </div>
               </div>
+            </div>
+
+            {/* Earnings breakdown — 5% Localy fee, 95% net, 8.25% tax (consistent with checkout) */}
+            <div className="bg-card border border-border rounded-2xl p-5 shadow-sm">
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-sm font-semibold text-foreground">Earnings breakdown</p>
+                <span className="text-[11px] font-semibold text-[#f97316] bg-orange-50 px-2 py-0.5 rounded-lg">Localy takes just 5%</span>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1">Gross sales</p>
+                  <p className="text-xl font-bold text-foreground">${money(grossSales)}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1">Localy fee (5%)</p>
+                  <p className="text-xl font-bold text-[#f97316]">-${money(localyFee)}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1">Your net earnings (95%)</p>
+                  <p className="text-xl font-bold text-foreground">${money(netEarnings)}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1">Tax collected (8.25%)</p>
+                  <p className="text-xl font-bold text-foreground">${money(taxCollected)}</p>
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground mt-4">
+                Localy only takes 5% — you keep 95% of every sale. Tax (8.25%) is collected from customers and remitted, not part of your earnings.
+              </p>
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
@@ -300,8 +340,8 @@ function DashboardContent() {
               <StatCard label="Reviews" value={String(reviews.length || 24)} />
             </div>
 
-            <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
-              <p className="text-sm font-semibold text-gray-700 mb-3">Most Popular Order</p>
+            <div className="bg-card border border-border rounded-2xl p-5 shadow-sm">
+              <p className="text-sm font-semibold text-foreground mb-3">Most Popular Order</p>
               {mostPopularOrder ? (
                 <div className="flex items-center gap-3">
                   {(itemImages[mostPopularOrder.itemId] || itemNameImages[mostPopularOrder.name]) ? (
@@ -316,24 +356,24 @@ function DashboardContent() {
                     </div>
                   )}
                   <div>
-                    <p className="font-semibold text-gray-900">{mostPopularOrder.name}</p>
+                    <p className="font-semibold text-foreground">{mostPopularOrder.name}</p>
                     <p className="text-xs text-gray-400">{mostPopularOrder.count} order{mostPopularOrder.count !== 1 ? 's' : ''} &middot; ${mostPopularOrder.price.toFixed(2)} avg</p>
                   </div>
                 </div>
               ) : (
                 <div className="flex items-center gap-3">
-                  <img src="/Bizness/Jay's Burger/classic burger.jpg" alt="Classic Burger" className="w-14 h-14 rounded-xl object-cover shrink-0" onError={(e) => { (e.target as HTMLImageElement).style.display='none'; }} />
+                  <img src="/menu/jays-burger/classic-burger.jpg" alt="Classic Burger" className="w-14 h-14 rounded-xl object-cover shrink-0" onError={(e) => { (e.target as HTMLImageElement).style.display='none'; }} />
                   <div>
-                    <p className="font-semibold text-gray-900">Classic Burger</p>
+                    <p className="font-semibold text-foreground">Classic Burger</p>
                     <p className="text-xs text-gray-400">47 orders &middot; $11.99 avg</p>
                   </div>
                 </div>
               )}
             </div>
 
-            <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
-              <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-                <p className="font-semibold text-gray-900 text-sm">Recent Orders</p>
+            <div className="bg-card border border-border rounded-2xl shadow-sm overflow-hidden">
+              <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+                <p className="font-semibold text-foreground text-sm">Recent Orders</p>
                 <button onClick={() => setActiveTab('orders')} className="text-xs text-[#f97316] font-medium hover:underline">View all</button>
               </div>
               <div className="divide-y divide-gray-50">
@@ -345,8 +385,8 @@ function DashboardContent() {
             {/* ── Extra Analytics ── */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {/* Top Items */}
-              <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
-                <p className="text-sm font-semibold text-gray-700 mb-3">Top Sellers</p>
+              <div className="bg-card border border-border rounded-2xl p-5 shadow-sm">
+                <p className="text-sm font-semibold text-foreground mb-3">Top Sellers</p>
                 <div className="space-y-2">
                   {(() => {
                     const real = (() => {
@@ -368,18 +408,18 @@ function DashboardContent() {
                     const max = items[0]?.count || 1;
                     return items.map((item, i) => (
                       <div key={item.name} className="flex items-center gap-2">
-                        <span className="w-4 text-[11px] font-bold text-gray-600">#{i + 1}</span>
+                        <span className="w-4 text-[11px] font-bold text-muted-foreground">#{i + 1}</span>
                         {real.length > 0 && (itemImages[item.itemId] || itemNameImages[item.name]) ? (
                           <img src={itemImages[item.itemId] || itemNameImages[item.name]} alt={item.name} className="w-7 h-7 rounded-lg object-cover shrink-0" />
                         ) : (
-                          <div className="w-7 h-7 rounded-lg bg-gray-100 shrink-0 flex items-center justify-center text-xs font-bold text-gray-500">{item.name[0]}</div>
+                          <div className="w-7 h-7 rounded-lg bg-muted shrink-0 flex items-center justify-center text-xs font-bold text-muted-foreground">{item.name[0]}</div>
                         )}
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between mb-0.5">
-                            <span className="text-xs font-medium text-gray-900 truncate">{item.name}</span>
-                            <span className="text-xs font-bold text-gray-900 shrink-0 ml-1">{item.count}x</span>
+                            <span className="text-xs font-medium text-foreground truncate">{item.name}</span>
+                            <span className="text-xs font-bold text-foreground shrink-0 ml-1">{item.count}x</span>
                           </div>
-                          <div className="h-1 w-full rounded-full bg-gray-100">
+                          <div className="h-1 w-full rounded-full bg-muted">
                             <div className="h-1 rounded-full bg-[#f97316]" style={{ width: `${(item.count / max) * 100}%` }} />
                           </div>
                         </div>
@@ -390,8 +430,8 @@ function DashboardContent() {
               </div>
 
               {/* Busiest Hours */}
-              <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
-                <p className="text-sm font-semibold text-gray-700 mb-3">Busiest Hours</p>
+              <div className="bg-card border border-border rounded-2xl p-5 shadow-sm">
+                <p className="text-sm font-semibold text-foreground mb-3">Busiest Hours</p>
                 {(() => {
                   const real: Record<number, number> = {};
                   for (const o of completedOrders) {
@@ -411,7 +451,7 @@ function DashboardContent() {
                         const label = h === 12 ? '12pm' : h > 12 ? `${h-12}pm` : `${h}am`;
                         return (
                           <div key={h} className="flex flex-col items-center flex-1 gap-0.5">
-                            <div className="w-full rounded-t-sm bg-gray-100 flex items-end overflow-hidden" style={{ height: '44px' }}>
+                            <div className="w-full rounded-t-sm bg-muted flex items-end overflow-hidden" style={{ height: '44px' }}>
                               <div className="w-full rounded-t-sm bg-[#f97316]" style={{ height: `${pct}%`, minHeight: pct > 0 ? '2px' : '0' }} />
                             </div>
                             <span className="text-[8px] text-gray-400 leading-none">{label}</span>
@@ -421,92 +461,92 @@ function DashboardContent() {
                     </div>
                   );
                 })()}
-                <p className="text-[11px] text-gray-600 mt-2">Peak: 12pm–1pm &middot; 6pm–7pm</p>
+                <p className="text-[11px] text-muted-foreground mt-2">Peak: 12pm–1pm &middot; 6pm–7pm</p>
               </div>
             </div>
 
             {/* Revenue Trend + Insights row */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              <div className="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm">
-                <p className="text-[11px] font-medium text-gray-700 mb-1">Avg Order Value</p>
-                <p className="text-xl font-bold text-gray-900">
+              <div className="bg-card border border-border rounded-2xl p-4 shadow-sm">
+                <p className="text-[11px] font-medium text-foreground mb-1">Avg Order Value</p>
+                <p className="text-xl font-bold text-foreground">
                   {completedOrders.length > 0
                     ? `$${(completedOrders.reduce((s,o)=>s+o.price,0)/completedOrders.length).toFixed(2)}`
                     : '$12.87'}
                 </p>
-                <span className="text-[10px] font-semibold text-green-600 bg-green-50 px-1.5 py-0.5 rounded mt-1 inline-block">+8.3%</span>
+                <span className="text-[10px] font-semibold text-[#f97316] bg-orange-50 px-1.5 py-0.5 rounded mt-1 inline-block">+8.3%</span>
               </div>
-              <div className="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm">
-                <p className="text-[11px] font-medium text-gray-700 mb-1">Repeat Customers</p>
-                <p className="text-xl font-bold text-gray-900">
+              <div className="bg-card border border-border rounded-2xl p-4 shadow-sm">
+                <p className="text-[11px] font-medium text-foreground mb-1">Repeat Customers</p>
+                <p className="text-xl font-bold text-foreground">
                   {completedOrders.length > 0
                     ? (() => { const s = new Set(); const r = new Set(); for (const o of completedOrders) { if (s.has(o.buyer_id)) r.add(o.buyer_id); s.add(o.buyer_id); } return `${Math.round((r.size/Math.max(s.size,1))*100)}%`; })()
                     : '68%'}
                 </p>
-                <span className="text-[10px] font-semibold text-green-600 bg-green-50 px-1.5 py-0.5 rounded mt-1 inline-block">Strong</span>
+                <span className="text-[10px] font-semibold text-[#f97316] bg-orange-50 px-1.5 py-0.5 rounded mt-1 inline-block">Strong</span>
               </div>
-              <div className="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm">
-                <p className="text-[11px] font-medium text-gray-700 mb-1">Highest Rated</p>
-                <p className="text-sm font-bold text-gray-900 truncate">
+              <div className="bg-card border border-border rounded-2xl p-4 shadow-sm">
+                <p className="text-[11px] font-medium text-foreground mb-1">Highest Rated</p>
+                <p className="text-sm font-bold text-foreground truncate">
                   {reviews.length > 0
                     ? (() => { const m: Record<string,{s:number;c:number}> = {}; for (const r of reviews) { if (r.video_caption) { if (!m[r.video_caption]) m[r.video_caption]={s:0,c:0}; m[r.video_caption].s+=r.rating; m[r.video_caption].c++; } } const top = Object.entries(m).sort((a,b)=>b[1].s/b[1].c - a[1].s/a[1].c)[0]; return top ? top[0] : 'Classic Burger'; })()
                     : 'Classic Burger'}
                 </p>
-                <p className="text-[10px] text-gray-600 mt-0.5">
+                <p className="text-[10px] text-muted-foreground mt-0.5">
                   {reviews.length > 0 ? `${avgRating.toFixed(1)} avg` : '4.9 avg, 23 reviews'}
                 </p>
               </div>
-              <div className="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm">
-                <p className="text-[11px] font-medium text-gray-700 mb-1">This Month</p>
-                <p className="text-xl font-bold text-gray-900">
+              <div className="bg-card border border-border rounded-2xl p-4 shadow-sm">
+                <p className="text-[11px] font-medium text-foreground mb-1">This Month</p>
+                <p className="text-xl font-bold text-foreground">
                   {completedOrders.length > 0
                     ? `$${completedOrders.filter(o => new Date(o.purchased_at).getMonth() === new Date().getMonth()).reduce((s,o)=>s+o.price,0).toLocaleString('en-US',{minimumFractionDigits:0})}`
                     : '$1,284'}
                 </p>
-                <span className="text-[10px] font-semibold text-green-600 bg-green-50 px-1.5 py-0.5 rounded mt-1 inline-block">+22%</span>
+                <span className="text-[10px] font-semibold text-[#f97316] bg-orange-50 px-1.5 py-0.5 rounded mt-1 inline-block">+22%</span>
               </div>
             </div>
 
             {/* ── Sales Insights ── */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
-                <p className="text-[11px] font-medium text-gray-700 mb-1">Order Completion Rate</p>
-                <p className="text-2xl font-bold text-gray-900">
+              <div className="bg-card border border-border rounded-2xl p-5 shadow-sm">
+                <p className="text-[11px] font-medium text-foreground mb-1">Order Completion Rate</p>
+                <p className="text-2xl font-bold text-foreground">
                   {(completedOrders.length + pendingOrders.length) > 0
                     ? `${Math.round((completedOrders.length / Math.max(completedOrders.length + pendingOrders.length, 1)) * 100)}%`
                     : '94%'}
                 </p>
-                <p className="text-[10px] text-gray-600 mt-0.5">Orders fulfilled on time</p>
-                <span className="text-[10px] font-semibold text-green-600 bg-green-50 px-1.5 py-0.5 rounded mt-1.5 inline-block">Excellent</span>
+                <p className="text-[10px] text-muted-foreground mt-0.5">Orders fulfilled on time</p>
+                <span className="text-[10px] font-semibold text-[#f97316] bg-orange-50 px-1.5 py-0.5 rounded mt-1.5 inline-block">Excellent</span>
               </div>
-              <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
-                <p className="text-[11px] font-medium text-gray-700 mb-1">Revenue / Customer</p>
-                <p className="text-2xl font-bold text-gray-900">
+              <div className="bg-card border border-border rounded-2xl p-5 shadow-sm">
+                <p className="text-[11px] font-medium text-foreground mb-1">Revenue / Customer</p>
+                <p className="text-2xl font-bold text-foreground">
                   {completedOrders.length > 0
                     ? (() => { const byBuyer: Record<string, number> = {}; for (const o of completedOrders) byBuyer[o.buyer_id] = (byBuyer[o.buyer_id] || 0) + o.price; const vals = Object.values(byBuyer); return `$${(vals.reduce((s,v)=>s+v,0)/Math.max(vals.length,1)).toFixed(2)}`; })()
                     : '$34.20'}
                 </p>
-                <p className="text-[10px] text-gray-600 mt-0.5">Avg lifetime value</p>
-                <span className="text-[10px] font-semibold text-green-600 bg-green-50 px-1.5 py-0.5 rounded mt-1.5 inline-block">+5.2%</span>
+                <p className="text-[10px] text-muted-foreground mt-0.5">Avg lifetime value</p>
+                <span className="text-[10px] font-semibold text-[#f97316] bg-orange-50 px-1.5 py-0.5 rounded mt-1.5 inline-block">+5.2%</span>
               </div>
-              <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
-                <p className="text-[11px] font-medium text-gray-700 mb-1">Items Sold (Month)</p>
-                <p className="text-2xl font-bold text-gray-900">
+              <div className="bg-card border border-border rounded-2xl p-5 shadow-sm">
+                <p className="text-[11px] font-medium text-foreground mb-1">Items Sold (Month)</p>
+                <p className="text-2xl font-bold text-foreground">
                   {completedOrders.length > 0
                     ? completedOrders.filter(o => new Date(o.purchased_at).getMonth() === new Date().getMonth()).reduce((s,o)=>s+(o.quantity||1),0)
                     : '312'}
                 </p>
-                <p className="text-[10px] text-gray-600 mt-0.5">Units across all items</p>
-                <span className="text-[10px] font-semibold text-green-600 bg-green-50 px-1.5 py-0.5 rounded mt-1.5 inline-block">+18%</span>
+                <p className="text-[10px] text-muted-foreground mt-0.5">Units across all items</p>
+                <span className="text-[10px] font-semibold text-[#f97316] bg-orange-50 px-1.5 py-0.5 rounded mt-1.5 inline-block">+18%</span>
               </div>
             </div>
 
             {/* ── Revenue Forecast ── */}
-            <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
+            <div className="bg-card border border-border rounded-2xl p-5 shadow-sm">
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <p className="text-sm font-semibold text-gray-900">Revenue Forecast</p>
-                  <p className="text-[11px] text-gray-600 mt-0.5">Projected next 7 days based on trend</p>
+                  <p className="text-sm font-semibold text-foreground">Revenue Forecast</p>
+                  <p className="text-[11px] text-muted-foreground mt-0.5">Projected next 7 days based on trend</p>
                 </div>
                 <span className="text-xs font-bold text-[#f97316] bg-orange-50 px-2.5 py-1 rounded-full">+12% projected</span>
               </div>
@@ -520,7 +560,7 @@ function DashboardContent() {
                     {DAYS.map((day, i) => (
                       <div key={day} className="flex flex-col items-center flex-1 gap-1">
                         <div className="w-full flex items-end gap-0.5" style={{ height: '52px' }}>
-                          <div className="flex-1 rounded-t bg-gray-100 self-end" style={{ height: `${(actual[i]/max)*100}%` }} />
+                          <div className="flex-1 rounded-t bg-muted self-end" style={{ height: `${(actual[i]/max)*100}%` }} />
                           <div className="flex-1 rounded-t bg-[#f97316]/40 self-end border border-[#f97316]/30 border-dashed" style={{ height: `${(forecast[i]/max)*100}%` }} />
                         </div>
                         <span className="text-[9px] text-gray-400 leading-none">{day}</span>
@@ -530,20 +570,20 @@ function DashboardContent() {
                 );
               })()}
               <div className="flex items-center gap-4 mt-3">
-                <div className="flex items-center gap-1.5"><div className="w-3 h-2 rounded-sm bg-gray-200" /><span className="text-[10px] text-gray-700">Actual</span></div>
-                <div className="flex items-center gap-1.5"><div className="w-3 h-2 rounded-sm bg-[#f97316]/40 border border-[#f97316]/40" /><span className="text-[10px] text-gray-700">Forecast</span></div>
+                <div className="flex items-center gap-1.5"><div className="w-3 h-2 rounded-sm bg-gray-200" /><span className="text-[10px] text-foreground">Actual</span></div>
+                <div className="flex items-center gap-1.5"><div className="w-3 h-2 rounded-sm bg-[#f97316]/40 border border-[#f97316]/40" /><span className="text-[10px] text-foreground">Forecast</span></div>
               </div>
             </div>
 
             {/* ── Customer Insights ── */}
-            <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
-              <p className="text-sm font-semibold text-gray-900 mb-4">Customer Insights</p>
+            <div className="bg-card border border-border rounded-2xl p-5 shadow-sm">
+              <p className="text-sm font-semibold text-foreground mb-4">Customer Insights</p>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 <div className="text-center">
-                  <p className="text-2xl font-bold text-gray-900">
+                  <p className="text-2xl font-bold text-foreground">
                     {(() => { const s = new Set(completedOrders.map(o=>o.buyer_id)); return s.size > 0 ? s.size : 89; })()}
                   </p>
-                  <p className="text-[11px] text-gray-700 mt-0.5">Total Customers</p>
+                  <p className="text-[11px] text-foreground mt-0.5">Total Customers</p>
                 </div>
                 <div className="text-center">
                   <p className="text-2xl font-bold text-[#f97316]">
@@ -551,20 +591,20 @@ function DashboardContent() {
                       ? (() => { const s = new Set<string>(); const r = new Set<string>(); for (const o of completedOrders) { if (s.has(o.buyer_id)) r.add(o.buyer_id); s.add(o.buyer_id); } return `${Math.round((r.size/Math.max(s.size,1))*100)}%`; })()
                       : '68%'}
                   </p>
-                  <p className="text-[11px] text-gray-700 mt-0.5">Returning</p>
+                  <p className="text-[11px] text-foreground mt-0.5">Returning</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-2xl font-bold text-gray-900">{avgRating > 0 ? avgRating.toFixed(1) : '4.9'}</p>
-                  <p className="text-[11px] text-gray-700 mt-0.5">Avg Rating</p>
+                  <p className="text-2xl font-bold text-foreground">{avgRating > 0 ? avgRating.toFixed(1) : '4.9'}</p>
+                  <p className="text-[11px] text-foreground mt-0.5">Avg Rating</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-2xl font-bold text-gray-900">{reviews.length > 0 ? reviews.length : 23}</p>
-                  <p className="text-[11px] text-gray-700 mt-0.5">Total Reviews</p>
+                  <p className="text-2xl font-bold text-foreground">{reviews.length > 0 ? reviews.length : 23}</p>
+                  <p className="text-[11px] text-foreground mt-0.5">Total Reviews</p>
                 </div>
               </div>
-              <div className="mt-4 pt-4 border-t border-gray-100">
+              <div className="mt-4 pt-4 border-t border-border">
                 <div className="flex items-center justify-between mb-2">
-                  <p className="text-[11px] font-medium text-gray-600">Rating Distribution</p>
+                  <p className="text-[11px] font-medium text-muted-foreground">Rating Distribution</p>
                 </div>
                 {[5,4,3,2,1].map(star => {
                   const count = reviews.filter(r=>r.rating===star).length || [23,8,3,1,0][5-star];
@@ -572,11 +612,11 @@ function DashboardContent() {
                   const pct = Math.round((count/total)*100);
                   return (
                     <div key={star} className="flex items-center gap-2 mb-1">
-                      <span className="text-[10px] font-bold text-gray-700 w-4 text-right">{star}</span>
-                      <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                      <span className="text-[10px] font-bold text-foreground w-4 text-right">{star}</span>
+                      <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
                         <div className="h-full rounded-full bg-[#f97316]" style={{ width: `${pct}%` }} />
                       </div>
-                      <span className="text-[10px] text-gray-600 w-6 text-left">{pct}%</span>
+                      <span className="text-[10px] text-muted-foreground w-6 text-left">{pct}%</span>
                     </div>
                   );
                 })}
@@ -603,14 +643,14 @@ function DashboardContent() {
             {groupOrders.length > 0 && (
               <Section title="Group Orders" count={groupOrders.length} countColor="gray">
                 {groupOrders.map(go => (
-                  <div key={go.id} className="bg-white border border-gray-200 rounded-2xl p-4">
+                  <div key={go.id} className="bg-card border border-border rounded-2xl p-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <Users className="h-4 w-4 text-gray-400" />
-                        <span className="text-sm font-medium text-gray-900">Group Order</span>
-                        <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-lg font-mono">{go.join_code}</span>
+                        <span className="text-sm font-medium text-foreground">Group Order</span>
+                        <span className="text-xs text-gray-400 bg-muted px-2 py-0.5 rounded-lg font-mono">{go.join_code}</span>
                       </div>
-                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${go.status === 'open' ? 'bg-green-50 text-green-700' : 'bg-gray-100 text-gray-500'}`}>{go.status}</span>
+                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${go.status === 'open' ? 'bg-orange-50 text-[#f97316]' : 'bg-muted text-muted-foreground'}`}>{go.status}</span>
                     </div>
                     <p className="text-xs text-gray-400 mt-1">{new Date(go.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}</p>
                   </div>
@@ -637,45 +677,45 @@ function DashboardContent() {
         {activeTab === 'reviews' && (
           <div className="space-y-4">
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-              <div className="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm text-center">
+              <div className="bg-card border border-border rounded-2xl p-4 shadow-sm text-center">
                 <p className="text-3xl font-bold text-black">{avgRating > 0 ? avgRating.toFixed(1) : '—'}</p>
                 <div className="flex justify-center gap-0.5 my-1">{[1,2,3,4,5].map(s => <Star key={s} className={`h-3.5 w-3.5 ${s <= Math.round(avgRating) ? 'text-[#f97316] fill-[#f97316]' : 'text-gray-200 fill-gray-200'}`} />)}</div>
                 <p className="text-xs text-black">Average Rating</p>
               </div>
-              <div className="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm text-center">
+              <div className="bg-card border border-border rounded-2xl p-4 shadow-sm text-center">
                 <p className="text-3xl font-bold text-black">{reviews.length}</p>
                 <p className="text-xs text-black mt-1">Total Reviews</p>
               </div>
-              <div className="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm text-center col-span-2 sm:col-span-1">
+              <div className="bg-card border border-border rounded-2xl p-4 shadow-sm text-center col-span-2 sm:col-span-1">
                 <p className="text-3xl font-bold text-black">{reviews.filter(r => r.rating >= 4).length}</p>
                 <p className="text-xs text-black mt-1">4+ Stars</p>
               </div>
             </div>
 
             {reviews.length === 0 ? (
-              <div className="bg-white border border-gray-200 rounded-2xl p-10 text-center">
+              <div className="bg-card border border-border rounded-2xl p-10 text-center">
                 <Star className="h-10 w-10 text-gray-200 mx-auto mb-3" />
-                <p className="font-semibold text-gray-700">No reviews yet</p>
-                <p className="text-gray-600 text-sm mt-1">Reviews appear here when customers rate your videos</p>
+                <p className="font-semibold text-foreground">No reviews yet</p>
+                <p className="text-muted-foreground text-sm mt-1">Reviews appear here when customers rate your videos</p>
               </div>
             ) : (
               <div className="space-y-2">
                 {reviews.map(r => (
-                  <div key={r.id} className="bg-white border border-gray-200 rounded-xl p-3 shadow-sm">
+                  <div key={r.id} className="bg-card border border-border rounded-xl p-3 shadow-sm">
                     <div className="flex items-start gap-2.5">
-                      <div className="w-8 h-8 rounded-full bg-gray-100 overflow-hidden shrink-0 flex items-center justify-center">
-                        {r.reviewer_avatar ? <img src={r.reviewer_avatar} alt={r.reviewer_name} className="w-full h-full object-cover" /> : <span className="text-xs font-semibold text-gray-500">{r.reviewer_name[0]?.toUpperCase()}</span>}
+                      <div className="w-8 h-8 rounded-full bg-muted overflow-hidden shrink-0 flex items-center justify-center">
+                        {r.reviewer_avatar ? <img src={r.reviewer_avatar} alt={r.reviewer_name} className="w-full h-full object-cover" /> : <span className="text-xs font-semibold text-muted-foreground">{r.reviewer_name[0]?.toUpperCase()}</span>}
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-2 mb-0.5">
                           <span className="text-sm font-semibold text-black truncate">
-                            {r.reviewer_name}{r.reviewer_username ? <span className="font-normal text-gray-600 ml-1">@{r.reviewer_username}</span> : null}
+                            {r.reviewer_name}{r.reviewer_username ? <span className="font-normal text-muted-foreground ml-1">@{r.reviewer_username}</span> : null}
                           </span>
                           <span className="text-[11px] text-gray-400 shrink-0">{new Date(r.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
                         </div>
                         <div className="flex items-center gap-0.5 mb-1">{[1,2,3,4,5].map(s => <Star key={s} className={`h-3 w-3 ${s <= r.rating ? 'text-[#f97316] fill-[#f97316]' : 'text-gray-200 fill-gray-200'}`} />)}</div>
                         {r.content && <p className="text-sm text-black leading-snug">{r.content}</p>}
-                        {r.video_caption && <p className="text-[11px] text-gray-600 mt-0.5 truncate">on: {r.video_caption}</p>}
+                        {r.video_caption && <p className="text-[11px] text-muted-foreground mt-0.5 truncate">on: {r.video_caption}</p>}
                       </div>
                     </div>
                   </div>
@@ -692,8 +732,8 @@ function DashboardContent() {
 
         {/* VIDEOS */}
         {activeTab === 'videos' && user && (
-          <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
-            <h2 className="text-sm font-semibold text-gray-900 mb-4">Your Videos</h2>
+          <div className="bg-card border border-border rounded-2xl p-5 shadow-sm">
+            <h2 className="text-sm font-semibold text-foreground mb-4">Your Videos</h2>
             <PostedVideos userId={user.id} isOwnProfile={true} />
           </div>
         )}
@@ -703,7 +743,7 @@ function DashboardContent() {
           <div className="space-y-5">
             <BusinessInfoEditor business={business} onSaved={setBusiness} />
             <BusinessHoursEditor business={business} onSaved={setBusiness} />
-            <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
+            <div className="bg-card border border-border rounded-2xl p-5 shadow-sm">
               <h2 className="text-sm font-semibold text-black mb-4">Services &amp; Menu</h2>
               <MenuList userId={user.id} businessId={business.id} isOwnProfile={true} layout="list" />
             </div>
@@ -720,19 +760,19 @@ function DashboardContent() {
 
 function StatCard({ label, value }: { label: string; value: string }) {
   return (
-    <div className="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm text-center">
-      <p className="text-2xl font-bold text-gray-900">{value}</p>
+    <div className="bg-card border border-border rounded-2xl p-4 shadow-sm text-center">
+      <p className="text-2xl font-bold text-foreground">{value}</p>
       <p className="text-xs text-black mt-0.5">{label}</p>
     </div>
   );
 }
 
 function Section({ title, count, countColor = 'gray', children }: { title: string; count?: number; countColor?: string; children: React.ReactNode }) {
-  const colors: Record<string, string> = { orange: 'bg-[#f97316] text-white', black: 'bg-gray-900 text-white', gray: 'bg-gray-100 text-gray-600' };
+  const colors: Record<string, string> = { orange: 'bg-[#f97316] text-white', black: 'bg-gray-900 text-white', gray: 'bg-muted text-muted-foreground' };
   return (
     <section>
       <div className="flex items-center gap-2 mb-3">
-        <h2 className="text-sm font-semibold text-gray-900">{title}</h2>
+        <h2 className="text-sm font-semibold text-foreground">{title}</h2>
         {count !== undefined && count > 0 && (
           <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${colors[countColor] || colors.gray}`}>{count}</span>
         )}
@@ -744,35 +784,35 @@ function Section({ title, count, countColor = 'gray', children }: { title: strin
 
 function Empty({ icon, text }: { icon: React.ReactNode; text: string }) {
   return (
-    <div className="bg-white border border-gray-200 rounded-2xl p-8 text-center">
+    <div className="bg-card border border-border rounded-2xl p-8 text-center">
       <div className="mx-auto mb-2 flex justify-center">{icon}</div>
-      <p className="text-gray-600 text-sm">{text}</p>
+      <p className="text-muted-foreground text-sm">{text}</p>
     </div>
   );
 }
 
-const AVATAR_COLORS = ['bg-orange-100', 'bg-blue-100', 'bg-green-100', 'bg-purple-100', 'bg-pink-100'];
+const AVATAR_COLORS = ['bg-orange-100', 'bg-muted', 'bg-orange-50', 'bg-gray-200', 'bg-[#f97316]/15'];
 
 function OrderRow({ order, itemImages, itemNameImages }: { order: ItemPurchase; itemImages?: Record<string, string>; itemNameImages?: Record<string, string> }) {
   const colorIdx = (order.item_name?.charCodeAt(0) || 0) % AVATAR_COLORS.length;
   const initial = (order.item_name || '?')[0].toUpperCase();
   const img = itemImages?.[order.item_id || ''] || itemNameImages?.[order.item_name || ''];
   return (
-    <div className="flex items-center gap-3 px-4 py-2 hover:bg-gray-50 transition-colors">
+    <div className="flex items-center gap-3 px-4 py-2 hover:bg-muted transition-colors">
       {img ? (
         <img src={img} alt={order.item_name} className="w-12 h-12 rounded-xl object-cover shrink-0" />
       ) : (
         <div className={`w-12 h-12 rounded-xl ${AVATAR_COLORS[colorIdx]} flex items-center justify-center shrink-0`}>
-          <span className="text-base font-bold text-gray-600">{initial}</span>
+          <span className="text-base font-bold text-muted-foreground">{initial}</span>
         </div>
       )}
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-semibold text-gray-900 truncate">{order.item_name}</p>
+        <p className="text-sm font-semibold text-foreground truncate">{order.item_name}</p>
         <p className="text-[11px] text-gray-400">{new Date(order.purchased_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</p>
       </div>
       <div className="text-right shrink-0">
-        <p className="text-sm font-semibold text-gray-900">${order.price.toFixed(2)}</p>
-        <span className={`text-[10px] font-medium ${order.status === 'completed' ? 'text-green-600' : 'text-[#f97316]'}`}>{order.status}</span>
+        <p className="text-sm font-semibold text-foreground">${order.price.toFixed(2)}</p>
+        <span className={`text-[10px] font-medium ${order.status === 'completed' ? 'text-[#f97316]' : 'text-[#f97316]'}`}>{order.status}</span>
       </div>
     </div>
   );
@@ -781,37 +821,37 @@ function OrderRow({ order, itemImages, itemNameImages }: { order: ItemPurchase; 
 function OrderCard({ order, variant }: { order: ItemPurchase; variant: 'pending' | 'scheduled' | 'completed' }) {
   const fmt = (d: string) => new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + ' ' + new Date(d).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
   return (
-    <div className={`bg-white border rounded-2xl p-4 ${variant === 'pending' ? 'border-orange-200' : variant === 'scheduled' ? 'border-gray-900' : 'border-gray-200'}`}>
+    <div className={`bg-card border rounded-2xl p-4 ${variant === 'pending' ? 'border-orange-200' : variant === 'scheduled' ? 'border-gray-900' : 'border-border'}`}>
       <div className="flex justify-between items-start">
         <div className="min-w-0 flex-1 mr-3">
           <div className="flex items-center gap-2">
-            <p className="font-medium text-gray-900 text-sm truncate">
-              {order.item_name}{order.quantity && order.quantity > 1 ? <span className="text-gray-600 font-normal"> ×{order.quantity}</span> : null}
+            <p className="font-medium text-foreground text-sm truncate">
+              {order.item_name}{order.quantity && order.quantity > 1 ? <span className="text-muted-foreground font-normal"> ×{order.quantity}</span> : null}
             </p>
             {order.group_order_id && (
-              <span className="shrink-0 text-xs bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded-md flex items-center gap-1">
+              <span className="shrink-0 text-xs bg-muted text-muted-foreground px-1.5 py-0.5 rounded-md flex items-center gap-1">
                 <Users className="h-3 w-3" /> Group
               </span>
             )}
           </div>
-          <p className="text-gray-500 text-xs mt-0.5">#{order.id.slice(0, 8)} · {fmt(order.purchased_at)}</p>
+          <p className="text-muted-foreground text-xs mt-0.5">#{order.id.slice(0, 8)} · {fmt(order.purchased_at)}</p>
           {order.scheduled_at && (
             <div className="flex items-center gap-1 mt-1">
-              <CalendarClock className="h-3 w-3 text-gray-900" />
-              <span className="text-xs font-medium text-gray-900">
+              <CalendarClock className="h-3 w-3 text-foreground" />
+              <span className="text-xs font-medium text-foreground">
                 Scheduled: {new Date(order.scheduled_at).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })} at {new Date(order.scheduled_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
               </span>
             </div>
           )}
         </div>
         <div className="text-right shrink-0">
-          <p className="font-semibold text-gray-900 text-sm">${order.price.toFixed(2)}</p>
-          <span className={`text-xs px-2 py-0.5 rounded-full font-medium mt-1 inline-block ${variant === 'pending' ? 'bg-orange-50 text-[#f97316]' : variant === 'scheduled' ? 'bg-gray-100 text-gray-700' : 'bg-green-50 text-green-700'}`}>{order.status}</span>
+          <p className="font-semibold text-foreground text-sm">${order.price.toFixed(2)}</p>
+          <span className={`text-xs px-2 py-0.5 rounded-full font-medium mt-1 inline-block ${variant === 'pending' ? 'bg-orange-50 text-[#f97316]' : variant === 'scheduled' ? 'bg-muted text-foreground' : 'bg-orange-50 text-[#f97316]'}`}>{order.status}</span>
         </div>
       </div>
       {order.special_requests && (
-        <div className="mt-2 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2">
-          <p className="text-gray-700 text-xs">{order.special_requests}</p>
+        <div className="mt-2 bg-muted border border-border rounded-xl px-3 py-2">
+          <p className="text-foreground text-xs">{order.special_requests}</p>
         </div>
       )}
     </div>
@@ -847,10 +887,10 @@ function BusinessInfoEditor({ business, onSaved }: { business: Business; onSaved
   };
 
   return (
-    <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
+    <div className="bg-card border border-border rounded-2xl p-5 shadow-sm">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-sm font-semibold text-gray-900">Business Info</h2>
-        <button onClick={handleSave} disabled={saving} className={`flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-xl transition-colors ${saved ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-[#f97316] text-white hover:opacity-90'} disabled:opacity-50`}>
+        <h2 className="text-sm font-semibold text-foreground">Business Info</h2>
+        <button onClick={handleSave} disabled={saving} className={`flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-xl transition-colors ${saved ? 'bg-orange-50 text-[#f97316] border border-orange-200' : 'bg-[#f97316] text-white hover:opacity-90'} disabled:opacity-50`}>
           <Save className="h-3.5 w-3.5" />
           {saving ? 'Saving…' : saved ? 'Saved!' : 'Save'}
         </button>
@@ -858,13 +898,13 @@ function BusinessInfoEditor({ business, onSaved }: { business: Business; onSaved
       {error && <div className="mb-3 bg-red-50 border border-red-200 text-red-600 rounded-xl p-3 text-sm">{error}</div>}
       <div className="space-y-3">
         <div>
-          <LabeledInput icon={<Phone className="h-4 w-4 text-gray-500" />} type="tel" value={phone} onChange={(v) => { setPhone(v); if (phoneError) setPhoneError(null); }} placeholder="Phone number" />
+          <LabeledInput icon={<Phone className="h-4 w-4 text-muted-foreground" />} type="tel" value={phone} onChange={(v) => { setPhone(v); if (phoneError) setPhoneError(null); }} placeholder="Phone number" />
           <FieldError message={phoneError} className="ml-11" />
         </div>
-        <LabeledInput icon={<MapPin className="h-4 w-4 text-gray-500" />} type="text" value={address} onChange={setAddress} placeholder="Address" />
+        <LabeledInput icon={<MapPin className="h-4 w-4 text-muted-foreground" />} type="text" value={address} onChange={setAddress} placeholder="Address" />
         <div className="flex items-start gap-3">
-          <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center shrink-0 mt-0.5"><FileText className="h-4 w-4 text-gray-500" /></div>
-          <textarea value={miscInfo} onChange={e => setMiscInfo(e.target.value)} placeholder="Website, description, notes, etc." rows={3} maxLength={1000} className="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-[#f97316] resize-none" />
+          <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center shrink-0 mt-0.5"><FileText className="h-4 w-4 text-muted-foreground" /></div>
+          <textarea value={miscInfo} onChange={e => setMiscInfo(e.target.value)} placeholder="Website, description, notes, etc." rows={3} maxLength={1000} className="flex-1 bg-muted border border-border rounded-xl px-3 py-2 text-sm text-foreground placeholder-gray-400 focus:outline-none focus:border-[#f97316] resize-none" />
         </div>
       </div>
     </div>
@@ -874,8 +914,8 @@ function BusinessInfoEditor({ business, onSaved }: { business: Business; onSaved
 function LabeledInput({ icon, type, value, onChange, placeholder }: { icon: React.ReactNode; type: string; value: string; onChange: (v: string) => void; placeholder: string }) {
   return (
     <div className="flex items-center gap-3">
-      <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center shrink-0">{icon}</div>
-      <input type={type} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} className="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-[#f97316]" />
+      <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center shrink-0">{icon}</div>
+      <input type={type} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} className="flex-1 bg-muted border border-border rounded-xl px-3 py-2 text-sm text-foreground placeholder-gray-400 focus:outline-none focus:border-[#f97316]" />
     </div>
   );
 }
@@ -920,10 +960,10 @@ function BusinessHoursEditor({ business, onSaved }: { business: Business; onSave
   };
 
   return (
-    <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
+    <div className="bg-card border border-border rounded-2xl p-5 shadow-sm">
       <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2"><Clock className="h-4 w-4 text-[#f97316]" /><h2 className="text-sm font-semibold text-gray-900">Business Hours</h2></div>
-        <button onClick={save} disabled={saving} className={`flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-xl transition-colors ${saved ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-[#f97316] text-white hover:opacity-90'} disabled:opacity-50`}>
+        <div className="flex items-center gap-2"><Clock className="h-4 w-4 text-[#f97316]" /><h2 className="text-sm font-semibold text-foreground">Business Hours</h2></div>
+        <button onClick={save} disabled={saving} className={`flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-xl transition-colors ${saved ? 'bg-orange-50 text-[#f97316] border border-orange-200' : 'bg-[#f97316] text-white hover:opacity-90'} disabled:opacity-50`}>
           <Save className="h-3.5 w-3.5" />{saving ? 'Saving…' : saved ? 'Saved!' : 'Save Hours'}
         </button>
       </div>
@@ -931,13 +971,13 @@ function BusinessHoursEditor({ business, onSaved }: { business: Business; onSave
       <div className="space-y-3">
         {DAYS.map(day => (
           <div key={day} className="flex items-center gap-3">
-            <label className="w-24 text-sm text-gray-900 capitalize shrink-0">{day}</label>
+            <label className="w-24 text-sm text-foreground capitalize shrink-0">{day}</label>
             <input type="checkbox" checked={!hours[day]?.closed} onChange={e => setHours({ ...hours, [day]: e.target.checked ? { open: '09:00', close: '17:00' } : { closed: true } })} className="w-4 h-4 accent-[#f97316] rounded" />
             {!hours[day]?.closed ? (
               <div className="flex items-center gap-2 flex-1">
-                <input type="time" value={hours[day]?.open || '09:00'} onChange={e => setHours({ ...hours, [day]: { ...hours[day], open: e.target.value } })} className="flex-1 bg-gray-50 border border-gray-200 rounded-lg px-2 py-1.5 text-sm text-gray-900 focus:outline-none focus:border-[#f97316]" />
+                <input type="time" value={hours[day]?.open || '09:00'} onChange={e => setHours({ ...hours, [day]: { ...hours[day], open: e.target.value } })} className="flex-1 bg-muted border border-border rounded-lg px-2 py-1.5 text-sm text-foreground focus:outline-none focus:border-[#f97316]" />
                 <span className="text-gray-400 text-sm">to</span>
-                <input type="time" value={hours[day]?.close || '17:00'} onChange={e => setHours({ ...hours, [day]: { ...hours[day], close: e.target.value } })} className="flex-1 bg-gray-50 border border-gray-200 rounded-lg px-2 py-1.5 text-sm text-gray-900 focus:outline-none focus:border-[#f97316]" />
+                <input type="time" value={hours[day]?.close || '17:00'} onChange={e => setHours({ ...hours, [day]: { ...hours[day], close: e.target.value } })} className="flex-1 bg-muted border border-border rounded-lg px-2 py-1.5 text-sm text-foreground focus:outline-none focus:border-[#f97316]" />
               </div>
             ) : (
               <span className="text-gray-400 text-sm">Closed</span>
@@ -981,8 +1021,8 @@ function PromoCodesManager({ userId, promoCodes, onChanged }: { userId: string; 
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-sm font-semibold text-gray-900">Promo Codes</h2>
-          <p className="text-xs text-gray-600 mt-0.5">Customers enter these at checkout to get a discount</p>
+          <h2 className="text-sm font-semibold text-foreground">Promo Codes</h2>
+          <p className="text-xs text-muted-foreground mt-0.5">Customers enter these at checkout to get a discount</p>
         </div>
         <button onClick={() => setShowForm(!showForm)} className="flex items-center gap-1.5 bg-[#f97316] hover:opacity-90 text-white text-sm font-semibold px-3 py-2 rounded-xl transition-opacity">
           <Plus className="h-4 w-4" /> New Code
@@ -990,39 +1030,39 @@ function PromoCodesManager({ userId, promoCodes, onChanged }: { userId: string; 
       </div>
 
       {showForm && (
-        <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm space-y-4">
-          <h3 className="text-sm font-semibold text-gray-900">Create Promo Code</h3>
+        <div className="bg-card border border-border rounded-2xl p-5 shadow-sm space-y-4">
+          <h3 className="text-sm font-semibold text-foreground">Create Promo Code</h3>
           {formError && <div className="bg-red-50 border border-red-200 text-red-600 text-sm rounded-xl p-3">{formError}</div>}
           <div className="grid grid-cols-2 gap-3">
             <div className="col-span-2">
-              <label className="block text-xs font-medium text-gray-600 mb-1">Code</label>
-              <input type="text" value={code} onChange={e => setCode(e.target.value.toUpperCase())} placeholder="e.g. SAVE20" maxLength={20} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm font-mono text-gray-900 placeholder-gray-400 focus:outline-none focus:border-[#f97316] uppercase" />
+              <label className="block text-xs font-medium text-muted-foreground mb-1">Code</label>
+              <input type="text" value={code} onChange={e => setCode(e.target.value.toUpperCase())} placeholder="e.g. SAVE20" maxLength={20} className="w-full bg-muted border border-border rounded-xl px-3 py-2 text-sm font-mono text-foreground placeholder-gray-400 focus:outline-none focus:border-[#f97316] uppercase" />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Type</label>
-              <select value={discountType} onChange={e => setDiscountType(e.target.value as 'percent' | 'fixed')} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-900 focus:outline-none focus:border-[#f97316]">
+              <label className="block text-xs font-medium text-muted-foreground mb-1">Type</label>
+              <select value={discountType} onChange={e => setDiscountType(e.target.value as 'percent' | 'fixed')} className="w-full bg-muted border border-border rounded-xl px-3 py-2 text-sm text-foreground focus:outline-none focus:border-[#f97316]">
                 <option value="percent">Percentage (%)</option>
                 <option value="fixed">Fixed ($)</option>
               </select>
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Value</label>
-              <input type="number" value={discountValue} onChange={e => setDiscountValue(e.target.value)} placeholder={discountType === 'percent' ? '20' : '5.00'} min="0" step={discountType === 'percent' ? '1' : '0.01'} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-[#f97316]" />
+              <label className="block text-xs font-medium text-muted-foreground mb-1">Value</label>
+              <input type="number" value={discountValue} onChange={e => setDiscountValue(e.target.value)} placeholder={discountType === 'percent' ? '20' : '5.00'} min="0" step={discountType === 'percent' ? '1' : '0.01'} className="w-full bg-muted border border-border rounded-xl px-3 py-2 text-sm text-foreground placeholder-gray-400 focus:outline-none focus:border-[#f97316]" />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Max Uses</label>
-              <input type="number" value={maxUses} onChange={e => setMaxUses(e.target.value)} placeholder="Unlimited" min="1" className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-[#f97316]" />
+              <label className="block text-xs font-medium text-muted-foreground mb-1">Max Uses</label>
+              <input type="number" value={maxUses} onChange={e => setMaxUses(e.target.value)} placeholder="Unlimited" min="1" className="w-full bg-muted border border-border rounded-xl px-3 py-2 text-sm text-foreground placeholder-gray-400 focus:outline-none focus:border-[#f97316]" />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Expiry Date</label>
-              <input type="date" value={expiryDate} onChange={e => setExpiryDate(e.target.value)} min={new Date().toISOString().slice(0, 10)} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-900 focus:outline-none focus:border-[#f97316]" />
+              <label className="block text-xs font-medium text-muted-foreground mb-1">Expiry Date</label>
+              <input type="date" value={expiryDate} onChange={e => setExpiryDate(e.target.value)} min={new Date().toISOString().slice(0, 10)} className="w-full bg-muted border border-border rounded-xl px-3 py-2 text-sm text-foreground focus:outline-none focus:border-[#f97316]" />
             </div>
           </div>
           <div className="flex gap-2">
             <button onClick={handleCreate} disabled={saving} className="flex-1 bg-[#f97316] hover:opacity-90 text-white text-sm font-semibold py-2.5 rounded-xl transition-opacity disabled:opacity-50">
               {saving ? 'Creating…' : 'Create Code'}
             </button>
-            <button onClick={() => setShowForm(false)} className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium py-2.5 rounded-xl transition-colors">
+            <button onClick={() => setShowForm(false)} className="flex-1 bg-muted hover:bg-gray-200 text-foreground text-sm font-medium py-2.5 rounded-xl transition-colors">
               Cancel
             </button>
           </div>
@@ -1030,10 +1070,10 @@ function PromoCodesManager({ userId, promoCodes, onChanged }: { userId: string; 
       )}
 
       {promoCodes.length === 0 && !showForm ? (
-        <div className="bg-white border border-gray-200 rounded-2xl p-10 text-center">
+        <div className="bg-card border border-border rounded-2xl p-10 text-center">
           <Tag className="h-10 w-10 text-gray-200 mx-auto mb-3" />
-          <p className="font-semibold text-gray-700">No promo codes yet</p>
-          <p className="text-gray-600 text-sm mt-1">Create codes to offer discounts to your customers</p>
+          <p className="font-semibold text-foreground">No promo codes yet</p>
+          <p className="text-muted-foreground text-sm mt-1">Create codes to offer discounts to your customers</p>
         </div>
       ) : (
         <div className="space-y-2">
@@ -1041,18 +1081,18 @@ function PromoCodesManager({ userId, promoCodes, onChanged }: { userId: string; 
             const expired = p.expiry_date && new Date(p.expiry_date) < new Date();
             const maxed = p.max_uses != null && p.used_count >= p.max_uses;
             return (
-              <div key={p.id} className="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm">
+              <div key={p.id} className="bg-card border border-border rounded-2xl p-4 shadow-sm">
                 <div className="flex items-center justify-between gap-3">
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-mono font-bold text-gray-900 text-sm">{p.code}</span>
-                      <span className="text-xs bg-gray-100 text-gray-700 px-2 py-0.5 rounded-lg">{p.discount_type === 'percent' ? `${p.discount_value}% off` : `-$${p.discount_value.toFixed(2)}`}</span>
+                      <span className="font-mono font-bold text-foreground text-sm">{p.code}</span>
+                      <span className="text-xs bg-muted text-foreground px-2 py-0.5 rounded-lg">{p.discount_type === 'percent' ? `${p.discount_value}% off` : `-$${p.discount_value.toFixed(2)}`}</span>
                       {expired ? <span className="text-xs bg-red-50 text-red-600 px-2 py-0.5 rounded-lg">Expired</span> :
-                        maxed ? <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-lg">Maxed out</span> :
-                        p.is_active ? <span className="text-xs bg-green-50 text-green-700 px-2 py-0.5 rounded-lg">Active</span> :
-                        <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-lg">Inactive</span>}
+                        maxed ? <span className="text-xs bg-muted text-muted-foreground px-2 py-0.5 rounded-lg">Maxed out</span> :
+                        p.is_active ? <span className="text-xs bg-orange-50 text-[#f97316] px-2 py-0.5 rounded-lg">Active</span> :
+                        <span className="text-xs bg-muted text-muted-foreground px-2 py-0.5 rounded-lg">Inactive</span>}
                     </div>
-                    <p className="text-xs text-gray-600 mt-1">
+                    <p className="text-xs text-muted-foreground mt-1">
                       {p.used_count} use{p.used_count !== 1 ? 's' : ''}
                       {p.max_uses != null && ` / ${p.max_uses} max`}
                       {p.expiry_date && ` · Expires ${new Date(p.expiry_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`}
@@ -1060,11 +1100,11 @@ function PromoCodesManager({ userId, promoCodes, onChanged }: { userId: string; 
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
                     {!expired && !maxed && (
-                      <button onClick={() => handleToggle(p)} className={`text-xs px-2.5 py-1.5 rounded-lg font-medium transition-colors ${p.is_active ? 'bg-gray-100 text-gray-600 hover:bg-gray-200' : 'bg-green-50 text-green-700 hover:bg-green-100'}`}>
+                      <button onClick={() => handleToggle(p)} className={`text-xs px-2.5 py-1.5 rounded-lg font-medium transition-colors ${p.is_active ? 'bg-muted text-muted-foreground hover:bg-gray-200' : 'bg-orange-50 text-[#f97316] hover:bg-orange-100'}`}>
                         {p.is_active ? 'Pause' : 'Activate'}
                       </button>
                     )}
-                    <button onClick={() => handleDelete(p.id)} className="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-100 hover:bg-red-50 text-gray-500 hover:text-red-600 transition-colors">
+                    <button onClick={() => handleDelete(p.id)} className="w-8 h-8 flex items-center justify-center rounded-lg bg-muted hover:bg-red-50 text-muted-foreground hover:text-red-600 transition-colors">
                       <Trash2 className="h-3.5 w-3.5" />
                     </button>
                   </div>

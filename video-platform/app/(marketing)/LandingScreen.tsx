@@ -3,25 +3,40 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, X, Twitter, Youtube, Facebook, Instagram, ChevronDown, Globe } from "lucide-react";
+import { Search, X, ChevronDown } from "lucide-react";
+import { Footer } from "@/components/layout/Footer";
 import { Logo } from "@/components/Logo";
+
+const DEFAULT_SUB =
+  "Discover and support your community's collection of local businesses: popular spots, hidden gems, and exclusive deals you won't find anywhere else.";
 
 const slides = [
   {
     image: "/landing/hero-food.jpeg",
     title: ["DISCOVER LOCAL.", "SUPPORT LOCAL."],
+    subtitle: DEFAULT_SUB,
     artist: "Pho Shop",
     role: "5051 Yonge St Unit #2",
   },
   {
+    image: "/landing/creator-dining.jpg",
+    title: ["LOCALY ONLY", "TAKES 5%."],
+    subtitle:
+      "So more of every order stays with local businesses — and comes back to you as rewards.",
+    artist: "95% stays local",
+    role: "Localy keeps just 5%",
+  },
+  {
     image: "/landing/hero-restaurant.png",
     title: ["DISCOVER LOCAL.", "SUPPORT LOCAL."],
+    subtitle: DEFAULT_SUB,
     artist: "Andy's Pho",
     role: "5051 Yonge St Unit #2",
   },
   {
     image: "/landing/hero-flowers.jpg",
     title: ["DISCOVER LOCAL.", "SUPPORT LOCAL."],
+    subtitle: DEFAULT_SUB,
     artist: "Dream Rose Florist",
     role: "14 Levendale Rd, Richmond Hill",
   },
@@ -36,8 +51,8 @@ const trending = [
   { img: "/landing/biz-acuvega.jpg", title: "Acuvega Wellness Center", artist: "207-22 Richmond St" },
   { img: "/landing/biz-arnold.png", title: "Arnold Crescent Animal Hospital", artist: "26 Arnold Cres" },
   { img: "/landing/Bookstore.webp", title: "Local Bookstore", artist: "Local & independent" },
-  { img: "/landing/catering buisness.jpg", title: "Catering Co.", artist: "Local & independent" },
-  { img: "/landing/landscaping company.webp", title: "Landscaping", artist: "Local & independent" },
+  { img: "/landing/catering%20buisness.jpg", title: "Catering Co.", artist: "Local & independent" },
+  { img: "/landing/landscaping%20company.webp", title: "Landscaping", artist: "Local & independent" },
   { img: "/landing/hero-flowers.jpg", title: "Dream Rose Florist", artist: "14 Levendale Rd" },
   { img: "/landing/hero-food.jpeg", title: "Pho Shop", artist: "5051 Yonge St" },
   { img: "/landing/creator-dining.jpg", title: "Local Dining", artist: "Food & drink" },
@@ -94,7 +109,7 @@ export default function LandingScreen() {
   const [slide, setSlide] = useState(0);
 
   useEffect(() => {
-    const id = setInterval(() => setSlide((s) => (s + 1) % slides.length), 6000);
+    const id = setInterval(() => setSlide((s) => (s + 1) % slides.length), 3000);
     return () => clearInterval(id);
   }, []);
 
@@ -146,6 +161,7 @@ export default function LandingScreen() {
                 className="h-full w-full object-cover"
                 width={1920}
                 height={1080}
+                onError={(e) => { e.currentTarget.style.display = 'none'; }}
               />
               <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/40 to-black/30" />
             </motion.div>
@@ -176,7 +192,7 @@ export default function LandingScreen() {
                   {current.title[0]}<br />{current.title[1]}
                 </h1>
                 <p className="mt-8 max-w-xl text-base leading-loose text-primary/85 [word-spacing:0.08em] sm:text-lg">
-                  Discover and support your community&apos;s collection of local businesses: popular spots, hidden gems, and exclusive deals you won&apos;t find anywhere else.
+                  {current.subtitle}
                 </p>
                 <div className="mt-6 flex flex-wrap gap-4">
                   <Link href="/feed" className="rounded-full bg-primary px-12 py-4 text-lg font-semibold text-primary-foreground transition hover:scale-[1.02]">Browse local</Link>
@@ -240,7 +256,7 @@ export default function LandingScreen() {
             {[...trending, ...trending].map((t, i) => (
               <div key={i} className="mr-7 w-64 shrink-0 sm:w-72">
                 <div className="group/card relative aspect-[8/7] overflow-hidden rounded-md bg-muted">
-                  <img src={t.img} alt={t.title} loading="eager" className="h-full w-full object-cover transition duration-500 group-hover/card:scale-105" />
+                  <img src={t.img} alt={t.title} loading="eager" className="h-full w-full object-cover transition duration-500 group-hover/card:scale-105" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
                 </div>
                 <div className="mt-3 truncate text-base font-semibold">{t.title}</div>
                 <div className="truncate text-sm text-muted-foreground">{t.artist}</div>
@@ -330,47 +346,7 @@ export default function LandingScreen() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="mt-24 border-t border-border">
-        <div className="mx-auto max-w-6xl px-6 py-12">
-          <div className="flex flex-col gap-10 md:flex-row md:justify-between">
-            <div className="max-w-xs">
-              <Logo href="/" className="text-foreground" iconClassName="h-6 w-6" textClassName="text-xl" />
-              <p className="mt-3 text-sm text-muted-foreground">Discover and support the small local businesses around you.</p>
-              <button className="mt-5 inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm text-muted-foreground transition hover:text-foreground">
-                <Globe className="h-4 w-4" aria-hidden /> Canada | English
-              </button>
-            </div>
-            <div className="grid grid-cols-2 gap-10">
-              <div>
-                <h3 className="text-sm font-semibold text-foreground">Explore</h3>
-                <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
-                  <li><Link href="/about" className="transition hover:text-foreground">About</Link></li>
-                  <li><Link href="/onboarding" className="transition hover:text-foreground">For Businesses</Link></li>
-                  <li><Link href="/contact" className="transition hover:text-foreground">Contact</Link></li>
-                </ul>
-              </div>
-              <div>
-                <h3 className="text-sm font-semibold text-foreground">Legal</h3>
-                <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
-                  <li><Link href="/terms" className="transition hover:text-foreground">Terms of Service</Link></li>
-                  <li><Link href="/privacy" className="transition hover:text-foreground">Privacy Policy</Link></li>
-                  <li><Link href="/sitemap" className="transition hover:text-foreground">Sitemap</Link></li>
-                </ul>
-              </div>
-            </div>
-          </div>
-          <div className="mt-10 flex flex-col items-center justify-between gap-6 border-t border-border pt-8 sm:flex-row">
-            <p className="text-xs text-muted-foreground">{new Date().getFullYear()} Localy. All rights reserved.</p>
-            <div className="flex gap-6 text-muted-foreground">
-              <a href="#" aria-label="Twitter" className="transition hover:text-foreground"><Twitter size={18} /></a>
-              <a href="#" aria-label="YouTube" className="transition hover:text-foreground"><Youtube size={18} /></a>
-              <a href="#" aria-label="Facebook" className="transition hover:text-foreground"><Facebook size={18} /></a>
-              <a href="#" aria-label="Instagram" className="transition hover:text-foreground"><Instagram size={18} /></a>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer className="mt-24" />
     </div>
   );
 }

@@ -3,11 +3,12 @@
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { MapPin, ChevronDown, Coins, User, ShoppingCart, Settings, LogOut, Building2 } from 'lucide-react';
+import { MapPin, ChevronDown, Coins, ShoppingCart, LogOut, Building2, Sun, Moon, Menu } from 'lucide-react';
 import { Logo } from '@/components/Logo';
 import { SearchDropdown } from './SearchDropdown';
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { useTheme } from '@/contexts/ThemeContext';
 import { useDeliveryLocation } from '@/contexts/DeliveryLocationContext';
 import { supabase } from '@/lib/supabase/client';
 import dynamic from 'next/dynamic';
@@ -40,10 +41,12 @@ export function TopHeader() {
   const { getCartCount } = useCart();
   const { signOut, user } = useAuth();
   const { location, detecting, setLocation, detectLocation } = useDeliveryLocation();
+  const { resolvedTheme, toggleTheme } = useTheme();
+  const isDark = resolvedTheme === 'dark';
 
   const [lang, setLang] = useState('EN');
   const [openMenu, setOpenMenu] = useState<null | 'location' | 'lang' | 'profile'>(null);
-  const [coins, setCoins] = useState<number | null>(null);
+  const [coins, setCoins] = useState<number>(0);
 
   useEffect(() => {
     if (!user) return;
@@ -136,44 +139,10 @@ export function TopHeader() {
         >
           <div className="flex items-center gap-1">
             <Coins className="h-4 w-4 text-[#f97316]" />
-            <span className="text-sm font-bold text-[#f97316]">{coins ?? '—'}</span>
+            <span className="text-sm font-bold text-[#f97316]">{coins}</span>
           </div>
           <span className="text-[11px] font-medium">Points</span>
         </Link>
-
-        {/* Profile */}
-        <div className="relative shrink-0">
-          <button
-            type="button"
-            onClick={() => setOpenMenu(openMenu === 'profile' ? null : 'profile')}
-            aria-label="Account menu"
-            className="flex flex-col items-center px-2 text-black transition hover:text-[#f97316] dark:text-white"
-          >
-            <User className="h-5 w-5" />
-            <span className="hidden text-[11px] font-medium lg:block">Account</span>
-          </button>
-          {openMenu === 'profile' && (
-            <div className="absolute right-0 top-full mt-2 w-48 rounded-2xl border border-gray-200 bg-white p-2 shadow-lg dark:border-gray-700 dark:bg-gray-900">
-              <Link href="/profile" onClick={() => setOpenMenu(null)} className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-black transition hover:bg-gray-50 dark:text-white dark:hover:bg-gray-800">
-                <User className="h-4 w-4" /> Profile
-              </Link>
-              <Link href="/dashboard" onClick={() => setOpenMenu(null)} className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-black transition hover:bg-gray-50 dark:text-white dark:hover:bg-gray-800">
-                <Building2 className="h-4 w-4" /> Business Manager
-              </Link>
-              <Link href="/profile?tab=settings" onClick={() => setOpenMenu(null)} className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-black transition hover:bg-gray-50 dark:text-white dark:hover:bg-gray-800">
-                <Settings className="h-4 w-4" /> Settings
-              </Link>
-              <div className="my-1 h-px bg-gray-100 dark:bg-gray-800" />
-              <button
-                type="button"
-                onClick={() => { setOpenMenu(null); void signOut(); router.push('/login'); }}
-                className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm text-black transition hover:bg-gray-50 dark:text-white dark:hover:bg-gray-800"
-              >
-                <LogOut className="h-4 w-4" /> Sign out
-              </button>
-            </div>
-          )}
-        </div>
 
         {/* Cart */}
         <Link href="/cart" aria-label={`Cart, ${cartCount} items`} className="relative shrink-0 flex flex-col items-center px-2 text-black transition hover:text-[#f97316] dark:text-white">
@@ -188,6 +157,63 @@ export function TopHeader() {
             </span>
           )}
         </Link>
+
+        {/* Menu (hamburger) — pinned top-right; opens the account dropdown.
+            Profile + Settings are intentionally omitted (Profile lives in the
+            bottom/secondary nav; Settings link removed). */}
+        <div className="relative shrink-0">
+          <button
+            type="button"
+            onClick={() => setOpenMenu(openMenu === 'profile' ? null : 'profile')}
+            aria-label="Open menu"
+            aria-haspopup="menu"
+            aria-expanded={openMenu === 'profile'}
+            className="flex items-center justify-center rounded-full p-2 text-black transition hover:bg-gray-50 hover:text-[#f97316] dark:text-white dark:hover:bg-gray-800"
+          >
+            <Menu className="h-6 w-6" />
+          </button>
+          {openMenu === 'profile' && (
+            <div className="absolute right-0 top-full mt-2 w-48 rounded-2xl border border-gray-200 bg-white p-2 shadow-lg dark:border-gray-700 dark:bg-gray-900">
+              <Link href="/dashboard" onClick={() => setOpenMenu(null)} className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-black transition hover:bg-gray-50 dark:text-white dark:hover:bg-gray-800">
+                <Building2 className="h-4 w-4" /> Business Manager
+              </Link>
+              <div className="my-1 h-px bg-gray-100 dark:bg-gray-800" />
+              {/* Dark/Light theme toggle — flips the app-wide theme (persisted via ThemeContext) */}
+              <button
+                type="button"
+                onClick={toggleTheme}
+                role="switch"
+                aria-checked={isDark}
+                aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+                className="flex w-full items-center justify-between gap-2 rounded-xl px-3 py-2 text-sm text-black transition hover:bg-gray-50 dark:text-white dark:hover:bg-gray-800"
+              >
+                <span className="flex items-center gap-2">
+                  {isDark ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+                  {isDark ? 'Dark mode' : 'Light mode'}
+                </span>
+                <span
+                  className={`relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors ${
+                    isDark ? 'bg-[#f97316]' : 'bg-gray-300'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
+                      isDark ? 'translate-x-4' : 'translate-x-0.5'
+                    }`}
+                  />
+                </span>
+              </button>
+              <div className="my-1 h-px bg-gray-100 dark:bg-gray-800" />
+              <button
+                type="button"
+                onClick={() => { setOpenMenu(null); void signOut(); router.push('/login'); }}
+                className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm text-black transition hover:bg-gray-50 dark:text-white dark:hover:bg-gray-800"
+              >
+                <LogOut className="h-4 w-4" /> Sign out
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </header>
   );

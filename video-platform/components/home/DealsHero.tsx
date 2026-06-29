@@ -17,7 +17,7 @@ const CAROUSEL_INTERVAL_MS = 5000;
  * Duration of the "Featured near you" slide/intro animation (seconds). Lower =
  * faster & snappier on load. Single source of truth — tune here.
  */
-const FEATURED_ANIM_DURATION_S = 0.45;
+const FEATURED_ANIM_DURATION_S = 0.28;
 
 /**
  * (A) Walmart-style top block: ONE large featured business that auto-shifts
@@ -93,7 +93,8 @@ export function DealsHero() {
           onMouseLeave={() => setPaused(false)}
         >
           <div className="relative aspect-[16/9] w-full lg:aspect-[2/1]">
-            <AnimatePresence mode="sync" initial={false}>
+            {/* initial (default true) lets the first slide animate in immediately on load. */}
+            <AnimatePresence mode="sync">
               <motion.div
                 key={current.id}
                 initial={{ x: '100%' }}

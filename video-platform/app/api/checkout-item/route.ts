@@ -208,6 +208,9 @@ export async function POST(request: NextRequest) {
       sid: item.sellerId,
       price: resolved?.price ?? 0,
       qty: item.quantity,
+      // Carry the buyer's special concerns/notes so verify-item-purchase can save
+      // them with the order (previously dropped here, so they never persisted).
+      ...(item.specialRequests ? { sr: item.specialRequests } : {}),
     };
   });
   const firstSellerId = items[0].sellerId;

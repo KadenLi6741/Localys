@@ -27,7 +27,7 @@ export function Toast({ message, onClose, duration = 3000 }: ToastProps) {
       aria-live="polite"
     >
       <div className="flex items-center gap-2">
-        <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-5 h-5 text-[#f97316]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
         </svg>
         <span>{message}</span>

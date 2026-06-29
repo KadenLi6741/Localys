@@ -6,6 +6,7 @@ import {
   RANKS,
   computeImpactScore,
   getRankProgress,
+  rankPointsRange,
   resolveImpactInputs,
   type ImpactInputs,
 } from '@/lib/ranks';
@@ -58,32 +59,49 @@ export function RankSection({ moneySpent, points, bizCount }: ImpactInputs) {
         </button>
       </div>
 
-      <div className="flex flex-col items-center gap-3">
-        {/* Dark background so transparent-PNG rank badges always show with contrast */}
-        <div className="flex h-52 w-52 shrink-0 items-center justify-center rounded-2xl bg-gray-900 sm:h-60 sm:w-60">
-          <RankBadge src={current.image} alt={current.name} className="h-44 w-44 sm:h-52 sm:w-52" />
+      <div className="flex flex-col items-center gap-1">
+        {/* Rank badge — kept at its large rendered size (h-[598px]/sm:h-[718px]),
+            but clipped by a shorter overflow-hidden box so the heavy white padding
+            baked into the image is trimmed top & bottom, condensing the card
+            WITHOUT shrinking the badge itself. */}
+        <div className="flex w-full items-center justify-center overflow-hidden h-[360px] sm:h-[430px]">
+          <RankBadge src={current.image} alt={current.name} className="h-[598px] w-[598px] max-w-full shrink-0 sm:h-[718px] sm:w-[718px]" />
         </div>
         <div className="w-full text-center">
           <p className="text-2xl font-extrabold leading-tight text-gray-900 sm:text-3xl">{current.name}</p>
           <p className="mt-0.5 text-sm text-gray-500">Impact Score {score.toLocaleString()}</p>
 
           {isMax ? (
-            <div className="mt-3 inline-flex items-center rounded-full bg-[#f97316] px-4 py-1.5 text-sm font-semibold text-white">
-              Max rank reached
-            </div>
+            <>
+              <div className="mt-3 inline-flex items-center rounded-full bg-[#f97316] px-4 py-1.5 text-sm font-semibold text-white">
+                Max rank reached
+              </div>
+              {/* Reward held at the top rank */}
+              <div className="mt-3 w-full rounded-xl border border-[#f97316] bg-[#f97316]/10 px-3 py-2 text-left">
+                <p className="text-[11px] font-bold uppercase tracking-wider text-[#f97316]">Your reward</p>
+                <p className="mt-0.5 text-sm font-medium text-gray-900">{current.reward}</p>
+              </div>
+            </>
           ) : (
-            <div className="mt-3 w-full">
-              <div className="mb-1.5 flex items-center justify-between text-sm">
-                <span className="font-semibold text-[#f97316]">{pctToNext}% to {next!.name}</span>
-                <span className="text-gray-400">{score.toLocaleString()} / {next!.threshold.toLocaleString()}</span>
+            <>
+              <div className="mt-3 w-full">
+                <div className="mb-1.5 flex items-center justify-between text-sm">
+                  <span className="font-semibold text-[#f97316]">{(next!.threshold - score).toLocaleString()} pts to {next!.name}</span>
+                  <span className="text-gray-400">{score.toLocaleString()} / {next!.threshold.toLocaleString()}</span>
+                </div>
+                <div className="h-3 w-full overflow-hidden rounded-full bg-gray-200">
+                  <div
+                    className="h-full rounded-full bg-[#f97316] transition-[width] duration-500"
+                    style={{ width: `${pctToNext}%` }}
+                  />
+                </div>
               </div>
-              <div className="h-3 w-full overflow-hidden rounded-full bg-gray-200">
-                <div
-                  className="h-full rounded-full bg-[#f97316] transition-[width] duration-500"
-                  style={{ width: `${pctToNext}%` }}
-                />
+              {/* Reward unlocked at the next rank */}
+              <div className="mt-3 w-full rounded-xl border border-[#f97316] bg-[#f97316]/10 px-3 py-2 text-left">
+                <p className="text-[11px] font-bold uppercase tracking-wider text-[#f97316]">Next reward · {next!.name}</p>
+                <p className="mt-0.5 text-sm font-medium text-gray-900">{next!.reward}</p>
               </div>
-            </div>
+            </>
           )}
         </div>
       </div>
@@ -123,18 +141,22 @@ function RanksModal({ currentId, score, onClose }: { currentId: string; score: n
         {/* Tiers — lowest to highest */}
         <div className="overflow-y-auto px-5 py-5">
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-            {RANKS.map((rank) => {
+            {RANKS.map((rank, i) => {
               const isCurrent = rank.id === currentId;
               const unlocked = score >= rank.threshold;
+              // Localy Philanthropist shows with no box/outline — just image + label on white.
+              const isPhil = rank.id === 'philanthropist';
               return (
                 <div
                   key={rank.id}
-                  className={`relative flex flex-col items-center rounded-xl border p-3 text-center transition-colors ${
-                    isCurrent
-                      ? 'border-[#f97316] bg-[#f97316]/10'
-                      : unlocked
-                        ? 'border-gray-200 bg-gray-50'
-                        : 'border-gray-100 bg-gray-50 opacity-60'
+                  className={`relative flex flex-col items-center rounded-xl p-3 text-center transition-colors ${
+                    isPhil
+                      ? 'border-0 bg-transparent'
+                      : isCurrent
+                        ? 'border border-[#f97316] bg-[#f97316]/10'
+                        : unlocked
+                          ? 'border border-gray-200 bg-gray-50'
+                          : 'border border-gray-100 bg-gray-50 opacity-60'
                   }`}
                 >
                   <p
@@ -146,21 +168,28 @@ function RanksModal({ currentId, score, onClose }: { currentId: string; score: n
                   </p>
 
                   <div className="relative">
-                    <div className={`flex h-20 w-20 items-center justify-center rounded-xl bg-gray-900 ${!unlocked ? 'opacity-30 grayscale' : ''}`}>
+                    {/* Borderless, ~2x larger rank image */}
+                    <div className={`flex h-32 w-32 items-center justify-center ${!unlocked ? 'opacity-30 grayscale' : ''}`}>
                       <RankBadge
                         src={rank.image}
                         alt={rank.name}
-                        className="h-16 w-16"
+                        className="h-32 w-32"
                       />
                     </div>
                     {!unlocked && (
                       <span className="absolute inset-0 flex items-center justify-center">
-                        <Lock className="h-5 w-5 text-gray-400" />
+                        <Lock className="h-6 w-6 text-gray-400" />
                       </span>
                     )}
                   </div>
 
-                  <p className="mt-2 text-[11px] leading-snug text-gray-500">{rank.requirement}</p>
+                  {/* Points range to reach this rank */}
+                  <p className={`mt-2 text-[11px] font-semibold ${unlocked ? 'text-gray-900' : 'text-gray-400'}`}>
+                    {rankPointsRange(i)}
+                  </p>
+
+                  {/* Reward unlocked at this rank */}
+                  <p className="mt-1 text-[11px] leading-snug text-gray-500">{rank.reward}</p>
 
                   {isCurrent ? (
                     <span className="mt-2 rounded-full bg-[#f97316] px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
