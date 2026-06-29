@@ -1,12 +1,55 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 import { MessageCircle, X, Send } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { useCart } from '@/contexts/CartContext';
+import { useAllergens } from '@/contexts/AllergenContext';
+
+// Pages the assistant is allowed to navigate to (mirrors the server prompt).
+const ALLOWED_PATHS = new Set([
+  '/home', '/feed', '/communities', '/chats', '/cart', '/checkout',
+  '/orders', '/profile', '/settings', '/points', '/buy-coins',
+  '/premium', '/dashboard', '/upload',
+]);
+
+interface AssistantAction {
+  command: 'navigate' | 'clear_cart';
+  arg?: string;
+  label: string;
+}
 
 interface Message {
   role: 'user' | 'assistant';
   text: string;
   showSuggestions?: boolean;
+  actions?: AssistantAction[];
+}
+
+/**
+ * Pull `[[ACTION: <command> | <label>]]` markers out of a reply, returning the
+ * cleaned text and the validated actions. Anything unrecognized is dropped so a
+ * misbehaving model can't trigger something unexpected.
+ */
+function parseActions(reply: string): { text: string; actions: AssistantAction[] } {
+  const actions: AssistantAction[] = [];
+  const text = reply
+    .replace(/\[\[ACTION:\s*([^\]]+?)\]\]/g, (_full, inner: string) => {
+      const [cmdPart, labelPart] = String(inner).split('|');
+      const label = (labelPart ?? '').trim();
+      const tokens = (cmdPart ?? '').trim().split(/\s+/);
+      const verb = tokens[0];
+      if (!label) return '';
+      if (verb === 'navigate' && ALLOWED_PATHS.has(tokens[1])) {
+        actions.push({ command: 'navigate', arg: tokens[1], label });
+      } else if (verb === 'clear_cart') {
+        actions.push({ command: 'clear_cart', label });
+      }
+      return '';
+    })
+    .trim();
+  return { text, actions: actions.slice(0, 2) };
 }
 
 const SUGGESTIONS = [
@@ -50,6 +93,47 @@ export function LocalysAssistant() {
   const [isLoading, setIsLoading] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
+  // Already-in-memory app state — no extra network calls / no added cost.
+  const pathname = usePathname();
+  const router = useRouter();
+  const { user } = useAuth();
+  const { items, clearCart } = useCart();
+  const { userAllergies, hideEnabled } = useAllergens();
+
+  const runAction = (action: AssistantAction) => {
+    if (action.command === 'navigate' && action.arg) {
+      router.push(action.arg);
+      setOpen(false);
+    } else if (action.command === 'clear_cart') {
+      if (window.confirm('Empty your cart? This removes all items.')) {
+        clearCart();
+      }
+    }
+  };
+
+  // Build a lightweight snapshot of who the user is and what they're doing,
+  // so the assistant can answer personally instead of guessing.
+  const buildContext = () => ({
+    page: pathname,
+    signedIn: !!user,
+    name:
+      (user?.user_metadata?.full_name as string | undefined) ||
+      (user?.user_metadata?.username as string | undefined) ||
+      user?.email ||
+      null,
+    cart: {
+      count: items.reduce((sum, i) => sum + i.quantity, 0),
+      total: items.reduce((sum, i) => sum + i.itemPrice * i.quantity, 0),
+      items: items.slice(0, 20).map((i) => ({
+        name: i.itemName,
+        quantity: i.quantity,
+        price: i.itemPrice,
+      })),
+    },
+    allergies: userAllergies,
+    hideFlaggedRestaurants: hideEnabled,
+  });
+
   useEffect(() => {
     if (open) bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, open, isLoading]);
@@ -73,13 +157,14 @@ export function LocalysAssistant() {
       const res = await fetch('/api/assistant', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: trimmed, history }),
+        body: JSON.stringify({ message: trimmed, history, context: buildContext() }),
       });
 
       const data = await res.json();
       const reply: string = data?.reply ?? "I'm having trouble right now — try a suggested question below.";
+      const { text, actions } = parseActions(reply);
 
-      setMessages((prev) => [...prev, { role: 'assistant', text: reply }]);
+      setMessages((prev) => [...prev, { role: 'assistant', text, actions }]);
     } catch {
       setMessages((prev) => [
         ...prev,
@@ -149,6 +234,20 @@ export function LocalysAssistant() {
                     {msg.text}
                   </div>
                 </div>
+                {msg.actions && msg.actions.length > 0 && (
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {msg.actions.map((action, ai) => (
+                      <button
+                        key={ai}
+                        type="button"
+                        onClick={() => runAction(action)}
+                        className="rounded-full bg-[#f97316] px-3 py-1.5 text-xs font-semibold text-white transition hover:opacity-90 active:scale-95"
+                      >
+                        {action.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
                 {msg.showSuggestions && (
                   <div className="mt-2 space-y-1">
                     {SUGGESTIONS.map((q) => (
