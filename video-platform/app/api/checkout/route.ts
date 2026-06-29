@@ -1,8 +1,19 @@
+/**
+ * API route: POST /api/checkout — start a Stripe Checkout session to buy coins.
+ * Purpose: Creates a Stripe payment session for a fixed coin package. Security-first: the buyer's id
+ *   comes from the verified auth token (never the request body), the package price is looked up server-
+ *   side, the request is rate-limited, and the body is schema-validated. The coins are credited later by
+ *   the Stripe webhook, not here.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { checkRateLimit, getClientIp, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit';
 import { CoinCheckoutSchema, parseBody } from '@/lib/schemas';
 import { getAuthenticatedUser } from '@/lib/server-auth';
+
+// Coin packages and their prices (in cents) — defined server-side so the client can't set its own price.
 
 const COIN_PACKAGES: Record<string, { coins: number; price: number; name: string }> = {
   starter: { coins: 1000, price: 1000, name: '1000 Coins' },

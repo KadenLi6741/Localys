@@ -1,5 +1,13 @@
 'use client';
 
+/**
+ * BusinessReports — the Reports tab of the Business Manager (sales/items/customers + PDF/CSV export).
+ * Purpose: Gives a business interactive, filterable reports (by date range, category, item) with charts
+ *   and tables, and exports a polished branded PDF or CSV. Falls back to realistic demo data when the
+ *   business has fewer than 5 real orders so the reports are never empty.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { useMemo, useRef, useState } from 'react';
 import {
   BarChart, Bar, LineChart, Line, ComposedChart, PieChart, Pie, Cell, Legend,
@@ -100,6 +108,8 @@ async function nodeToImage(node: HTMLElement | null): Promise<CapturedImage | nu
   }
 }
 
+// Renders the reports UI. `orders`/`reviews` are the real data; everything below derives filtered
+// metrics from them and renders charts/tables plus the export buttons.
 export function BusinessReports({
   orders, reviews, businessName = 'Your Business',
 }: {
@@ -108,6 +118,8 @@ export function BusinessReports({
   businessName?: string;
 }) {
   const now = useMemo(() => Date.now(), []);
+  // Use real orders only when there are enough to be meaningful (>=5); otherwise show demo data so the
+  // reports look populated for new businesses.
   const allOrders = useMemo(() => {
     const real = normalizeOrders(orders);
     return real.length >= 5 ? real : generateDemoOrders(now);
@@ -667,6 +679,7 @@ export function BusinessReports({
   );
 }
 
+// Reusable card wrapper for an on-screen chart (title + optional subtitle + fixed-height body).
 function ChartCard({ title, subtitle, children }: { title: string; subtitle?: string; children: React.ReactNode }) {
   return (
     <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
@@ -679,6 +692,7 @@ function ChartCard({ title, subtitle, children }: { title: string; subtitle?: st
   );
 }
 
+// Reusable data table with a header row, body rows, an optional bold footer (totals), and an empty state.
 function TableCard({ headers, rows, footer }: { headers: string[]; rows: string[][]; footer?: string[] }) {
   return (
     <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
@@ -717,6 +731,7 @@ function TableCard({ headers, rows, footer }: { headers: string[]; rows: string[
   );
 }
 
+// Small labelled stat tile used in the customer report's summary row.
 function MiniStat({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-2xl border border-border bg-card p-4 text-center shadow-sm">

@@ -1,8 +1,18 @@
+/**
+ * API route: POST /api/webhooks/stripe — Stripe webhook that fulfills paid orders.
+ * Purpose: The trusted server-side completion step for payments. It verifies the Stripe signature, then
+ *   on a completed checkout credits coins / records the item purchase (and generates the order's
+ *   verification token for the pickup QR). Uses the Supabase service-role key since it acts as the system,
+ *   not a logged-in user. Fulfilling here (not on the client) prevents users from faking payment.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 import { generateToken } from '@/lib/verification';
 
+// Handles incoming Stripe events; only acts on verified, completed-checkout events.
 export async function POST(request: NextRequest) {
   const stripeKey = process.env.STRIPE_SECRET_KEY;
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;

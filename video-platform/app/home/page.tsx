@@ -1,5 +1,13 @@
 'use client';
 
+/**
+ * Home page (/home) — the Walmart-style storefront feed of local businesses and products.
+ * Purpose: Composes the home experience from its section components (hero, challenges, themed product/
+ *   business rows, departments, featured videos, feedback), all fed by one shared HomeDataProvider so
+ *   the whole page renders from a single data load.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { HomeDataProvider, useHomeFeed } from '@/components/home/HomeData';
 import { DealsHero } from '@/components/home/DealsHero';
 import { Challenges } from '@/components/home/Challenges';

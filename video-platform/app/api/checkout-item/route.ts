@@ -1,3 +1,12 @@
+/**
+ * API route: POST /api/checkout-item — start a Stripe Checkout session for buying menu item(s).
+ * Purpose: Creates the payment session for an item order. Like the coin checkout, it's security-first:
+ *   buyer id from the auth token, prices resolved authoritatively server-side (DB row for real items,
+ *   the bundled manifest for demo-store items), rate-limited and schema-validated — so the client can
+ *   never dictate what it pays. Fulfilment happens later via the Stripe webhook.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';

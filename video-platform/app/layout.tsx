@@ -1,3 +1,11 @@
+/**
+ * layout.tsx — the root layout that wraps every page in the app.
+ * Purpose: Loads fonts and global CSS, sets metadata, mounts all the global context providers (theme,
+ *   auth, language, cart, activity, delivery location) and the AppChrome shell. Also runs a tiny inline
+ *   script before hydration to apply the saved theme class, preventing a flash of the wrong theme.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import type { Metadata, Viewport } from "next";
 import { Anton, Inter, Outfit, JetBrains_Mono } from "next/font/google";
 import "./globals.css";

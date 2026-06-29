@@ -1,3 +1,11 @@
+/**
+ * AuthSplitLayout — the two-pane layout for auth screens (login/signup): form on one side, a
+ *   scrolling photo collage on the other.
+ * Purpose: Gives the auth pages a polished, branded split-screen look while keeping the actual form
+ *   markup in the page components. The photo columns are decorative (aria-hidden).
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { Logo } from '@/components/Logo';
 
 // Two vertically-scrolling columns of local-business / community photos.

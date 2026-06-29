@@ -3,6 +3,7 @@
  * Used only to compute a straight-line "how far" distance for an address-based store.
  * Returns null on any failure (missing key, blocked API, no result) — never throws,
  * so callers degrade gracefully to the map-only view.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
  */
 const KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 

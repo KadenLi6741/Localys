@@ -1,5 +1,14 @@
+/**
+ * API route: POST /api/assistant — backend for the in-app Localy Assistant chat.
+ * Purpose: Takes the user's message (plus recent history) and returns an AI help reply, primed with a
+ *   system prompt describing how Localy works. Runs server-side so the AI provider key stays secret, and
+ *   degrades to a friendly fallback message on any error.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { NextRequest, NextResponse } from 'next/server';
 
+// System prompt: teaches the assistant what Localy is and how to answer (scope + tone).
 const SYSTEM_PROMPT = `You are the Localy Assistant, the in-app help guide for Localy — a web app that helps people discover and support small local businesses. Localy blends a TikTok-style video feed, Reddit-style communities, and Uber Eats-style ordering. Your job is to help users navigate the app and answer questions clearly, briefly, and in a friendly tone.
 
 KEY FEATURES YOU CAN HELP WITH:

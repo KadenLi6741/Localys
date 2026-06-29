@@ -1,3 +1,11 @@
+/**
+ * supabase/profiles.ts — data-access layer for user/business profiles, menus and avatars.
+ * Purpose: Central place for reading/updating profiles and businesses, uploading profile pictures, and
+ *   managing menus + menu items (the building blocks behind MenuList/MenuModal and the dashboard).
+ *   Re-exports the related model types for convenience.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { supabase } from './client';
 import { cacheGet, cacheSet, cacheInvalidate } from '../cache';
 import type { Profile, Business, ProfileUpdateData, BusinessUpdateData, BusinessHours } from '../../models/Profile';

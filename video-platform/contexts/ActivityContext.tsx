@@ -1,5 +1,12 @@
 'use client';
 
+/**
+ * ActivityContext — shared open/closed state and unread count for the notifications (Activity) panel.
+ * Purpose: Lets the nav bars toggle the ActivityPanel and show an unread badge without prop-drilling.
+ *   The ActivityPanel owns the actual notification data; this context just coordinates open state + count.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { createContext, useContext, useState, useCallback, type ReactNode, type Dispatch, type SetStateAction } from 'react';
 
 interface ActivityContextType {

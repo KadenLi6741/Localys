@@ -1,5 +1,12 @@
 'use client';
 
+/**
+ * Email-verified page (/auth/verified) — landing page after a user confirms their email.
+ * Purpose: Finalizes email verification for the current session and confirms success, then guides the
+ *   user into the app.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';

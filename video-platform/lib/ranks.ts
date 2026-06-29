@@ -8,6 +8,7 @@
  *
  * Everything here is intentionally tweakable: adjust IMPACT_WEIGHTS or a rank's
  * `threshold` and the whole profile UI updates.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
  */
 
 export interface Rank {

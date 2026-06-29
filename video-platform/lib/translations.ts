@@ -1,3 +1,10 @@
+/**
+ * translations.ts — the app's i18n dictionary and supported-language list.
+ * Purpose: Defines every supported language and the key→string translation tables consumed by
+ *   LanguageContext / useTranslation, so UI text can be localised from one central place.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 // Supported languages
 export type Language = 'en' | 'es' | 'fr' | 'de' | 'it' | 'pt' | 'ja' | 'zh' | 'ko' | 'ru' | 'ar';
 

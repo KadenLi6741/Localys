@@ -4,7 +4,8 @@
  * CommentItem Component
  *
  * Displays a single comment with replies, likes, and actions.
- * Handles reply creation and like toggling.
+ * Handles reply creation and like toggling. Demo/local comments persist likes client-side.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
  */
 
 import { useState, useEffect } from 'react';

@@ -1,9 +1,18 @@
+/**
+ * API route: POST /api/verify-purchase — confirm a completed coin purchase and credit coins.
+ * Purpose: Called after the Stripe success redirect to verify the checkout session really paid, then
+ *   credit the coins to the authenticated user (idempotently, so a refresh can't double-credit). A
+ *   client-side safety net alongside the webhook.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 import { checkRateLimit, getClientIp, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit';
 import { getAuthenticatedUser } from '@/lib/server-auth';
 
+// Admin (service-role) Supabase client for trusted writes; null if env vars are missing.
 function getSupabaseAdminClient() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;

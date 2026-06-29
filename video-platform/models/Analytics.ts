@@ -1,3 +1,10 @@
+/**
+ * Analytics.ts — TypeScript types for the promotion + financial analytics datasets.
+ * Purpose: Shapes the summary, time-series and breakdown data consumed by the analytics dashboards and
+ *   their hooks. Types only — no runtime code.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 export interface AnalyticsSummary {
   totalCoinsSpent: number;
   totalViews: number;

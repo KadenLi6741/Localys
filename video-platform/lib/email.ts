@@ -5,6 +5,7 @@
  * no-op that reports `false` (not sent). Callers must treat a `false` result as
  * non-fatal — the login flow's 77777 backup code means a failed/absent email can
  * never lock anyone out.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
  */
 const ORANGE = '#f97316';
 

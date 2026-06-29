@@ -1,3 +1,10 @@
+/**
+ * supabase/promo-codes.ts — data-access layer for seller (store-specific) promo codes.
+ * Purpose: Lets businesses create/manage discount codes (percent or fixed, with usage limits/expiry)
+ *   and validates a code at checkout. Distinct from global coupons (see coupons.ts).
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { supabase } from './client';
 
 export interface PromoCode {

@@ -12,6 +12,10 @@
  * - Reply system with threaded comments
  * - Pagination support
  * - Optimistic updates for better UX
+ *
+ * Demo/local videos (no DB row) fall back to client-side stored comments/ratings so the thread works
+ * for built-in content too.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
  */
 
 import { useEffect, useState, useCallback } from 'react';

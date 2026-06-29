@@ -1,3 +1,11 @@
+/**
+ * rate-limit.ts — simple in-memory request rate limiter for API routes.
+ * Purpose: Throttles abusive/automated requests (e.g. login-code, checkout) by counting hits per key
+ *   within a time window. Note: the store is per server instance, so on serverless it's per-instance,
+ *   not global — swap the Map for Redis for global enforcement.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { NextRequest, NextResponse } from 'next/server';
 
 interface RateLimitConfig {

@@ -1,3 +1,11 @@
+/**
+ * server-auth.ts — server-side authentication helper for API routes.
+ * Purpose: Verifies the caller's Supabase bearer token on the server so protected API routes can trust
+ *   the user's identity (never relying on a client-supplied user id). Returns either the verified user
+ *   or a ready-to-return 401 response.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { createClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
 import type { User } from '@supabase/supabase-js';

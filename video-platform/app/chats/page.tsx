@@ -1,5 +1,12 @@
 'use client';
 
+/**
+ * Chats page (/chats) — the messaging hub (conversation list + open conversation).
+ * Purpose: Shows the user's conversations (via useChats) alongside the active thread (via useMessages),
+ *   with search and starting new chats. Handles both real and demo chats. Gated behind ProtectedRoute.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Plus, Search, Send } from 'lucide-react';

@@ -1,3 +1,11 @@
+/**
+ * API route: POST /api/subscribe-premium — start a Stripe subscription for Localy Premium ($5/mo).
+ * Purpose: Creates a recurring Stripe Checkout session for the Premium subscription, attributed to the
+ *   authenticated user via metadata. Rate-limited; uses inline recurring price_data so no pre-created
+ *   Stripe Price object is needed. Activation is confirmed by the verify-premium route / webhook.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { checkRateLimit, getClientIp, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit';

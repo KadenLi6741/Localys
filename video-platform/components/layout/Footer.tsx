@@ -1,9 +1,17 @@
 'use client';
 
+/**
+ * Footer — the site-wide footer (logo, tagline, locale, Explore/Legal links, social icons).
+ * Purpose: Standard page footer shown at the bottom of most app screens (via AppChrome). Purely
+ *   presentational and fully theme-aware (uses bg-background/text-foreground tokens).
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import Link from 'next/link';
 import { Twitter, Youtube, Facebook, Instagram, Globe } from 'lucide-react';
 import { Logo } from '@/components/Logo';
 
+// Renders the global footer. `className` lets callers add layout tweaks per placement.
 export function Footer({ className = '' }: { className?: string }) {
   return (
     <footer className={`border-t border-border bg-background text-foreground ${className}`}>

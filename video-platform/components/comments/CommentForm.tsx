@@ -4,7 +4,8 @@
  * CommentForm Component
  *
  * Form for creating comments and replies.
- * Supports both full and compact modes.
+ * Supports both full and compact modes, an optional star rating, and an optional image attachment.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
  */
 
 import { useState, useRef, useEffect } from 'react';

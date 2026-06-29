@@ -1,3 +1,10 @@
+/**
+ * supabase/comments.ts — data-access layer for video comments, replies, likes and ratings.
+ * Purpose: All comment CRUD plus realtime subscriptions (new comments, new replies, like changes) live
+ *   here, so the comment UI components stay declarative. Re-exports the comment model types.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { supabase } from './client';
 import { RealtimeChannel } from '@supabase/supabase-js';
 import type {

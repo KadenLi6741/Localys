@@ -1,3 +1,11 @@
+/**
+ * API route: POST /api/verify-item-purchase — confirm a completed item order and record it.
+ * Purpose: Called after the Stripe success redirect for an item order: verifies the session paid, then
+ *   records the purchase and generates its pickup verification token (idempotently). The item-order
+ *   counterpart to verify-purchase, and a safety net beside the webhook.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';

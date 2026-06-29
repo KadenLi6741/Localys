@@ -9,6 +9,8 @@ import { DEMO_STORES } from '@/lib/demoStores';
  * SINGLE SOURCE OF TRUTH = `data/store-menus.json` (built from public/menu by
  * scripts/build-store-menus.mjs). Supabase is used ONLY for identity/routing:
  * it resolves each seeded business → its profile id (cart sellerId) + username
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ *
  * (the /profile/<username> link). Banners and item photos come from public/menu
  * via the manifest, so the home feed and the store page render the same photos.
  */

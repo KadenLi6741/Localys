@@ -9,6 +9,7 @@ import { isDemoId } from '../utils/ids';
  * (lib/clientEngagement.ts) — these functions short-circuit on `isDemoId` to
  * avoid `invalid input syntax for type uuid`. Only real UUID items are written
  * to / read from Supabase.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
  */
 
 export interface LikedItemInput {

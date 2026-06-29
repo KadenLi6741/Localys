@@ -1,5 +1,12 @@
 'use client';
 
+/**
+ * Coin purchase success page (/buy-coins/success) — Stripe redirect after buying coins.
+ * Purpose: Reads the Stripe session id from the URL, confirms the purchase (crediting coins via
+ *   /api/verify-purchase as a safety net beside the webhook), and shows a confirmation.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';

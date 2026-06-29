@@ -5,6 +5,7 @@
  * `lib/supabase/featured.ts` (see getLocalBusinesses / getFeaturedVideos). The
  * old hardcoded placeholder businesses were removed — only the challenge data
  * (which is not business data) remains hardcoded here.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
  */
 
 /** A varied deal/discount attached to an item (% off, BOGO, $ off, etc.). */

@@ -1,5 +1,12 @@
 'use client';
 
+/**
+ * My profile page (/profile) — the signed-in user's own profile and account hub.
+ * Purpose: Shows the user's editable profile (avatar, info), their rank, saved/liked items, posted &
+ *   bookmarked videos, language settings, and (for businesses) their menu. Gated behind ProtectedRoute.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';

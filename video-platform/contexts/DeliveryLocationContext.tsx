@@ -1,5 +1,13 @@
 'use client';
 
+/**
+ * DeliveryLocationContext — the user's chosen delivery location, shared app-wide.
+ * Purpose: Stores the confirmed delivery {lat,lng,address}, persists it to localStorage, and can detect
+ *   the current position (reverse-geocoding it to an address). Used everywhere distance/ETA to a business
+ *   is shown (feed, cards, store pages).
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from 'react';
 import { reverseGeocode } from '@/lib/utils/googleGeocode';
 

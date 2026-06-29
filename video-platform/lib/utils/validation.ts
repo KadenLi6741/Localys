@@ -11,6 +11,7 @@
  *   - SEMANTIC (meaning / business rules): prices/quantities can't be zero or
  *     negative, ratings must be 1–5, opening time must be before closing time,
  *     scheduled times can't be in the past, percentages stay within 0–100, etc.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
  */
 
 /* ----------------------------- low-level checks ----------------------------- */

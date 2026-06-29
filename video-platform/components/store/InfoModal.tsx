@@ -8,6 +8,7 @@
  * Extracted from StorePage so the page component stays focused on the menu layout
  * and this self-contained modal (with its own geolocation/geocoding effects) can
  * be reasoned about and reused independently.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
  */
 import { useEffect, useRef, useState } from 'react';
 import { Clock, MapPin, Phone, X } from 'lucide-react';

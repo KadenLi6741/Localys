@@ -1,5 +1,12 @@
 'use client';
 
+/**
+ * Communities page (/communities) — browse and post in local community threads (Reddit-style).
+ * Purpose: Lists communities and their threads with upvote/downvote, posting, and sharing. State comes
+ *   from CommunitiesContext (provided by the section layout). Gated behind ProtectedRoute.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';

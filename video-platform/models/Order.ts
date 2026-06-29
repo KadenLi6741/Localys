@@ -1,3 +1,10 @@
+/**
+ * Order.ts — TypeScript types for purchases (coin purchases and item/order purchases).
+ * Purpose: Shared shapes used by checkout, order history and the dashboard so order data is typed
+ *   consistently across the app. Types only — no runtime code.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 export interface CoinPurchase {
   id: string;
   user_id: string;

@@ -1,3 +1,11 @@
+/**
+ * schemas.ts — Zod validation schemas for API request bodies (server-side input validation).
+ * Purpose: Defines the shape/limits of payloads the API accepts (checkout, etc.) so routes reject
+ *   malformed/malicious input. Crucially, security-sensitive fields (userId, prices) are intentionally
+ *   excluded — the server derives those from the auth token and database, so the client can't forge them.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { z, ZodType } from 'zod';
 import { NextResponse } from 'next/server';
 

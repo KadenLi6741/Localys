@@ -1,5 +1,12 @@
 'use client';
 
+/**
+ * ChatListItem — a single conversation row in the chat list (avatar, name, last-message preview, time).
+ * Purpose: Renders one conversation summary with a relative timestamp, unread badge, and a verified
+ *   badge for business accounts. Tapping it opens that thread.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { ChatWithDetails } from '@/lib/supabase/messaging';
 import { BadgeCheck } from 'lucide-react';
 
@@ -9,6 +16,7 @@ interface ChatListItemProps {
   onClick?: () => void;
 }
 
+// Relative timestamp for a conversation: time-of-day if <24h, weekday if <1wk, else month/day.
 function formatTimestamp(ts: string | null | undefined): string {
   if (!ts) return '';
   const date = new Date(ts);

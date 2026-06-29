@@ -1,5 +1,13 @@
 'use client';
 
+/**
+ * Public profile page (/profile/[userId]) — another user's or business's profile.
+ * Purpose: Shows a profile's header (avatar, name, rating), actions (message, share, report/block), and
+ *   for businesses their location map, menu/services and posted videos. Business storefronts render the
+ *   StorePage view. Uses theme tokens so it's light in light mode and dark in dark mode.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { useState, useEffect, useRef } from 'react'; // useRef kept for 3-dot menu
 import Link from 'next/link';
 import dynamic from 'next/dynamic';

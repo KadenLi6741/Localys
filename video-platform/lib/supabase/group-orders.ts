@@ -1,3 +1,10 @@
+/**
+ * supabase/group-orders.ts — data-access layer for group (shared) orders.
+ * Purpose: Lets a user start a group order others can join by code and add their own items to (each
+ *   paying for themselves). Handles create/join/lookup and the group order's items.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { supabase } from './client';
 
 export interface GroupOrder {

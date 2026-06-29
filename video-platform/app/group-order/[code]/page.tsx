@@ -1,5 +1,12 @@
 'use client';
 
+/**
+ * Group-order page (/group-order/[code]) — join a shared order by its code.
+ * Purpose: Lets invited friends view a group order, add their own items, and each check out their share.
+ *   Looks the order up by join code. Gated behind ProtectedRoute.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';

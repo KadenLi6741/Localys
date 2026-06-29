@@ -1,5 +1,12 @@
 'use client';
 
+/**
+ * error.tsx — Next.js route-level error boundary for the app.
+ * Purpose: Shown when a page throws during render. Logs the error and offers a "try again" (reset) plus
+ *   a link home, so a crash degrades to a friendly recoverable screen instead of a blank page.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { useEffect } from 'react';
 import Link from 'next/link';
 
