@@ -40,6 +40,8 @@ CREATE TABLE IF NOT EXISTS collection_entries (
   restaurant_image_url TEXT,                   -- denormalized
   combo_title          TEXT,
   combo_body           TEXT,
+  combo_price          NUMERIC,                -- total price of the combo
+  combo_serves         INT,                    -- how many people it feeds
   combo_items          JSONB NOT NULL DEFAULT '[]'::jsonb,  -- [{ name, price }]
   combo_image_urls     TEXT[] NOT NULL DEFAULT '{}',
   sort_order           INT NOT NULL DEFAULT 0,
@@ -50,6 +52,11 @@ CREATE TABLE IF NOT EXISTS collection_entries (
 
 CREATE INDEX IF NOT EXISTS collection_entries_collection_idx
   ON collection_entries (collection_id);
+
+-- Idempotent add for environments where the table was created before these
+-- combo fields existed.
+ALTER TABLE collection_entries ADD COLUMN IF NOT EXISTS combo_price  NUMERIC;
+ALTER TABLE collection_entries ADD COLUMN IF NOT EXISTS combo_serves INT;
 
 -- ── Per-user likes on a list ──────────────────────────────────────
 CREATE TABLE IF NOT EXISTS collection_likes (

@@ -2,7 +2,7 @@
 
 import { useRef, useState } from 'react';
 import Link from 'next/link';
-import { Trash2, ImagePlus, X, Check, Loader2, ExternalLink } from 'lucide-react';
+import { Trash2, ImagePlus, X, Check, Loader2, ExternalLink, DollarSign, Users } from 'lucide-react';
 import {
   updateEntry,
   removeEntry,
@@ -39,6 +39,8 @@ export function ComboEditor({
 }) {
   const [title, setTitle] = useState(entry.combo_title ?? '');
   const [body, setBody] = useState(entry.combo_body ?? '');
+  const [price, setPrice] = useState(entry.combo_price != null ? String(entry.combo_price) : '');
+  const [serves, setServes] = useState(entry.combo_serves != null ? String(entry.combo_serves) : '');
   const [items, setItems] = useState<ComboItem[]>(entry.combo_items);
   const [images, setImages] = useState<string[]>(entry.combo_image_urls);
   const [saving, setSaving] = useState(false);
@@ -80,9 +82,13 @@ export function ComboEditor({
   const handleSave = async () => {
     setSaving(true);
     setError(null);
+    const parsedPrice = price.trim() ? Number(price) : null;
+    const parsedServes = serves.trim() ? parseInt(serves, 10) : null;
     const patch = {
       combo_title: title.trim() || null,
       combo_body: body.trim() || null,
+      combo_price: parsedPrice != null && Number.isFinite(parsedPrice) ? parsedPrice : null,
+      combo_serves: parsedServes != null && Number.isFinite(parsedServes) ? parsedServes : null,
       combo_items: items,
       combo_image_urls: images,
     };
@@ -103,13 +109,29 @@ export function ComboEditor({
 
   // ---- Read-only display (visitor viewing a posted list) ----
   if (readOnly) {
-    const hasCombo = entry.combo_title || entry.combo_body || entry.combo_items.length || entry.combo_image_urls.length;
+    const hasCombo =
+      entry.combo_title || entry.combo_body || entry.combo_items.length ||
+      entry.combo_image_urls.length || entry.combo_price != null || entry.combo_serves != null;
     return (
       <div className="rounded-2xl border border-border bg-card p-4">
         <RestaurantHeader entry={entry} storeHref={storeHref} />
         {hasCombo ? (
           <div className="mt-3 space-y-3">
             {entry.combo_title ? <p className="font-semibold text-foreground">{entry.combo_title}</p> : null}
+            {(entry.combo_price != null || entry.combo_serves != null) && (
+              <div className="flex flex-wrap items-center gap-2">
+                {entry.combo_price != null && (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-[#f97316]/10 px-2.5 py-1 text-xs font-bold text-[#f97316]">
+                    <DollarSign className="h-3 w-3" />{entry.combo_price.toFixed(2)}
+                  </span>
+                )}
+                {entry.combo_serves != null && (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2.5 py-1 text-xs font-medium text-muted-foreground">
+                    <Users className="h-3 w-3" />Feeds {entry.combo_serves}
+                  </span>
+                )}
+              </div>
+            )}
             {entry.combo_body ? <p className="text-sm text-muted-foreground">{entry.combo_body}</p> : null}
             {entry.combo_items.length > 0 && (
               <div className="flex flex-wrap gap-1.5">
@@ -170,6 +192,35 @@ export function ComboEditor({
           className={`${inputClass} resize-none`}
           maxLength={500}
         />
+
+        <div className="flex gap-3">
+          <div className="flex-1">
+            <label className="mb-1 block text-xs font-semibold text-muted-foreground">Price ($)</label>
+            <input
+              type="number"
+              inputMode="decimal"
+              min="0"
+              step="0.01"
+              value={price}
+              onChange={(e) => { setPrice(e.target.value); setSaved(false); }}
+              placeholder="e.g. 24.50"
+              className={inputClass}
+            />
+          </div>
+          <div className="flex-1">
+            <label className="mb-1 block text-xs font-semibold text-muted-foreground">Feeds</label>
+            <input
+              type="number"
+              inputMode="numeric"
+              min="1"
+              step="1"
+              value={serves}
+              onChange={(e) => { setServes(e.target.value); setSaved(false); }}
+              placeholder="e.g. 2"
+              className={inputClass}
+            />
+          </div>
+        </div>
 
         {products.length > 0 && (
           <div>

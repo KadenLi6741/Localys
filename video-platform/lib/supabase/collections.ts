@@ -25,6 +25,8 @@ export interface CollectionEntry {
   restaurant_image_url: string | null;
   combo_title: string | null;
   combo_body: string | null;
+  combo_price: number | null;
+  combo_serves: number | null;
   combo_items: ComboItem[];
   combo_image_urls: string[];
   sort_order: number;
@@ -50,7 +52,7 @@ export interface CollectionWithEntries extends Collection {
 }
 
 const SELECT_WITH_ENTRIES =
-  '*, collection_entries(id, collection_id, store_slug, restaurant_name, restaurant_image_url, combo_title, combo_body, combo_items, combo_image_urls, sort_order, created_at, updated_at)';
+  '*, collection_entries(id, collection_id, store_slug, restaurant_name, restaurant_image_url, combo_title, combo_body, combo_price, combo_serves, combo_items, combo_image_urls, sort_order, created_at, updated_at)';
 
 /** Normalize a raw row's nested entries (sorted) so callers get a stable shape. */
 function normalize(row: Record<string, unknown>): CollectionWithEntries {
@@ -188,7 +190,7 @@ export async function addEntry(
 
 export async function updateEntry(
   entryId: string,
-  patch: Partial<Pick<CollectionEntry, 'combo_title' | 'combo_body' | 'combo_items' | 'combo_image_urls' | 'sort_order'>>,
+  patch: Partial<Pick<CollectionEntry, 'combo_title' | 'combo_body' | 'combo_price' | 'combo_serves' | 'combo_items' | 'combo_image_urls' | 'sort_order'>>,
 ): Promise<{ error: Error | null }> {
   try {
     const { error } = await supabase
