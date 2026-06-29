@@ -170,9 +170,9 @@ function RanksModal({ currentId, score, onClose }: { currentId: string; score: n
                       Current
                     </span>
                   ) : unlocked ? (
-                    <span className="mt-2 text-[10px] font-semibold uppercase tracking-wide text-gray-400">Unlocked</span>
+                    <span className="mt-2 text-[10px] font-semibold uppercase tracking-wide text-gray-500">Unlocked</span>
                   ) : (
-                    <span className="mt-2 text-[10px] font-semibold uppercase tracking-wide text-gray-300">Locked</span>
+                    <span className="mt-2 text-[10px] font-semibold uppercase tracking-wide text-gray-400">Locked</span>
                   )}
                 </div>
               );

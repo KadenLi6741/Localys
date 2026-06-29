@@ -1286,7 +1286,7 @@ export function HomeContent({ isActive }: HomeContentProps) {
                     {/* Volume slider — opens to the left of the icon */}
                     {showVolumeSlider && (
                       <div className="flex items-center gap-2 rounded-2xl bg-white/90 border border-black/10 px-3 py-2 backdrop-blur-md shadow-xl">
-                        <span className="text-[10px] font-bold text-black/40 w-5 text-right">0</span>
+                        <span className="text-[10px] font-bold text-black/60 w-5 text-right">0</span>
                         <input
                           type="range"
                           min={0}

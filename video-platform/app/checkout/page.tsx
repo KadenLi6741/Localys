@@ -208,7 +208,7 @@ function CheckoutContent() {
                 <div className="flex-1 min-w-0">
                   <p className="text-gray-900 font-medium truncate">{item.itemName}</p>
                   {item.deal && <span className="mt-0.5 inline-flex rounded bg-[#f97316] px-1.5 py-0.5 text-[11px] font-semibold text-white">{item.deal.label}</span>}
-                  {item.quantity > 1 && <p className="text-gray-400 text-xs">×{item.quantity} @ ${item.itemPrice.toFixed(2)}</p>}
+                  {item.quantity > 1 && <p className="text-gray-500 text-xs">×{item.quantity} @ ${item.itemPrice.toFixed(2)}</p>}
                   {item.specialRequests && <p className="text-gray-500 text-xs mt-0.5">{item.specialRequests}</p>}
                 </div>
                 <p className="text-[#f97316] font-bold shrink-0">${(item.itemPrice * item.quantity).toFixed(2)}</p>
@@ -300,7 +300,7 @@ function CheckoutContent() {
             `Pay $${total.toFixed(2)}${scheduledAt ? ' (Scheduled)' : ''}`
           )}
         </button>
-        <p className="text-gray-400 text-xs text-center mt-3">Redirecting to Stripe for secure payment</p>
+        <p className="text-gray-500 text-xs text-center mt-3">Redirecting to Stripe for secure payment</p>
       </div>
     </div>
   );

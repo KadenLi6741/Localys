@@ -87,7 +87,7 @@ export function BusinessCard({ business }: { business: LocalBusiness }) {
           <span className="flex items-center gap-1 text-xs text-gray-600 dark:text-gray-300">
             <MapPin className="h-3 w-3 shrink-0 text-[#f97316]" />
             {distanceLabel}
-            {etaLabel ? <span className="text-gray-400">· {etaLabel}</span> : null}
+            {etaLabel ? <span className="text-gray-500 dark:text-gray-400">· {etaLabel}</span> : null}
           </span>
         )}
       </div>

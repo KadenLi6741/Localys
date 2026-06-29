@@ -213,7 +213,7 @@ export default function CartPage() {
                       <span className="px-3 py-1.5 text-foreground font-medium min-w-[2rem] text-center border-x border-border">{item.quantity}</span>
                       <button onClick={() => updateQuantity(item.itemId, item.quantity + 1)} className="px-3 py-1.5 text-foreground hover:bg-gray-200 transition-colors min-w-[40px] min-h-[40px]">+</button>
                     </div>
-                    {item.quantity > 1 && <span className="text-gray-400 text-xs">${item.itemPrice.toFixed(2)} each</span>}
+                    {item.quantity > 1 && <span className="text-gray-500 text-xs">${item.itemPrice.toFixed(2)} each</span>}
                   </div>
                   <div className="mt-3">
                     <input
@@ -298,7 +298,7 @@ export default function CartPage() {
                 <CalendarClock className="h-4 w-4 text-[#f97316]" />
                 <span className="text-sm font-semibold text-foreground flex-1">Schedule for Later</span>
                 {scheduledAt && <span className="text-xs text-[#f97316] font-medium">{new Date(scheduledAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}</span>}
-                <span className="text-gray-400 text-xs">{showSchedule ? 'Hide' : 'Set time'}</span>
+                <span className="text-gray-500 text-xs">{showSchedule ? 'Hide' : 'Set time'}</span>
               </button>
               {showSchedule && (
                 <div className="mt-3 space-y-2">
@@ -334,7 +334,7 @@ export default function CartPage() {
               <button onClick={() => setShowGroupOrder(!showGroupOrder)} className="flex items-center gap-2 w-full text-left">
                 <Users className="h-4 w-4 text-[#f97316]" />
                 <span className="text-sm font-semibold text-foreground flex-1">Group Order</span>
-                <span className="text-gray-400 text-xs">{showGroupOrder ? 'Hide' : 'Start or join'}</span>
+                <span className="text-gray-500 text-xs">{showGroupOrder ? 'Hide' : 'Start or join'}</span>
               </button>
               {showGroupOrder && (
                 <div className="mt-3 space-y-4">
@@ -362,7 +362,7 @@ export default function CartPage() {
                       </div>
                       <div className="relative flex items-center">
                         <div className="flex-grow border-t border-border" />
-                        <span className="mx-3 text-xs text-gray-400">or join</span>
+                        <span className="mx-3 text-xs text-gray-500">or join</span>
                         <div className="flex-grow border-t border-border" />
                       </div>
                       <div className="space-y-2">
