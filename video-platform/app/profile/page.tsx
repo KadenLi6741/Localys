@@ -26,7 +26,7 @@ import { getSavedItems, getLikedItemIds, getLikedMenuItems, subscribeEngagement,
 import { getUserLikedItems } from '@/lib/supabase/likedItems';
 import { isDemoId } from '@/lib/utils/ids';
 import { DEMO_VIDEOS, buildFeedVideos } from '@/lib/demoVideos';
-import { ChevronRight, Store, DollarSign, MapPin, ShoppingBag, Heart, Trophy, Star, MessageCircle, Award, Play, Crown } from 'lucide-react';
+import { ChevronRight, Store, DollarSign, MapPin, ShoppingBag, Heart, Trophy, Star, MessageCircle, Award, Play, Crown, ListChecks } from 'lucide-react';
 
 // Demo feed (videos for slug/local content) keyed for quick enrichment of the
 // profile Saved/Liked cards — same source the Home "Featured in Videos" cards use.
@@ -659,6 +659,15 @@ function ProfileView({ profile, user, onEditClick, onSignOut, onProfileUpdated }
           >
             <span className="flex items-center gap-2 text-sm font-semibold text-gray-900">
               <Crown className="w-4 h-4 text-[#f97316]" /> Localy Premium
+            </span>
+            <ChevronRight className="w-4 h-4 text-gray-400" />
+          </Link>
+          <Link
+            href="/collections"
+            className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors"
+          >
+            <span className="flex items-center gap-2 text-sm text-gray-900">
+              <ListChecks className="w-4 h-4 text-[#f97316]" /> Your Lists
             </span>
             <ChevronRight className="w-4 h-4 text-gray-400" />
           </Link>
