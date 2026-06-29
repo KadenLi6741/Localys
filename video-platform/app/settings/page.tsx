@@ -2,7 +2,9 @@
 
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { useTheme } from '@/contexts/ThemeContext';
-import { Sun, Moon, Monitor } from 'lucide-react';
+import { useAllergens } from '@/contexts/AllergenContext';
+import { COMMON_ALLERGENS } from '@/lib/allergens';
+import { Sun, Moon, Monitor, AlertTriangle } from 'lucide-react';
 
 export default function SettingsPage() {
   return (
@@ -14,6 +16,14 @@ export default function SettingsPage() {
 
 function SettingsContent() {
   const { theme, resolvedTheme, setTheme } = useTheme();
+  const { userAllergies, setUserAllergies, hideEnabled, setHideEnabled } = useAllergens();
+
+  const toggleAllergen = (key: string) => {
+    const next = userAllergies.includes(key)
+      ? userAllergies.filter((k) => k !== key)
+      : [...userAllergies, key];
+    void setUserAllergies(next);
+  };
 
   const options = [
     { value: 'light', label: 'Light', icon: <Sun className="h-5 w-5" />, desc: 'White background, black text' },
@@ -114,6 +124,64 @@ function SettingsContent() {
                 <span
                   className={`pointer-events-none inline-block h-6 w-6 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${
                     resolvedTheme === 'dark' ? 'translate-x-5' : 'translate-x-0'
+                  }`}
+                />
+              </button>
+            </div>
+          </div>
+        </section>
+
+        {/* Food allergies */}
+        <section>
+          <h2 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-3">
+            Food Allergies
+          </h2>
+          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-5 shadow-sm space-y-4">
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              Select your allergens. Restaurants that contain them are flagged with a warning across Localy.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {COMMON_ALLERGENS.map((a) => {
+                const active = userAllergies.includes(a.key);
+                return (
+                  <button
+                    key={a.key}
+                    type="button"
+                    aria-pressed={active}
+                    onClick={() => toggleAllergen(a.key)}
+                    className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-semibold transition ${
+                      active
+                        ? 'border-red-500 bg-red-500 text-white'
+                        : 'border-gray-300 text-gray-700 hover:border-red-400 dark:border-gray-600 dark:text-gray-200'
+                    }`}
+                  >
+                    <span aria-hidden>{a.icon}</span>
+                    {a.label}
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="flex items-center justify-between border-t border-gray-100 dark:border-gray-800 pt-4">
+              <div className="flex items-center gap-2">
+                <AlertTriangle className="h-4 w-4 shrink-0 text-red-600 dark:text-red-400" strokeWidth={2.5} />
+                <div>
+                  <p className="font-medium text-gray-900 dark:text-white text-sm">Hide flagged restaurants</p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Remove restaurants with my allergens from listings</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setHideEnabled(!hideEnabled)}
+                className={`relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#f97316] focus:ring-offset-2 ${
+                  hideEnabled ? 'bg-[#f97316]' : 'bg-gray-200 dark:bg-gray-700'
+                }`}
+                role="switch"
+                aria-checked={hideEnabled}
+              >
+                <span
+                  className={`pointer-events-none inline-block h-6 w-6 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${
+                    hideEnabled ? 'translate-x-5' : 'translate-x-0'
                   }`}
                 />
               </button>

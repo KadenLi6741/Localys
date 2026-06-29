@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Heart, Plus, Check } from 'lucide-react';
+import { Heart, Plus, Check, AlertTriangle } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
 import type { Product } from '@/lib/home-data';
+import { allergenLabel } from '@/lib/allergens';
 import { isMenuItemLiked, toggleMenuItemLike, subscribeEngagement } from '@/lib/clientEngagement';
 import { likeMenuItem, unlikeMenuItem } from '@/lib/supabase/likedItems';
 import { isDemoId } from '@/lib/utils/ids';
@@ -19,7 +20,7 @@ import { Thumb } from './Thumb';
  * original) → title/description → stars + review count. Uses `Thumb` so a real
  * photo drops in via `product.image`; otherwise a flat lettered placeholder.
  */
-export function ProductCard({ product }: { product: Product }) {
+export function ProductCard({ product, allergens = [] }: { product: Product; allergens?: string[] }) {
   const { addToCart } = useCart();
   const { user } = useAuth();
   const [liked, setLiked] = useState(false);
@@ -102,6 +103,16 @@ export function ProductCard({ product }: { product: Product }) {
         >
           <Heart className={`h-4 w-4 ${liked ? 'fill-[#f97316] text-[#f97316]' : ''}`} strokeWidth={1.8} />
         </button>
+
+        {allergens.length > 0 && (
+          <span
+            className="absolute bottom-2 left-2 inline-flex items-center gap-1 rounded-full bg-red-600/95 px-2 py-0.5 text-xs font-semibold text-white shadow-sm"
+            title={`Contains your allergens: ${allergens.map(allergenLabel).join(', ')}`}
+          >
+            <AlertTriangle className="h-3 w-3" strokeWidth={2.5} />
+            Allergen
+          </span>
+        )}
       </Link>
 
       {/* Body */}
@@ -128,6 +139,13 @@ export function ProductCard({ product }: { product: Product }) {
         <Link href={product.href} className="line-clamp-2 text-sm font-medium text-black hover:underline dark:text-white">
           {product.title} — <span className="font-normal">{product.description}</span>
         </Link>
+
+        {allergens.length > 0 && (
+          <span className="flex items-center gap-1 text-xs font-semibold text-red-600 dark:text-red-400">
+            <AlertTriangle className="h-3 w-3 shrink-0" strokeWidth={2.5} />
+            Contains: {allergens.map(allergenLabel).join(', ')}
+          </span>
+        )}
 
         {product.reviewCount > 0 ? (
           <Stars rating={product.rating} reviewCount={product.reviewCount} />

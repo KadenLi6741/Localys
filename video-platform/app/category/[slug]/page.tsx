@@ -3,11 +3,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft, AlertTriangle } from 'lucide-react';
 import { getLocalBusinesses, type LocalBusiness } from '@/lib/supabase/featured';
 import { BusinessCard } from '@/components/home/BusinessCard';
 import { ProductCard } from '@/components/home/ProductCard';
 import type { Product } from '@/lib/home-data';
+import { useAllergens } from '@/contexts/AllergenContext';
+import { allergenLabel } from '@/lib/allergens';
 
 const SLUG_LABELS: Record<string, string> = {
   restaurants:    'Restaurants',
@@ -79,7 +81,24 @@ export default function CategoryPage() {
     return () => { active = false; };
   }, []);
 
-  const filtered = useMemo(() => filterBusinesses(businesses, slug), [businesses, slug]);
+  const { userAllergies, hideEnabled, setHideEnabled, matchedAllergens } = useAllergens();
+
+  const categoryFiltered = useMemo(() => filterBusinesses(businesses, slug), [businesses, slug]);
+
+  // Map each business → the user's allergens it contains (for badges + hiding).
+  const bizMatches = useMemo(() => {
+    const m = new Map<string, string[]>();
+    for (const b of categoryFiltered) m.set(b.id, matchedAllergens(b));
+    return m;
+  }, [categoryFiltered, matchedAllergens]);
+
+  // When the hide filter is on, drop businesses that contain a user allergen.
+  const filtered = useMemo(
+    () => (hideEnabled ? categoryFiltered.filter((b) => (bizMatches.get(b.id) ?? []).length === 0) : categoryFiltered),
+    [categoryFiltered, hideEnabled, bizMatches],
+  );
+  const hiddenCount = categoryFiltered.length - filtered.length;
+
   const products = useMemo(() => isOthers ? [] : buildProducts(filtered), [filtered, isOthers]);
 
   return (
@@ -95,6 +114,40 @@ export default function CategoryPage() {
           </Link>
           <h1 className="text-2xl font-extrabold text-black dark:text-white">{label}</h1>
         </div>
+
+        {/* Allergen filter — shown when the user has set allergies in Settings. */}
+        {userAllergies.length > 0 && (
+          <div className="mb-6 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-900">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex flex-wrap items-center gap-2">
+                <AlertTriangle className="h-4 w-4 shrink-0 text-red-600 dark:text-red-400" strokeWidth={2.5} />
+                <span className="text-sm font-semibold text-black dark:text-white">Your allergens:</span>
+                {userAllergies.map((k) => (
+                  <span key={k} className="rounded-full bg-red-50 px-2.5 py-0.5 text-xs font-semibold text-red-700 dark:bg-red-950/40 dark:text-red-300">
+                    {allergenLabel(k)}
+                  </span>
+                ))}
+              </div>
+              <label className="flex cursor-pointer items-center gap-2 text-sm font-semibold text-black dark:text-white">
+                Hide restaurants with my allergens
+                <input
+                  type="checkbox"
+                  checked={hideEnabled}
+                  onChange={(e) => setHideEnabled(e.target.checked)}
+                  className="h-4 w-4 accent-[#f97316]"
+                />
+              </label>
+            </div>
+            {hideEnabled && hiddenCount > 0 && (
+              <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                {hiddenCount} {hiddenCount === 1 ? 'business' : 'businesses'} hidden because they contain your allergens.
+              </p>
+            )}
+            <p className="mt-2 text-[11px] leading-snug text-gray-400 dark:text-gray-500">
+              Allergen info is a best-effort guide from menu data — always confirm with the restaurant before ordering.
+            </p>
+          </div>
+        )}
 
         {loading && (
           <p className="text-sm text-gray-500 dark:text-gray-400">Loading…</p>
@@ -121,7 +174,7 @@ export default function CategoryPage() {
               {products.length} item{products.length === 1 ? '' : 's'} from {filtered.length} business{filtered.length === 1 ? '' : 'es'}
             </p>
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
-              {products.map((p, i) => <ProductCard key={`${p.id}-${i}`} product={p} />)}
+              {products.map((p, i) => <ProductCard key={`${p.id}-${i}`} product={p} allergens={bizMatches.get(p.businessId) ?? []} />)}
             </div>
           </div>
         )}
