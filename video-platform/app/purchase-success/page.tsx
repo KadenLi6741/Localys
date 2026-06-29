@@ -15,6 +15,7 @@ interface OrderInfo {
   quantity?: number;
   scheduledAt?: string | null;
   specialRequests?: string | null;
+  fulfillment?: 'pickup' | 'delivery';
 }
 
 /** Last-resort order number when verification is unavailable (demo/offline). */
@@ -107,6 +108,7 @@ function PurchaseSuccessContent() {
                 specialRequests: o.specialRequests ?? null,
                 token: o.token || null,
                 quantity: o.quantity,
+                fulfillment: o.fulfillment,
               });
             } catch (err) {
               console.error('[purchase-success] Could not save local order:', err);
@@ -130,6 +132,7 @@ function PurchaseSuccessContent() {
   const total = serverTotal ?? computedTotal;
   const qrOrders = orders.filter((o) => o.token);
   const scheduledLabel = formatSchedule(orders.find((o) => o.scheduledAt)?.scheduledAt);
+  const fulfillment = orders.find((o) => o.fulfillment)?.fulfillment ?? 'delivery';
 
   return (
     <div className="min-h-screen bg-white pb-20">
@@ -188,6 +191,10 @@ function PurchaseSuccessContent() {
                   <span className="text-sm font-bold text-[#f97316] shrink-0">${(o.price * (o.quantity ?? 1)).toFixed(2)}</span>
                 </div>
               ))}
+            </div>
+            <div className="flex justify-between items-center pt-3 mt-3 border-t border-gray-100">
+              <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Fulfillment</span>
+              <span className="text-sm font-semibold text-black">{fulfillment === 'pickup' ? 'Pickup' : 'Delivery'}</span>
             </div>
             {scheduledLabel && (
               <div className="flex justify-between items-center pt-3 mt-3 border-t border-gray-100">

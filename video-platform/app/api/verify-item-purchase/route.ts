@@ -17,6 +17,7 @@ interface OrderResult {
   quantity: number;
   scheduledAt: string | null;
   specialRequests: string | null;
+  fulfillment?: 'pickup' | 'delivery';
 }
 
 /** Trusted prices for built-in demo-store items (ids like "jays-burger-0"). */
@@ -159,6 +160,7 @@ export async function POST(request: NextRequest) {
     const couponCode = metadata.couponCode || null;
     const discountPercentage = parseInt(metadata.discountPercentage || '0');
     const scheduledAt = metadata.scheduledAt || null; // buyer-chosen pickup/delivery time
+    const fulfillment: 'pickup' | 'delivery' = metadata.fulfillment === 'pickup' ? 'pickup' : 'delivery';
     const stripeLines = extractLines(session);
     // Authoritative total straight from Stripe (cents → dollars).
     const sessionTotal = typeof session.amount_total === 'number' ? session.amount_total / 100 : null;
@@ -190,7 +192,7 @@ export async function POST(request: NextRequest) {
           item.id, resolvedSellerId, userId, resolvedName, resolvedPrice, resolvedQty,
           sessionId, couponCode, discountPercentage, scheduledAt, item.sr || null,
         );
-        if (result) orders.push(result);
+        if (result) orders.push({ ...result, fulfillment });
       }
 
       const total = sessionTotal ?? orders.reduce((s, o) => s + o.price * o.quantity, 0);
@@ -213,7 +215,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({
         success: true,
         confirmationNumber,
-        orders: result ? [result] : [],
+        orders: result ? [{ ...result, fulfillment }] : [],
         total,
       });
     }

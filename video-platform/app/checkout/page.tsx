@@ -7,7 +7,9 @@ import { useCart, CartItem } from '@/contexts/CartContext';
 import { getShopCoupons, Coupon } from '@/lib/supabase/coupons';
 import { validateFutureDateTime } from '@/lib/utils/validation';
 import Link from 'next/link';
-import { ChevronLeft, CalendarClock, Tag, CheckCircle } from 'lucide-react';
+import { ChevronLeft, CalendarClock, Tag, CheckCircle, Truck, Store } from 'lucide-react';
+
+type Fulfillment = 'pickup' | 'delivery';
 
 function CheckoutContent() {
   const searchParams = useSearchParams();
@@ -27,6 +29,7 @@ function CheckoutContent() {
   const groupOrderId = searchParams.get('groupOrderId');
   const promoCodeParam = searchParams.get('promoCode');
   const couponCodeParam = searchParams.get('couponCode');
+  const fulfillment: Fulfillment = searchParams.get('fulfillment') === 'pickup' ? 'pickup' : 'delivery';
 
   useEffect(() => {
     if (!user) { router.push('/login'); return; }
@@ -125,6 +128,7 @@ function CheckoutContent() {
           promoCode: selectedCoupon ? null : (promoCodeParam || null),
           scheduledAt: scheduledAt || null,
           groupOrderId: groupOrderId || null,
+          fulfillment,
         }),
       });
       const data = await response.json();
@@ -166,6 +170,19 @@ function CheckoutContent() {
             <ChevronLeft className="w-4 h-4" /> Back
           </button>
           <h1 className="text-2xl font-bold text-gray-900">Checkout</h1>
+        </div>
+
+        {/* Fulfillment notice */}
+        <div className="bg-orange-50 border border-orange-200 rounded-2xl p-4 mb-4 flex items-start gap-3">
+          {fulfillment === 'pickup'
+            ? <Store className="h-5 w-5 text-[#f97316] shrink-0 mt-0.5" />
+            : <Truck className="h-5 w-5 text-[#f97316] shrink-0 mt-0.5" />}
+          <div>
+            <p className="text-sm font-semibold text-gray-900">{fulfillment === 'pickup' ? 'Pickup' : 'Delivery'}</p>
+            <p className="text-sm text-gray-600">
+              {fulfillment === 'pickup' ? 'Pick this order up at the store' : 'This order will be delivered to you'}
+            </p>
+          </div>
         </div>
 
         {/* Scheduled notice */}

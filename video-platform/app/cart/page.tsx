@@ -3,18 +3,38 @@
 import { useState, useEffect } from 'react';
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { useDeliveryLocation } from '@/contexts/DeliveryLocationContext';
 import { useRouter } from 'next/navigation';
 import { getShopCoupons, Coupon } from '@/lib/supabase/coupons';
 import { validatePromoCode, calcPromoDiscount, PromoCode } from '@/lib/supabase/promo-codes';
 import { createGroupOrder, getGroupOrderByCode, addGroupOrderItem, GroupOrder } from '@/lib/supabase/group-orders';
 import { validateFutureDateTime } from '@/lib/utils/validation';
 import Link from 'next/link';
-import { ChevronLeft, Trash2, ShoppingCart, CalendarClock, Users, Tag, Check, X } from 'lucide-react';
+import { ChevronLeft, Trash2, ShoppingCart, CalendarClock, Users, Tag, Check, X, Truck, Store, MapPin } from 'lucide-react';
+
+/** Fulfillment type carried from the cart through checkout and into the order. */
+type Fulfillment = 'pickup' | 'delivery';
+
+/** Humanize a seller slug ("jays-burger") into a readable store name ("Jays Burger").
+ *  Real UUID sellers have no slug name here, so fall back to a generic label. */
+function storeNameFromSeller(sellerId?: string): string {
+  if (!sellerId) return 'the store';
+  if (/^[0-9a-f]{8}-[0-9a-f]{4}-/i.test(sellerId)) return 'the store';
+  return sellerId
+    .split('-')
+    .filter(Boolean)
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ');
+}
 
 export default function CartPage() {
   const { items, removeFromCart, updateQuantity, updateSpecialRequests, clearCart } = useCart();
   const { user } = useAuth();
+  const { location, detectLocation, detecting } = useDeliveryLocation();
   const router = useRouter();
+
+  // Pickup vs Delivery — defaults to delivery.
+  const [fulfillment, setFulfillment] = useState<Fulfillment>('delivery');
 
   const [coupons, setCoupons] = useState<Coupon[]>([]);
   const [loadingCoupons, setLoadingCoupons] = useState(false);
@@ -151,6 +171,7 @@ export default function CartPage() {
       }
     }
     const params = new URLSearchParams({ source: 'cart' });
+    params.set('fulfillment', fulfillment);
     if (scheduledAt) params.set('scheduledAt', scheduledAt);
     if (groupOrder?.id) params.set('groupOrderId', groupOrder.id);
     // Pass whichever single discount is applied (promo or coupon) — checkout honors it.
@@ -292,6 +313,70 @@ export default function CartPage() {
               </div>
             )}
 
+            {/* ── Pickup or Delivery ── */}
+            <div className="bg-card border border-border rounded-2xl p-4 mb-4">
+              <span className="text-sm font-semibold text-foreground">How would you like to get it?</span>
+              <div className="mt-3 grid grid-cols-2 gap-2">
+                {([
+                  { key: 'delivery', label: 'Delivery', Icon: Truck },
+                  { key: 'pickup', label: 'Pickup', Icon: Store },
+                ] as const).map(({ key, label, Icon }) => {
+                  const active = fulfillment === key;
+                  return (
+                    <button
+                      key={key}
+                      type="button"
+                      onClick={() => setFulfillment(key)}
+                      aria-pressed={active}
+                      className={`flex items-center justify-center gap-2 rounded-xl border-2 py-3 text-sm font-semibold transition-colors ${
+                        active
+                          ? 'border-[#f97316] bg-[#f97316] text-white'
+                          : 'border-border bg-card text-foreground hover:border-[#f97316]/50'
+                      }`}
+                    >
+                      <Icon className="h-4 w-4" /> {label}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {fulfillment === 'delivery' ? (
+                <div className="mt-3 rounded-xl border border-border bg-muted px-3 py-3">
+                  <div className="flex items-start gap-2">
+                    <MapPin className="h-4 w-4 text-[#f97316] shrink-0 mt-0.5" />
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs font-semibold text-foreground">Delivery address</p>
+                      <p className="text-sm text-muted-foreground truncate">
+                        {location?.address || 'No address set yet'}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => void detectLocation()}
+                      disabled={detecting}
+                      className="shrink-0 text-xs font-semibold text-[#f97316] hover:underline disabled:opacity-50"
+                    >
+                      {detecting ? 'Locating…' : location ? 'Update' : 'Detect'}
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="mt-3 rounded-xl border border-border bg-muted px-3 py-3">
+                  <div className="flex items-start gap-2">
+                    <Store className="h-4 w-4 text-[#f97316] shrink-0 mt-0.5" />
+                    <div className="min-w-0">
+                      <p className="text-xs font-semibold text-foreground">Pickup at {storeNameFromSeller(primarySellerId)}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {scheduledAt
+                          ? `Ready for pickup at ${new Date(scheduledAt).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })} on ${new Date(scheduledAt).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}`
+                          : 'Ready for pickup shortly after you order — set a time below to schedule it.'}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
             {/* ── Schedule for Later ── */}
             <div className="bg-card border border-border rounded-2xl p-4 mb-4">
               <button onClick={() => setShowSchedule(!showSchedule)} className="flex items-center gap-2 w-full text-left">
@@ -399,6 +484,10 @@ export default function CartPage() {
                   <span className="font-medium text-[#f97316]">-${promoDiscount.toFixed(2)}</span>
                 </div>
               )}
+              <div className="flex items-center gap-1.5 text-xs text-muted-foreground pt-1">
+                {fulfillment === 'pickup' ? <Store className="h-3.5 w-3.5" /> : <Truck className="h-3.5 w-3.5" />}
+                <span>{fulfillment === 'pickup' ? 'Pickup' : 'Delivery'}</span>
+              </div>
               {scheduledAt && (
                 <div className="flex items-center gap-1.5 text-xs text-muted-foreground pt-1">
                   <CalendarClock className="h-3.5 w-3.5" />

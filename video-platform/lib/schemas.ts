@@ -35,6 +35,9 @@ export const ItemCheckoutSchema = z.object({
   promoCode:     z.string().max(50).optional().nullable(),
   scheduledAt:   z.string().datetime().optional().nullable(),
   groupOrderId:  z.string().uuid().optional().nullable(),
+  // How the order is fulfilled: picked up at the store, or delivered. Defaults to
+  // 'delivery' on the server when omitted.
+  fulfillment:   z.enum(['pickup', 'delivery']).optional().nullable(),
 });
 
 export const VerifyItemPurchaseSchema = z.object({

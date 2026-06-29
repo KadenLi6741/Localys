@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
 
   const parsed = parseBody(ItemCheckoutSchema, body);
   if (!parsed.success) return parsed.response;
-  const { items, couponCode, promoCode, scheduledAt, groupOrderId } = parsed.data;
+  const { items, couponCode, promoCode, scheduledAt, groupOrderId, fulfillment } = parsed.data;
 
   const supabase = createClient(supabaseUrl, supabaseKey);
 
@@ -240,6 +240,8 @@ export async function POST(request: NextRequest) {
         }),
         ...(scheduledAt && { scheduledAt }),
         ...(groupOrderId && { groupOrderId }),
+        // Small fixed-string value ("pickup" | "delivery"), well under Stripe's limit.
+        fulfillment: fulfillment ?? 'delivery',
       },
     });
 
