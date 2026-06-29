@@ -8,7 +8,6 @@ import { BusinessesRow } from '@/components/home/BusinessesRow';
 import { ExpressDelivery } from '@/components/home/ExpressDelivery';
 import { ShopByDepartment } from '@/components/home/ShopByDepartment';
 import { FeaturedInVideos } from '@/components/home/FeaturedInVideos';
-import { CuratedCollections } from '@/components/home/CuratedCollections';
 import { Feedback } from '@/components/home/Feedback';
 
 /**
@@ -36,9 +35,6 @@ function HomeBody() {
 
       {/* Businesses with linked videos — hover to preview, click to watch in Discover */}
       <FeaturedInVideos />
-
-      {/* Community-curated restaurant lists + order combos */}
-      <CuratedCollections />
 
       {/* Food-forward, themed rows */}
       <BusinessesRow title="Top restaurants near you" seeAllHref="/feed" list={feed.topRestaurants} />
