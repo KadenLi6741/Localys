@@ -11,6 +11,7 @@
  * Mirrors the localStorage pattern used by `contexts/CartContext.tsx`. A tiny
  * pub-sub lets components (profile "Saved" section, headers, comment lists)
  * re-render when demo state changes.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
  */
 
 import type { Comment } from '../models/Comment';

@@ -1,5 +1,12 @@
 'use client';
 
+/**
+ * RevenueChart — area chart of business revenue over time with Week/Month/All-Time filters.
+ * Purpose: Lets a business track sales trends and zoom the window to the last 7/30 days or everything.
+ *   Needs at least two points in the selected range to draw a line.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { useState } from 'react';
 import {
   ResponsiveContainer,
@@ -18,6 +25,8 @@ interface RevenueChartProps {
 
 type TimeRange = 'week' | 'month' | 'all';
 
+// Keeps only the data points within the chosen window by comparing each point's date to a cutoff
+// (7 or 30 days ago). 'all' returns everything untouched.
 function filterByRange(data: RevenueDataPoint[], range: TimeRange): RevenueDataPoint[] {
   if (range === 'all' || data.length === 0) return data;
   const now = new Date();

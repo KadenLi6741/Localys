@@ -1,5 +1,12 @@
 'use client';
 
+/**
+ * NewChatModal — dialog to start a new conversation by searching for a user.
+ * Purpose: Lets a user search people by name/username and open (or reuse) a one-to-one chat with the
+ *   chosen person. Resets its search state whenever it closes.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { useState, useEffect, useCallback } from 'react';
 import { searchUsers, getOrCreateOneToOneChat } from '@/lib/supabase/messages';
 import { useRouter } from 'next/navigation';

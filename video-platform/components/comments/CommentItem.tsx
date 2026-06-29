@@ -4,7 +4,8 @@
  * CommentItem Component
  *
  * Displays a single comment with replies, likes, and actions.
- * Handles reply creation and like toggling.
+ * Handles reply creation and like toggling. Demo/local comments persist likes client-side.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
  */
 
 import { useState, useEffect } from 'react';
@@ -203,10 +204,23 @@ export default function CommentItem({ comment, videoId, onLikeUpdate, onCommentD
 
         {/* Comment Content */}
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1">
+          <div className="flex items-center flex-wrap gap-x-2 gap-y-1 mb-1">
             <span className="font-semibold text-sm">
               {comment.full_name || comment.username}
             </span>
+            {/* Verified Review badge — shown only when the reviewer has a real
+                order from this business. On-brand: orange check + orange text. */}
+            {comment.verified && (
+              <span
+                className="inline-flex items-center gap-1 text-[#f97316]"
+                title="Verified Review — this reviewer ordered from this business"
+              >
+                <svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+                <span className="text-xs font-semibold">Verified Review</span>
+              </span>
+            )}
             <span className="text-xs text-gray-500">
               {formatTimestamp(comment.created_at)}
             </span>

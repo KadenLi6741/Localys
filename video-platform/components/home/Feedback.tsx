@@ -1,5 +1,12 @@
 'use client';
 
+/**
+ * Feedback — the friendly "give feedback" prompt at the bottom of the home page.
+ * Purpose: Invites users to share thoughts. Currently a lightweight UI gesture (button flips to a
+ *   thank-you state); a placeholder for a future feedback flow.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { useState } from 'react';
 import { MessageSquareHeart } from 'lucide-react';
 

@@ -1,5 +1,12 @@
 'use client';
 
+/**
+ * StatCards — the four headline promotion KPIs (coins spent, views, views/coin, balance).
+ * Purpose: Gives creators an at-a-glance summary at the top of the analytics dashboard before the
+ *   detailed charts. Purely presentational — receives a pre-computed summary object.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import type { AnalyticsSummary } from '@/models/Analytics';
 
 interface StatCardsProps {

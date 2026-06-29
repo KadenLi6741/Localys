@@ -1,3 +1,10 @@
+/**
+ * verification.ts — signed order-verification tokens for the pickup QR-code flow.
+ * Purpose: Generates and validates HMAC tokens that prove an order is genuine when a merchant scans the
+ *   customer's QR code. Used consistently by the Stripe webhook, order completion, and the verify route.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { createHmac, timingSafeEqual } from 'crypto';
 
 /**

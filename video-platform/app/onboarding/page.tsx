@@ -1,5 +1,12 @@
 'use client';
 
+/**
+ * Onboarding page (/onboarding) — first-run profile setup for new accounts.
+ * Purpose: Walks a just-registered user through completing their profile (picture, details) before
+ *   entering the app, saving via the profiles data layer.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';

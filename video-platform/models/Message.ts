@@ -1,3 +1,9 @@
+/**
+ * Message.ts — TypeScript types for direct messaging (messages, chats, members, conversations).
+ * Purpose: Shared shapes used by the messaging data layer and chat UI. Types only — no runtime code.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 export interface Message {
   id?: string;
   chat_id?: string;

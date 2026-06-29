@@ -1,9 +1,18 @@
 'use client';
 
+/**
+ * PromotionModal — dialog for spending coins to "boost" a video higher in the feed.
+ * Purpose: Lets creators trade in-app coins for feed visibility. They pick an amount (slider/presets),
+ *   see the estimated boost and remaining balance, then confirm. It serves two modes: promoting an
+ *   already-uploaded video, or confirming a boost as part of a fresh upload (preview mode, videoId='temp').
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { useState, useEffect } from 'react';
 import { promoteVideo } from '@/lib/supabase/videos';
 import { useAuth } from '@/contexts/AuthContext';
 
+// Coins the user is allowed to spend in a single promotion (floor and ceiling for the slider).
 const MIN_COINS = 10;
 const MAX_COINS = 500;
 
@@ -22,15 +31,20 @@ export function PromotionModal({ isOpen, onClose, videoId, userCoins, onSuccess,
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [estimatedBoost, setEstimatedBoost] = useState(2);
+  // 'temp' is the sentinel id used during a new upload, before the video row exists — in that case
+  // we defer the actual boost to the upload flow (onConfirmUpload) instead of promoting directly.
   const isPreviewMode = videoId === 'temp';
 
+  // Never let the slider exceed what the user can actually afford.
   const maxCoinsAllowed = Math.min(MAX_COINS, userCoins);
 
+  // Preview the boost the chosen spend would buy (0.2 boost per coin), rounded to one decimal.
   useEffect(() => {
     const boost = (coinsToSpend * 0.2);
     setEstimatedBoost(Math.round(boost * 10) / 10);
   }, [coinsToSpend]);
 
+  // Promotes an existing video: deducts coins and raises its feed boost via the backend.
   const handlePromote = async () => {
     if (!user || !videoId || isPreviewMode) return;
 
@@ -57,6 +71,8 @@ export function PromotionModal({ isOpen, onClose, videoId, userCoins, onSuccess,
     }
   };
 
+  // Preview-mode path: hands the chosen coin amount back to the upload flow, which creates the video
+  // and applies the boost in one step.
   const handleConfirmUpload = async () => {
     if (!onConfirmUpload) return;
 
@@ -76,6 +92,7 @@ export function PromotionModal({ isOpen, onClose, videoId, userCoins, onSuccess,
 
   if (!isOpen) return null;
 
+  // Gate the promote button and warning message on whether the user has enough coins.
   const canAfford = userCoins >= coinsToSpend;
   const sliderValue = ((coinsToSpend - MIN_COINS) / (maxCoinsAllowed - MIN_COINS)) * 100;
 

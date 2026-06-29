@@ -1,5 +1,12 @@
 'use client';
 
+/**
+ * Premium page (/premium) — Localy Premium details and subscribe entry point.
+ * Purpose: Explains the $5/month Premium benefits (15% off, double coins), shows the user's current
+ *   status, and starts the subscription via /api/subscribe-premium.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Check, Crown } from 'lucide-react';

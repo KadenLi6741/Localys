@@ -8,6 +8,7 @@
  *
  * The project has no @types/google.maps, so the Maps namespace is typed loosely
  * as `GoogleMaps` (any). Callers stay isolated to the picker component.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
  */
 const KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 

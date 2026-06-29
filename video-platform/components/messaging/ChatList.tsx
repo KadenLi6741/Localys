@@ -12,6 +12,9 @@
  * - Unread message counts
  * - Last message preview
  * - Click to navigate to conversation
+ *
+ * Note: legacy messaging implementation; the active chats UI lives in components/chats/.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
  */
 
 import { useEffect, useState } from 'react';

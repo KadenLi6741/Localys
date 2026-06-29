@@ -1,9 +1,17 @@
+/**
+ * API route: POST /api/verify-premium — confirm a Premium subscription and activate it.
+ * Purpose: Called after the Premium Stripe success redirect to verify the subscription is active, then
+ *   flag the authenticated user's profile as Premium (idempotently). Safety net beside the webhook.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 import { checkRateLimit, getClientIp, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit';
 import { getAuthenticatedUser } from '@/lib/server-auth';
 
+// Admin (service-role) Supabase client for trusted writes; null if env vars are missing.
 function getSupabaseAdminClient() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;

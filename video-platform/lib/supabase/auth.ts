@@ -1,3 +1,11 @@
+/**
+ * supabase/auth.ts — authentication data-access layer (sign up, sign in, profile bootstrap).
+ * Purpose: Wraps Supabase auth calls and ensures a matching profile row exists for each user (creating
+ *   a sanitised fallback username and a welcome coupon on first sign-up). Keeps auth side-effects in one
+ *   place so the AuthContext/UI stay simple.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { supabase } from './client';
 import type { SignUpData, SignInData } from '../../models/Auth';
 import { createWelcomeCoupon } from './coupons';

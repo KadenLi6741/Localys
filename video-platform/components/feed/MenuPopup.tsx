@@ -1,5 +1,13 @@
 'use client';
 
+/**
+ * MenuPopup — toggleable menu panel overlaid on the Discover feed video.
+ * Purpose: Lets viewers open a business's full menu (name/price/add-to-cart) while watching its video,
+ *   loading the menu lazily on first open. Styled as a dark translucent panel because it sits on top of
+ *   the (always-dark) video, so its colors are intentionally fixed rather than theme-aware.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { useEffect, useState } from 'react';
 import { X, UtensilsCrossed, Plus, Check } from 'lucide-react';
 import { getUserMenu, type Menu } from '@/lib/supabase/profiles';

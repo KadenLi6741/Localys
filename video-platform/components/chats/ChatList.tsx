@@ -1,3 +1,10 @@
+/**
+ * ChatList — the list of a user's conversations (left pane of the chats screen).
+ * Purpose: Renders each conversation via ChatListItem, with a skeleton loading state and an empty
+ *   state prompting the user to start one. Highlights the active chat and reports selections upward.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { ChatWithDetails } from '@/lib/supabase/messaging';
 import { ChatListItem } from './ChatListItem';
 

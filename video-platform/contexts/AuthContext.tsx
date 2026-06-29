@@ -1,5 +1,13 @@
 'use client';
 
+/**
+ * AuthContext — app-wide authentication state (current user, session, loading).
+ * Purpose: Loads the Supabase session on mount, keeps it in sync via auth-state-change events, and
+ *   exposes the user/session plus signOut to the whole app through useAuth(). The `loading` flag lets
+ *   guards (e.g. ProtectedRoute) wait for auth to resolve before deciding to redirect.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { getSession, onAuthStateChange, signOut as supabaseSignOut } from '@/lib/supabase/auth';

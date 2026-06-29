@@ -1,5 +1,12 @@
 'use client';
 
+/**
+ * Settings page (/settings) — user preferences (currently appearance/theme).
+ * Purpose: Lets the signed-in user choose their theme (light/dark/system) via ThemeContext. Gated behind
+ *   ProtectedRoute.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Sun, Moon, Monitor } from 'lucide-react';

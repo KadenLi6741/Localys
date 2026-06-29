@@ -1,5 +1,12 @@
 'use client';
 
+/**
+ * Points page (/points) — the user's coin/points balance and earning challenges.
+ * Purpose: Shows the user's current balance and the daily/monthly challenges they can complete to earn
+ *   more, reusing the challenge data from lib/home-data. Gated behind ProtectedRoute.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ChevronLeft, Coins } from 'lucide-react';

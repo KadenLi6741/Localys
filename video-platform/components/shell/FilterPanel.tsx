@@ -1,5 +1,13 @@
 'use client';
 
+/**
+ * FilterPanel — reusable set of search filters (distance, category, rating, price, open-now, deals).
+ * Purpose: A fully-controlled filter UI shared by the header search dropdown (and anywhere filtering is
+ *   needed), so the same controls and defaults are reused rather than duplicated. Parent owns the state
+ *   via value/onChange.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { Star } from 'lucide-react';
 
 export interface Filters {
@@ -35,6 +43,7 @@ export function FilterPanel({
   onChange: (next: Filters) => void;
   onReset?: () => void;
 }) {
+  // Immutably update a single filter field and bubble the whole new filters object up to the parent.
   const set = <K extends keyof Filters>(key: K, v: Filters[K]) => onChange({ ...value, [key]: v });
 
   return (

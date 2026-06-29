@@ -1,3 +1,10 @@
+/**
+ * Profile.ts — TypeScript types for user and business profiles.
+ * Purpose: Defines Profile/Business shapes plus their update payloads and business-hours type, shared
+ *   by the profiles data layer, dashboard and profile pages. Types only — no runtime code.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 export interface Profile {
   id: string;
   email: string;

@@ -1,3 +1,10 @@
+/**
+ * Auth.ts — TypeScript types for authentication form data (sign up / sign in).
+ * Purpose: Shapes the credentials/registration payloads used by the auth flow and auth data layer.
+ *   Types only — no runtime code.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 export interface SignUpData {
   email: string;
   password: string;

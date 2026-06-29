@@ -1,5 +1,13 @@
 'use client';
 
+/**
+ * Thumb — image slot with a graceful neutral placeholder fallback.
+ * Purpose: Shows an image when a URL is supplied and loads successfully; otherwise a clean grey
+ *   placeholder. Centralising this keeps cards looking consistent even when business/product images
+ *   are missing or fail to load.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { useState } from 'react';
 import { ImageIcon } from 'lucide-react';
 

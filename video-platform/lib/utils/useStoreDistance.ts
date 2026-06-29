@@ -17,6 +17,7 @@ import { formatDistanceKm, etaMinutes } from '@/lib/utils/distance';
  *
  * Returns all-null fields when the user has no location set or the address can't
  * be geocoded — callers should simply hide the distance in that case.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
  */
 interface LatLng {
   lat: number;

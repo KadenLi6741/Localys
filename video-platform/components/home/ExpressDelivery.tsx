@@ -1,3 +1,10 @@
+/**
+ * ExpressDelivery — promotional banner advertising fast local delivery on the home page.
+ * Purpose: A static marketing call-to-action that drives users toward browsing the feed. No data
+ *   dependencies — purely presentational.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import Link from 'next/link';
 import { Zap } from 'lucide-react';
 
@@ -35,7 +42,7 @@ export function ExpressDelivery() {
       <div className="relative hidden shrink-0 sm:block" style={{ width: '176px' }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/Refrences%20of%20ui%20I%20like/Teddybear.jpg"
+          src="/ui-references/teddybear.jpg"
           alt=""
           className="h-full w-full object-cover object-top"
         />

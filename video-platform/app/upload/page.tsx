@@ -1,5 +1,12 @@
 'use client';
 
+/**
+ * Upload page (/upload) — post a new video (and optionally boost it).
+ * Purpose: Lets a signed-in user pick/record a video, add a caption/category, upload the file +
+ *   metadata to Supabase, and optionally promote it with coins on publish. Gated behind ProtectedRoute.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { ProtectedRoute } from '@/components/ProtectedRoute';

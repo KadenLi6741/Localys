@@ -1,5 +1,12 @@
 'use client';
 
+/**
+ * My profile page (/profile) — the signed-in user's own profile and account hub.
+ * Purpose: Shows the user's editable profile (avatar, info), their rank, saved/liked items, posted &
+ *   bookmarked videos, language settings, and (for businesses) their menu. Gated behind ProtectedRoute.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -20,6 +27,8 @@ import {
 } from '@/lib/supabase/profiles';
 import { OrderHistory } from '@/components/OrderHistory';
 import { RankSection } from '@/components/RankSection';
+import { CommunityLeaderboard } from '@/components/CommunityLeaderboard';
+import { computeImpactScore, resolveImpactInputs } from '@/lib/ranks';
 import { getUserCoins } from '@/lib/supabase/profiles';
 import { getUserBookmarkedVideos } from '@/lib/supabase/videos';
 import { getSavedItems, getLikedItemIds, getLikedMenuItems, subscribeEngagement, type LikedMenuItem } from '@/lib/clientEngagement';
@@ -511,7 +520,7 @@ function ProfileContent() {
         />
       ) : (
         <>
-          {user && <SideCards userId={user.id} />}
+          {user && <SideCards />}
           <ProfileView
             profile={profile}
             user={user}
@@ -588,6 +597,14 @@ function ProfileView({ profile, user, onEditClick, onSignOut, onProfileUpdated }
       {/* Rank / tier */}
       {!statsLoading && (
         <RankSection moneySpent={moneySpent} points={points} bizCount={bizCount} />
+      )}
+
+      {/* Community leaderboard (mock 5km neighbors, real "you" score) */}
+      {!statsLoading && (
+        <CommunityLeaderboard
+          youName={profile?.full_name || profile?.username || 'You'}
+          youScore={computeImpactScore(resolveImpactInputs({ moneySpent, points, bizCount }))}
+        />
       )}
 
       {/* Impact stats */}

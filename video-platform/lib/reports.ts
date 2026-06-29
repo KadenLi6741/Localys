@@ -5,6 +5,7 @@
  * are normalized; when a demo business has none, realistic demo data is generated
  * deterministically (stable per session) so charts/tables/filters all work. Every
  * total is computed from the same filtered rows, so numbers always reconcile.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
  */
 import type { ItemPurchase } from '@/models/Order';
 import type { BusinessReview } from '@/lib/supabase/reviews';

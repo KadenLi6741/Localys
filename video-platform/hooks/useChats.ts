@@ -1,3 +1,10 @@
+/**
+ * useChats — hook that loads and live-updates a user's conversation list.
+ * Purpose: Fetches the user's chats and merges in client-side demo chats, refreshing when demo chats
+ *   change, so the chats screen shows both real and demo conversations with loading/error state.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { useState, useEffect, useCallback } from 'react';
 import { getChats, ChatWithDetails } from '@/lib/supabase/messaging';
 import { getDemoChats, DEMO_CHAT_EVENT } from '@/lib/demoChat';

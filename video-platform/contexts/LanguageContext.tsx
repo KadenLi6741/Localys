@@ -1,5 +1,13 @@
 'use client';
 
+/**
+ * LanguageContext — the active UI language, shared app-wide.
+ * Purpose: Holds the current language and exposes setLanguage(), persisting the choice (and syncing it
+ *   to the signed-in user's profile) so translated text via useTranslation updates everywhere and sticks
+ *   across visits.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { createContext, useContext, useState, useEffect } from 'react';
 import { Language } from '@/lib/translations';
 import { supabase } from '@/lib/supabase/client';

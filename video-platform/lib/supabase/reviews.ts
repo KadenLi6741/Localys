@@ -1,3 +1,10 @@
+/**
+ * supabase/reviews.ts — data-access layer for business reviews.
+ * Purpose: Fetches the reviews/ratings shown on a business profile and the dashboard Reviews tab
+ *   (reviewer name/avatar, rating, content). Keeps review queries in one place.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { supabase } from './client';
 
 export interface BusinessReview {

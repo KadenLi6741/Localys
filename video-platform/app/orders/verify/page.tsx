@@ -1,5 +1,12 @@
 'use client';
 
+/**
+ * Order-verify page (/orders/verify) — the page a merchant lands on after scanning an order QR.
+ * Purpose: Reads the order id + token from the URL (the QR's payload) and confirms/marks the order
+ *   fulfilled via /api/orders/complete, showing success/failure. This is the pickup-redemption step.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';

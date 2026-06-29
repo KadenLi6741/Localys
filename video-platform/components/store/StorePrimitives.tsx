@@ -5,6 +5,7 @@
  * store page: a fault-tolerant item image (with a neutral placeholder) and a
  * fractional star-rating display. Kept separate so the page and item cards can
  * share them without duplicating markup.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
  */
 import { useEffect, useState } from 'react';
 import { Star } from 'lucide-react';

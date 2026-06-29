@@ -1,5 +1,13 @@
 'use client';
 
+/**
+ * Public profile page (/profile/[userId]) — another user's or business's profile.
+ * Purpose: Shows a profile's header (avatar, name, rating), actions (message, share, report/block), and
+ *   for businesses their location map, menu/services and posted videos. Business storefronts render the
+ *   StorePage view. Uses theme tokens so it's light in light mode and dark in dark mode.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { useState, useEffect, useRef } from 'react'; // useRef kept for 3-dot menu
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
@@ -43,7 +51,7 @@ export default function UserProfilePage() {
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-/** Build a StoreMenu from Supabase items for stores without a public/Menu folder. */
+/** Build a StoreMenu from Supabase items for stores without a public/menu folder. */
 function buildFallbackMenu(business: Business, items: any[]): StoreMenu {
   const mapped: StoreItem[] = (items || []).map((it, i) => ({
     id: it.id || `${business.owner_id}-${i}`,
@@ -598,7 +606,7 @@ function UserProfileContent() {
   }
 
   return (
-    <div className="min-h-screen bg-[#1A1A18] text-[#F5F0E8]">
+    <div className="min-h-screen bg-background text-foreground">
       {/* Toast */}
       {toastMessage && (
         <div className={`fixed top-6 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-lg text-sm font-medium shadow-lg transition-all duration-300 ${
@@ -613,13 +621,13 @@ function UserProfileContent() {
       {/* Report Modal */}
       {showReportModal && (
         <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4" onClick={() => setShowReportModal(false)}>
-          <div className="bg-[#242420] border border-[#3A3A34] rounded-xl p-6 w-full max-w-md" onClick={e => e.stopPropagation()}>
-            <h3 className="text-lg font-semibold text-[#F5F0E8] mb-4">Report @{profile.username}</h3>
+          <div className="bg-card border border-border rounded-xl p-6 w-full max-w-md" onClick={e => e.stopPropagation()}>
+            <h3 className="text-lg font-semibold text-foreground mb-4">Report @{profile.username}</h3>
             <div className="space-y-3">
               {REPORT_REASONS.map(r => (
-                <label key={r.value} className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors ${reportReason === r.value ? 'bg-[#f97316]/20 border border-[#f97316]/40' : 'bg-[#1A1A18] border border-[#3A3A34] hover:border-[#f97316]/30'}`}>
+                <label key={r.value} className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors ${reportReason === r.value ? 'bg-[#f97316]/20 border border-[#f97316]/40' : 'bg-background border border-border hover:border-[#f97316]/30'}`}>
                   <input type="radio" name="reason" value={r.value} checked={reportReason === r.value} onChange={() => setReportReason(r.value)} className="accent-[#f97316]" />
-                  <span className="text-sm text-[#F5F0E8]">{r.label}</span>
+                  <span className="text-sm text-foreground">{r.label}</span>
                 </label>
               ))}
               <textarea
@@ -628,11 +636,11 @@ function UserProfileContent() {
                 placeholder="Additional details (optional)"
                 rows={3}
                 maxLength={500}
-                className="w-full bg-[#1A1A18] border border-[#3A3A34] rounded-lg px-4 py-3 text-sm text-[#F5F0E8] placeholder-[#9E9A90] focus:outline-none focus:border-[#f97316]/50 resize-none"
+                className="w-full bg-background border border-border rounded-lg px-4 py-3 text-sm text-foreground placeholder-muted-foreground focus:outline-none focus:border-[#f97316]/50 resize-none"
               />
             </div>
             <div className="flex gap-3 mt-5">
-              <button onClick={() => setShowReportModal(false)} className="flex-1 bg-[#3A3A34] text-[#F5F0E8] rounded-lg py-2.5 text-sm hover:bg-[#3A3A34]/80 transition-colors">Cancel</button>
+              <button onClick={() => setShowReportModal(false)} className="flex-1 bg-muted text-foreground rounded-lg py-2.5 text-sm hover:bg-muted/80 transition-colors">Cancel</button>
               <button onClick={handleReport} disabled={!reportReason || reportLoading} className="flex-1 bg-[#E05C3A] text-white rounded-lg py-2.5 text-sm font-medium hover:bg-[#E05C3A]/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                 {reportLoading ? 'Submitting...' : 'Submit Report'}
               </button>
@@ -642,14 +650,14 @@ function UserProfileContent() {
       )}
 
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-[#1A1A18]/80 backdrop-blur-md border-b border-[#3A3A34]">
+      <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b border-border">
         <div className="flex items-center justify-between p-4">
           <button
             onClick={() => router.back()}
-            className="p-2 hover:bg-[#242420] rounded-full transition-colors"
+            className="p-2 hover:bg-card rounded-full transition-colors"
             aria-label="Go back"
           >
-            <svg className="w-6 h-6 text-[#F5F0E8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-6 h-6 text-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </button>
@@ -658,20 +666,20 @@ function UserProfileContent() {
           <div className="relative" ref={menuRef}>
             <button
               onClick={() => setShowMenu(!showMenu)}
-              className="p-2 hover:bg-[#242420] rounded-full transition-colors"
+              className="p-2 hover:bg-card rounded-full transition-colors"
               aria-label="More options"
             >
-              <svg className="w-6 h-6 text-[#F5F0E8]" fill="currentColor" viewBox="0 0 24 24">
+              <svg className="w-6 h-6 text-foreground" fill="currentColor" viewBox="0 0 24 24">
                 <circle cx="12" cy="5" r="2" />
                 <circle cx="12" cy="12" r="2" />
                 <circle cx="12" cy="19" r="2" />
               </svg>
             </button>
             {showMenu && (
-              <div className="absolute right-0 top-full mt-1 bg-[#242420] border border-[#3A3A34] rounded-lg shadow-xl overflow-hidden min-w-[180px] z-20">
+              <div className="absolute right-0 top-full mt-1 bg-card border border-border rounded-lg shadow-xl overflow-hidden min-w-[180px] z-20">
                 <button
                   onClick={() => { setShowMenu(false); setShowReportModal(true); }}
-                  className="w-full text-left px-4 py-3 text-sm text-[#F5F0E8] hover:bg-[#f97316]/10 transition-colors flex items-center gap-3"
+                  className="w-full text-left px-4 py-3 text-sm text-foreground hover:bg-[#f97316]/10 transition-colors flex items-center gap-3"
                 >
                   <svg className="w-4 h-4 text-[#E05C3A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
@@ -680,7 +688,7 @@ function UserProfileContent() {
                 </button>
                 <button
                   onClick={() => { setShowMenu(false); handleBlock(); }}
-                  className="w-full text-left px-4 py-3 text-sm text-[#E05C3A] hover:bg-[#E05C3A]/10 transition-colors flex items-center gap-3 border-t border-[#3A3A34]"
+                  className="w-full text-left px-4 py-3 text-sm text-[#E05C3A] hover:bg-[#E05C3A]/10 transition-colors flex items-center gap-3 border-t border-border"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
@@ -702,16 +710,16 @@ function UserProfileContent() {
             className="w-32 h-32 rounded-full ring-2 ring-[#f97316]/40 object-cover mb-4"
           />
           <h2 className="text-2xl font-bold mb-1">{profile.full_name}</h2>
-          <p className="text-[#F5F0E8]/60 mb-1">@{profile.username}</p>
+          <p className="text-foreground/60 mb-1">@{profile.username}</p>
 
           {profile.bio && (
-            <p className="text-[#F5F0E8]/80 text-center max-w-md mb-2">{profile.bio}</p>
+            <p className="text-foreground/80 text-center max-w-md mb-2">{profile.bio}</p>
           )}
           
           {/* Average Rating */}
           {avgRating !== null && (
-            <p className="text-[#F5F0E8] text-sm mb-4">
-              {avgRating} <span className="text-[#9E9A90]">({totalReviews} {totalReviews === 1 ? 'review' : 'reviews'})</span>
+            <p className="text-foreground text-sm mb-4">
+              {avgRating} <span className="text-muted-foreground">({totalReviews} {totalReviews === 1 ? 'review' : 'reviews'})</span>
             </p>
           )}
 
@@ -741,7 +749,7 @@ function UserProfileContent() {
             {/* Share Button */}
             <button
               onClick={handleShare}
-              className="border-2 border-[#3A3A34] text-[#F5F0E8] p-2 rounded-lg hover:bg-[#242420] transition-colors"
+              className="border-2 border-border text-foreground p-2 rounded-lg hover:bg-card transition-colors"
               aria-label="Share profile"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -754,10 +762,10 @@ function UserProfileContent() {
         {/* Business Location Map */}
         {businessLocations.length > 0 && (
           <div className="mt-8">
-            <h3 className="text-xl font-semibold text-[#F5F0E8] mb-4">
+            <h3 className="text-xl font-semibold text-foreground mb-4">
               Location{businessLocations.length > 1 ? 's' : ''}
             </h3>
-            <div className="bg-[#242420] border border-[#3A3A34] rounded-lg overflow-hidden">
+            <div className="bg-card border border-border rounded-lg overflow-hidden">
               <BusinessLocationMap
                 locations={businessLocations}
                 businessName={profile.full_name}
@@ -769,10 +777,10 @@ function UserProfileContent() {
         {/* Menu / Services Section (business only) */}
         {profile.type && (
           <div className="mt-8">
-            <h3 className="text-xl font-semibold text-[#F5F0E8] mb-4">
+            <h3 className="text-xl font-semibold text-foreground mb-4">
               {profile.type === 'service' ? 'Services' : 'Menu'}
             </h3>
-            <div className="bg-[#242420] border border-[#3A3A34] rounded-lg p-6">
+            <div className="bg-card border border-border rounded-lg p-6">
               <MenuList userId={profile.id} isOwnProfile={false} />
             </div>
           </div>
@@ -780,46 +788,46 @@ function UserProfileContent() {
 
         {/* Videos Section */}
         <div className="mt-8">
-          <h3 className="text-xl font-semibold text-[#F5F0E8] mb-4">Videos</h3>
-          <div className="bg-[#242420] border border-[#3A3A34] rounded-lg p-6">
+          <h3 className="text-xl font-semibold text-foreground mb-4">Videos</h3>
+          <div className="bg-card border border-border rounded-lg p-6">
             <PostedVideos userId={profile.id} isOwnProfile={false} />
           </div>
         </div>
       </div>
 
       {/* Bottom Navigation Hotbar */}
-      <div className="fixed bottom-0 left-0 right-0 z-20 bg-[#1A1A18]/50 backdrop-blur-md border-t border-[#3A3A34]">
+      <div className="fixed bottom-0 left-0 right-0 z-20 bg-background/50 backdrop-blur-md border-t border-border">
         <div className="flex items-center justify-around py-3">
           <Link href="/feed" className="flex flex-col items-center gap-1 transition-transform duration-200 hover:scale-110 active:scale-95">
-            <svg className={`w-6 h-6 ${pathname === '/' ? 'text-[#F5F0E8]' : 'text-[#F5F0E8]/60'}`} fill="currentColor" viewBox="0 0 24 24">
+            <svg className={`w-6 h-6 ${pathname === '/' ? 'text-foreground' : 'text-foreground/60'}`} fill="currentColor" viewBox="0 0 24 24">
               <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
             </svg>
-            <span className={`text-xs ${pathname === '/' ? 'text-[#F5F0E8]' : 'text-[#F5F0E8]/60'}`}>Home</span>
+            <span className={`text-xs ${pathname === '/' ? 'text-foreground' : 'text-foreground/60'}`}>Home</span>
           </Link>
           <Link href="/feed" className="flex flex-col items-center gap-1 transition-transform duration-200 hover:scale-110 active:scale-95">
-            <svg className={`w-6 h-6 ${pathname === '/feed' ? 'text-[#F5F0E8]' : 'text-[#F5F0E8]/60'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className={`w-6 h-6 ${pathname === '/feed' ? 'text-foreground' : 'text-foreground/60'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
-            <span className={`text-xs ${pathname === '/feed' ? 'text-[#F5F0E8]' : 'text-[#F5F0E8]/60'}`}>Discover</span>
+            <span className={`text-xs ${pathname === '/feed' ? 'text-foreground' : 'text-foreground/60'}`}>Discover</span>
           </Link>
           <Link href="/upload" className="flex flex-col items-center gap-1 transition-transform duration-200 hover:scale-110 active:scale-95">
             <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-200 ${pathname === '/upload' ? 'bg-[#f97316]' : 'bg-[#f97316]/20'}`}>
-              <svg className={`w-6 h-6 ${pathname === '/upload' ? 'text-black' : 'text-[#F5F0E8]'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className={`w-6 h-6 ${pathname === '/upload' ? 'text-black' : 'text-foreground'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
             </div>
           </Link>
           <Link href="/chats" className="flex flex-col items-center gap-1 transition-transform duration-200 hover:scale-110 active:scale-95">
-            <svg className={`w-6 h-6 ${pathname === '/chats' ? 'text-[#F5F0E8]' : 'text-[#F5F0E8]/60'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className={`w-6 h-6 ${pathname === '/chats' ? 'text-foreground' : 'text-foreground/60'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
             </svg>
-            <span className={`text-xs ${pathname === '/chats' ? 'text-[#F5F0E8]' : 'text-[#F5F0E8]/60'}`}>Chats</span>
+            <span className={`text-xs ${pathname === '/chats' ? 'text-foreground' : 'text-foreground/60'}`}>Chats</span>
           </Link>
           <Link href="/profile" className="flex flex-col items-center gap-1 transition-transform duration-200 hover:scale-110 active:scale-95">
-            <svg className={`w-6 h-6 ${pathname?.startsWith('/profile') ? 'text-[#F5F0E8]' : 'text-[#F5F0E8]/60'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className={`w-6 h-6 ${pathname?.startsWith('/profile') ? 'text-foreground' : 'text-foreground/60'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
             </svg>
-            <span className={`text-xs ${pathname?.startsWith('/profile') ? 'text-[#F5F0E8]' : 'text-[#F5F0E8]/60'}`}>Profile</span>
+            <span className={`text-xs ${pathname?.startsWith('/profile') ? 'text-foreground' : 'text-foreground/60'}`}>Profile</span>
           </Link>
         </div>
       </div>

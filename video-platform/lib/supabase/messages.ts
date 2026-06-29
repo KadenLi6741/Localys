@@ -1,3 +1,10 @@
+/**
+ * supabase/messages.ts — data-access layer for direct messaging (chats + messages).
+ * Purpose: Powers the chats UI — fetching a user's chats, loading/sending/editing/deleting messages,
+ *   finding-or-creating one-to-one chats, read receipts, user search, and realtime message subscriptions.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { supabase } from './client';
 import type { Message, Chat, ChatMember, ChatWithDetails, Conversation } from '../../models/Message';
 import { isUuid } from '../utils/uuid';

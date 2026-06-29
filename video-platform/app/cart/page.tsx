@@ -1,5 +1,13 @@
 'use client';
 
+/**
+ * Cart page (/cart) — review cart items before checkout, with coupons, scheduling and group orders.
+ * Purpose: Lists the items in the cart with quantity/special-request editing, applies a promo or coupon,
+ *   optionally schedules the order for later or starts/joins a group order, shows the order summary, and
+ *   proceeds to checkout. Fully theme-aware (uses bg-background/bg-card/bg-muted tokens).
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { useState, useEffect } from 'react';
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';

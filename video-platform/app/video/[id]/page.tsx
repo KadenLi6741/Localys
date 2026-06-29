@@ -1,5 +1,12 @@
 'use client';
 
+/**
+ * Single video page (/video/[id]) — a shareable, direct view of one video.
+ * Purpose: The destination for shared video links: loads the video by id and shows it with likes and
+ *   comments. Complements the in-feed experience for deep links from outside the app.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';

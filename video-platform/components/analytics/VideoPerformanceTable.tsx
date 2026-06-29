@@ -1,5 +1,12 @@
 'use client';
 
+/**
+ * VideoPerformanceTable — per-video promotion breakdown (spend, views, efficiency, boost).
+ * Purpose: Ranks a creator's videos by how many views each coin bought (views/coin), so they can
+ *   see which content gave the best return. Renders nothing when there are no videos.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import type { VideoPerformance } from '@/models/Analytics';
 
 interface VideoPerformanceTableProps {
@@ -11,6 +18,7 @@ export function VideoPerformanceTable({ videos }: VideoPerformanceTableProps) {
     return null;
   }
 
+  // Most efficient first: highest views-per-coin at the top (and gets the "best" marker).
   const sorted = [...videos].sort((a, b) => b.viewsPerCoin - a.viewsPerCoin);
 
   return (

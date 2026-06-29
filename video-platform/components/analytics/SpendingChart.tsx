@@ -1,5 +1,12 @@
 'use client';
 
+/**
+ * SpendingChart — area chart of coins spent on promotions over time.
+ * Purpose: Visualises a creator's promotion spend trend in the analytics dashboard. Requires at
+ *   least two data points to plot a meaningful line; otherwise shows a "not enough data" message.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import {
   ResponsiveContainer,
   AreaChart,
@@ -15,6 +22,7 @@ interface SpendingChartProps {
   data: SpendingDataPoint[];
 }
 
+// Branded tooltip showing the coins spent on the hovered date.
 function CustomTooltip({ active, payload, label }: { active?: boolean; payload?: { value: number }[]; label?: string }) {
   if (!active || !payload?.length) return null;
   return (

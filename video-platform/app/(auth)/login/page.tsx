@@ -1,5 +1,13 @@
 'use client';
 
+/**
+ * Login page (/login) — email+password sign-in with email-code verification.
+ * Purpose: Authenticates returning users. It runs a Turnstile bot check, signs in via the login-code
+ *   flow (a 6-digit email code finishes the login), and also offers Google sign-in and password reset.
+ *   Validates inputs inline for clear feedback.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { Suspense, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';

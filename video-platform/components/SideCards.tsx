@@ -2,47 +2,19 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { supabase } from '@/lib/supabase/client';
-import { X, RefreshCw, Tag, Store, Users } from 'lucide-react';
+import { X, Tag, Store, Users } from 'lucide-react';
 
-interface SideCardsProps {
-  userId: string;
-}
-
-interface LastOrder {
-  item_name: string;
-  item_id: string;
-  seller_id: string;
-  price: number;
-}
-
-const LEFT_CARDS = ['order', 'browse'] as const;
 const RIGHT_CARDS = ['deals', 'community'] as const;
-type LeftCard = typeof LEFT_CARDS[number];
 type RightCard = typeof RIGHT_CARDS[number];
 
-export function SideCards({ userId }: SideCardsProps) {
+export function SideCards() {
   const router = useRouter();
   const [showLeft, setShowLeft] = useState(true);
   const [showRight, setShowRight] = useState(true);
-  const [lastOrder, setLastOrder] = useState<LastOrder | null>(null);
-  const [leftIdx, setLeftIdx] = useState(0);
   const [rightIdx, setRightIdx] = useState(0);
 
   useEffect(() => {
-    supabase
-      .from('item_purchases')
-      .select('item_name, item_id, seller_id, price')
-      .eq('buyer_id', userId)
-      .order('purchased_at', { ascending: false })
-      .limit(1)
-      .maybeSingle()
-      .then(({ data }) => { if (data) setLastOrder(data as LastOrder); });
-  }, [userId]);
-
-  useEffect(() => {
     const id = setInterval(() => {
-      setLeftIdx((i) => i + 1);
       setRightIdx((i) => i + 1);
     }, 30000);
     return () => clearInterval(id);
@@ -50,10 +22,7 @@ export function SideCards({ userId }: SideCardsProps) {
 
   if (!showLeft && !showRight) return null;
 
-  const leftCard: LeftCard = LEFT_CARDS[leftIdx % LEFT_CARDS.length];
   const rightCard: RightCard = RIGHT_CARDS[rightIdx % RIGHT_CARDS.length];
-
-  const showOrderCard = leftCard === 'order' && !!lastOrder;
 
   return (
     <>
@@ -69,43 +38,20 @@ export function SideCards({ userId }: SideCardsProps) {
               <X className="h-5 w-5" />
             </button>
 
-            {showOrderCard ? (
-              <>
-                <p className="text-xs font-bold text-black uppercase tracking-widest mb-3 pr-8">Order Again</p>
-                <p className="text-sm font-semibold text-black mb-0.5 line-clamp-2 leading-snug">
-                  {lastOrder!.item_name}
-                </p>
-                <p className="text-[#f97316] font-bold text-base mb-3">${lastOrder!.price.toFixed(2)}</p>
-                <button
-                  onClick={() =>
-                    router.push(
-                      `/checkout?itemId=${lastOrder!.item_id}&itemName=${encodeURIComponent(lastOrder!.item_name)}&itemPrice=${lastOrder!.price}&sellerId=${lastOrder!.seller_id}&buyerId=${userId}`
-                    )
-                  }
-                  className="w-full bg-[#f97316] text-white text-sm font-semibold py-2.5 rounded-xl hover:opacity-90 transition-opacity flex items-center justify-center gap-1.5"
-                >
-                  <RefreshCw className="h-3.5 w-3.5" />
-                  Re-order
-                </button>
-              </>
-            ) : (
-              <>
-                <p className="text-xs font-bold text-black uppercase tracking-widest mb-3 pr-8">Browse Local</p>
-                <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center mb-2">
-                  <Store className="h-5 w-5 text-gray-600" />
-                </div>
-                <p className="text-sm font-semibold text-black mb-1">Local businesses</p>
-                <p className="text-xs text-black leading-relaxed mb-3">
-                  Discover shops, food and services near you.
-                </p>
-                <button
-                  onClick={() => router.push('/home')}
-                  className="w-full bg-black text-white text-sm font-semibold py-2.5 rounded-xl hover:opacity-80 transition-opacity"
-                >
-                  Explore
-                </button>
-              </>
-            )}
+            <p className="text-xs font-bold text-black uppercase tracking-widest mb-3 pr-8">Browse Local</p>
+            <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center mb-2">
+              <Store className="h-5 w-5 text-gray-600" />
+            </div>
+            <p className="text-sm font-semibold text-black mb-1">Local businesses</p>
+            <p className="text-xs text-black leading-relaxed mb-3">
+              Discover shops, food and services near you.
+            </p>
+            <button
+              onClick={() => router.push('/home')}
+              className="w-full bg-black text-white text-sm font-semibold py-2.5 rounded-xl hover:opacity-80 transition-opacity"
+            >
+              Explore
+            </button>
           </div>
         </div>
       )}

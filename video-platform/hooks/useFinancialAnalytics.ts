@@ -1,5 +1,13 @@
 'use client';
 
+/**
+ * useFinancialAnalytics — hook that builds the business Financial Overview dataset.
+ * Purpose: Queries a business's orders and derives the financial metrics the dashboard shows (revenue
+ *   over time, orders breakdown, top items, video conversions, quick stats), with loading state. Passing
+ *   `undefined` skips fetching until the panel is opened.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase/client';
 import type {

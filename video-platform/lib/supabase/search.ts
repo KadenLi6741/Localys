@@ -1,3 +1,10 @@
+/**
+ * supabase/search.ts — data-access + ranking layer for business/item search.
+ * Purpose: Runs business/menu searches with semantic keyword expansion (so "burger" also matches
+ *   related terms), then filters/ranks results by distance and price. Results are cached for speed.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { supabase } from './client';
 import { cacheGet, cacheSet } from '../cache';
 import { haversineDistance } from '../utils/geo';

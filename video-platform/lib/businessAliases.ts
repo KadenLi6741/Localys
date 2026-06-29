@@ -1,3 +1,11 @@
+/**
+ * businessAliases.ts — maps certain real businesses to a built-in demo store/menu.
+ * Purpose: Lets specific accounts (e.g. a test business that is really "Pho Xe Lua") display a curated
+ *   demo name, menu and caption without mutating the live database. Centralises that mapping so the feed,
+ *   store page and item rail all resolve the same alias.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import storeMenus from '@/data/store-menus.json';
 
 /**

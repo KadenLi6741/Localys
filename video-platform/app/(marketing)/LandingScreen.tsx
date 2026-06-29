@@ -1,5 +1,12 @@
 "use client";
 
+/**
+ * LandingScreen — the public marketing landing page UI.
+ * Purpose: The animated hero/landing experience that introduces Localy and funnels visitors to sign up /
+ *   log in. Purely promotional; styled within the `landing-root` theme scope.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";

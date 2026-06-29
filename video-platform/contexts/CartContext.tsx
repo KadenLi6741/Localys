@@ -1,5 +1,13 @@
 'use client';
 
+/**
+ * CartContext — the shopping cart state shared across the app.
+ * Purpose: Holds the list of cart items and the operations on them (add, remove, update quantity/special
+ *   requests, clear) plus derived helpers like the total item count. Persists to localStorage so the cart
+ *   survives reloads, and exposes everything via useCart().
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 
 export interface CartDeal {

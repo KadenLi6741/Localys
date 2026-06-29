@@ -1,5 +1,12 @@
 'use client';
 
+/**
+ * CommunitiesContext — in-app state for the Communities feature (communities, threads, votes).
+ * Purpose: Holds the demo communities and their discussion threads/media plus voting state, shared
+ *   across the communities pages via context so list and detail views stay in sync.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { createContext, useContext, useState, ReactNode } from 'react';
 
 export interface Community {
@@ -72,15 +79,14 @@ const SEED_COMMUNITIES: Community[] = [
 ];
 
 /* ----------------------------- media (matched to posts by filename) ----------------------------- */
-const M = (p: string): string => encodeURI(p);
 const THREAD_MEDIA: Record<string, ThreadMedia> = {
-  t1: { type: 'image', src: M('/Communities/images.jpg') },
-  t2: { type: 'video', src: M('/Communities/Franklin BBQ vs the new Austin pop-ups.mp4') },
-  t3: { type: 'image', src: '/Communities/Best$1.50slice' },
-  t5: { type: 'image', src: M('/Communities/Lou Malnati’s vs Giordano’s — settle it.jpg') },
-  t6: { type: 'image', src: M('/Communities/Bestfriedchicekninnashvile.jpg') },
-  t7: { type: 'image', src: M('/Communities/Independant coffee shop.jpg') },
-  t8: { type: 'video', src: M('/Communities/Independant coffee shop video.mp4') },
+  t1: { type: 'image', src: '/community-media/images.jpg' },
+  t2: { type: 'video', src: '/community-media/franklin-bbq-vs-austin-popups.mp4' },
+  t3: { type: 'image', src: '/community-media/best-150-slice.jpg' },
+  t5: { type: 'image', src: '/community-media/lou-malnati-vs-giordano-settle-it.jpg' },
+  t6: { type: 'image', src: '/community-media/best-fried-chicken-nashville.jpg' },
+  t7: { type: 'image', src: '/community-media/independent-coffee-shop.jpg' },
+  t8: { type: 'video', src: '/community-media/independent-coffee-shop-video.mp4' },
 };
 
 const BASE_THREADS: Omit<Thread, 'commentCount' | 'media'>[] = [

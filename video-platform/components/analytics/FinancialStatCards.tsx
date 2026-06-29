@@ -1,5 +1,12 @@
 'use client';
 
+/**
+ * FinancialStatCards — the headline KPI cards (revenue, total/completed/cancelled orders).
+ * Purpose: Top-of-dashboard summary for a business's finances, with a staggered fade-in. Driven by a
+ *   small config array so the four cards render uniformly; revenue is formatted as currency.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import type { FinancialSummary } from '@/models/Analytics';
 
 interface FinancialStatCardsProps {

@@ -1,4 +1,12 @@
 /**
+ * geo.ts — geographic distance helper.
+ * Purpose: Provides the Haversine great-circle distance used across the app (feed distance labels,
+ *   nearest-location selection, search distance filtering) so straight-line distances are computed
+ *   one consistent way.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
+/**
  * Calculate distance between two lat/lng points using the Haversine formula.
  * @returns distance in kilometers
  */

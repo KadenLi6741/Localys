@@ -2,5 +2,12 @@
 command = "npm run build"
 publish = ".next"
 
+[build.environment]
+# These NEXT_PUBLIC_* keys are intentionally inlined into the client bundle
+# (browser-side keys, restricted by referrer/domain — not real secrets).
+# The genuinely secret vars are deliberately omitted so the scanner keeps
+# guarding them against accidental exposure.
+SECRETS_SCAN_OMIT_KEYS = "NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,NEXT_PUBLIC_SUPABASE_ANON_KEY,NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_TURNSTILE_SITE_KEY"
+
 [[plugins]]
 package = "@netlify/plugin-nextjs"

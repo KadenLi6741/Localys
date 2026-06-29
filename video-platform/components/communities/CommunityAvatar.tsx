@@ -6,6 +6,7 @@ import { useState } from 'react';
  * Round community avatar. Shows the mapped image when one exists; otherwise (or
  * if the image fails to load) falls back to an orange circle with the community's
  * initial — keeps the palette black/white/orange and avoids broken-image icons.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
  */
 export function CommunityAvatar({
   src,

@@ -6,10 +6,10 @@ import { DEMO_STORES } from '@/lib/demoStores';
 /**
  * Real-data layer for the Walmart-style Home feed.
  *
- * SINGLE SOURCE OF TRUTH = `data/store-menus.json` (built from public/Menu by
+ * SINGLE SOURCE OF TRUTH = `data/store-menus.json` (built from public/menu by
  * scripts/build-store-menus.mjs). Supabase is used ONLY for identity/routing:
  * it resolves each seeded business → its profile id (cart sellerId) + username
- * (the /profile/<username> link). Banners and item photos come from public/Menu
+ * (the /profile/<username> link). Banners and item photos come from public/menu
  * via the manifest, so the home feed and the store page render the same photos.
  */
 interface ManifestItem {

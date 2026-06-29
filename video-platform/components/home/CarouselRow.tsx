@@ -1,5 +1,12 @@
 'use client';
 
+/**
+ * CarouselRow — reusable horizontal, arrow-scrollable row with a section header.
+ * Purpose: The shared layout primitive behind every home-page row (deals, trending, ranked, etc.).
+ *   It renders the title, a scroll track for its children, and left/right scroll buttons.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { useRef } from 'react';
 import { ChevronRight, ChevronLeft } from 'lucide-react';
 import { SectionHeader } from './SectionHeader';
@@ -19,6 +26,8 @@ export function CarouselRow({
 }) {
   const trackRef = useRef<HTMLDivElement>(null);
 
+  // Scrolls the track by ~80% of its visible width in the given direction (1 = right, -1 = left),
+  // so each arrow click pages through roughly a screenful of cards.
   const scrollBy = (dir: 1 | -1) => {
     const el = trackRef.current;
     if (!el) return;

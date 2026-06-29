@@ -1,5 +1,13 @@
 'use client';
 
+/**
+ * ShopByDepartment — the circular category shortcuts row on the home page.
+ * Purpose: Lets users browse by department (Restaurants, Grocery, Beauty, …). Each circle links to
+ *   that category page; an "Others" circle uses a drawn dot-grid icon. Department list and styling
+ *   are defined statically here.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import Link from 'next/link';
 import { SectionHeader } from './SectionHeader';
 

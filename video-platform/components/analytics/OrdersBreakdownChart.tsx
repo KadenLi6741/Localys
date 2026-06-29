@@ -1,5 +1,12 @@
 'use client';
 
+/**
+ * OrdersBreakdownChart — donut chart splitting a business's orders by status (completed/cancelled/…).
+ * Purpose: Shows the composition of a business's orders at a glance. Renders nothing when there's no
+ *   order data; slice colours come from the data so statuses stay consistent with the rest of the UI.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import {
   ResponsiveContainer,
   PieChart,
@@ -26,6 +33,7 @@ function BreakdownTooltip({ active, payload }: { active?: boolean; payload?: { p
   );
 }
 
+// Centres a percentage label inside each slice, hiding it for slices under 5% to prevent clutter.
 function CustomLabel(props: PieLabelRenderProps) {
   const cx = Number(props.cx);
   const cy = Number(props.cy);

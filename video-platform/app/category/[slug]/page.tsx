@@ -1,5 +1,12 @@
 'use client';
 
+/**
+ * Category page (/category/[slug]) — businesses/items within one department (e.g. Restaurants, Pets).
+ * Purpose: Lists the businesses and products that belong to the chosen department slug, reusing the home
+ *   BusinessCard/ProductCard components. Reached from the "Shop by department" shortcuts.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
