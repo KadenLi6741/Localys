@@ -82,8 +82,8 @@ function BadgesSection({ userId }: { userId: string }) {
   if (loading) return null;
 
   return (
-    <div className="bg-white border border-gray-200 rounded-2xl p-4 mb-4">
-      <h3 className="text-xs font-bold text-gray-900 uppercase tracking-widest mb-2.5">Achievements</h3>
+    <div className="bg-card border border-border rounded-2xl p-4 mb-4">
+      <h3 className="text-xs font-bold text-foreground uppercase tracking-widest mb-2.5">Achievements</h3>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
         {BADGE_DEFS.map(({ id, Icon, name, desc, check }) => {
           const earned = check(stats);
@@ -91,15 +91,15 @@ function BadgesSection({ userId }: { userId: string }) {
             <div
               key={id}
               className={`flex items-center gap-2.5 px-2.5 py-1.5 rounded-xl border transition-colors ${
-                earned ? 'border-[#f97316]/20 bg-[#f97316]/5' : 'border-gray-100 bg-gray-50 opacity-50'
+                earned ? 'border-[#f97316]/20 bg-[#f97316]/5' : 'border-border bg-muted opacity-50'
               }`}
             >
-              <div className={`w-7 h-7 shrink-0 rounded-lg flex items-center justify-center ${earned ? 'bg-[#f97316]' : 'bg-gray-200'}`}>
-                <Icon className={`h-3.5 w-3.5 ${earned ? 'text-white' : 'text-gray-400'}`} />
+              <div className={`w-7 h-7 shrink-0 rounded-lg flex items-center justify-center ${earned ? 'bg-[#f97316]' : 'bg-muted'}`}>
+                <Icon className={`h-3.5 w-3.5 ${earned ? 'text-white' : 'text-muted-foreground'}`} />
               </div>
               <div className="min-w-0">
-                <p className={`text-xs font-bold leading-none mb-0 truncate ${earned ? 'text-gray-900' : 'text-gray-400'}`}>{name}</p>
-                <p className={`text-[10px] leading-none mb-0 mt-0.5 truncate ${earned ? 'text-gray-500' : 'text-gray-300'}`}>{desc}</p>
+                <p className={`text-xs font-bold leading-none mb-0 truncate ${earned ? 'text-foreground' : 'text-muted-foreground'}`}>{name}</p>
+                <p className={`text-[10px] leading-none mb-0 mt-0.5 truncate ${earned ? 'text-muted-foreground' : 'text-muted-foreground'}`}>{desc}</p>
               </div>
             </div>
           );
@@ -165,7 +165,7 @@ function MediaCard({
       onMouseLeave={showVideo ? stop : undefined}
       onFocus={showVideo ? play : undefined}
       onBlur={showVideo ? stop : undefined}
-      className="group relative block aspect-[3/4] overflow-hidden rounded-xl border border-gray-200 bg-black text-left transition-transform active:scale-95 hover:border-[#f97316]/40 focus:outline-none focus:ring-2 focus:ring-[#f97316]"
+      className="group relative block aspect-[3/4] overflow-hidden rounded-xl border border-border bg-black text-left transition-transform active:scale-95 hover:border-[#f97316]/40 focus:outline-none focus:ring-2 focus:ring-[#f97316]"
       aria-label={`${ctaLabel}: ${data.title}`}
     >
       {/* Banner/logo as the base layer (also the fallback if no/failed video cover) */}
@@ -338,9 +338,9 @@ function SavedLikedSection({ userId }: { userId: string }) {
 
   return (
     <section className="mb-6">
-      <h3 className="text-base font-semibold text-gray-900 mb-3">My Activity</h3>
+      <h3 className="text-base font-semibold text-foreground mb-3">My Activity</h3>
       {/* Tab switcher */}
-      <div className="flex gap-1 mb-3 rounded-xl bg-gray-100 p-1">
+      <div className="flex gap-1 mb-3 rounded-xl bg-muted p-1">
         {([
           { key: 'saved', label: 'Saved' },
           { key: 'stores', label: 'Liked Stores' },
@@ -350,7 +350,7 @@ function SavedLikedSection({ userId }: { userId: string }) {
             key={t.key}
             onClick={() => setTab(t.key)}
             className={`flex-1 py-1.5 text-sm font-semibold rounded-lg transition-colors ${
-              tab === t.key ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+              tab === t.key ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             {t.label}
@@ -358,10 +358,10 @@ function SavedLikedSection({ userId }: { userId: string }) {
         ))}
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-2xl p-4">
+      <div className="bg-card border border-border rounded-2xl p-4">
         {tab === 'saved' && (
           savedItems.length === 0 ? (
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-muted-foreground">
               Nothing saved yet. Tap the bookmark on a video to save it here.
             </p>
           ) : (
@@ -380,7 +380,7 @@ function SavedLikedSection({ userId }: { userId: string }) {
 
         {tab === 'stores' && (
           likedBiz.length === 0 ? (
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-muted-foreground">
               No liked stores yet. Tap the heart on a business in Discover to add it here.
             </p>
           ) : (
@@ -399,7 +399,7 @@ function SavedLikedSection({ userId }: { userId: string }) {
 
         {tab === 'items' && (
           likedItems.length === 0 ? (
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-muted-foreground">
               No liked items yet. Tap the heart on a menu item to add it here.
             </p>
           ) : (
@@ -430,10 +430,10 @@ function ItemCard({ item, onClick }: { item: LikedMenuItem; onClick: () => void 
     <button
       type="button"
       onClick={onClick}
-      className="group flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white text-left transition active:scale-95 hover:border-[#f97316]/40 focus:outline-none focus:ring-2 focus:ring-[#f97316]"
+      className="group flex flex-col overflow-hidden rounded-xl border border-border bg-card text-left transition active:scale-95 hover:border-[#f97316]/40 focus:outline-none focus:ring-2 focus:ring-[#f97316]"
       aria-label={`View ${item.name}`}
     >
-      <div className="aspect-square w-full overflow-hidden bg-gray-100">
+      <div className="aspect-square w-full overflow-hidden bg-muted">
         {src ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={src} alt="" className="h-full w-full object-cover" onError={() => setImgFailed(true)} />
@@ -442,9 +442,9 @@ function ItemCard({ item, onClick }: { item: LikedMenuItem; onClick: () => void 
         )}
       </div>
       <div className="p-2">
-        <p className="truncate text-xs font-semibold text-gray-900">{item.name}</p>
+        <p className="truncate text-xs font-semibold text-foreground">{item.name}</p>
         <p className="text-xs font-bold text-[#f97316]">${item.price.toFixed(2)}</p>
-        {item.storeName ? <p className="truncate text-[10px] text-gray-500">{item.storeName}</p> : null}
+        {item.storeName ? <p className="truncate text-[10px] text-muted-foreground">{item.storeName}</p> : null}
       </div>
     </button>
   );
@@ -584,12 +584,12 @@ function ProfileView({ profile, user, onEditClick, onSignOut, onProfileUpdated }
           className="w-24 h-24"
         />
         <div className="flex-1">
-          <h2 className="text-2xl font-bold text-gray-900 mb-0.5">
+          <h2 className="text-2xl font-bold text-foreground mb-0.5">
             {profile?.full_name || 'User'}
           </h2>
-          <p className="text-gray-500 text-sm mb-1">@{profile?.username || 'username'}</p>
-          {profile?.bio && <p className="text-gray-900 text-sm">{profile.bio}</p>}
-          {memberSince && <p className="text-gray-400 text-xs mt-1">Member since {memberSince}</p>}
+          <p className="text-muted-foreground text-sm mb-1">@{profile?.username || 'username'}</p>
+          {profile?.bio && <p className="text-foreground text-sm">{profile.bio}</p>}
+          {memberSince && <p className="text-muted-foreground text-xs mt-1">Member since {memberSince}</p>}
         </div>
       </div>
 
@@ -600,16 +600,16 @@ function ProfileView({ profile, user, onEditClick, onSignOut, onProfileUpdated }
 
       {/* Impact stats */}
       {!statsLoading && (bizCount > 0 || moneySpent > 0) && (
-        <div className="bg-white border border-gray-200 rounded-2xl p-4 mb-4">
-          <h3 className="text-xs font-bold text-gray-900 uppercase tracking-widest mb-2.5">Your Local Impact</h3>
+        <div className="bg-card border border-border rounded-2xl p-4 mb-4">
+          <h3 className="text-xs font-bold text-foreground uppercase tracking-widest mb-2.5">Your Local Impact</h3>
           <div className="grid grid-cols-2 gap-2">
             <div className="flex items-center gap-1.5">
               <div className="w-7 h-7 rounded-xl bg-[#f97316]/10 flex items-center justify-center shrink-0">
                 <Store className="h-3.5 w-3.5 text-[#f97316]" />
               </div>
               <div>
-                <p className="text-lg font-bold text-gray-900 leading-none mb-0">{bizCount}</p>
-                <p className="text-[10px] text-gray-500 leading-none mb-0 mt-0.5">
+                <p className="text-lg font-bold text-foreground leading-none mb-0">{bizCount}</p>
+                <p className="text-[10px] text-muted-foreground leading-none mb-0 mt-0.5">
                   {bizCount === 1 ? 'business' : 'businesses'} supported
                 </p>
               </div>
@@ -619,8 +619,8 @@ function ProfileView({ profile, user, onEditClick, onSignOut, onProfileUpdated }
                 <DollarSign className="h-3.5 w-3.5 text-[#f97316]" />
               </div>
               <div>
-                <p className="text-lg font-bold text-gray-900 leading-none mb-0">${moneySpent.toFixed(0)}</p>
-                <p className="text-[10px] text-gray-500 leading-none mb-0 mt-0.5">kept in community</p>
+                <p className="text-lg font-bold text-foreground leading-none mb-0">${moneySpent.toFixed(0)}</p>
+                <p className="text-[10px] text-muted-foreground leading-none mb-0 mt-0.5">kept in community</p>
               </div>
             </div>
           </div>
@@ -633,7 +633,7 @@ function ProfileView({ profile, user, onEditClick, onSignOut, onProfileUpdated }
       {/* Edit Profile */}
       <button
         onClick={onEditClick}
-        className="w-full bg-gray-100 hover:bg-gray-200 border border-gray-200 text-gray-900 font-medium rounded-xl py-2.5 mb-6 transition-colors"
+        className="w-full bg-muted hover:bg-muted border border-border text-foreground font-medium rounded-xl py-2.5 mb-6 transition-colors"
       >
         {t('profile.edit_profile')}
       </button>
@@ -643,31 +643,31 @@ function ProfileView({ profile, user, onEditClick, onSignOut, onProfileUpdated }
 
       {/* Order History */}
       <section className="mb-6">
-        <h3 className="text-base font-semibold text-gray-900 mb-3">Order History</h3>
-        <div className="bg-white border border-gray-200 rounded-2xl p-4">
+        <h3 className="text-base font-semibold text-foreground mb-3">Order History</h3>
+        <div className="bg-card border border-border rounded-2xl p-4">
           <OrderHistory userId={user.id} isBusiness={false} />
         </div>
       </section>
 
       {/* Settings */}
       <section className="mb-6">
-        <h3 className="text-base font-semibold text-gray-900 mb-3">{t('common.settings')}</h3>
+        <h3 className="text-base font-semibold text-foreground mb-3">{t('common.settings')}</h3>
         <div className="space-y-2">
           <Link
             href="/premium"
-            className="flex items-center justify-between p-4 bg-white border border-[#f97316]/30 rounded-xl hover:bg-[#f97316]/5 transition-colors"
+            className="flex items-center justify-between p-4 bg-card border border-[#f97316]/30 rounded-xl hover:bg-[#f97316]/5 transition-colors"
           >
-            <span className="flex items-center gap-2 text-sm font-semibold text-gray-900">
+            <span className="flex items-center gap-2 text-sm font-semibold text-foreground">
               <Crown className="w-4 h-4 text-[#f97316]" /> Localy Premium
             </span>
-            <ChevronRight className="w-4 h-4 text-gray-400" />
+            <ChevronRight className="w-4 h-4 text-muted-foreground" />
           </Link>
           <Link
             href="/settings"
-            className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors"
+            className="flex items-center justify-between p-4 bg-card border border-border rounded-xl hover:bg-muted transition-colors"
           >
-            <span className="text-sm text-gray-900">Settings</span>
-            <ChevronRight className="w-4 h-4 text-gray-400" />
+            <span className="text-sm text-foreground">Settings</span>
+            <ChevronRight className="w-4 h-4 text-muted-foreground" />
           </Link>
         </div>
       </section>
@@ -675,19 +675,19 @@ function ProfileView({ profile, user, onEditClick, onSignOut, onProfileUpdated }
       {/* Sign Out */}
       <button
         onClick={onSignOut}
-        className="w-full bg-red-50 hover:bg-red-100 border border-red-200 text-red-600 font-medium rounded-xl py-3 transition-colors mb-8"
+        className="w-full bg-red-50 hover:bg-red-100 border border-red-200 text-red-600 dark:bg-red-500/10 dark:hover:bg-red-500/20 dark:border-red-500/30 dark:text-red-400 font-medium rounded-xl py-3 transition-colors mb-8"
       >
         {t('profile.sign_out')}
       </button>
 
       {/* Footer */}
-      <div className="border-t border-gray-200 pt-6 pb-8 text-center">
+      <div className="border-t border-border pt-6 pb-8 text-center">
         <div className="flex items-center justify-center gap-6 mb-2">
-          <a href="#" className="text-gray-400 text-xs hover:text-gray-700 transition-colors">Company</a>
-          <a href="#" className="text-gray-400 text-xs hover:text-gray-700 transition-colors">Program</a>
-          <a href="#" className="text-gray-400 text-xs hover:text-gray-700 transition-colors">Terms &amp; Policies</a>
+          <a href="#" className="text-muted-foreground text-xs hover:text-foreground transition-colors">Company</a>
+          <a href="#" className="text-muted-foreground text-xs hover:text-foreground transition-colors">Program</a>
+          <a href="#" className="text-muted-foreground text-xs hover:text-foreground transition-colors">Terms &amp; Policies</a>
         </div>
-        <p className="text-gray-400 text-xs">2026 Localy</p>
+        <p className="text-muted-foreground text-xs">2026 Localy</p>
       </div>
     </div>
   );
@@ -764,11 +764,11 @@ function ProfileEditForm({ profile, user, onSave, onCancel }: ProfileEditFormPro
         {/* Profile picture */}
         <div className="flex flex-col items-center gap-3">
           <div className="relative">
-            <div className="w-24 h-24 rounded-full bg-gray-200 overflow-hidden">
+            <div className="w-24 h-24 rounded-full bg-muted overflow-hidden">
               {profilePicturePreview ? (
                 <img src={profilePicturePreview} alt="Preview" className="w-full h-full object-cover" />
               ) : (
-                <div className="w-full h-full flex items-center justify-center text-3xl text-gray-400">
+                <div className="w-full h-full flex items-center justify-center text-3xl text-muted-foreground">
                   {fullName?.[0] || username?.[0] || '?'}
                 </div>
               )}
@@ -782,36 +782,36 @@ function ProfileEditForm({ profile, user, onSave, onCancel }: ProfileEditFormPro
             </button>
           </div>
           <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
-          <p className="text-gray-500 text-sm">Tap the icon to change your photo</p>
+          <p className="text-muted-foreground text-sm">Tap the icon to change your photo</p>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-900 mb-1.5">Full Name</label>
+          <label className="block text-sm font-medium text-foreground mb-1.5">Full Name</label>
           <input type="text" value={fullName} onChange={(e) => setFullName(e.target.value)}
-            className="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#f97316]/20 focus:border-[#f97316] transition-colors"
+            className="w-full bg-card border border-border rounded-xl px-4 py-2.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#f97316]/20 focus:border-[#f97316] transition-colors"
             placeholder="Your full name" required />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-900 mb-1.5">Username</label>
+          <label className="block text-sm font-medium text-foreground mb-1.5">Username</label>
           <input type="text" value={username} onChange={(e) => setUsername(e.target.value)}
-            className="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#f97316]/20 focus:border-[#f97316] transition-colors"
+            className="w-full bg-card border border-border rounded-xl px-4 py-2.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#f97316]/20 focus:border-[#f97316] transition-colors"
             placeholder="username" required />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-900 mb-1.5">Bio</label>
+          <label className="block text-sm font-medium text-foreground mb-1.5">Bio</label>
           <textarea value={bio} onChange={(e) => setBio(e.target.value)}
-            className="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#f97316]/20 focus:border-[#f97316] resize-none transition-colors"
+            className="w-full bg-card border border-border rounded-xl px-4 py-2.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#f97316]/20 focus:border-[#f97316] resize-none transition-colors"
             placeholder="Tell people a bit about yourself" rows={3} />
         </div>
 
-        {error && <div className="bg-red-50 border border-red-200 text-red-600 rounded-xl p-3 text-sm">{error}</div>}
-        {success && <div className="bg-gray-50 border border-gray-200 text-gray-900 rounded-xl p-3 text-sm">{success}</div>}
+        {error && <div className="bg-red-50 border border-red-200 text-red-600 dark:bg-red-500/10 dark:border-red-500/30 dark:text-red-400 rounded-xl p-3 text-sm">{error}</div>}
+        {success && <div className="bg-muted border border-border text-foreground rounded-xl p-3 text-sm">{success}</div>}
 
         <div className="flex gap-3 pt-1">
           <button type="button" onClick={onCancel} disabled={loading}
-            className="flex-1 bg-gray-100 hover:bg-gray-200 border border-gray-200 text-gray-900 rounded-xl py-3 font-medium transition-colors disabled:opacity-50">
+            className="flex-1 bg-muted hover:bg-muted border border-border text-foreground rounded-xl py-3 font-medium transition-colors disabled:opacity-50">
             Cancel
           </button>
           <button type="submit" disabled={loading}

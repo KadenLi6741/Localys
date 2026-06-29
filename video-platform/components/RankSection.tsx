@@ -16,10 +16,10 @@ function RankBadge({ src, alt, className = '' }: { src: string; alt: string; cla
   if (failed) {
     return (
       <div
-        className={`rounded-full border-2 border-gray-200 bg-gray-100 flex items-center justify-center ${className}`}
+        className={`rounded-full border-2 border-border bg-muted flex items-center justify-center ${className}`}
         aria-label={alt}
       >
-        <span className="text-2xl font-black text-gray-400 select-none">{alt[0]}</span>
+        <span className="text-2xl font-black text-muted-foreground select-none">{alt[0]}</span>
       </div>
     );
   }
@@ -47,9 +47,9 @@ export function RankSection({ moneySpent, points, bizCount }: ImpactInputs) {
   const { current, next, pctToNext, isMax } = getRankProgress(score);
 
   return (
-    <div className="mb-4 rounded-2xl border border-gray-200 bg-white p-4">
+    <div className="mb-4 rounded-2xl border border-border bg-card p-4">
       <div className="mb-3 flex items-center justify-between">
-        <h3 className="text-xs font-bold uppercase tracking-widest text-gray-900">Your Rank</h3>
+        <h3 className="text-xs font-bold uppercase tracking-widest text-foreground">Your Rank</h3>
         <button
           onClick={() => setOpen(true)}
           className="rounded-full border border-[#f97316] px-3 py-1 text-xs font-semibold text-[#f97316] transition-colors hover:bg-[#f97316] hover:text-white"
@@ -62,8 +62,8 @@ export function RankSection({ moneySpent, points, bizCount }: ImpactInputs) {
         {/* Rank badge — ~2x larger, borderless, sits cleanly on the white card */}
         <RankBadge src={current.image} alt={current.name} className="h-80 w-80 max-w-full sm:h-96 sm:w-96" />
         <div className="w-full text-center">
-          <p className="text-2xl font-extrabold leading-tight text-gray-900 sm:text-3xl">{current.name}</p>
-          <p className="mt-0.5 text-sm text-gray-500">Impact Score {score.toLocaleString()}</p>
+          <p className="text-2xl font-extrabold leading-tight text-foreground sm:text-3xl">{current.name}</p>
+          <p className="mt-0.5 text-sm text-muted-foreground">Impact Score {score.toLocaleString()}</p>
 
           {isMax ? (
             <div className="mt-3 inline-flex items-center rounded-full bg-[#f97316] px-4 py-1.5 text-sm font-semibold text-white">
@@ -73,9 +73,9 @@ export function RankSection({ moneySpent, points, bizCount }: ImpactInputs) {
             <div className="mt-3 w-full">
               <div className="mb-1.5 flex items-center justify-between text-sm">
                 <span className="font-semibold text-[#f97316]">{pctToNext}% to {next!.name}</span>
-                <span className="text-gray-400">{score.toLocaleString()} / {next!.threshold.toLocaleString()}</span>
+                <span className="text-muted-foreground">{score.toLocaleString()} / {next!.threshold.toLocaleString()}</span>
               </div>
-              <div className="h-3 w-full overflow-hidden rounded-full bg-gray-200">
+              <div className="h-3 w-full overflow-hidden rounded-full bg-muted">
                 <div
                   className="h-full rounded-full bg-[#f97316] transition-[width] duration-500"
                   style={{ width: `${pctToNext}%` }}
@@ -104,16 +104,16 @@ function RanksModal({ currentId, score, onClose }: { currentId: string; score: n
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center p-0 sm:items-center sm:p-4">
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative flex max-h-[92vh] w-full max-w-3xl flex-col overflow-hidden rounded-t-2xl bg-white shadow-2xl sm:rounded-2xl">
+      <div className="relative flex max-h-[92vh] w-full max-w-3xl flex-col overflow-hidden rounded-t-2xl bg-card shadow-2xl sm:rounded-2xl">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-gray-200 px-5 py-4">
+        <div className="flex items-center justify-between border-b border-border px-5 py-4">
           <div>
-            <h2 className="text-lg font-extrabold uppercase tracking-widest text-gray-900">Ranks</h2>
-            <p className="mt-0.5 text-xs text-gray-500">
+            <h2 className="text-lg font-extrabold uppercase tracking-widest text-foreground">Ranks</h2>
+            <p className="mt-0.5 text-xs text-muted-foreground">
               Support local businesses to raise your Impact Score and climb the tiers.
             </p>
           </div>
-          <button onClick={onClose} aria-label="Close" className="text-gray-400 transition-colors hover:text-gray-700">
+          <button onClick={onClose} aria-label="Close" className="text-muted-foreground transition-colors hover:text-foreground">
             <X className="h-5 w-5" />
           </button>
         </div>
@@ -135,13 +135,13 @@ function RanksModal({ currentId, score, onClose }: { currentId: string; score: n
                       : isCurrent
                         ? 'border border-[#f97316] bg-[#f97316]/10'
                         : unlocked
-                          ? 'border border-gray-200 bg-gray-50'
-                          : 'border border-gray-100 bg-gray-50 opacity-60'
+                          ? 'border border-border bg-muted'
+                          : 'border border-border bg-muted opacity-60'
                   }`}
                 >
                   <p
                     className={`mb-2 text-[11px] font-bold uppercase tracking-wider ${
-                      unlocked ? 'text-[#f97316]' : 'text-gray-400'
+                      unlocked ? 'text-[#f97316]' : 'text-muted-foreground'
                     }`}
                   >
                     {rank.name}
@@ -158,21 +158,21 @@ function RanksModal({ currentId, score, onClose }: { currentId: string; score: n
                     </div>
                     {!unlocked && (
                       <span className="absolute inset-0 flex items-center justify-center">
-                        <Lock className="h-6 w-6 text-gray-400" />
+                        <Lock className="h-6 w-6 text-muted-foreground" />
                       </span>
                     )}
                   </div>
 
-                  <p className="mt-2 text-[11px] leading-snug text-gray-500">{rank.requirement}</p>
+                  <p className="mt-2 text-[11px] leading-snug text-muted-foreground">{rank.requirement}</p>
 
                   {isCurrent ? (
                     <span className="mt-2 rounded-full bg-[#f97316] px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
                       Current
                     </span>
                   ) : unlocked ? (
-                    <span className="mt-2 text-[10px] font-semibold uppercase tracking-wide text-gray-400">Unlocked</span>
+                    <span className="mt-2 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Unlocked</span>
                   ) : (
-                    <span className="mt-2 text-[10px] font-semibold uppercase tracking-wide text-gray-300">Locked</span>
+                    <span className="mt-2 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Locked</span>
                   )}
                 </div>
               );

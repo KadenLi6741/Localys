@@ -26,13 +26,13 @@ function OrderDetails({ scheduledAt, specialRequests }: { scheduledAt?: string |
   return (
     <div className="mt-2 space-y-1">
       {schedule && (
-        <p className="flex items-center gap-1.5 text-xs font-medium text-gray-700">
+        <p className="flex items-center gap-1.5 text-xs font-medium text-foreground">
           <CalendarClock className="h-3.5 w-3.5 text-[#f97316] shrink-0" />
           {schedule}
         </p>
       )}
       {specialRequests && (
-        <p className="text-xs text-gray-500">Note: {specialRequests}</p>
+        <p className="text-xs text-muted-foreground">Note: {specialRequests}</p>
       )}
     </div>
   );
@@ -42,7 +42,7 @@ function OrderDetails({ scheduledAt, specialRequests }: { scheduledAt?: string |
 function OrderReviews({ statsKey }: { statsKey: string }) {
   const { rating, reviews } = getReviewStats(statsKey);
   return (
-    <p className="mt-0.5 flex items-center gap-1 text-xs text-gray-600">
+    <p className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
       <Star className="h-3 w-3 fill-[#f97316] text-[#f97316]" strokeWidth={1.5} />
       {rating.toFixed(1)} · {reviews} reviews
     </p>
@@ -80,8 +80,8 @@ function StatusBadge({ status }: { status: string }) {
     paid:      'bg-[#f97316]/10 text-[#f97316] border-[#f97316]/30',
     pending:   'bg-[#f97316]/10 text-[#f97316] border-[#f97316]/30',
     shipped:   'bg-[#f97316]/10 text-[#f97316] border-[#f97316]/30',
-    completed: 'bg-gray-100 text-gray-700 border-gray-200',
-    delivered: 'bg-gray-100 text-gray-700 border-gray-200',
+    completed: 'bg-muted text-foreground border-border',
+    delivered: 'bg-muted text-foreground border-border',
     failed:    'bg-red-50 text-red-600 border-red-200',
     cancelled: 'bg-red-50 text-red-600 border-red-200',
   };
@@ -166,22 +166,22 @@ export function OrderHistory({ userId, businessId, isBusiness = false }: OrderHi
   }
 
   if (!tablesExist) {
-    return <div className="text-center py-8"><p className="text-sm text-gray-400">Order history coming soon</p></div>;
+    return <div className="text-center py-8"><p className="text-sm text-muted-foreground">Order history coming soon</p></div>;
   }
 
   if (isBusiness) {
     const hasPurchases = coinPurchases.length > 0 || itemPurchases.length > 0;
     const hasSales = itemSales.length > 0;
     if (!hasPurchases && !hasSales) {
-      return <div className="text-center py-8"><p className="text-gray-400 text-sm">No orders yet</p></div>;
+      return <div className="text-center py-8"><p className="text-muted-foreground text-sm">No orders yet</p></div>;
     }
     return (
       <div className="space-y-4">
-        <div className="flex gap-4 border-b border-gray-200">
+        <div className="flex gap-4 border-b border-border">
           {(['purchases', 'sales'] as const).map(tab => (
             <button key={tab} onClick={() => setActiveTab(tab)}
               className={`pb-2 text-sm font-medium capitalize transition-colors border-b-2 ${
-                activeTab === tab ? 'text-[#f97316] border-[#f97316]' : 'text-gray-500 border-transparent hover:text-gray-900'
+                activeTab === tab ? 'text-[#f97316] border-[#f97316]' : 'text-muted-foreground border-transparent hover:text-foreground'
               }`}
             >
               {tab}
@@ -193,7 +193,7 @@ export function OrderHistory({ userId, businessId, isBusiness = false }: OrderHi
         {activeTab === 'purchases' && (
           <div className="space-y-2">
             {allPurchases.length === 0
-              ? <p className="text-center py-4 text-gray-400 text-sm">No purchases</p>
+              ? <p className="text-center py-4 text-muted-foreground text-sm">No purchases</p>
               : allPurchases.map((order, idx) => (
                   <OrderItem key={idx} order={order}
                     onReorder={!('coins' in order) ? () => handleReorder(order as ItemPurchase) : undefined} />
@@ -203,7 +203,7 @@ export function OrderHistory({ userId, businessId, isBusiness = false }: OrderHi
         {activeTab === 'sales' && (
           <div className="space-y-2">
             {itemSales.length === 0
-              ? <p className="text-center py-4 text-gray-400 text-sm">No sales yet</p>
+              ? <p className="text-center py-4 text-muted-foreground text-sm">No sales yet</p>
               : itemSales.map((sale, idx) => <SaleItem key={idx} sale={sale} />)}
           </div>
         )}
@@ -216,7 +216,7 @@ export function OrderHistory({ userId, businessId, isBusiness = false }: OrderHi
   const dedupedLocal = localOrders.filter((o) => !supabaseItemIds.has(o.id));
 
   if (allPurchases.length === 0 && dedupedLocal.length === 0) {
-    return <div className="text-center py-8"><p className="text-gray-400 text-sm">No orders yet</p></div>;
+    return <div className="text-center py-8"><p className="text-muted-foreground text-sm">No orders yet</p></div>;
   }
 
   return (
@@ -241,15 +241,15 @@ function OrderItem({ order, onReorder }: { order: CoinPurchase | ItemPurchase; o
   if (isCoinPurchase) {
     const coins = order as CoinPurchase;
     return (
-      <div className="bg-white border border-gray-200 rounded-xl p-4">
+      <div className="bg-card border border-border rounded-xl p-4">
         <div className="flex justify-between items-center">
           <div>
-            <p className="font-semibold text-gray-900">Coin Purchase</p>
-            <p className="text-gray-500 text-sm">{coins.coins} coins</p>
+            <p className="font-semibold text-foreground">Coin Purchase</p>
+            <p className="text-muted-foreground text-sm">{coins.coins} coins</p>
           </div>
           <div className="text-right">
             <p className="font-semibold text-[#f97316]">{coins.coins}x</p>
-            <p className="text-gray-400 text-xs">{formattedDate}</p>
+            <p className="text-muted-foreground text-xs">{formattedDate}</p>
           </div>
         </div>
       </div>
@@ -260,28 +260,28 @@ function OrderItem({ order, onReorder }: { order: CoinPurchase | ItemPurchase; o
   const isPaid = item.status === 'paid';
 
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-4">
+    <div className="bg-card border border-border rounded-xl p-4">
       <div className="flex justify-between items-start gap-3">
         <div className="flex-1 min-w-0">
-          <p className="font-semibold text-gray-900 truncate">{item.item_name}</p>
+          <p className="font-semibold text-foreground truncate">{item.item_name}</p>
           <OrderReviews statsKey={item.seller_id || item.item_name} />
-          <p className="text-gray-700 text-xs font-semibold mt-0.5">Order #{item.id.substring(0, 8).toUpperCase()}</p>
+          <p className="text-foreground text-xs font-semibold mt-0.5">Order #{item.id.substring(0, 8).toUpperCase()}</p>
         </div>
         <div className="text-right shrink-0">
-          <p className="font-semibold text-gray-900">
+          <p className="font-semibold text-foreground">
             {item.original_price ? `$${item.original_price.toFixed(2)}` : `$${item.price.toFixed(2)}`}
           </p>
           <DiscountBadge item={item} />
-          <p className="text-gray-400 text-xs mt-0.5">{formattedDate}</p>
+          <p className="text-muted-foreground text-xs mt-0.5">{formattedDate}</p>
         </div>
       </div>
       <OrderDetails scheduledAt={item.scheduled_at} specialRequests={item.special_requests} />
-      <div className="mt-3 flex items-center gap-2 pt-3 border-t border-gray-100">
+      <div className="mt-3 flex items-center gap-2 pt-3 border-t border-border">
         <StatusBadge status={item.status} />
         {isPaid && item.verification_token && (
           <button
             onClick={() => setShowQR(!showQR)}
-            className="text-xs px-3 py-1 rounded-full border border-gray-200 text-gray-600 hover:border-gray-400 transition-colors font-medium"
+            className="text-xs px-3 py-1 rounded-full border border-border text-muted-foreground hover:border-foreground/30 transition-colors font-medium"
           >
             {showQR ? 'Hide QR' : 'Show QR'}
           </button>
@@ -297,8 +297,8 @@ function OrderItem({ order, onReorder }: { order: CoinPurchase | ItemPurchase; o
         )}
       </div>
       {showQR && isPaid && item.verification_token && (
-        <div className="mt-3 flex flex-col items-center py-3 border-t border-gray-100">
-          <p className="text-gray-400 text-xs mb-2">Show at pickup</p>
+        <div className="mt-3 flex flex-col items-center py-3 border-t border-border">
+          <p className="text-muted-foreground text-xs mb-2">Show at pickup</p>
           <OrderQRCode orderId={item.id} token={item.verification_token} size={160} />
         </div>
       )}
@@ -311,37 +311,37 @@ function LocalOrderItem({ order }: { order: LocalOrder }) {
   const date = new Date(order.purchased_at);
   const formattedDate = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-4">
+    <div className="bg-card border border-border rounded-xl p-4">
       <div className="flex justify-between items-start gap-3">
         <div className="flex-1 min-w-0">
-          <p className="font-semibold text-gray-900 truncate">
-            {order.itemName}{order.quantity && order.quantity > 1 ? <span className="text-gray-500 font-normal"> ×{order.quantity}</span> : null}
+          <p className="font-semibold text-foreground truncate">
+            {order.itemName}{order.quantity && order.quantity > 1 ? <span className="text-muted-foreground font-normal"> ×{order.quantity}</span> : null}
           </p>
           <OrderReviews statsKey={order.itemName} />
-          <p className="text-gray-700 text-xs font-semibold mt-0.5">Order #{order.confirmationNumber}</p>
+          <p className="text-foreground text-xs font-semibold mt-0.5">Order #{order.confirmationNumber}</p>
         </div>
         <div className="text-right shrink-0">
-          <p className="font-semibold text-gray-900">${order.price.toFixed(2)}</p>
-          <p className="text-gray-400 text-xs mt-0.5">{formattedDate}</p>
+          <p className="font-semibold text-foreground">${order.price.toFixed(2)}</p>
+          <p className="text-muted-foreground text-xs mt-0.5">{formattedDate}</p>
         </div>
       </div>
       <OrderDetails scheduledAt={order.scheduledAt} specialRequests={order.specialRequests} />
-      <div className="mt-3 flex items-center gap-2 pt-3 border-t border-gray-100">
+      <div className="mt-3 flex items-center gap-2 pt-3 border-t border-border">
         <span className="inline-flex items-center text-xs px-3 py-1 rounded-full font-semibold capitalize border bg-[#f97316]/10 text-[#f97316] border-[#f97316]/30">
           paid
         </span>
         {order.token && (
           <button
             onClick={() => setShowQR(!showQR)}
-            className="text-xs px-3 py-1 rounded-full border border-gray-200 text-gray-600 hover:border-gray-400 transition-colors font-medium"
+            className="text-xs px-3 py-1 rounded-full border border-border text-muted-foreground hover:border-foreground/30 transition-colors font-medium"
           >
             {showQR ? 'Hide QR' : 'Show QR'}
           </button>
         )}
       </div>
       {showQR && order.token && (
-        <div className="mt-3 flex flex-col items-center py-3 border-t border-gray-100">
-          <p className="text-gray-400 text-xs mb-2">Show at pickup</p>
+        <div className="mt-3 flex flex-col items-center py-3 border-t border-border">
+          <p className="text-muted-foreground text-xs mb-2">Show at pickup</p>
           <OrderQRCode orderId={order.id} token={order.token} size={160} />
         </div>
       )}
@@ -354,18 +354,18 @@ function SaleItem({ sale }: { sale: ItemPurchase }) {
   const formattedDate = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-4">
+    <div className="bg-card border border-border rounded-xl p-4">
       <div className="flex justify-between items-start gap-3">
         <div className="flex-1 min-w-0">
-          <p className="font-semibold text-gray-900 truncate">{sale.item_name}</p>
-          <p className="text-gray-700 text-xs font-semibold mt-0.5">Order #{sale.id.substring(0, 8).toUpperCase()}</p>
+          <p className="font-semibold text-foreground truncate">{sale.item_name}</p>
+          <p className="text-foreground text-xs font-semibold mt-0.5">Order #{sale.id.substring(0, 8).toUpperCase()}</p>
         </div>
         <div className="text-right shrink-0">
           <p className="font-semibold text-[#f97316]">${sale.price.toFixed(2)}</p>
-          <p className="text-gray-400 text-xs mt-0.5">{formattedDate}</p>
+          <p className="text-muted-foreground text-xs mt-0.5">{formattedDate}</p>
         </div>
       </div>
-      <div className="mt-3 pt-3 border-t border-gray-100">
+      <div className="mt-3 pt-3 border-t border-border">
         <StatusBadge status={sale.status} />
       </div>
     </div>

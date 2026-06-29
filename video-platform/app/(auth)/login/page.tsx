@@ -297,20 +297,20 @@ function LoginPageContent() {
   if (stage === 'code') {
     return (
       <AuthSplitLayout>
-        <div className="space-y-6 text-gray-900">
+        <div className="space-y-6 text-foreground">
           <div className="text-center">
             <h1 className="text-3xl font-bold">Enter your verification code</h1>
-            <p className="mt-2 text-sm text-gray-500">Enter the verification code we emailed you to finish signing in.</p>
+            <p className="mt-2 text-sm text-muted-foreground">Enter the verification code we emailed you to finish signing in.</p>
           </div>
 
           <form onSubmit={handleVerifyCode} className="space-y-5">
             {codeNote && (
-              <div className="rounded-lg border border-orange-200 bg-orange-50 px-4 py-3 text-center text-[#f97316]">
+              <div className="rounded-lg border border-orange-200 bg-orange-50 dark:border-[#f97316]/30 dark:bg-[#f97316]/10 px-4 py-3 text-center text-[#f97316]">
                 {codeNote}
               </div>
             )}
             {codeError && (
-              <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-red-700">{codeError}</div>
+              <div className="rounded-lg border border-red-200 bg-red-50 dark:border-red-500/30 dark:bg-red-500/10 px-4 py-3 text-red-700 dark:text-red-400">{codeError}</div>
             )}
 
             <div>
@@ -340,7 +340,7 @@ function LoginPageContent() {
             </button>
 
             <div className="flex items-center justify-between text-sm">
-              <button type="button" onClick={backToLoginFromCode} className="font-medium text-gray-500 transition hover:text-gray-900">
+              <button type="button" onClick={backToLoginFromCode} className="font-medium text-muted-foreground transition hover:text-foreground">
                 Back to Sign in
               </button>
               <button
@@ -362,15 +362,15 @@ function LoginPageContent() {
   if (resetMode) {
     return (
       <AuthSplitLayout>
-        <div className="space-y-6 text-gray-900">
+        <div className="space-y-6 text-foreground">
           <div className="text-center">
             <h1 className="text-3xl font-bold">Reset your password</h1>
-            <p className="mt-2 text-sm text-gray-500">Enter your email and we&apos;ll send you a reset link.</p>
+            <p className="mt-2 text-sm text-muted-foreground">Enter your email and we&apos;ll send you a reset link.</p>
           </div>
 
           {resetSent ? (
             <div className="space-y-6">
-              <div className="rounded-lg border border-orange-200 bg-orange-50 px-4 py-3 text-center text-[#f97316]">
+              <div className="rounded-lg border border-orange-200 bg-orange-50 dark:border-[#f97316]/30 dark:bg-[#f97316]/10 px-4 py-3 text-center text-[#f97316]">
                 Check your email for a password reset link.
               </div>
               <button
@@ -384,7 +384,7 @@ function LoginPageContent() {
           ) : (
             <form onSubmit={handleResetPassword} className="space-y-5">
               {error && (
-                <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-red-700">{error}</div>
+                <div className="rounded-lg border border-red-200 bg-red-50 dark:border-red-500/30 dark:bg-red-500/10 px-4 py-3 text-red-700 dark:text-red-400">{error}</div>
               )}
               <div>
                 <label htmlFor="reset-email" className="sr-only">Email address</label>
@@ -404,7 +404,7 @@ function LoginPageContent() {
                 {loading ? 'Sending…' : 'Send reset link'}
               </button>
 
-              <button type="button" onClick={switchToLogin} className="block w-full text-center text-sm text-gray-500 transition hover:text-gray-900">
+              <button type="button" onClick={switchToLogin} className="block w-full text-center text-sm text-muted-foreground transition hover:text-foreground">
                 Back to Sign in
               </button>
             </form>
@@ -417,11 +417,11 @@ function LoginPageContent() {
   // ----- Login mode -----
   return (
     <AuthSplitLayout>
-      <div className="space-y-6 text-gray-900">
+      <div className="space-y-6 text-foreground">
         {/* Top row */}
         <div className="flex items-center justify-end gap-3 text-sm">
-          <span className="text-gray-500">Don&apos;t have an account?</span>
-          <Link href="/signup" className="rounded-md border border-gray-300 px-4 py-1.5 font-medium text-gray-900 transition hover:bg-gray-50">
+          <span className="text-muted-foreground">Don&apos;t have an account?</span>
+          <Link href="/signup" className="rounded-md border border-border px-4 py-1.5 font-medium text-foreground transition hover:bg-muted">
             Sign up
           </Link>
         </div>
@@ -429,17 +429,17 @@ function LoginPageContent() {
         {/* Heading */}
         <div className="text-center">
           <h1 className="text-3xl font-bold sm:text-4xl">Sign in to Localy</h1>
-          <p className="mt-2 text-sm text-gray-500">Welcome back — enter your details to continue.</p>
+          <p className="mt-2 text-sm text-muted-foreground">Welcome back — enter your details to continue.</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {isEmailVerified && (
-            <div className="rounded-lg border border-orange-200 bg-orange-50 px-4 py-3 text-center text-[#f97316]">
+            <div className="rounded-lg border border-orange-200 bg-orange-50 dark:border-[#f97316]/30 dark:bg-[#f97316]/10 px-4 py-3 text-center text-[#f97316]">
               Email verified. Please sign in to continue.
             </div>
           )}
           {error && (
-            <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-red-700">{error}</div>
+            <div className="rounded-lg border border-red-200 bg-red-50 dark:border-red-500/30 dark:bg-red-500/10 px-4 py-3 text-red-700 dark:text-red-400">{error}</div>
           )}
 
           <div>
@@ -455,7 +455,7 @@ function LoginPageContent() {
           </div>
 
           <div className="text-center">
-            <button type="button" onClick={switchToReset} className="text-base font-semibold text-black transition hover:opacity-70">
+            <button type="button" onClick={switchToReset} className="text-base font-semibold text-foreground transition hover:opacity-70">
               Forgot the password?
             </button>
           </div>
@@ -476,9 +476,9 @@ function LoginPageContent() {
 
         {/* OR divider */}
         <div className="flex items-center gap-4">
-          <div className="h-px flex-1 bg-gray-200" />
-          <span className="text-xs font-medium text-gray-400">OR</span>
-          <div className="h-px flex-1 bg-gray-200" />
+          <div className="h-px flex-1 bg-border" />
+          <span className="text-xs font-medium text-muted-foreground">OR</span>
+          <div className="h-px flex-1 bg-border" />
         </div>
 
         {/* Google */}
@@ -486,7 +486,7 @@ function LoginPageContent() {
           type="button"
           onClick={handleGoogle}
           disabled={googleLoading}
-          className="flex w-full items-center justify-center gap-3 rounded-lg border border-gray-300 bg-white py-3 font-semibold text-gray-900 transition hover:bg-gray-50 disabled:opacity-60"
+          className="flex w-full items-center justify-center gap-3 rounded-lg border border-border bg-card py-3 font-semibold text-foreground transition hover:bg-muted disabled:opacity-60"
         >
           <GoogleIcon />
           {googleLoading ? 'Opening Google…' : 'Sign in with Google'}
