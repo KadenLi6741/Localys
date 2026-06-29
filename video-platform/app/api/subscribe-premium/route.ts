@@ -70,6 +70,9 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     console.error('[subscribe-premium] Stripe checkout error:', message);
-    return NextResponse.json({ error: 'Failed to create checkout session' }, { status: 500 });
+    return NextResponse.json(
+      { error: message || 'Failed to create checkout session' },
+      { status: 500 }
+    );
   }
 }

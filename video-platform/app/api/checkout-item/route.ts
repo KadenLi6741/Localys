@@ -259,7 +259,13 @@ export async function POST(request: NextRequest) {
     console.log(`Checkout session created: ${session.id} for buyer ${buyerId}`);
     return NextResponse.json({ url: session.url });
   } catch (error) {
-    console.error('Stripe checkout-item error:', error);
-    return NextResponse.json({ error: 'Failed to create checkout session' }, { status: 500 });
+    // Surface the REAL Stripe error (e.g. bad key, invalid amount, bad URL) instead
+    // of a generic message, so failures are diagnosable from the log and the client.
+    const message = error instanceof Error ? error.message : String(error);
+    console.error('Stripe checkout-item error:', message);
+    return NextResponse.json(
+      { error: message || 'Failed to create checkout session' },
+      { status: 500 }
+    );
   }
 }
