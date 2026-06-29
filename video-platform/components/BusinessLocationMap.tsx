@@ -1,5 +1,13 @@
 'use client';
 
+/**
+ * BusinessLocationMap — map card on a business profile showing where the store is and how far away.
+ * Purpose: Renders the business's primary location and, once the user opts in to share GPS, switches
+ *   to a driving route and shows the straight-line distance. Privacy-friendly: location is only used
+ *   after an explicit tap. Wraps the lower-level GoogleMap embed.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { useCallback, useState } from 'react';
 import { MapPin } from 'lucide-react';
 import { haversineDistance } from '@/lib/utils/geo';
@@ -22,6 +30,8 @@ export default function BusinessLocationMap({ locations, businessName }: Busines
   const [gpsState, setGpsState] = useState<GpsState>('idle');
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
 
+  // Asks the browser for the user's position (only when they tap the button) and records it so the
+  // map can draw a route and compute distance. Failure/denial just falls back to the store-only view.
   const requestLocation = useCallback(() => {
     if (!navigator.geolocation) { setGpsState('denied'); return; }
     setGpsState('loading');

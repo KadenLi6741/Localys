@@ -1,5 +1,13 @@
 'use client';
 
+/**
+ * RankSection — the "Your Rank" card on the profile, showing tier badge, Impact Score and progress.
+ * Purpose: Gamifies supporting local businesses. It derives the user's Impact Score from their spend,
+ *   points and number of businesses supported, maps it to a rank tier (lib/ranks), shows progress to
+ *   the next tier, and opens a modal listing all tiers with their unlock thresholds and rewards.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { useEffect, useState } from 'react';
 import { X, Lock } from 'lucide-react';
 import {
@@ -43,6 +51,8 @@ function RankBadge({ src, alt, className = '' }: { src: string; alt: string; cla
 export function RankSection({ moneySpent, points, bizCount }: ImpactInputs) {
   const [open, setOpen] = useState(false);
 
+  // Turn the raw inputs into a single Impact Score, then resolve which rank that score falls in
+  // and how far along the user is toward the next tier. All ranking rules live in lib/ranks.
   const inputs = resolveImpactInputs({ moneySpent, points, bizCount });
   const score = computeImpactScore(inputs);
   const { current, next, pctToNext, isMax } = getRankProgress(score);
@@ -111,6 +121,8 @@ export function RankSection({ moneySpent, points, bizCount }: ImpactInputs) {
   );
 }
 
+// Full-screen overlay listing every rank tier with its badge, points range and reward, dimming/locking
+// tiers the user hasn't reached yet. Opened from the "Ranks" button so users can see what's ahead.
 function RanksModal({ currentId, score, onClose }: { currentId: string; score: number; onClose: () => void }) {
   // Close on Escape; lock body scroll while open.
   useEffect(() => {

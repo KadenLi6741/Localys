@@ -1,5 +1,13 @@
 'use client';
 
+/**
+ * RankedLists — the "Top ___ near you" themed carousels on the home page.
+ * Purpose: Builds three ranked product rows (top restaurants, home services, cheapest nearby) entirely
+ *   from real businesses/menu items using the shared HomeData helpers. Each row only appears if it has
+ *   real items, so the section adapts to whatever data exists.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { ProductCarousel } from './ProductCarousel';
 import { useHomeData, spreadProducts, cheapestPerBusiness, rankBusinessesByType } from './HomeData';
 

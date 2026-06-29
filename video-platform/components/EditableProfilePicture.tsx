@@ -1,5 +1,13 @@
 'use client';
 
+/**
+ * EditableProfilePicture — avatar that shows a user's photo and (on their own profile) lets them change it.
+ * Purpose: Displays the profile image with an initial-letter fallback, and for the owner adds an upload
+ *   button that pushes the new image to Supabase storage and updates their profile record. Handles the
+ *   instant local preview, size/type validation, and loading/error states.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { useRef, useState, useEffect } from 'react';
 import { uploadProfilePicture, updateProfile, MAX_PROFILE_PICTURE_SIZE, BYTES_TO_MB } from '@/lib/supabase/profiles';
 
@@ -26,8 +34,10 @@ export function EditableProfilePicture({
   const [preview, setPreview] = useState<string | null>(currentImageUrl || null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Tracks the temporary blob: URL used for instant preview so we can revoke it and avoid memory leaks.
   const objectUrlRef = useRef<string | null>(null);
 
+  // Revoke any outstanding preview blob URL when the component unmounts.
   useEffect(() => {
     return () => {
       if (objectUrlRef.current) {
@@ -37,15 +47,19 @@ export function EditableProfilePicture({
     };
   }, []);
 
+  // Validates the chosen file, shows an immediate preview, uploads it, then saves the public URL
+  // to the user's profile. Runs when the owner picks a new image from the hidden file input.
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    // Reject non-images up front so we don't waste an upload on an invalid file.
     if (!file.type.startsWith('image/')) {
       setError('Please select an image file');
       return;
     }
 
+    // Enforce the size cap client-side for instant feedback (storage also limits it server-side).
     if (file.size > MAX_PROFILE_PICTURE_SIZE) {
       const maxSizeMB = MAX_PROFILE_PICTURE_SIZE / BYTES_TO_MB;
       setError(`Image size must be less than ${maxSizeMB}MB`);
@@ -56,11 +70,13 @@ export function EditableProfilePicture({
     setError(null);
 
     try {
+      // Drop the previous preview URL before creating a new one to prevent blob leaks.
       if (objectUrlRef.current) {
         URL.revokeObjectURL(objectUrlRef.current);
         objectUrlRef.current = null;
       }
 
+      // Show the picked image immediately (optimistic preview) while the upload happens in the background.
       const objectUrl = URL.createObjectURL(file);
       objectUrlRef.current = objectUrl;
       setPreview(objectUrl);
@@ -75,6 +91,7 @@ export function EditableProfilePicture({
       console.log('Upload successful, updating profile with URL:', data?.publicUrl);
 
       if (data?.publicUrl) {
+        // Persist the uploaded image's public URL onto the profile so it shows everywhere going forward.
         const { error: updateError } = await updateProfile(userId, {
           profile_picture_url: data.publicUrl,
         });
@@ -84,6 +101,7 @@ export function EditableProfilePicture({
           throw new Error('Failed to update profile: ' + updateError.message);
         }
 
+        // Swap the temporary blob preview for the real hosted URL now that the save succeeded.
         if (objectUrlRef.current) {
           URL.revokeObjectURL(objectUrlRef.current);
           objectUrlRef.current = null;
@@ -93,6 +111,7 @@ export function EditableProfilePicture({
         onImageUpdated?.();
       }
     } catch (err: any) {
+      // On any failure, roll the preview back to the original image so the UI doesn't lie about success.
       console.error('Profile picture update error:', err);
       setError(err.message || 'Failed to update profile picture');
       if (objectUrlRef.current) {

@@ -1,5 +1,13 @@
 'use client';
 
+/**
+ * ProductCard — the standard product/item card used in every home-page row.
+ * Purpose: Shows an item's image, deal badge, price (with struck original), title, rating and quick
+ *   actions (like + add to cart). Like ratings elsewhere, demo/slug items persist engagement
+ *   client-side while real (UUID) items also sync to Supabase, so the card works for both kinds.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Heart, Plus, Check } from 'lucide-react';
@@ -35,6 +43,8 @@ export function ProductCard({ product }: { product: Product }) {
     return () => { active = false; unsub(); };
   }, [product.id]);
 
+  // Toggles a like on this item. Updates instantly via the client snapshot (works for demo items),
+  // then mirrors the change to Supabase only for real UUID items belonging to a signed-in user.
   const handleLike = async (e: React.MouseEvent) => {
     e.preventDefault();
     const snapshot = {
@@ -58,6 +68,8 @@ export function ProductCard({ product }: { product: Product }) {
     }
   };
 
+  // Adds this item to the cart (preventDefault so the card's link doesn't also fire) and briefly
+  // shows an "Added" confirmation.
   const handleAdd = (e: React.MouseEvent) => {
     e.preventDefault();
     addToCart({

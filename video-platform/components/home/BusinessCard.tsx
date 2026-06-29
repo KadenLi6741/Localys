@@ -1,5 +1,12 @@
 'use client';
 
+/**
+ * BusinessCard — compact card for a real seeded business in home-page rows/carousels.
+ * Purpose: Shows a business's photo, category, rating, distance/ETA and a "from" price (its cheapest
+ *   item), with a quick-add button that drops that item into the cart. Links through to the profile.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { useState } from 'react';
 import Link from 'next/link';
 import { MapPin, Plus, Check } from 'lucide-react';
@@ -19,11 +26,14 @@ export function BusinessCard({ business }: { business: LocalBusiness }) {
   const { user } = useAuth();
   const [added, setAdded] = useState(false);
 
+  // The cheapest product backs both the "from $X" label and the quick-add button.
   const cheapest = business.products.length
     ? business.products.slice().sort((a, b) => a.price - b.price)[0]
     : null;
   const { label: distanceLabel, etaLabel } = useStoreDistance(business.address);
 
+  // Quick-add the cheapest item to the cart. preventDefault stops the surrounding card link from
+  // also navigating, and the brief "Added" state gives visual confirmation.
   const handleAdd = (e: React.MouseEvent) => {
     e.preventDefault();
     if (!cheapest) return;

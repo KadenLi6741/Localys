@@ -1,5 +1,13 @@
 'use client';
 
+/**
+ * OrderHistory — the user's (and business's) order list with coin purchases, item orders and sales.
+ * Purpose: Shows a customer their past purchases (with pickup QR codes, schedules and reorder), and
+ *   for business accounts adds a Sales tab. It merges Supabase orders with locally-stored "demo"
+ *   orders, de-duping so a demo order that later syncs to Supabase isn't shown twice.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { getUserCoinPurchases, getUserItemPurchases, getBusinessItemSales } from '@/lib/supabase/profiles';
@@ -49,6 +57,8 @@ function OrderReviews({ statsKey }: { statsKey: string }) {
   );
 }
 
+// Shows how much a coupon saved on an order, with a hover/tap tooltip revealing the code and percent.
+// Renders nothing for orders that had no coupon applied.
 function DiscountBadge({ item }: { item: ItemPurchase }) {
   const [showTooltip, setShowTooltip] = useState(false);
   if (!item.coupon_code || !item.original_price) return null;
@@ -75,6 +85,8 @@ function DiscountBadge({ item }: { item: ItemPurchase }) {
   );
 }
 
+// Colored pill for an order's status. Maps each status to a palette (active=orange, done=grey,
+// problem=red), falling back to the "pending" style for any unrecognised status.
 function StatusBadge({ status }: { status: string }) {
   const styles: Record<string, string> = {
     paid:      'bg-[#f97316]/10 text-[#f97316] border-[#f97316]/30',
@@ -98,6 +110,8 @@ interface OrderHistoryProps {
   isBusiness?: boolean;
 }
 
+// Top-level order history. Loads orders, subscribes to live status changes, and renders the
+// customer view or the business view (Purchases/Sales tabs) depending on `isBusiness`.
 export function OrderHistory({ userId, businessId, isBusiness = false }: OrderHistoryProps) {
   const { t } = useTranslation();
   const router = useRouter();
@@ -111,6 +125,8 @@ export function OrderHistory({ userId, businessId, isBusiness = false }: OrderHi
 
   useEffect(() => { loadOrders(); }, [userId, isBusiness]);
 
+  // Live-update an order's status badge the moment the merchant marks it (e.g. paid → completed),
+  // so the customer sees the change without refreshing.
   useEffect(() => {
     const channel = supabase
       .channel('order-status-changes')
@@ -139,18 +155,22 @@ export function OrderHistory({ userId, businessId, isBusiness = false }: OrderHi
       setCoinPurchases([]); setItemPurchases([]); setItemSales([]);
       setTablesExist(false);
     } finally {
-      // Load client-side orders (demo items that may not be in Supabase)
+      // Always also load client-side "demo" orders saved in the browser — these may never have hit
+      // Supabase (e.g. demo content), so they're tracked locally and merged into the history below.
       try { setLocalOrders(getLocalOrders()); } catch { /* ignore */ }
       setLoading(false);
     }
   };
 
+  // "Order again" — sends the user to checkout pre-filled with this item's details.
   const handleReorder = (item: ItemPurchase) => {
     router.push(
       `/checkout?itemId=${item.item_id}&itemName=${encodeURIComponent(item.item_name)}&itemPrice=${item.price}&sellerId=${item.seller_id}&buyerId=${userId}`
     );
   };
 
+  // Combine coin purchases and item purchases into one list, newest first. The two types store their
+  // timestamp under different keys (created_at vs purchased_at), so pick whichever the record has.
   const allPurchases = [...coinPurchases, ...itemPurchases].sort((a, b) => {
     const dateA = new Date('created_at' in a ? a.created_at : a.purchased_at).getTime();
     const dateB = new Date('created_at' in b ? b.created_at : b.purchased_at).getTime();
@@ -232,6 +252,9 @@ export function OrderHistory({ userId, businessId, isBusiness = false }: OrderHi
   );
 }
 
+// Renders a single purchase card. One component handles both coin purchases and item orders; the
+// `'coins' in order` check distinguishes them since they're different shapes. Paid item orders can
+// reveal their pickup QR code and offer "Order again".
 function OrderItem({ order, onReorder }: { order: CoinPurchase | ItemPurchase; onReorder?: () => void }) {
   const [showQR, setShowQR] = useState(false);
   const isCoinPurchase = 'coins' in order;
@@ -306,6 +329,8 @@ function OrderItem({ order, onReorder }: { order: CoinPurchase | ItemPurchase; o
   );
 }
 
+// Card for a browser-stored "demo" order (not in Supabase). Mirrors OrderItem's look but reads from
+// the LocalOrder shape; always treated as paid since these are completed demo checkouts.
 function LocalOrderItem({ order }: { order: LocalOrder }) {
   const [showQR, setShowQR] = useState(false);
   const date = new Date(order.purchased_at);
@@ -349,6 +374,7 @@ function LocalOrderItem({ order }: { order: LocalOrder }) {
   );
 }
 
+// Card shown in the business "Sales" tab — the merchant's view of an order someone placed with them.
 function SaleItem({ sale }: { sale: ItemPurchase }) {
   const date = new Date(sale.purchased_at);
   const formattedDate = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });

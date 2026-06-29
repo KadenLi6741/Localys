@@ -1,3 +1,10 @@
+/**
+ * Logo — the shared Localy brand mark (map-pin icon + wordmark).
+ * Purpose: Provides one reusable, consistently-styled logo so every screen (header, auth pages,
+ *   nav) shows the same brand. Centralising it means a single edit changes the logo everywhere.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import Link from 'next/link';
 import { MapPin } from 'lucide-react';
 
@@ -5,6 +12,9 @@ import { MapPin } from 'lucide-react';
  * The single Localys logo used across the whole app (the one from the login page).
  * Colors via `currentColor` — set the color with `className` (works in light & dark).
  * Pass `href={null}` to render a non-link wordmark (e.g. as a page header).
+ *
+ * Why two render paths: when used as a page heading we must NOT nest a link, so href=null
+ * returns a plain <span>; otherwise it wraps in a Next <Link> back to the chosen route.
  */
 export function Logo({
   href = '/',

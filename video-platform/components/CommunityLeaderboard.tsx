@@ -1,5 +1,13 @@
 'use client';
 
+/**
+ * CommunityLeaderboard — local "within 5 km" ranking of users by Impact Score.
+ * Purpose: Motivates users to support nearby businesses by showing their standing against neighbors.
+ *   The current user is slotted into the list by their real Impact Score so their rank/badge here
+ *   always matches the "Your Rank" card. Neighbor rows are mock data until a real geo-query exists.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { useState } from 'react';
 import { getRankProgress } from '@/lib/ranks';
 
@@ -61,6 +69,8 @@ function RankBadge({ src, name }: { src: string; name: string }) {
   );
 }
 
+// Renders the leaderboard card. Takes the current user's name + real Impact Score so it can place
+// them correctly among the neighbors and highlight their row.
 export function CommunityLeaderboard({ youName, youScore }: { youName: string; youScore: number }) {
   // Insert the current user into the sorted neighbor list by their REAL Impact
   // Score, then number the rows. This keeps the leaderboard badge + position in

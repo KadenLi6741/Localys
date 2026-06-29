@@ -1,5 +1,12 @@
 'use client';
 
+/**
+ * GoogleMap — thin wrapper around the Google Maps Embed API (an iframe).
+ * Purpose: Reusable map that reliably renders a place marker, or a driving route when an origin is
+ *   given. Keeps the API key in an env var and centralises URL building so callers just pass a query.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { useMemo } from 'react';
 
 /**
@@ -23,6 +30,8 @@ export function GoogleMap({
   title: string;
   className?: string;
 }) {
+  // Build the embed URL: directions mode when we have an origin, otherwise a single-place marker.
+  // Memoized so the iframe src only changes when the query/origin actually change (avoids reloads).
   const src = useMemo(() => {
     if (!KEY || !query) return null;
     const dest = encodeURIComponent(query);

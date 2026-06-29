@@ -1,5 +1,13 @@
 'use client';
 
+/**
+ * Toast — transient, auto-dismissing notification banner.
+ * Purpose: Shows brief status messages (e.g. "Added to cart", "Copied link") near the
+ *   bottom of the screen and removes itself after a timeout so the user never has to dismiss it.
+ *   Used app-wide for lightweight, non-blocking feedback.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { useEffect } from 'react';
 
 interface ToastProps {
@@ -9,9 +17,13 @@ interface ToastProps {
 }
 
 /**
- * Simple toast notification component
+ * Renders a floating toast and self-dismisses after `duration` ms.
+ * Exists so callers can fire-and-forget a message: the component owns its own timer
+ * and calls `onClose` when it expires, keeping notification state out of the parent.
  */
 export function Toast({ message, onClose, duration = 3000 }: ToastProps) {
+  // Start a one-shot timer when shown; clearing on unmount prevents calling
+  // onClose after the toast (or its parent) has already gone away.
   useEffect(() => {
     const timer = setTimeout(() => {
       onClose();

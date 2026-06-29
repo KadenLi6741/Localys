@@ -1,5 +1,12 @@
 'use client';
 
+/**
+ * CommentModal — popup dialog wrapper around the comments thread for a post/video.
+ * Purpose: Presents the shared CommentSection inside an accessible modal (Escape to close, body-scroll
+ *   lock, backdrop click-to-dismiss). Used wherever comments are opened as an overlay rather than inline.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { useEffect } from 'react';
 import { CommentSection } from '@/components/comments';
 
@@ -14,6 +21,7 @@ interface CommentModalProps {
  * Modal for viewing and composing comments on a post
  */
 export function CommentModal({ isOpen, onClose, postId, businessName }: CommentModalProps) {
+  // Let users dismiss with the Escape key, the standard expectation for a modal dialog.
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isOpen) {
@@ -27,6 +35,7 @@ export function CommentModal({ isOpen, onClose, postId, businessName }: CommentM
     return () => document.removeEventListener('keydown', handleEscape);
   }, [isOpen, onClose]);
 
+  // Lock background scrolling while open so the page behind the modal doesn't move under it.
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
@@ -40,6 +49,7 @@ export function CommentModal({ isOpen, onClose, postId, businessName }: CommentM
 
   if (!isOpen) return null;
 
+  // Close only when the click is on the backdrop itself, not when it bubbles up from inner content.
   const handleBackdropClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
       onClose();

@@ -1,5 +1,13 @@
 'use client';
 
+/**
+ * AppBottomNav — the mobile bottom tab bar (Home, Search, Upload, Chats, Cart, Orders, Activity, Profile).
+ * Purpose: Primary navigation on small screens. It highlights the active tab with a sliding indicator,
+ *   shows live badges (unread chats, cart count, pending business orders), and adapts its tabs to the
+ *   account type (the Orders tab only appears for business accounts).
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState, useRef } from 'react';
@@ -8,6 +16,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useActivity } from '@/contexts/ActivityContext';
 import { supabase } from '@/lib/supabase/client';
 
+// Renders the fixed bottom navigation bar and keeps its badges/indicator in sync with app state.
 export function AppBottomNav() {
   const pathname = usePathname();
   const { getCartCount } = useCart();
@@ -20,6 +29,8 @@ export function AppBottomNav() {
   const [unreadMessages, setUnreadMessages] = useState(0);
   const [pendingOrders, setPendingOrders] = useState(0);
 
+  // Maps the current URL to the nav tab that should be highlighted. Centralised so both the
+  // indicator position and the active styling agree on which tab is "current".
   const getActiveHref = () => {
     if (pathname === '/feed') return '/feed';
     if (pathname?.startsWith('/search')) return '/search';
@@ -31,6 +42,7 @@ export function AppBottomNav() {
     return null;
   };
 
+  // Look up whether the signed-in user is a business account, which decides if the Orders tab shows.
   useEffect(() => {
     if (!user) {
       setIsBusiness(false);
@@ -49,7 +61,8 @@ export function AppBottomNav() {
     checkBusiness();
   }, [user]);
 
-  // Fetch unread messages count
+  // Fetch unread messages count, then keep it live via realtime subscriptions so the Chats badge
+  // updates the moment a new message arrives or the user reads a thread elsewhere.
   useEffect(() => {
     if (!user) { setUnreadMessages(0); return; }
     const fetchUnread = async () => {
@@ -58,6 +71,7 @@ export function AppBottomNav() {
         .select('chat_id, last_read')
         .eq('user_id', user.id);
       if (!memberships || memberships.length === 0) { setUnreadMessages(0); return; }
+      // Sum unread per chat: count messages from others created after this user's last_read marker.
       let total = 0;
       for (const m of memberships) {
         let query = supabase
@@ -77,7 +91,8 @@ export function AppBottomNav() {
     return () => { supabase.removeChannel(msgChannel); supabase.removeChannel(readChannel); };
   }, [user]);
 
-  // Fetch pending orders count (business only)
+  // Fetch the count of orders awaiting fulfilment (business accounts only) and keep it live so
+  // merchants see new orders appear on the Orders tab without refreshing.
   useEffect(() => {
     if (!user || !isBusiness) { setPendingOrders(0); return; }
     const fetchPending = async () => {
@@ -93,6 +108,8 @@ export function AppBottomNav() {
     return () => { supabase.removeChannel(channel); };
   }, [user, isBusiness]);
 
+  // Slide the orange underline indicator to sit under the active tab whenever the route changes.
+  // We measure the rendered tabs so the indicator stays correct even as tabs are added/removed.
   useEffect(() => {
     // Calculate indicator position based on active tab
     if (!navRef.current) return;
@@ -116,10 +133,13 @@ export function AppBottomNav() {
     });
   }, [pathname]);
 
+  // Hide the bar entirely on auth screens, which have their own full-screen layout.
   if (pathname === '/login' || pathname === '/signup' || pathname === '/reset-password') {
     return null;
   }
 
+  // Whether a tab is the current one. Home is exact-match (so it isn't "active" on every sub-route),
+  // while other tabs match by prefix so deep pages (e.g. /profile/123) still highlight the parent tab.
   const isActive = (href: string) => {
     if (href === '/feed') {
       return pathname === '/feed';
@@ -238,6 +258,8 @@ export function AppBottomNav() {
   );
 }
 
+// A single bottom-nav tab: icon + label, active styling, and an optional count badge (capped at "9+").
+// Extracted so every standard tab renders identically and we don't repeat the markup per item.
 function NavItem({ href, label, active, icon, fillIcon = false, onClick, badge }: { href: string; label: string; active: boolean; icon: React.ReactNode; fillIcon?: boolean; onClick?: (e: React.MouseEvent) => void; badge?: number }) {
   const colorClass = active ? 'text-[#F5F0E8]' : 'text-[#9E9A90]';
 

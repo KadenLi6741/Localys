@@ -1,18 +1,29 @@
 'use client';
 
+/**
+ * SideCards — dismissible promo cards pinned to the left/right edges on wide screens.
+ * Purpose: Surfaces gentle calls-to-action (browse local, deals, communities) without crowding the
+ *   main content. Only shown on xl+ viewports, each card can be dismissed independently, and the
+ *   right card rotates between promos over time. Purely promotional — no data dependencies.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { X, Tag, Store, Users } from 'lucide-react';
 
+// The promos the right-hand card cycles through, in rotation order.
 const RIGHT_CARDS = ['deals', 'community'] as const;
 type RightCard = typeof RIGHT_CARDS[number];
 
+// Renders the floating side promo cards.
 export function SideCards() {
   const router = useRouter();
   const [showLeft, setShowLeft] = useState(true);
   const [showRight, setShowRight] = useState(true);
   const [rightIdx, setRightIdx] = useState(0);
 
+  // Advance the right card to the next promo every 30s so it doesn't stay static.
   useEffect(() => {
     const id = setInterval(() => {
       setRightIdx((i) => i + 1);
@@ -20,8 +31,10 @@ export function SideCards() {
     return () => clearInterval(id);
   }, []);
 
+  // If the user dismissed both cards, render nothing at all.
   if (!showLeft && !showRight) return null;
 
+  // Pick which promo to show by cycling the counter through the list (modulo wraps it around).
   const rightCard: RightCard = RIGHT_CARDS[rightIdx % RIGHT_CARDS.length];
 
   return (

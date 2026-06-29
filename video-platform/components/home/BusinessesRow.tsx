@@ -1,5 +1,13 @@
 'use client';
 
+/**
+ * BusinessesRow — a home-page carousel of real business cards.
+ * Purpose: Pulls the shared home data and renders a labelled row of BusinessCards. A `select`
+ *   function (or pre-composed `list`) decides which businesses to show and in what order. Renders
+ *   nothing while loading or when empty so the home page never shows blank rows.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { CarouselRow } from './CarouselRow';
 import { BusinessCard } from './BusinessCard';
 import { useHomeData } from './HomeData';

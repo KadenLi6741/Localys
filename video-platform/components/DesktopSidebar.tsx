@@ -1,5 +1,13 @@
 'use client';
 
+/**
+ * DesktopSidebar — the left-hand navigation rail shown on large screens (lg+).
+ * Purpose: Desktop counterpart to AppBottomNav. It lists the main destinations with live badges
+ *   (unread chats, cart count, pending business orders), shows a shortcut list of accounts the user
+ *   follows, and adapts to account type (Orders only for businesses). Hidden on auth screens.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
@@ -17,6 +25,7 @@ interface FollowingAccount {
   profile_picture_url: string | null;
 }
 
+// Renders the persistent desktop sidebar and keeps its badges/following-list in sync with app state.
 export function DesktopSidebar() {
   const pathname = usePathname();
   const router = useRouter();
@@ -29,6 +38,7 @@ export function DesktopSidebar() {
   const [unreadMessages, setUnreadMessages] = useState(0);
   const [pendingOrders, setPendingOrders] = useState(0);
 
+  // Determine whether the user is a business account (controls whether the Orders link appears).
   useEffect(() => {
     if (!user) { setIsBusiness(false); setFollowing([]); return; }
     const check = async () => {
@@ -38,7 +48,7 @@ export function DesktopSidebar() {
     check();
   }, [user]);
 
-  // Fetch unread messages count
+  // Fetch unread message count and keep it live via realtime subscriptions on messages + read markers.
   useEffect(() => {
     if (!user) { setUnreadMessages(0); return; }
     const fetchUnread = async () => {
@@ -66,7 +76,7 @@ export function DesktopSidebar() {
     return () => { supabase.removeChannel(msgChannel); supabase.removeChannel(readChannel); };
   }, [user]);
 
-  // Fetch pending orders count (business only)
+  // Fetch the count of unfulfilled orders for business accounts, kept live so new orders show instantly.
   useEffect(() => {
     if (!user || !isBusiness) { setPendingOrders(0); return; }
     const fetchPending = async () => {
@@ -82,6 +92,7 @@ export function DesktopSidebar() {
     return () => { supabase.removeChannel(channel); };
   }, [user, isBusiness]);
 
+  // Load up to 5 accounts the user follows to show as quick shortcuts at the bottom of the sidebar.
   useEffect(() => {
     if (!user) { setFollowing([]); return; }
     const loadFollowing = async () => {
@@ -100,8 +111,10 @@ export function DesktopSidebar() {
     loadFollowing();
   }, [user]);
 
+  // Auth screens use their own layout, so the sidebar renders nothing there.
   if (pathname === '/login' || pathname === '/signup' || pathname === '/reset-password') return null;
 
+  // Highlight the current tab: Home matches exactly; others match by prefix so sub-pages stay active.
   const isActive = (href: string) => {
     if (href === '/feed') return pathname === '/feed';
     return pathname?.startsWith(href);

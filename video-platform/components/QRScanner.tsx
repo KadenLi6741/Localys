@@ -1,5 +1,13 @@
 'use client';
 
+/**
+ * QRScanner — full-screen camera view that reads a customer's order QR code.
+ * Purpose: The merchant side of order verification. It opens the rear camera, continuously scans
+ *   frames for a QR code, and calls back with the decoded data (the verify URL) on the first hit.
+ *   Carefully tears down the camera stream and scan loop to avoid leaving the camera on.
+ * Part of: Localy (FBLA Coding & Programming — Byte-Sized Business Boost)
+ */
+
 import { useEffect, useRef, useState, useCallback } from 'react';
 import jsQR from 'jsqr';
 
@@ -8,6 +16,7 @@ interface QRScannerProps {
   onClose: () => void;
 }
 
+// Renders the camera scanner overlay and reports the first QR code it detects via onScan.
 export function QRScanner({ onScan, onClose }: QRScannerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -15,6 +24,8 @@ export function QRScanner({ onScan, onClose }: QRScannerProps) {
   const streamRef = useRef<MediaStream | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  // Stops the scan loop and releases the camera. Critical: without stopping the tracks the camera
+  // light/stream would stay on after the scanner closes.
   const cleanup = useCallback(() => {
     if (animFrameRef.current) {
       cancelAnimationFrame(animFrameRef.current);
@@ -26,6 +37,8 @@ export function QRScanner({ onScan, onClose }: QRScannerProps) {
     }
   }, []);
 
+  // Acquire the rear-facing camera on mount. The `mounted` guard prevents attaching a stream that
+  // arrives after the component already unmounted (which would leak the camera).
   useEffect(() => {
     let mounted = true;
 
@@ -60,11 +73,14 @@ export function QRScanner({ onScan, onClose }: QRScannerProps) {
     const canvas = canvasRef.current;
     if (!video || !canvas) return;
 
+    // willReadFrequently hints the browser to optimise the repeated getImageData reads below.
     const ctx = canvas.getContext('2d', { willReadFrequently: true });
     if (!ctx) return;
 
     let scanning = true;
 
+    // Per-frame loop: copy the current video frame onto the hidden canvas, run jsQR over the pixels,
+    // and on the first successful decode stop everything and hand the data to the caller.
     const scan = () => {
       if (!scanning || video.readyState !== video.HAVE_ENOUGH_DATA) {
         animFrameRef.current = requestAnimationFrame(scan);
