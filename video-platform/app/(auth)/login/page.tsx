@@ -164,7 +164,7 @@ function LoginPageContent() {
       setCodeNote(
         result.sent
           ? 'We emailed a 6-digit code to your email address.'
-          : 'Could not send the email — enter your backup code to continue.',
+          : 'Enter the verification code in your email.',
       );
       setStage('code');
       setLoading(false);
@@ -241,7 +241,7 @@ function LoginPageContent() {
       setCodeNote(
         result.sent
           ? 'A new code is on its way to your email.'
-          : 'Could not send the email — enter your backup code to continue.',
+          : 'Enter the verification code in your email.',
       );
       setResendLoading(false);
     } catch {
