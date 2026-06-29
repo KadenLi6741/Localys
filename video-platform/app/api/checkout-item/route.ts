@@ -200,28 +200,30 @@ export async function POST(request: NextRequest) {
     return {
       price_data: {
         currency: 'usd',
-        product_data: { name: `${item.itemName}${discLabel}`, description: 'Purchase from local business' },
+        product_data: {
+          name: `${item.itemName}${discLabel}`,
+          description: 'Purchase from local business',
+          // Per-item details ride along on EACH line item's product metadata (small,
+          // well under Stripe's 500-char-per-value limit) instead of one giant
+          // session-metadata blob. The webhook + verify route read these back by
+          // expanding line_items, so an order of any size never overflows metadata.
+          // `price` is the ORIGINAL (pre-discount) server-trusted price; the discount
+          // is re-applied downstream so original_price/strikethrough still work.
+          metadata: {
+            id: item.itemId,
+            name: mi.name,
+            sid: item.sellerId,
+            price: String(mi.price),
+            qty: String(item.quantity),
+            ...(item.specialRequests ? { sr: item.specialRequests } : {}),
+          },
+        },
         unit_amount: Math.round(unitPrice * 100),
       },
       quantity: item.quantity,
     };
   });
 
-  // Save resolved (server-trusted) name/price alongside id so verify-item-purchase
-  // can reconstruct order details from the Stripe session without a second DB query.
-  const itemsMetadata = items.map((item) => {
-    const resolved = menuMap.get(item.itemId);
-    return {
-      id: item.itemId,
-      name: resolved?.name ?? item.itemName,
-      sid: item.sellerId,
-      price: resolved?.price ?? 0,
-      qty: item.quantity,
-      // Carry the buyer's special concerns/notes so verify-item-purchase can save
-      // them with the order (previously dropped here, so they never persisted).
-      ...(item.specialRequests ? { sr: item.specialRequests } : {}),
-    };
-  });
   const firstSellerId = items[0].sellerId;
 
   try {
@@ -234,10 +236,11 @@ export async function POST(request: NextRequest) {
       mode: 'payment',
       success_url: `${origin}/purchase-success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/profile/${firstSellerId}?canceled=true`,
+      // Session-level metadata is kept TINY (only short scalars) — never the cart.
+      // Per-item details live on each line item's product_data.metadata (above).
       metadata: {
         buyerId,
         sellerId: firstSellerId,
-        items: JSON.stringify(itemsMetadata),
         ...(appliedCouponCode && {
           couponCode: appliedCouponCode,
           discountPercentage: discountPercentage.toString(),

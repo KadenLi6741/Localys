@@ -171,32 +171,38 @@ export async function POST(request: NextRequest) {
     // Authoritative total straight from Stripe (cents → dollars).
     const sessionTotal = typeof session.amount_total === 'number' ? session.amount_total / 100 : null;
 
-    // Multi-item format
-    if (metadata.items && metadata.buyerId) {
-      let rawItems: { id: string; name?: string; sid?: string; price?: number; qty?: number; sr?: string }[];
-      try {
-        rawItems = JSON.parse(metadata.items);
-      } catch {
-        return NextResponse.json({ error: 'Invalid session data' }, { status: 400 });
-      }
+    // Per-item details now ride on each line item's product metadata (set by
+    // checkout-item) instead of one oversized session-metadata blob, so we read
+    // them back from the expanded line items.
+    const productMetas = (session.line_items?.data ?? []).map((li) => {
+      const product = li.price && typeof li.price.product !== 'string'
+        ? (li.price.product as Stripe.Product)
+        : null;
+      return (product?.metadata ?? {}) as Record<string, string>;
+    });
 
+    // Multi-item format
+    if (productMetas.length > 0 && metadata.buyerId) {
       const orders: OrderResult[] = [];
-      for (let i = 0; i < rawItems.length; i++) {
-        const item = rawItems[i];
+      for (let i = 0; i < productMetas.length; i++) {
+        const meta = productMetas[i];
         const line = stripeLines[i];
-        // Resolve name/price/qty: metadata first (written by checkout-item), then the
-        // real Stripe line item, then the manifest — so we never return 0 / "Unknown".
-        const manifest = MANIFEST_PRICES.get(item.id);
-        const resolvedName = item.name || line?.name || manifest?.name || item.id;
-        const resolvedPrice = (typeof item.price === 'number' && item.price > 0)
-          ? item.price
+        const itemId = meta.id || `line-${i}`;
+        // Resolve name/price/qty: product metadata first (written by checkout-item),
+        // then the real Stripe line item, then the manifest — never 0 / "Unknown".
+        const manifest = MANIFEST_PRICES.get(itemId);
+        const metaPrice = meta.price ? parseFloat(meta.price) : NaN;
+        const metaQty = meta.qty ? parseInt(meta.qty, 10) : NaN;
+        const resolvedName = meta.name || line?.name || manifest?.name || itemId;
+        const resolvedPrice = (Number.isFinite(metaPrice) && metaPrice > 0)
+          ? metaPrice
           : (line && line.unit > 0 ? line.unit : (manifest?.price ?? 0));
-        const resolvedQty = item.qty && item.qty > 0 ? item.qty : (line?.qty ?? 1);
-        const resolvedSellerId = item.sid || metadata.sellerId || item.id;
+        const resolvedQty = (Number.isFinite(metaQty) && metaQty > 0) ? metaQty : (line?.qty ?? 1);
+        const resolvedSellerId = meta.sid || metadata.sellerId || itemId;
 
         const result = await processPurchase(
-          item.id, resolvedSellerId, userId, resolvedName, resolvedPrice, resolvedQty,
-          sessionId, couponCode, discountPercentage, scheduledAt, item.sr || null,
+          itemId, resolvedSellerId, userId, resolvedName, resolvedPrice, resolvedQty,
+          sessionId, couponCode, discountPercentage, scheduledAt, meta.sr || null,
         );
         if (result) orders.push(result);
       }
