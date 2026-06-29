@@ -163,7 +163,7 @@ export function TopHeader() {
               <Link href="/dashboard" onClick={() => setOpenMenu(null)} className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-black transition hover:bg-gray-50 dark:text-white dark:hover:bg-gray-800">
                 <Building2 className="h-4 w-4" /> Business Manager
               </Link>
-              <Link href="/profile?tab=settings" onClick={() => setOpenMenu(null)} className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-black transition hover:bg-gray-50 dark:text-white dark:hover:bg-gray-800">
+              <Link href="/settings" onClick={() => setOpenMenu(null)} className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-black transition hover:bg-gray-50 dark:text-white dark:hover:bg-gray-800">
                 <Settings className="h-4 w-4" /> Settings
               </Link>
               <div className="my-1 h-px bg-gray-100 dark:bg-gray-800" />
