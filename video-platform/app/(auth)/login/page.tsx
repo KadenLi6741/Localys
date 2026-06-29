@@ -164,7 +164,7 @@ function LoginPageContent() {
       setCodeNote(
         result.sent
           ? 'We emailed a 6-digit code to your email address.'
-          : 'Could not send the email — enter your backup code 77777 to continue.',
+          : 'Could not send the email — enter your backup code to continue.',
       );
       setStage('code');
       setLoading(false);
@@ -184,7 +184,7 @@ function LoginPageContent() {
     // decides what is valid (and always accepts 77777).
     const entered = code.trim();
     if (!entered) {
-      setCodeError('Enter your code, or use your backup code 77777.');
+      setCodeError('Enter your code, or use your backup code.');
       return;
     }
 
@@ -241,7 +241,7 @@ function LoginPageContent() {
       setCodeNote(
         result.sent
           ? 'A new code is on its way to your email.'
-          : 'Could not send the email — enter your backup code 77777 to continue.',
+          : 'Could not send the email — enter your backup code to continue.',
       );
       setResendLoading(false);
     } catch {
@@ -317,7 +317,7 @@ function LoginPageContent() {
               <label htmlFor="login-code" className="sr-only">6-digit verification code</label>
               <input
                 id="login-code"
-                type="text"
+                type="password"
                 inputMode="numeric"
                 autoComplete="one-time-code"
                 maxLength={6}
