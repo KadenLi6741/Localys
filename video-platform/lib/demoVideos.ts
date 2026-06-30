@@ -49,6 +49,15 @@ export const DEMO_VIDEOS: DemoVideo[] = [
     caption: 'Clean fades and sharp lineups.',
   },
   {
+    id: 'local:k1-floral-studio',
+    src: '/Videos/Florist.mp4',
+    businessName: 'K1 Floral Studio',
+    businessSlug: 'k1-floral-studio',
+    manifestKey: 'K1 Floral Studio',
+    category: 'Flowers',
+    caption: 'Handcrafted bouquets for every occasion.',
+  },
+  {
     id: 'local:holy-smoke-barbecue',
     src: '/Videos/Holy%20Smoke.mp4',
     businessName: 'Holy Smoke Barbecue',
@@ -112,6 +121,7 @@ export interface FeedVideo {
 const DEMO_COORDS: Record<string, { latitude: number; longitude: number }> = {
   'jays-burger':           { latitude: 45.4215, longitude: -75.6972 },
   'sharp-fade-barbershop': { latitude: 45.4220, longitude: -75.7015 },
+  'k1-floral-studio':      { latitude: 45.4230, longitude: -75.6950 },
   'holy-smoke-barbecue':   { latitude: 45.4200, longitude: -75.6980 },
   'pho-nga-son':           { latitude: 45.4225, longitude: -75.6940 },
 };

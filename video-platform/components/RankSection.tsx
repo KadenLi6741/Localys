@@ -7,7 +7,6 @@ import {
   buildLeaderboard,
   computeImpactScore,
   getRankProgress,
-  rankRange,
   resolveImpactInputs,
   type ImpactInputs,
   type Rank,
@@ -175,26 +174,29 @@ function RanksModal({
             </div>
           </div>
 
-          {/* All tiers — lowest to highest, with each tier's reward + score range.
-              This detailed list lives ONLY inside the modal (never inline). */}
+          {/* All tiers — lowest to highest; only the actual current rank is highlighted */}
           <div>
-            <h3 className="mb-2 text-[11px] font-bold uppercase tracking-widest text-gray-500">All tiers &amp; rewards</h3>
-            <ul className="space-y-1.5">
+            <h3 className="mb-2 text-[11px] font-bold uppercase tracking-widest text-gray-500">All tiers</h3>
+            <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
               {RANKS.map((rank) => {
                 const isCurrent = rank.id === current.id;
                 const unlocked = score >= rank.threshold;
                 return (
-                  <li
+                  <div
                     key={rank.id}
-                    className={`flex items-center gap-3 rounded-xl border px-3 py-2 ${
-                      isCurrent ? 'border-[#f97316] bg-[#f97316]/10' : 'border-gray-200 bg-white'
+                    className={`flex flex-col items-center rounded-lg border p-2 text-center ${
+                      isCurrent
+                        ? 'border-[#f97316] bg-[#f97316]/10'
+                        : unlocked
+                          ? 'border-gray-200 bg-gray-50'
+                          : 'border-gray-100 bg-gray-50 opacity-60'
                     }`}
                   >
-                    <div className="relative flex h-10 w-10 shrink-0 items-center justify-center">
+                    <div className="relative flex h-12 w-12 items-center justify-center">
                       <RankBadge
                         src={rank.image}
                         alt={rank.name}
-                        className={`h-10 w-10 ${!unlocked ? 'opacity-30 grayscale' : ''}`}
+                        className={`h-12 w-12 ${!unlocked ? 'opacity-30 grayscale' : ''}`}
                       />
                       {!unlocked && (
                         <span className="absolute inset-0 flex items-center justify-center">
@@ -202,28 +204,22 @@ function RanksModal({
                         </span>
                       )}
                     </div>
-                    <div className="min-w-0 flex-1">
-                      <p
-                        className={`flex items-center gap-1.5 text-sm font-bold ${
-                          isCurrent ? 'text-[#f97316]' : unlocked ? 'text-gray-900' : 'text-gray-400'
-                        }`}
-                      >
-                        {rank.name}
-                        {isCurrent && (
-                          <span className="rounded-full bg-[#f97316] px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white">
-                            Current
-                          </span>
-                        )}
-                      </p>
-                      <p className="truncate text-[11px] text-gray-500">{rank.reward}</p>
-                    </div>
-                    <span className="shrink-0 text-[11px] font-semibold tabular-nums text-gray-400">
-                      {rankRange(rank)}
-                    </span>
-                  </li>
+                    <p
+                      className={`mt-1 text-[10px] font-bold uppercase leading-tight ${
+                        isCurrent ? 'text-[#f97316]' : unlocked ? 'text-gray-700' : 'text-gray-400'
+                      }`}
+                    >
+                      {rank.name}
+                    </p>
+                    {isCurrent && (
+                      <span className="mt-1 rounded-full bg-[#f97316] px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white">
+                        Current
+                      </span>
+                    )}
+                  </div>
                 );
               })}
-            </ul>
+            </div>
           </div>
 
           {/* Community leaderboard — rank number sits right next to the name */}

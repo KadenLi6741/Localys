@@ -3,8 +3,7 @@
 import React, { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ChevronLeft, MessageSquare, Plus, Users, Share2 } from 'lucide-react';
-import { VoteArrowUp, VoteArrowDown } from '@/components/VoteArrow';
+import { ChevronLeft, ChevronUp, ChevronDown, MessageSquare, Plus, Users, Share2 } from 'lucide-react';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { useCommunities } from '@/contexts/CommunitiesContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -207,7 +206,7 @@ function CommunityContent() {
                         t.userVote === 1 ? 'text-[#f97316]' : 'text-black dark:text-white hover:text-[#f97316]'
                       }`}
                     >
-                      <VoteArrowUp className="h-4 w-4" />
+                      <ChevronUp className="h-4 w-4" strokeWidth={2.5} />
                     </button>
                     <span className={`min-w-[20px] text-center text-xs font-bold tabular-nums ${
                       t.userVote !== 0 ? 'text-[#f97316]' : 'text-black dark:text-white'
@@ -219,7 +218,7 @@ function CommunityContent() {
                         t.userVote === -1 ? 'text-[#f97316]' : 'text-black dark:text-white hover:text-[#f97316]'
                       }`}
                     >
-                      <VoteArrowDown className="h-4 w-4" />
+                      <ChevronDown className="h-4 w-4" strokeWidth={2.5} />
                     </button>
                   </div>
 

@@ -14,7 +14,7 @@
  * - Optimistic updates for better UX
  */
 
-import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   getVideoComments,
@@ -99,7 +99,10 @@ export default function CommentSection({ videoId, className = '' }: CommentSecti
           const merged = [...getDemoComments(videoId), ...seeded];
           setComments(merged);
           setOffset(merged.length);
-          // averageRating for demo videos is derived from `comments` by an effect.
+
+          const { avg, count } = averageOf(merged);
+          setAverageRating(avg);
+          setTotalRatedComments(count);
         } else {
           setComments(data);
           setOffset(data.length);
@@ -143,15 +146,18 @@ export default function CommentSection({ videoId, className = '' }: CommentSecti
       }
 
       if (data) {
-        if (isDemoId(videoId)) {
-          // Persist the demo comment ONCE, outside the state updater (Strict
-          // Mode may invoke updaters twice, which would double-persist and
-          // create duplicate ids). The averageRating effect recomputes the avg.
-          addDemoComment(videoId, data);
-          if (rating) setDemoRating(videoId, rating);
-        }
-        // Pure updater + id guard: never add the same comment twice.
-        setComments(prev => (prev.some(c => c.id === data.id) ? prev : [data, ...prev]));
+        setComments(prev => {
+          const next = [data, ...prev];
+          if (isDemoId(videoId)) {
+            // Persist the demo comment + recompute the client-side average.
+            addDemoComment(videoId, data);
+            if (rating) setDemoRating(videoId, rating);
+            const { avg, count } = averageOf(next);
+            setAverageRating(avg);
+            setTotalRatedComments(count);
+          }
+          return next;
+        });
 
         if (rating && !isDemoId(videoId)) {
           const { data: ratingData, error: ratingErr } = await getVideoAverageRating(videoId);
@@ -198,22 +204,6 @@ export default function CommentSection({ videoId, className = '' }: CommentSecti
     loadComments();
 
   }, [videoId]);
-
-  // Demo videos have no Supabase rating RPC — derive the average client-side
-  // from the (deduped) comments list so it stays correct after posting.
-  useEffect(() => {
-    if (!isDemoId(videoId)) return;
-    const { avg, count } = averageOf(comments);
-    setAverageRating(avg);
-    setTotalRatedComments(count);
-  }, [comments, videoId]);
-
-  // Safety net: render each comment id at most once, even if a duplicate ever
-  // slips into state (e.g. a realtime echo). Keys stay stable as comment.id.
-  const visibleComments = useMemo(() => {
-    const seen = new Set<string>();
-    return comments.filter(c => (seen.has(c.id) ? false : (seen.add(c.id), true)));
-  }, [comments]);
 
   useEffect(() => {
     if (!videoId) return;
@@ -289,7 +279,7 @@ export default function CommentSection({ videoId, className = '' }: CommentSecti
           </div>
         ) : (
           <>
-            {visibleComments.map((comment) => (
+            {comments.map((comment) => (
               <CommentItem
                 key={comment.id}
                 comment={comment}

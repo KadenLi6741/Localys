@@ -109,7 +109,7 @@ export default function LandingScreen() {
   const [slide, setSlide] = useState(0);
 
   useEffect(() => {
-    const id = setInterval(() => setSlide((s) => (s + 1) % slides.length), 7000);
+    const id = setInterval(() => setSlide((s) => (s + 1) % slides.length), 3000);
     return () => clearInterval(id);
   }, []);
 

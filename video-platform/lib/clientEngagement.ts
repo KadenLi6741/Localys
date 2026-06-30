@@ -195,25 +195,15 @@ export function toggleCommentLikeLocal(commentId: string): boolean {
 
 // ----- Demo comments + replies -------------------------------------------------------
 
-/** Drop any entries that repeat an earlier id (keeps first occurrence). */
-function dedupeById(list: Comment[]): Comment[] {
-  const seen = new Set<string>();
-  return list.filter((c) => (seen.has(c.id) ? false : (seen.add(c.id), true)));
-}
-
-/** Comments the user posted on a demo video (newest first). Deduped to clean
- *  up any legacy entries persisted under the old colliding-id scheme. */
+/** Comments the user posted on a demo video (newest first). */
 export function getDemoComments(videoId: string): Comment[] {
   hydrate();
-  return dedupeById(state.demoComments[videoId] ?? []);
+  return state.demoComments[videoId] ?? [];
 }
 
 export function addDemoComment(videoId: string, comment: Comment): void {
   hydrate();
   const existing = state.demoComments[videoId] ?? [];
-  // Guard against double-seeding (e.g. a Strict-Mode-replayed effect): never
-  // store the same comment id twice.
-  if (existing.some((c) => c.id === comment.id)) return;
   state = {
     ...state,
     demoComments: { ...state.demoComments, [videoId]: [comment, ...existing] },
