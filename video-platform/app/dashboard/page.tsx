@@ -648,15 +648,25 @@ function DashboardContent() {
               businessImage={business?.profile_picture_url}
             />
 
-            {/* Community Feedback — customer wishlist/requests, owner-managed */}
-            <CommunityFeedbackPanel businessId={business?.id} />
+            {/* ── Customer Engagement: outreach emails first, community feedback below ── */}
+            <section className="space-y-4 border-t border-border pt-6">
+              <div>
+                <h2 className="text-lg font-bold text-foreground">Customer Engagement</h2>
+                <p className="text-sm text-muted-foreground mt-0.5">
+                  Reach opted-in customers with Localy Emails, then review what the community is asking for.
+                </p>
+              </div>
 
-            {/* Localy Emails — opted-in list, compose/send, AI writing + automation (Premium) */}
-            <LocalyEmailsPanel
-              businessId={business?.id || ''}
-              businessName={business?.business_name || 'your business'}
-              isPremium={isPremium}
-            />
+              {/* Localy Emails — opted-in list, compose/send, AI writing + automation (Premium) */}
+              <LocalyEmailsPanel
+                businessId={business?.id || ''}
+                businessName={business?.business_name || 'your business'}
+                isPremium={isPremium}
+              />
+
+              {/* Community Feedback — customer wishlist/requests (secondary; sits below the emails) */}
+              <CommunityFeedbackPanel businessId={business?.id} />
+            </section>
           </div>
         )}
 
