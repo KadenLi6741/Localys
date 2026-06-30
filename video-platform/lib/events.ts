@@ -54,8 +54,20 @@ export interface LocalEvent {
   createdByUser?: boolean;
 }
 
+/** A single comment on an event (mock + user-added for the demo). */
+export interface EventComment {
+  id: string;
+  author: string;
+  message: string;
+  /** ISO timestamp. */
+  createdAt: string;
+  /** True for comments added by the current viewer in the demo. */
+  createdByUser?: boolean;
+}
+
 const CREATED_KEY = 'localy_events_created';
 const INTERESTED_KEY = 'localy_events_interested';
+const COMMENTS_KEY = 'localy_event_comments';
 
 /** Build an ISO timestamp `days` from now at the given hour (deterministic per render day). */
 function atDay(days: number, hour: number, minute = 0): string {
@@ -63,6 +75,20 @@ function atDay(days: number, hour: number, minute = 0): string {
   d.setHours(hour, minute, 0, 0);
   d.setDate(d.getDate() + days);
   return d.toISOString();
+}
+
+/** ISO timestamp on day-of-month `dom` of the CURRENT month at the given time.
+ *  Used so seeded events spread across the calendar regardless of today's date. */
+function onDom(dom: number, hour: number, minute = 0): string {
+  const d = new Date();
+  d.setHours(hour, minute, 0, 0);
+  d.setDate(dom);
+  return d.toISOString();
+}
+
+/** ISO timestamp `h` hours before now — for believable comment timestamps. */
+function hoursAgo(h: number): string {
+  return new Date(Date.now() - h * 60 * 60 * 1000).toISOString();
 }
 
 /**
@@ -138,7 +164,7 @@ export const MOCK_EVENTS: LocalEvent[] = [
     businessSlug: 'ashario-pets',
     title: 'Adoption & Charity Day',
     type: 'Community/Charity',
-    startsAt: atDay(4, 12, 0),
+    startsAt: onDom(6, 12, 0),
     description:
       'Meet adoptable rescues from the local shelter. Every treat and toy sold today sends 100% of profits to animal welfare.',
     imageUrl: '/stores/ashario-pets/banner.jpg',
@@ -167,7 +193,7 @@ export const MOCK_EVENTS: LocalEvent[] = [
     businessSlug: 'flowers-gifts-and-balloons',
     title: 'Grand Re-Opening',
     type: 'Grand Opening',
-    startsAt: atDay(6, 10, 0),
+    startsAt: onDom(11, 10, 0),
     description:
       'Freshly renovated and bursting with colour. First 50 guests get a complimentary single-stem rose and a ribbon-cutting at 10am sharp.',
     imageUrl: '/stores/flowers-gifts-and-balloons/banner.jpg',
@@ -181,7 +207,7 @@ export const MOCK_EVENTS: LocalEvent[] = [
     businessSlug: 'pho-xe-lua',
     title: 'Trivia & Noodle Night',
     type: 'Other',
-    startsAt: atDay(7, 19, 0),
+    startsAt: onDom(16, 19, 0),
     description:
       'Team trivia over steaming bowls of pho. Winning table takes home a month of free spring rolls. Tables of up to six.',
     imageUrl: '/stores/pho-xe-lua/banner.jpg',
@@ -210,14 +236,106 @@ export const MOCK_EVENTS: LocalEvent[] = [
     businessSlug: 'razi-pharmacy',
     title: 'Free Wellness Clinic',
     type: 'Community/Charity',
-    startsAt: atDay(9, 13, 0),
+    startsAt: onDom(22, 13, 0),
     description:
       'Drop in for free blood-pressure checks and a chat with our pharmacists about seasonal health. No appointment needed.',
     imageUrl: '/stores/razi-pharmacy/banner.jpg',
     interestedCount: 15,
     distanceKm: 2.9,
   },
+  {
+    id: 'evt-seed-11',
+    businessId: 'holy-smoke-barbecue',
+    businessName: 'Holy Smoke Barbecue',
+    businessSlug: 'holy-smoke-barbecue',
+    title: 'Low & Slow Brisket Masterclass',
+    type: 'Workshop',
+    startsAt: onDom(9, 15, 0),
+    description:
+      'Our pitmaster walks you through trimming, rubbing and the all-day smoke. Tasting board and a bottle of our house rub to take home.',
+    imageUrl: '/stores/holy-smoke-barbecue/banner.jpg',
+    promoDetails: '$60 per seat · tasting board included',
+    interestedCount: 29,
+    distanceKm: 1.2,
+  },
+  {
+    id: 'evt-seed-12',
+    businessId: 'amys-fish-and-chips',
+    businessName: "Amy's Fish & Chips",
+    businessSlug: 'amys-fish-and-chips',
+    title: 'Sunday Acoustic Sessions',
+    type: 'Live Music',
+    startsAt: onDom(27, 16, 0),
+    description:
+      'Wind down the weekend with rotating local singer-songwriters on the harbour deck. Family friendly, free entry, kids welcome.',
+    imageUrl: '/stores/amys-fish-and-chips/banner.jpg',
+    interestedCount: 47,
+    distanceKm: 2.4,
+  },
 ];
+
+/**
+ * MOCK event comments — wire to Supabase later.
+ *
+ * A few believable comments per seeded event (varied names, short realistic
+ * messages, relative timestamps). User-added comments are layered on top from
+ * localStorage (see getCommentsForEvent / addCommentToEvent).
+ */
+export const MOCK_EVENT_COMMENTS: Record<string, EventComment[]> = {
+  'evt-seed-1': [
+    { id: 'c1-1', author: 'Marcus T.', message: "Those brisket sliders are unreal. See you at 5!", createdAt: hoursAgo(20) },
+    { id: 'c1-2', author: 'Priya K.', message: 'Do you take walk-ins or should we book a table?', createdAt: hoursAgo(6) },
+    { id: 'c1-3', author: 'Dan R.', message: 'Went last week, the craft soda is a great shout.', createdAt: hoursAgo(2) },
+  ],
+  'evt-seed-2': [
+    { id: 'c2-1', author: 'Sofia L.', message: 'The Harbourmen are so good live, highly recommend.', createdAt: hoursAgo(30) },
+    { id: 'c2-2', author: 'Aiden M.', message: 'Is there space for a group of six?', createdAt: hoursAgo(9) },
+    { id: 'c2-3', author: 'Grace W.', message: "Can't wait for this!", createdAt: hoursAgo(3) },
+  ],
+  'evt-seed-3': [
+    { id: 'c3-1', author: 'Helen O.', message: 'Loved the olive oil tasting last season.', createdAt: hoursAgo(40) },
+    { id: 'c3-2', author: 'Tomas V.', message: 'Are the juices available to buy on the night?', createdAt: hoursAgo(12) },
+  ],
+  'evt-seed-4': [
+    { id: 'c4-1', author: 'Bella N.', message: 'Booked two seats for me and my mum, so excited.', createdAt: hoursAgo(26) },
+    { id: 'c4-2', author: 'Chris D.', message: 'Total beginner here — is that ok?', createdAt: hoursAgo(8) },
+    { id: 'c4-3', author: 'Yuki S.', message: 'Did this last summer, you come away with a gorgeous bouquet.', createdAt: hoursAgo(4) },
+  ],
+  'evt-seed-5': [
+    { id: 'c5-1', author: 'Olivia P.', message: 'Are kids allowed to meet the rescues?', createdAt: hoursAgo(22) },
+    { id: 'c5-2', author: 'Ravi B.', message: 'Such a good cause, will be there.', createdAt: hoursAgo(5) },
+  ],
+  'evt-seed-6': [
+    { id: 'c6-1', author: 'Linh T.', message: 'Ten years already?! Congratulations team.', createdAt: hoursAgo(33) },
+    { id: 'c6-2', author: 'Jordan F.', message: 'Is the tasting menu veggie friendly?', createdAt: hoursAgo(11) },
+    { id: 'c6-3', author: 'Mei H.', message: 'Best pho in the area, no contest.', createdAt: hoursAgo(2) },
+  ],
+  'evt-seed-7': [
+    { id: 'c7-1', author: 'Emma C.', message: 'The new layout looks stunning from the window!', createdAt: hoursAgo(18) },
+    { id: 'c7-2', author: 'Noah K.', message: 'What time does the ribbon-cutting start exactly?', createdAt: hoursAgo(7) },
+  ],
+  'evt-seed-8': [
+    { id: 'c8-1', author: 'Sam G.', message: 'Our table is already booked, bringing the A-team.', createdAt: hoursAgo(28) },
+    { id: 'c8-2', author: 'Isla R.', message: 'How hard are the questions?? Asking for a friend.', createdAt: hoursAgo(6) },
+  ],
+  'evt-seed-9': [
+    { id: 'c9-1', author: 'Paul E.', message: 'These flash deals are no joke, set an alarm.', createdAt: hoursAgo(15) },
+    { id: 'c9-2', author: 'Nadia A.', message: 'What time do the first markdowns drop?', createdAt: hoursAgo(4) },
+  ],
+  'evt-seed-10': [
+    { id: 'c10-1', author: 'George M.', message: 'Did the BP check last time, lovely staff.', createdAt: hoursAgo(24) },
+    { id: 'c10-2', author: 'Farah J.', message: 'Do I need to bring anything?', createdAt: hoursAgo(10) },
+  ],
+  'evt-seed-11': [
+    { id: 'c11-1', author: 'Leo W.', message: 'Been waiting for a class like this, count me in.', createdAt: hoursAgo(21) },
+    { id: 'c11-2', author: 'Hana Q.', message: 'Is the house rub gluten free?', createdAt: hoursAgo(5) },
+  ],
+  'evt-seed-12': [
+    { id: 'c12-1', author: 'Ruby S.', message: 'The harbour deck at sunset is perfect for this.', createdAt: hoursAgo(27) },
+    { id: 'c12-2', author: 'Theo L.', message: 'Are the acts confirmed yet?', createdAt: hoursAgo(8) },
+    { id: 'c12-3', author: 'Amara D.', message: 'Went last year, it was amazing.', createdAt: hoursAgo(3) },
+  ],
+};
 
 /* ── localStorage helpers (SSR-safe) ── */
 
@@ -298,4 +416,31 @@ export function toggleInterested(id: string): boolean {
 /** Stable client id for newly created events. */
 export function newEventId(): string {
   return `evt-user-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
+/* ── Comments (mock + user-added, persisted client-side) ── */
+
+/** All comments for an event: seeded + user-added, oldest first. */
+export function getCommentsForEvent(eventId: string): EventComment[] {
+  const seeded = MOCK_EVENT_COMMENTS[eventId] ?? [];
+  const stored = readJSON<Record<string, EventComment[]>>(COMMENTS_KEY, {});
+  const added = stored[eventId] ?? [];
+  return [...seeded, ...added].sort(
+    (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+  );
+}
+
+/** Add a viewer comment to an event (optimistic + localStorage); returns it. */
+export function addCommentToEvent(eventId: string, author: string, message: string): EventComment {
+  const comment: EventComment = {
+    id: `c-user-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+    author: author.trim() || 'You',
+    message: message.trim(),
+    createdAt: new Date().toISOString(),
+    createdByUser: true,
+  };
+  const stored = readJSON<Record<string, EventComment[]>>(COMMENTS_KEY, {});
+  stored[eventId] = [...(stored[eventId] ?? []), comment];
+  writeJSON(COMMENTS_KEY, stored);
+  return comment;
 }
