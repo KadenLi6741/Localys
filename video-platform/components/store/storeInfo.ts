@@ -394,8 +394,41 @@ const DEFAULT_STORE_INFO: StoreInfo = {
   ],
 };
 
-/** Look up demo store info by slug, falling back to a safe generic entry. */
+/**
+ * Food / restaurant businesses — the ONLY stores that should show allergen
+ * warnings in "Things to Look Out For". Every other business (convenience stores,
+ * pharmacies, florist / gift / balloon shops, grocers like Ambrosia/Thornhill,
+ * pet shops, and all service trades) has its allergen tags hidden. Matched by
+ * slug (the business id); keep this in sync when adding new food businesses.
+ */
+const FOOD_SLUGS = new Set<string>([
+  'amys-fish-and-chips',
+  'holy-smoke-barbecue',
+  'pho-nga-son',
+  'jays-burger',
+]);
+
+/** Keywords that mark a "look out for" tag as an allergy/allergen warning. */
+const ALLERGEN_RE = /allerg|\bnuts?\b|peanut|gluten|dairy|lactose|sesame|\bsoy\b|shellfish|latex|pollen/i;
+
+/** True when a "look out for" tag is an allergy/allergen warning (vs a general caution). */
+function isAllergenWarning(text: string): boolean {
+  return ALLERGEN_RE.test(text);
+}
+
+/** True only for food/restaurant businesses, which keep their allergen warnings. */
+export function showsAllergens(slug?: string): boolean {
+  return !!slug && FOOD_SLUGS.has(slug);
+}
+
+/**
+ * Look up demo store info by slug, falling back to a safe generic entry.
+ * For NON-food businesses, allergen/allergy tags are stripped from `lookOut`
+ * (general cautions like "Cash only" / "ID required" are kept) so allergy
+ * warnings only ever appear on food businesses.
+ */
 export function getStoreInfo(slug?: string): StoreInfo {
-  if (slug && STORE_INFO[slug]) return STORE_INFO[slug];
-  return DEFAULT_STORE_INFO;
+  const base = (slug && STORE_INFO[slug]) ? STORE_INFO[slug] : DEFAULT_STORE_INFO;
+  if (showsAllergens(slug)) return base;
+  return { ...base, lookOut: base.lookOut.filter((tag) => !isAllergenWarning(tag)) };
 }

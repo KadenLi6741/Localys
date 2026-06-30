@@ -32,24 +32,27 @@ export function StoreInfoSections({ slug }: { slug?: string }) {
         </div>
       </section>
 
-      {/* 2. Things to Look Out For */}
-      <section>
-        <div className="mb-3 flex items-center gap-2">
-          <AlertTriangle className="h-5 w-5 text-[#f97316]" strokeWidth={2} />
-          <h2 className="text-2xl font-bold text-black">Things to Look Out For</h2>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {info.lookOut.map((point, i) => (
-            <span
-              key={i}
-              className="inline-flex items-center gap-1.5 rounded-full border border-[#f97316]/40 bg-[#f97316]/10 px-3 py-1.5 text-sm font-medium text-black"
-            >
-              <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#f97316]" />
-              {point}
-            </span>
-          ))}
-        </div>
-      </section>
+      {/* 2. Things to Look Out For — hidden entirely when there's nothing to show
+          (e.g. a non-food business whose only entries were allergen warnings). */}
+      {info.lookOut.length > 0 && (
+        <section>
+          <div className="mb-3 flex items-center gap-2">
+            <AlertTriangle className="h-5 w-5 text-[#f97316]" strokeWidth={2} />
+            <h2 className="text-2xl font-bold text-black">Things to Look Out For</h2>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {info.lookOut.map((point, i) => (
+              <span
+                key={i}
+                className="inline-flex items-center gap-1.5 rounded-full border border-[#f97316]/40 bg-[#f97316]/10 px-3 py-1.5 text-sm font-medium text-black"
+              >
+                <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#f97316]" />
+                {point}
+              </span>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* 3. Common Questions */}
       <section>
