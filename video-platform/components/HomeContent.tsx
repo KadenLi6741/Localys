@@ -1091,6 +1091,18 @@ export function HomeContent({ isActive }: HomeContentProps) {
     ? (currentEta ? `${distance} · ${currentEta} min` : distance)
     : 'Set location';
 
+  // Lazy windowing: only the current video and its immediate neighbours (incl.
+  // the wrap-around neighbour) actually mount a <video> and buffer. Every other
+  // slide renders a lightweight poster instead, so the browser never downloads
+  // or holds the entire feed in RAM — off-screen videos are fully unmounted and
+  // their memory is released. This is the main fix for the slow live-domain load
+  // + RAM bloat (previously every video mounted with src set and preloaded).
+  const total = videos.length;
+  const isNear = (index: number) => {
+    const d = Math.abs(index - currentIndex);
+    return d <= 1 || d === total - 1;
+  };
+
   return (
     <>
       <style>{`
@@ -1225,19 +1237,38 @@ export function HomeContent({ isActive }: HomeContentProps) {
 
               return (
                 <>
-            {/* Main video — centered vertical column, fills with object-cover */}
+            {/* Main video — centered vertical column, fills with object-cover.
+                Only mounted for near slides (current + neighbours); far slides
+                show the poster image so nothing off-screen buffers into RAM. */}
             <div className="absolute inset-0 flex items-center justify-center">
-              <video
-                ref={(el) => { videoRefs.current[index] = el; }}
-                src={video.video_url}
-                className="h-full w-full max-w-[min(100%,calc((100vh-112px)*9/16))] object-cover cursor-pointer"
-                controls={false}
-                loop
-                playsInline
-                muted={!isActive || index !== currentIndex}
-                autoPlay={index === currentIndex}
-                onClick={index === currentIndex ? togglePlayPause : undefined}
-              />
+              {isNear(index) ? (
+                <video
+                  ref={(el) => { videoRefs.current[index] = el; }}
+                  src={video.video_url}
+                  poster={feedBusiness?.profile_picture_url || undefined}
+                  preload={index === currentIndex ? 'auto' : 'metadata'}
+                  className="h-full w-full max-w-[min(100%,calc((100vh-112px)*9/16))] object-cover cursor-pointer"
+                  controls={false}
+                  loop
+                  playsInline
+                  muted={!isActive || index !== currentIndex}
+                  autoPlay={index === currentIndex}
+                  onClick={index === currentIndex ? togglePlayPause : undefined}
+                />
+              ) : (
+                <div className="h-full w-full max-w-[min(100%,calc((100vh-112px)*9/16))] bg-black">
+                  {feedBusiness?.profile_picture_url && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={feedBusiness.profile_picture_url}
+                      alt=""
+                      loading="lazy"
+                      aria-hidden="true"
+                      className="h-full w-full object-cover opacity-50"
+                    />
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Centered Play Icon - shown when paused */}
@@ -1266,8 +1297,10 @@ export function HomeContent({ isActive }: HomeContentProps) {
               </div>
             )}
 
-            {/* Left-side item cards — original compact pop-up tied to this business */}
-            {(feedBusiness || feedItems) && (
+            {/* Left-side item cards — original compact pop-up tied to this business.
+                Only render for near slides so off-screen item images don't all
+                decode into memory at once. */}
+            {isNear(index) && (feedBusiness || feedItems) && (
               <div className="absolute left-3 top-20 bottom-28 z-20 hidden w-[clamp(150px,18vw,210px)] overflow-y-auto overscroll-contain pr-1 sm:block">
                 <BusinessItemsRail
                   userId={video.user_id || ''}
