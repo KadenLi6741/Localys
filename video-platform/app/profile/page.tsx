@@ -20,6 +20,7 @@ import {
 import { OrderHistory } from '@/components/OrderHistory';
 import { RankSection } from '@/components/RankSection';
 import { CommunityLeaderboard } from '@/components/CommunityLeaderboard';
+import { computeImpactScore, resolveImpactInputs } from '@/lib/ranks';
 import { getUserCoins } from '@/lib/supabase/profiles';
 import { getUserBookmarkedVideos } from '@/lib/supabase/videos';
 import { getSavedItems, getLikedItemIds, getLikedMenuItems, subscribeEngagement, type LikedMenuItem } from '@/lib/clientEngagement';
@@ -675,8 +676,15 @@ function ProfileView({ profile, user, onEditClick, onSignOut, onProfileUpdated }
         />
       )}
 
-      {/* Community leaderboard — your rank within 5 km + rank rewards */}
-      <CommunityLeaderboard />
+      {/* Community leaderboard — your rank within 5 km + rank rewards.
+          Score is computed from the SAME source of truth as RankSection so the
+          rank label matches everywhere (no Gold-vs-Philanthropist mismatch). */}
+      {!statsLoading && (
+        <CommunityLeaderboard
+          score={computeImpactScore(resolveImpactInputs({ moneySpent, points, bizCount }))}
+          userName={profile?.full_name || profile?.username || 'You'}
+        />
+      )}
 
       {/* Impact stats */}
       {!statsLoading && (bizCount > 0 || moneySpent > 0) && (
