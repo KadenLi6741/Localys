@@ -1,14 +1,24 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase/client';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
-import { QRScanner } from '@/components/QRScanner';
 import { PostedVideos } from '@/components/PostedVideos';
 import { MenuList } from '@/components/MenuList';
-import { BusinessReports } from '@/components/dashboard/BusinessReports';
+
+// Heavy, tab-gated widgets — code-split so their bundles (recharts + jsPDF for
+// reports, jsQR + camera for the scanner) load only when actually opened.
+const BusinessReports = dynamic(
+  () => import('@/components/dashboard/BusinessReports').then((m) => m.BusinessReports),
+  { ssr: false, loading: () => <div className="h-96 animate-pulse rounded-2xl bg-muted" /> },
+);
+const QRScanner = dynamic(
+  () => import('@/components/QRScanner').then((m) => m.QRScanner),
+  { ssr: false },
+);
 import {
   ensureUserBusiness,
   updateBusinessInfo,

@@ -1,12 +1,18 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { getUserCoinPurchases, getUserItemPurchases, getBusinessItemSales } from '@/lib/supabase/profiles';
 import { supabase } from '@/lib/supabase/client';
 import type { CoinPurchase, ItemPurchase } from '@/models/Order';
 import { useTranslation } from '@/hooks/useTranslation';
-import { OrderQRCode } from '@/components/QRCode';
+
+// qrcode.react ships only when an order QR is actually rendered.
+const OrderQRCode = dynamic(
+  () => import('@/components/QRCode').then((m) => m.OrderQRCode),
+  { ssr: false, loading: () => <div className="h-40 w-40 animate-pulse rounded-lg bg-white/10" /> },
+);
 import { RefreshCw, Star, CalendarClock } from 'lucide-react';
 import { getLocalOrders, type LocalOrder } from '@/lib/clientEngagement';
 import { getReviewStats } from '@/lib/utils/reviewStats';

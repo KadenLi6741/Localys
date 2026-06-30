@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { Heart, Store, Utensils } from 'lucide-react';
 import type { CollectionWithEntries } from '@/lib/supabase/collections';
 
@@ -35,11 +36,12 @@ export function CollectionCard({
     >
       <div className="relative aspect-[16/10] w-full overflow-hidden bg-muted">
         {cover ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
+          <Image
             src={cover}
             alt=""
-            className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+            fill
+            sizes="(max-width: 768px) 100vw, 320px"
+            className="object-cover transition duration-500 group-hover:scale-105"
           />
         ) : (
           <span className="grid h-full w-full place-items-center">

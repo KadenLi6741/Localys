@@ -5,8 +5,6 @@ import {
   BarChart, Bar, LineChart, Line, ComposedChart, PieChart, Pie, Cell, Legend,
   XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
 } from 'recharts';
-import { jsPDF } from 'jspdf';
-import autoTable from 'jspdf-autotable';
 import { Download, FileText, SlidersHorizontal } from 'lucide-react';
 import type { ItemPurchase } from '@/models/Order';
 import type { BusinessReview } from '@/lib/supabase/reviews';
@@ -222,6 +220,12 @@ export function BusinessReports({
     if (pdfBusy) return;
     setPdfBusy(true);
     try {
+      // Lazy-load the PDF libs (~large) only when the user actually exports.
+      const [{ jsPDF }, autoTable] = await Promise.all([
+        import('jspdf'),
+        import('jspdf-autotable').then((m) => m.default),
+      ]);
+
       const [revImg, catImg, itemsImg] = await Promise.all([
         nodeToImage(revChartRef.current),
         nodeToImage(catChartRef.current),

@@ -1,9 +1,15 @@
 'use client';
 
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { OrderQRCode } from '@/components/QRCode';
+
+// qrcode.react ships only when an order QR is actually rendered.
+const OrderQRCode = dynamic(
+  () => import('@/components/QRCode').then((m) => m.OrderQRCode),
+  { ssr: false, loading: () => <div className="h-40 w-40 animate-pulse rounded-lg bg-white/10" /> },
+);
 import { useAuth } from '@/contexts/AuthContext';
 import { saveLocalOrder, getLocalOrders } from '@/lib/clientEngagement';
 

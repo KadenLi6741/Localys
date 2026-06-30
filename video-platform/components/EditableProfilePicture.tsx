@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef, useState, useEffect } from 'react';
+import Image from 'next/image';
 import { uploadProfilePicture, updateProfile, MAX_PROFILE_PICTURE_SIZE, BYTES_TO_MB } from '@/lib/supabase/profiles';
 
 interface EditableProfilePictureProps {
@@ -107,13 +108,16 @@ export function EditableProfilePicture({
 
   return (
     <div className="relative">
-      <div className={`${className} rounded-full bg-white/20 flex items-center justify-center overflow-hidden`}>
+      <div className={`${className} relative rounded-full bg-white/20 flex items-center justify-center overflow-hidden`}>
         {preview ? (
-          <img
-            src={preview}
-            alt="Profile"
-            className="w-full h-full object-cover"
-          />
+          // Live upload previews are blob:/data: URLs — bypass the optimizer for
+          // those; persisted (Supabase) URLs go through next/image.
+          preview.startsWith('blob:') || preview.startsWith('data:') ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={preview} alt="Profile" className="w-full h-full object-cover" />
+          ) : (
+            <Image src={preview} alt="Profile" fill sizes="96px" className="object-cover" />
+          )
         ) : (
           <span className="text-3xl text-white/60">
             {fullName?.[0] || username?.[0] || '?'}
