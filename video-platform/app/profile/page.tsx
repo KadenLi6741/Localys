@@ -18,7 +18,6 @@ import {
   BYTES_TO_MB,
 } from '@/lib/supabase/profiles';
 import { OrderHistory } from '@/components/OrderHistory';
-import { RankSection } from '@/components/RankSection';
 import { CommunityLeaderboard } from '@/components/CommunityLeaderboard';
 import { computeImpactScore, resolveImpactInputs } from '@/lib/ranks';
 import { getUserCoins } from '@/lib/supabase/profiles';
@@ -666,19 +665,9 @@ function ProfileView({ profile, user, onEditClick, onSignOut, onProfileUpdated }
         </div>
       </div>
 
-      {/* Rank / tier */}
-      {!statsLoading && (
-        <RankSection
-          moneySpent={moneySpent}
-          points={points}
-          bizCount={bizCount}
-          userName={profile?.full_name || profile?.username || 'You'}
-        />
-      )}
-
-      {/* Community leaderboard — your rank within 5 km + rank rewards.
-          Score is computed from the SAME source of truth as RankSection so the
-          rank label matches everywhere (no Gold-vs-Philanthropist mismatch). */}
+      {/* Community leaderboard — the single place the user's rank is shown.
+          The separate rank summary card was removed; the leaderboard already
+          shows the user's tier (computed from the same Impact Score). */}
       {!statsLoading && (
         <CommunityLeaderboard
           score={computeImpactScore(resolveImpactInputs({ moneySpent, points, bizCount }))}
