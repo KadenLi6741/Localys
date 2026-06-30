@@ -20,3 +20,24 @@ export const isRealUuid = (id?: string | null): boolean => !!id && UUID_RE.test(
  * must be handled client-side, never sent to Supabase uuid columns.
  */
 export const isDemoId = (id?: string | null): boolean => !isRealUuid(id);
+
+/** Monotonic fallback counter for environments without crypto.randomUUID. */
+let demoIdCounter = 0;
+
+/**
+ * Guaranteed-unique client id for a demo comment/reply.
+ *
+ * Keeps the `demo-comment-` prefix so the value is NOT a syntactic UUID and
+ * `isDemoId()` still routes its likes/replies through the client-side path.
+ * Uses crypto.randomUUID() when available (collision-proof even when many are
+ * created in the same millisecond), with a counter+random fallback otherwise.
+ * Replaces the old `demo-comment-${Date.now()}` scheme, which collided when
+ * several comments were posted within the same millisecond.
+ */
+export function newDemoCommentId(): string {
+  const unique =
+    typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+      ? crypto.randomUUID()
+      : `${Date.now().toString(36)}-${(demoIdCounter++).toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+  return `demo-comment-${unique}`;
+}

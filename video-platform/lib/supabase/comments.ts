@@ -11,7 +11,7 @@ import type {
 
 export type { Comment, CreateCommentPayload, CreateReplyPayload, UpdateCommentPayload, CommentSubscriptionCallback, LikeSubscriptionCallback };
 
-import { isDemoId } from '../utils/ids';
+import { isDemoId, newDemoCommentId } from '../utils/ids';
 
 // Demo comment ids are intentionally non-UUID so isDemoId() routes their
 // likes/replies through the client-side path (no Supabase, no FK violation).
@@ -214,7 +214,7 @@ export async function createComment(
     const { data: { user } } = await supabase.auth.getUser();
     const username = user?.email?.split('@')[0] || 'you';
     const comment: Comment = {
-      id: `demo-comment-${Date.now()}`,
+      id: newDemoCommentId(),
       video_id: payload.video_id,
       user_id: user?.id || 'local-user',
       content: payload.content,
@@ -302,7 +302,7 @@ export async function createReply(
     const { data: { user } } = await supabase.auth.getUser();
     const username = user?.email?.split('@')[0] || 'you';
     const reply: Comment = {
-      id: `demo-comment-${Date.now()}`,
+      id: newDemoCommentId(),
       video_id: 'local',
       user_id: user?.id || 'local-user',
       content: payload.content,
