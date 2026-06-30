@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { ChevronLeft, ChevronUp, ChevronDown } from 'lucide-react';
+import { ChevronLeft } from 'lucide-react';
+import { VoteArrowUp, VoteArrowDown } from '@/components/VoteArrow';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { useCommunities } from '@/contexts/CommunitiesContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -87,7 +88,7 @@ function ThreadContent() {
                   : 'text-black dark:text-white hover:text-[#f97316]'
               }`}
             >
-              <ChevronUp className="h-5 w-5" strokeWidth={2.5} />
+              <VoteArrowUp className="h-5 w-5" />
             </button>
             <span
               className={`text-sm font-bold tabular-nums ${
@@ -109,7 +110,7 @@ function ThreadContent() {
                   : 'text-black dark:text-white hover:text-[#f97316]'
               }`}
             >
-              <ChevronDown className="h-5 w-5" strokeWidth={2.5} />
+              <VoteArrowDown className="h-5 w-5" />
             </button>
           </div>
 
@@ -197,7 +198,7 @@ function ThreadContent() {
                         c.userVote === 1 ? 'text-[#f97316]' : 'text-black dark:text-white hover:text-[#f97316]'
                       }`}
                     >
-                      <ChevronUp className="h-4 w-4" strokeWidth={2.5} />
+                      <VoteArrowUp className="h-4 w-4" />
                     </button>
                     <span className={`text-[11px] font-semibold tabular-nums ${c.userVote === 1 ? 'text-[#f97316]' : 'text-black dark:text-white'}`}>
                       {c.votes}
@@ -209,7 +210,7 @@ function ThreadContent() {
                         c.userVote === -1 ? 'text-[#f97316]' : 'text-black dark:text-white hover:text-[#f97316]'
                       }`}
                     >
-                      <ChevronDown className="h-4 w-4" strokeWidth={2.5} />
+                      <VoteArrowDown className="h-4 w-4" />
                     </button>
                   </div>
                 </div>
