@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { keywordRank, type SearchCandidate } from '@/lib/semanticSearch';
+import { geminiUrl } from '@/lib/gemini';
 
 /**
  * Semantic search ranking via Gemini (server-side; GEMINI_API_KEY never leaves
@@ -64,10 +65,9 @@ ${JSON.stringify(trimmed)}`;
 
   try {
     const geminiRes = await fetch(
-      // gemini-2.5-flash with thinking disabled = fast, JSON-only ranking. (The
-      // free tier blocks gemini-2.0-flash on this account; 2.5-flash is what the
-      // Localy Assistant route already uses.)
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+      // Model id is centralized in lib/gemini.ts (GEMINI_MODEL). Thinking
+      // disabled below = fast, JSON-only ranking.
+      geminiUrl(apiKey),
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

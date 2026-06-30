@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCart, CartItem } from '@/contexts/CartContext';
 import { getShopCoupons, Coupon } from '@/lib/supabase/coupons';
+import { saveConsent } from '@/lib/supabase/emailConsents';
 import { validateFutureDateTime } from '@/lib/utils/validation';
 import Link from 'next/link';
 import { ChevronLeft, CalendarClock, Tag, CheckCircle, Truck, Store } from 'lucide-react';
@@ -23,6 +24,8 @@ function CheckoutContent() {
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Email/notifications opt-in — UNCHECKED by default (explicit opt-in).
+  const [emailConsent, setEmailConsent] = useState(false);
 
   const source = searchParams.get('source');
   const scheduledAt = searchParams.get('scheduledAt');
@@ -113,6 +116,23 @@ function CheckoutContent() {
     }
     setProcessing(true);
     setError(null);
+
+    // Save email/notification consent for each business in this order — only if
+    // the customer opted in. Best-effort + fire-and-forget so it never blocks or
+    // crashes checkout (handles demo/slug sellers gracefully).
+    if (emailConsent && user) {
+      const sellerIds = [...new Set(checkoutItems.map((i) => i.sellerId))];
+      const userName = (user.user_metadata?.full_name as string) || user.email || null;
+      for (const sellerId of sellerIds) {
+        void saveConsent({
+          userId: user.id,
+          userEmail: user.email ?? null,
+          userName,
+          businessId: sellerId,
+        });
+      }
+    }
+
     try {
       const response = await fetch('/api/checkout-item', {
         method: 'POST',
@@ -304,6 +324,19 @@ function CheckoutContent() {
             <p className="text-red-600 text-sm">{error}</p>
           </div>
         )}
+
+        {/* Email/notifications consent — opt-in, unchecked by default */}
+        <label className="mb-4 flex cursor-pointer items-start gap-3 rounded-2xl border border-gray-200 p-4">
+          <input
+            type="checkbox"
+            checked={emailConsent}
+            onChange={(e) => setEmailConsent(e.target.checked)}
+            className="mt-0.5 h-4 w-4 shrink-0 accent-[#f97316]"
+          />
+          <span className="text-sm text-gray-700">
+            Allow this business to send me emails and notifications about deals and updates.
+          </span>
+        </label>
 
         {/* Proceed */}
         <button

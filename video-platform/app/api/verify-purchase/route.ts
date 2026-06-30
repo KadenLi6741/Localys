@@ -3,6 +3,7 @@ import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 import { checkRateLimit, getClientIp, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit';
 import { getAuthenticatedUser } from '@/lib/server-auth';
+import { applyPremiumPoints } from '@/lib/premium';
 
 function getSupabaseAdminClient() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -89,7 +90,7 @@ async function processOrder(userId: string, coins: number, sessionId: string) {
 
   const { data: profile, error: profileError } = await supabase
     .from('profiles')
-    .select('coin_balance')
+    .select('coin_balance, is_premium')
     .eq('id', userId)
     .single();
 
@@ -98,7 +99,9 @@ async function processOrder(userId: string, coins: number, sessionId: string) {
     throw profileError;
   }
 
-  const newBalance = (profile?.coin_balance || 0) + coins;
+  // Premium: +15% points. Premium customers earn 1.15x on what they receive.
+  const earnedCoins = applyPremiumPoints(coins, !!(profile as { is_premium?: boolean })?.is_premium);
+  const newBalance = (profile?.coin_balance || 0) + earnedCoins;
 
   const { error: updateError } = await supabase
     .from('profiles')
@@ -112,11 +115,11 @@ async function processOrder(userId: string, coins: number, sessionId: string) {
 
   await supabase.from('coin_purchases').insert({
     user_id: userId,
-    coins,
+    coins: earnedCoins,
     amount_cents: null,
     stripe_session_id: sessionId,
     created_at: new Date().toISOString(),
   });
 
-  console.log(`[verify-purchase] +${coins} coins for user ${userId}`);
+  console.log(`[verify-purchase] +${earnedCoins} coins for user ${userId}`);
 }

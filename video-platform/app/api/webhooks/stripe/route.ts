@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 import { generateToken } from '@/lib/verification';
+import { applyPremiumPoints } from '@/lib/premium';
 
 export async function POST(request: NextRequest) {
   const stripeKey = process.env.STRIPE_SECRET_KEY;
@@ -97,7 +98,7 @@ export async function POST(request: NextRequest) {
 
         const { data: profile, error: profileError } = await supabase
           .from('profiles')
-          .select('coin_balance')
+          .select('coin_balance, is_premium')
           .eq('id', userId)
           .single();
 
@@ -109,7 +110,9 @@ export async function POST(request: NextRequest) {
           );
         }
 
-        const newBalance = (profile?.coin_balance || 0) + coins;
+        // Premium: +15% points. Premium customers earn 1.15x on what they receive.
+        const earnedCoins = applyPremiumPoints(coins, !!(profile as { is_premium?: boolean })?.is_premium);
+        const newBalance = (profile?.coin_balance || 0) + earnedCoins;
 
         const { error: updateError } = await supabase
           .from('profiles')
@@ -124,11 +127,11 @@ export async function POST(request: NextRequest) {
           );
         }
 
-        console.log(`Added ${coins} coins to user ${userId}. New balance: ${newBalance}`);
+        console.log(`Added ${earnedCoins} coins to user ${userId}. New balance: ${newBalance}`);
 
         await supabase.from('coin_purchases').insert({
           user_id: userId,
-          coins,
+          coins: earnedCoins,
           amount_cents: session.amount_total,
           stripe_session_id: session.id,
           created_at: new Date().toISOString(),

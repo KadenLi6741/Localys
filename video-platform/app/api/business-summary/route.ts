@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { geminiUrl } from '@/lib/gemini';
 
 /**
  * Generate a 1–2 sentence business summary from its product/menu item names via
@@ -48,9 +49,8 @@ Items: ${items.join(', ')}`;
 
   try {
     const geminiRes = await fetch(
-      // gemini-2.5-flash (thinking off) — matches the Localy Assistant route; the
-      // free tier blocks gemini-2.0-flash on this account.
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+      // Model id is centralized in lib/gemini.ts (GEMINI_MODEL).
+      geminiUrl(apiKey),
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
