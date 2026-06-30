@@ -9,7 +9,6 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { supabase } from '@/lib/supabase/client';
 import { EditableProfilePicture } from '@/components/EditableProfilePicture';
 import { LanguageSettings } from '@/components/LanguageSettings';
-import { SideCards } from '@/components/SideCards';
 import {
   uploadProfilePicture,
   updateProfile,
@@ -520,7 +519,6 @@ function ProfileContent() {
         />
       ) : (
         <>
-          {user && <SideCards userId={user.id} />}
           <ProfileView
             profile={profile}
             user={user}
