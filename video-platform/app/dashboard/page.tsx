@@ -11,6 +11,7 @@ import { MenuList } from '@/components/MenuList';
 import { BusinessReports } from '@/components/dashboard/BusinessReports';
 import { CommunityFeedbackPanel } from '@/components/dashboard/CommunityFeedbackPanel';
 import { LocalyEmailsPanel } from '@/components/dashboard/LocalyEmailsPanel';
+import { MyEventsPanel } from '@/components/dashboard/MyEventsPanel';
 import {
   ensureUserBusiness,
   updateBusinessInfo,
@@ -629,6 +630,13 @@ function DashboardContent() {
                 })}
               </div>
             </div>
+
+            {/* My Events — create/edit/delete events shown on the customer Events page */}
+            <MyEventsPanel
+              businessId={business?.id}
+              businessName={business?.business_name}
+              businessImage={business?.profile_picture_url}
+            />
 
             {/* Community Feedback — customer wishlist/requests, owner-managed */}
             <CommunityFeedbackPanel businessId={business?.id} />

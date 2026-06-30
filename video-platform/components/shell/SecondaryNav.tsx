@@ -2,12 +2,13 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Compass, Users, MessageCircle, User } from 'lucide-react';
+import { Home, Compass, Users, CalendarDays, MessageCircle, User } from 'lucide-react';
 
 const items = [
   { href: '/home', label: 'Home', icon: Home },
   { href: '/feed', label: 'Discover', icon: Compass },
   { href: '/communities', label: 'Communities', icon: Users },
+  { href: '/events', label: 'Events', icon: CalendarDays },
   { href: '/chats', label: 'Messages', icon: MessageCircle },
   { href: '/profile', label: 'Profile', icon: User },
 ];
