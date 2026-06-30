@@ -1,48 +1,53 @@
 /**
  * Vote arrows for community upvote/downvote buttons.
  *
- * Rendered as TEXT GLYPHS (geometric triangles), not an icon-library import and
- * not an <svg>. The vote count text in the same pill always renders, so a text
- * glyph is the most reliable way to guarantee the arrow shows too — it can't
- * fail to import, can't collapse to a zero-size <svg> box, and isn't affected by
- * any svg-specific CSS.
+ * Drawn as CSS BORDER TRIANGLES — the most bulletproof method possible. There
+ * is no icon-library import, no <svg> path, and no font glyph involved, so the
+ * arrow cannot fail to render because of a missing export, an svg sizing quirk,
+ * or a font that lacks a triangle character. The triangle is produced purely
+ * from the CSS box model (a zero-size box with thick coloured borders).
  *
- * Details that keep it correct:
- *  - U+25B2 / U+25BC (BLACK UP/DOWN-POINTING TRIANGLE) + U+FE0E (variation
- *    selector-15) force TEXT presentation, so they never render as an emoji.
- *  - Color comes from the parent button's text color (currentColor), so the
- *    arrow is black in light mode, white in dark mode, and orange (#f97316)
- *    when that vote is active — clearly visible in both themes.
- *  - Explicit font-size + line-height so the glyph is always a visible size.
+ *  - Colour is `currentColor`, so the arrow inherits the parent button's text
+ *    colour: black in light mode, white in dark mode, orange (#f97316) when that
+ *    vote is active — clearly visible in both themes.
+ *  - Sizes are explicit pixel borders (inline style beats any utility class), so
+ *    the triangle is always a visible, fixed size.
  */
 
 interface VoteArrowProps {
   className?: string;
 }
 
-const BASE =
-  'inline-flex items-center justify-center leading-none select-none font-normal';
-
-export function VoteArrowUp({ className = 'h-4 w-4' }: VoteArrowProps) {
+export function VoteArrowUp({ className = '' }: VoteArrowProps) {
   return (
     <span
       aria-hidden="true"
-      className={`${BASE} ${className}`}
-      style={{ fontSize: '1rem', lineHeight: 1 }}
-    >
-      {'▲︎'}
-    </span>
+      className={className}
+      style={{
+        display: 'inline-block',
+        width: 0,
+        height: 0,
+        borderLeft: '6px solid transparent',
+        borderRight: '6px solid transparent',
+        borderBottom: '9px solid currentColor',
+      }}
+    />
   );
 }
 
-export function VoteArrowDown({ className = 'h-4 w-4' }: VoteArrowProps) {
+export function VoteArrowDown({ className = '' }: VoteArrowProps) {
   return (
     <span
       aria-hidden="true"
-      className={`${BASE} ${className}`}
-      style={{ fontSize: '1rem', lineHeight: 1 }}
-    >
-      {'▼︎'}
-    </span>
+      className={className}
+      style={{
+        display: 'inline-block',
+        width: 0,
+        height: 0,
+        borderLeft: '6px solid transparent',
+        borderRight: '6px solid transparent',
+        borderTop: '9px solid currentColor',
+      }}
+    />
   );
 }
