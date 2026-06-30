@@ -58,6 +58,28 @@ All packages are open-source. Licenses are noted as they appear in each project'
 
 ---
 
+## Store / Business Image Sources
+
+All store and business images used in the demo are sourced from third-party websites and are used strictly for **educational, non-commercial purposes** for the FBLA Coding & Programming (Byte-Sized Business Boost) competition. No ownership of these images is claimed. The list below covers the primary sources; it does not include every individual store or image.
+
+| Store / Business | Source |
+|---|---|
+| Amy's Fish and Chips | Tripadvisor — [Amy's Fish and Chips, Richmond Hill](https://www.tripadvisor.com/Restaurant_Review-g181740-d11631371-Reviews-Amy_s_Fish_and_Chips-Richmond_Hill_Ontario.html) (retrieved June 28, 2026) |
+| Pho Nga Son | [phongason.com](https://phongason.com/) (retrieved June 28, 2026) |
+| Holy Smoke (Texas BBQ) | [getholy.ca](https://www.getholy.ca/) (retrieved June 28, 2026) |
+| Jay's Burger | [jaysburger.com](https://www.jaysburger.com/) (retrieved June 28, 2026) |
+| Pho Xe Lua | [phoxelua.ca](https://www.phoxelua.ca/) |
+| Ambrosia (natural foods) | [canada.ambrosia.ca](https://canada.ambrosia.ca/) |
+| Ashario Pets | [ashariopets.ca](https://ashariopets.ca/) |
+| K1 Floral Studio (florist) | [k1floralstudio.com](https://www.k1floralstudio.com/) |
+| JHC Landscaping | [jhc-landscaping.com](https://jhc-landscaping.com/) |
+| HVAC / Heating & Ventilation | [Checkatrade blog](https://www.checkatrade.com/blog/trade/start-business/start-heating-and-ventilation-business/) · [PropertyRadar blog](https://www.propertyradar.com/blog/scale-your-hvac-business-this-year-with-high-impact-lead-generation) |
+| Home Painting Services | [Berger Paints blog](https://www.bergerpaints.com/blogs/features-of-home-painting-services) |
+| Pressure Washing Services | [DTK Inc. blog](https://dtkinc.com/blog/cleaning-services/tips-for-getting-pressure-washing-services/) |
+| Personal Trainer / Fitness | [Harvard Health](https://www.health.harvard.edu/exercise-and-fitness/7-things-your-personal-trainer-wants-you-to-know) |
+
+---
+
 ## Fonts
 
 | Font | Provider | License |

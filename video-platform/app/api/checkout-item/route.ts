@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
 
   const parsed = parseBody(ItemCheckoutSchema, body);
   if (!parsed.success) return parsed.response;
-  const { items, couponCode, promoCode, scheduledAt, groupOrderId } = parsed.data;
+  const { items, couponCode, promoCode, scheduledAt, groupOrderId, fulfillment, reservation } = parsed.data;
 
   const supabase = createClient(supabaseUrl, supabaseKey);
 
@@ -215,6 +215,35 @@ export async function POST(request: NextRequest) {
   });
   const firstSellerId = items[0].sellerId;
 
+  // Fee rules: pickup & reservation are FREE; delivery adds a 5% fee on the
+  // (server-trusted) subtotal. Add it as its own Stripe line so it's actually
+  // charged and shows up in the order total.
+  const resolvedFulfillment = fulfillment ?? 'delivery';
+  if (resolvedFulfillment === 'delivery') {
+    const serverSubtotal = items.reduce((sum, item) => {
+      const mi = menuMap.get(item.itemId);
+      return sum + (mi?.price ?? 0) * item.quantity;
+    }, 0);
+    const deliveryFee = Math.round(serverSubtotal * 0.05 * 100) / 100;
+    if (deliveryFee > 0) {
+      lineItems.push({
+        price_data: {
+          currency: 'usd',
+          product_data: { name: 'Delivery fee (5%)', description: 'Delivery service fee' },
+          unit_amount: Math.round(deliveryFee * 100),
+        },
+        quantity: 1,
+      });
+    }
+  }
+
+  // Reservation details as a single compact JSON string (party / ISO time /
+  // trimmed comments) — kept well under Stripe's 500-char metadata limit.
+  const reservationMeta =
+    resolvedFulfillment === 'reservation' && reservation
+      ? JSON.stringify({ p: reservation.party, t: reservation.time, c: (reservation.comments ?? '').slice(0, 280) })
+      : null;
+
   try {
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
@@ -240,6 +269,10 @@ export async function POST(request: NextRequest) {
         }),
         ...(scheduledAt && { scheduledAt }),
         ...(groupOrderId && { groupOrderId }),
+        // Small fixed-string value ("pickup" | "delivery" | "reservation").
+        fulfillment: resolvedFulfillment,
+        // Compact reservation JSON (< 500 chars) when this is a reservation.
+        ...(reservationMeta && { reservation: reservationMeta }),
       },
     });
 

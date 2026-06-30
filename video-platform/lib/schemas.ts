@@ -35,6 +35,16 @@ export const ItemCheckoutSchema = z.object({
   promoCode:     z.string().max(50).optional().nullable(),
   scheduledAt:   z.string().datetime().optional().nullable(),
   groupOrderId:  z.string().uuid().optional().nullable(),
+  // How the order is fulfilled: picked up at the store, a dine-in reservation, or
+  // delivered. Defaults to 'delivery' on the server when omitted.
+  fulfillment:   z.enum(['pickup', 'delivery', 'reservation']).optional().nullable(),
+  // Reservation details (only when fulfillment === 'reservation'). Kept small so
+  // the whole object stays well under Stripe's 500-char metadata limit.
+  reservation:   z.object({
+    party:    z.number().int().min(1).max(50),
+    time:     z.string().datetime(),
+    comments: z.string().max(300).optional().nullable(),
+  }).optional().nullable(),
 });
 
 export const VerifyItemPurchaseSchema = z.object({

@@ -1,45 +1,71 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search } from 'lucide-react';
-import { supabase } from '@/lib/supabase/client';
-import { haversineDistance } from '@/lib/utils/geo';
-import { useDeliveryLocation } from '@/contexts/DeliveryLocationContext';
+import { Search, Sparkles } from 'lucide-react';
+import { getLocalBusinesses, type LocalBusiness } from '@/lib/supabase/featured';
+import { getBusinessSummary, getBusinessTags } from '@/lib/businessSummaries';
+import { rankCandidates, type SearchCandidate } from '@/lib/semanticSearch';
 import { FilterPanel, DEFAULT_FILTERS, type Filters } from './FilterPanel';
-
-interface Suggestion {
-  id: string;
-  username?: string | null;
-  full_name?: string | null;
-  type?: string | null;
-  latitude?: number | null;
-  longitude?: number | null;
-}
 
 const FOOD_CATS = new Set(['Restaurants', 'Bakery', 'Café', 'Grocery']);
 const SERVICE_CATS = new Set(['Services']);
 
-function mapCategory(cat: string): string {
+function mapCategory(cat: string): 'food' | 'service' | 'retail' {
   if (FOOD_CATS.has(cat)) return 'food';
   if (SERVICE_CATS.has(cat)) return 'service';
   return 'retail';
 }
 
+/** A business enriched for display + ranking. */
+interface Enriched extends LocalBusiness {
+  summary?: string;
+  tags: string[];
+}
+
 /**
- * Header search: focusing the input drops a panel with live business/username
- * suggestions filtered by query + active filters. Selecting a suggestion opens
- * that business profile. Filters: category, max distance, max price, deals only.
+ * Header search: focusing the input drops a panel with live business suggestions.
+ *
+ * Search is SEMANTIC — the query + candidate businesses (name, AI summary, tags,
+ * a few item names) go to /api/ai-search where Gemini ranks them by intent
+ * ("burger" → burger places, "spicy" → likely-spicy food). A fast keyword/tag
+ * fallback (see lib/semanticSearch) runs whenever Gemini is missing, slow, or
+ * errors, so results ALWAYS appear and never hang. Filters (category, price,
+ * deals) are applied client-side over the same candidates.
  */
 export function SearchDropdown() {
   const router = useRouter();
-  const { location } = useDeliveryLocation();
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);
   const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
-  const [results, setResults] = useState<Suggestion[]>([]);
+
+  const [businesses, setBusinesses] = useState<Enriched[]>([]);
+  const [resultIds, setResultIds] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
+  const [aiPowered, setAiPowered] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
+
+  // Load + enrich the candidate businesses once (cached for the session).
+  useEffect(() => {
+    let active = true;
+    getLocalBusinesses()
+      .then((list) => {
+        if (!active) return;
+        setBusinesses(
+          list.map((b) => ({
+            ...b,
+            summary: getBusinessSummary(b.name),
+            tags: getBusinessTags(b.name),
+          }))
+        );
+      })
+      .catch(() => {
+        /* leave empty — search simply returns nothing rather than crashing */
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -49,103 +75,77 @@ export function SearchDropdown() {
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
-  // Live search + filter logic, debounced 300ms.
+  // Apply non-text filters (category / price / deals) to the candidate set.
+  const filtered = useMemo(() => {
+    return businesses.filter((b) => {
+      if (filters.category && b.type !== mapCategory(filters.category)) return false;
+      if (filters.minRating > 0 && b.rating < filters.minRating) return false;
+      if (
+        filters.maxPrice < DEFAULT_FILTERS.maxPrice &&
+        !b.products.some((p) => p.price <= filters.maxPrice)
+      )
+        return false;
+      if (filters.dealsOnly && !b.products.some((p) => p.deal)) return false;
+      return true;
+    });
+  }, [businesses, filters]);
+
+  const hasActiveFilters =
+    filters.category !== '' ||
+    filters.minRating > 0 ||
+    filters.maxPrice < DEFAULT_FILTERS.maxPrice ||
+    filters.dealsOnly;
+
+  // Semantic (or keyword-fallback) ranking, debounced 300ms.
   useEffect(() => {
     const q = query.trim();
-    const hasActiveFilters =
-      filters.category !== '' ||
-      filters.maxPrice < DEFAULT_FILTERS.maxPrice ||
-      filters.dealsOnly ||
-      filters.maxDistanceKm < DEFAULT_FILTERS.maxDistanceKm;
 
-    if (q.length === 0 && !hasActiveFilters) {
-      setResults([]);
+    if (q.length === 0) {
+      // No query: list the filtered candidates (only when a filter is active).
+      setResultIds(hasActiveFilters ? filtered.map((b) => b.id) : []);
       setLoading(false);
+      setAiPowered(false);
       return;
     }
 
     setLoading(true);
+    let cancelled = false;
     const t = setTimeout(async () => {
-      // Category → Supabase type
-      const types = filters.category
-        ? [mapCategory(filters.category)]
-        : ['food', 'retail', 'service'];
+      const candidates: SearchCandidate[] = filtered.map((b) => ({
+        id: b.id,
+        name: b.name,
+        summary: b.summary,
+        category: b.category,
+        type: b.type,
+        tags: b.tags,
+        items: b.products.slice(0, 8).map((p) => p.title),
+      }));
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      let dbQ: any = supabase
-        .from('profiles')
-        .select('id, username, full_name, type, latitude, longitude')
-        .in('type', types);
-
-      if (q) {
-        // Sanitize before interpolating into the PostgREST `.or()` filter: strip
-        // characters that are syntactically meaningful there (commas, parens, and
-        // the % wildcard) so odd input can't break the query or error out.
-        const safeQ = q.replace(/[%,()*\\]/g, ' ').trim();
-        if (safeQ) {
-          dbQ = dbQ.or(`username.ilike.%${safeQ}%,full_name.ilike.%${safeQ}%`);
-        }
-      }
-
-      const { data } = await dbQ.limit(30);
-      let suggestions = (data as Suggestion[]) ?? [];
-
-      // Distance filter (client-side haversine — requires user location)
-      if (location && filters.maxDistanceKm < 50) {
-        suggestions = suggestions.filter((s) => {
-          if (s.latitude == null || s.longitude == null) return true;
-          return (
-            haversineDistance(location.lat, location.lng, s.latitude, s.longitude) <=
-            filters.maxDistanceKm
-          );
-        });
-      }
-
-      // Max price — keep businesses that have at least one item ≤ maxPrice
-      if (filters.maxPrice < DEFAULT_FILTERS.maxPrice && suggestions.length > 0) {
-        const ids = suggestions.map((s) => s.id);
-        const { data: items } = await supabase
-          .from('menu_items')
-          .select('user_id')
-          .in('user_id', ids)
-          .lte('price', filters.maxPrice)
-          .limit(500);
-        const bizWithItems = new Set(
-          (items ?? []).map((i: { user_id: string }) => i.user_id)
-        );
-        if (bizWithItems.size > 0) {
-          suggestions = suggestions.filter((s) => bizWithItems.has(s.id));
-        }
-      }
-
-      // Deals only — keep businesses with at least one active promo code
-      if (filters.dealsOnly && suggestions.length > 0) {
-        const ids = suggestions.map((s) => s.id);
-        const { data: promos } = await supabase
-          .from('promo_codes')
-          .select('seller_id')
-          .in('seller_id', ids)
-          .eq('is_active', true);
-        const withDeals = new Set(
-          (promos ?? []).map((p: { seller_id: string }) => p.seller_id)
-        );
-        if (withDeals.size > 0) {
-          suggestions = suggestions.filter((s) => withDeals.has(s.id));
-        }
-      }
-
-      setResults(suggestions);
+      const { ids, source } = await rankCandidates(q, candidates);
+      if (cancelled) return;
+      setResultIds(ids);
+      setAiPowered(source === 'ai');
       setLoading(false);
     }, 300);
-    return () => clearTimeout(t);
-  }, [query, filters, location]);
 
-  const go = (s: Suggestion) => {
+    return () => {
+      cancelled = true;
+      clearTimeout(t);
+    };
+  }, [query, filtered, hasActiveFilters]);
+
+  // Resolve ranked ids → businesses, preserving rank order.
+  const results = useMemo(() => {
+    const byId = new Map(filtered.map((b) => [b.id, b]));
+    return resultIds.map((id) => byId.get(id)).filter((b): b is Enriched => Boolean(b));
+  }, [resultIds, filtered]);
+
+  const go = (b: Enriched) => {
     setOpen(false);
-    router.push(`/profile/${s.username || s.id}`);
+    router.push(b.href || `/profile/${b.username || b.id}`);
   };
 
-  const showResults = loading || results.length > 0 || query.trim().length > 0;
+  const showResults = loading || query.trim().length > 0 || hasActiveFilters;
 
   return (
     <div ref={wrapRef} className="relative flex min-w-0 flex-1 items-center">
@@ -154,7 +154,7 @@ export function SearchDropdown() {
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         onFocus={() => setOpen(true)}
-        placeholder="Search local businesses, deals, food…"
+        placeholder="Search food, deals, or try “spicy”…"
         aria-label="Search"
         aria-expanded={open}
         className="w-full rounded-full border border-border bg-card py-2.5 pl-11 pr-4 text-sm text-black dark:text-white placeholder:text-muted-foreground transition focus:border-[#f97316] focus:outline-none focus:ring-2 focus:ring-[#f97316]/20"
@@ -165,30 +165,48 @@ export function SearchDropdown() {
           {/* Business results */}
           {showResults && (
             <div className="mb-4">
-              <p className="mb-2 text-xs font-bold uppercase tracking-wide text-black dark:text-white">
-                Businesses
-              </p>
+              <div className="mb-2 flex items-center justify-between">
+                <p className="text-xs font-bold uppercase tracking-wide text-black dark:text-white">
+                  Businesses
+                </p>
+                {aiPowered && !loading && (
+                  <span className="inline-flex items-center gap-1 text-xs font-semibold text-[#f97316]">
+                    <Sparkles className="h-3.5 w-3.5" />
+                    AI results
+                  </span>
+                )}
+              </div>
+
               {loading ? (
-                <p className="px-1 py-2 text-sm text-black dark:text-white">Searching…</p>
+                <p className="px-1 py-2 text-sm text-muted-foreground">Searching…</p>
               ) : results.length > 0 ? (
                 <ul className="space-y-1">
-                  {results.map((s) => (
-                    <li key={s.id}>
+                  {results.map((b) => (
+                    <li key={b.id}>
                       <button
                         type="button"
-                        onClick={() => go(s)}
-                        className="flex w-full items-center gap-3 rounded-xl px-2 py-2 text-left transition hover:bg-muted"
+                        onClick={() => go(b)}
+                        className="flex w-full items-start gap-3 rounded-xl px-2 py-2 text-left transition hover:bg-muted"
                       >
-                        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-muted text-sm font-bold text-black dark:text-white">
-                          {(s.full_name || s.username || '?').charAt(0).toUpperCase()}
+                        <span className="grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-full bg-muted text-sm font-bold text-black dark:text-white">
+                          {b.image ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={b.image} alt="" className="h-full w-full object-cover" />
+                          ) : (
+                            (b.name || '?').charAt(0).toUpperCase()
+                          )}
                         </span>
-                        <span className="min-w-0">
+                        <span className="min-w-0 flex-1">
                           <span className="block truncate text-sm font-semibold text-black dark:text-white">
-                            {s.full_name || s.username}
+                            {b.name}
                           </span>
-                          {s.username && (
+                          {b.summary ? (
+                            <span className="mt-0.5 block line-clamp-2 text-xs text-muted-foreground">
+                              {b.summary}
+                            </span>
+                          ) : (
                             <span className="block truncate text-xs text-muted-foreground">
-                              @{s.username}
+                              {b.category}
                             </span>
                           )}
                         </span>
@@ -197,8 +215,10 @@ export function SearchDropdown() {
                   ))}
                 </ul>
               ) : (
-                <p className="px-1 py-2 text-sm text-black dark:text-white">
-                  No businesses match &quot;{query.trim()}&quot;.
+                <p className="px-1 py-2 text-sm text-muted-foreground">
+                  {query.trim()
+                    ? `No businesses match “${query.trim()}”.`
+                    : 'No businesses match these filters.'}
                 </p>
               )}
             </div>

@@ -983,6 +983,32 @@ export async function getUserPremiumStatus(
 }
 
 /**
+ * DEMO: toggle premium without real payment. Flips profiles.is_premium and sets
+ * premium_until to one month out (or clears it when turning off). Lets judges see
+ * Premium features without going through Stripe. Returns true on success.
+ */
+export async function setPremiumDemo(userId: string, on: boolean): Promise<boolean> {
+  if (!userId) return false;
+  try {
+    const premiumUntil = on
+      ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+      : null;
+    const { error } = await supabase
+      .from('profiles')
+      .update({ is_premium: on, premium_until: premiumUntil })
+      .eq('id', userId);
+    if (error) {
+      console.error('[setPremiumDemo] failed:', error.message || error);
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.error('[setPremiumDemo] threw:', err);
+    return false;
+  }
+}
+
+/**
  * Get item sales where user is the seller (for business)
  */
 export async function getBusinessItemSales(userId: string) {

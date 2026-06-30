@@ -21,6 +21,8 @@ interface OrderInfo {
   quantity?: number;
   scheduledAt?: string | null;
   specialRequests?: string | null;
+  fulfillment?: 'pickup' | 'delivery' | 'reservation';
+  reservation?: { party: number; time: string; comments: string | null } | null;
 }
 
 /** Last-resort order number when verification is unavailable (demo/offline). */
@@ -113,6 +115,7 @@ function PurchaseSuccessContent() {
                 specialRequests: o.specialRequests ?? null,
                 token: o.token || null,
                 quantity: o.quantity,
+                fulfillment: o.fulfillment,
               });
             } catch (err) {
               console.error('[purchase-success] Could not save local order:', err);
@@ -136,6 +139,10 @@ function PurchaseSuccessContent() {
   const total = serverTotal ?? computedTotal;
   const qrOrders = orders.filter((o) => o.token);
   const scheduledLabel = formatSchedule(orders.find((o) => o.scheduledAt)?.scheduledAt);
+  const fulfillment = orders.find((o) => o.fulfillment)?.fulfillment ?? 'delivery';
+  const fulfillmentLabel = fulfillment === 'pickup' ? 'Pickup' : fulfillment === 'reservation' ? 'Reservation' : 'Delivery';
+  const reservation = orders.find((o) => o.reservation)?.reservation ?? null;
+  const reservationLabel = formatSchedule(reservation?.time);
 
   return (
     <div className="min-h-screen bg-white pb-20">
@@ -195,6 +202,36 @@ function PurchaseSuccessContent() {
                 </div>
               ))}
             </div>
+            <div className="flex justify-between items-center pt-3 mt-3 border-t border-gray-100">
+              <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Fulfillment</span>
+              <span className="text-sm font-semibold text-black">{fulfillmentLabel}</span>
+            </div>
+            {fulfillment === 'delivery' && (
+              <div className="flex justify-between items-center pt-3 mt-3 border-t border-gray-100">
+                <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Delivery fee (5%)</span>
+                <span className="text-sm font-semibold text-black">Included in total</span>
+              </div>
+            )}
+            {fulfillment === 'reservation' && reservation && (
+              <div className="pt-3 mt-3 border-t border-gray-100 space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Party size</span>
+                  <span className="text-sm font-semibold text-black">{reservation.party} {reservation.party === 1 ? 'guest' : 'guests'}</span>
+                </div>
+                {reservationLabel && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Reservation</span>
+                    <span className="text-sm font-semibold text-black">{reservationLabel}</span>
+                  </div>
+                )}
+                {reservation.comments && (
+                  <div className="flex justify-between items-start gap-3">
+                    <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide shrink-0">Comments</span>
+                    <span className="text-sm text-black text-right break-words min-w-0">{reservation.comments}</span>
+                  </div>
+                )}
+              </div>
+            )}
             {scheduledLabel && (
               <div className="flex justify-between items-center pt-3 mt-3 border-t border-gray-100">
                 <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Scheduled for</span>

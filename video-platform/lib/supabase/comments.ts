@@ -62,7 +62,7 @@ const LOCAL_DEMO_COMMENTS: Comment[] = [
     full_name: 'Devon A.',
     avatar_url: null,
     reply_count: 0,
-    rating: null,
+    rating: 4,
   },
   {
     id: 'demo-comment-4',
