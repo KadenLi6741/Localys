@@ -104,7 +104,7 @@ export function DealsHero() {
                 className="absolute inset-0"
               >
                 <Link href={current.href} className="block h-full w-full">
-                  <Thumb src={current.image} label={current.name} alt={current.name} className="h-full w-full" />
+                  <Thumb src={current.image} label={current.name} alt={current.name} className="h-full w-full" priority sizes="(max-width: 1024px) 100vw, 66vw" />
                   <div className="absolute inset-0 bg-black/35" />
                   <div className="absolute bottom-0 left-0 p-6 sm:p-8">
                     <span className="inline-block rounded-full bg-[#f97316] px-3 py-1 text-sm font-bold text-white">
