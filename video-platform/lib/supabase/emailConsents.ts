@@ -29,6 +29,17 @@ export interface SaveConsentInput {
 }
 
 /**
+ * True when the error just means the `email_consents` table hasn't been created
+ * yet (migration not applied). That's an expected demo state, so we treat it as a
+ * silent no-op instead of logging a scary console error on every checkout.
+ */
+function isMissingTable(error: { code?: string; message?: string } | null): boolean {
+  if (!error) return false;
+  if (error.code === 'PGRST205' || error.code === '42P01') return true;
+  return /schema cache|could not find the table|does not exist/i.test(error.message || '');
+}
+
+/**
  * Record (upsert) a customer's opt-in to a business's email list. Best-effort:
  * returns true/false and never throws, so callers can fire-and-forget.
  */
@@ -46,6 +57,8 @@ export async function saveConsent(input: SaveConsentInput): Promise<boolean> {
       { onConflict: 'user_id,business_id' }
     );
     if (error) {
+      // Missing table = migration not applied yet; ignore quietly (best-effort).
+      if (isMissingTable(error)) return false;
       console.error('[emailConsents] saveConsent failed:', error.message || error);
       return false;
     }
@@ -70,7 +83,7 @@ export async function getBusinessConsents(businessId: string): Promise<EmailCons
       .eq('opted_in', true)
       .order('created_at', { ascending: false });
     if (error || !data) {
-      if (error) console.error('[emailConsents] getBusinessConsents:', error.message || error);
+      if (error && !isMissingTable(error)) console.error('[emailConsents] getBusinessConsents:', error.message || error);
       return [];
     }
     return data as EmailConsent[];

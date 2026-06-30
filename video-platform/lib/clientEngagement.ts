@@ -224,8 +224,8 @@ export interface LocalOrder {
   specialRequests?: string | null;
   token?: string | null;
   quantity?: number;
-  /** How the order is fulfilled: picked up at the store, or delivered. */
-  fulfillment?: 'pickup' | 'delivery';
+  /** How the order is fulfilled: store pickup, dine-in reservation, or delivery. */
+  fulfillment?: 'pickup' | 'delivery' | 'reservation';
 }
 
 const LOCAL_ORDERS_KEY = 'localys:local-orders';

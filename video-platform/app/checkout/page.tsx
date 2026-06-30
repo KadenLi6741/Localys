@@ -7,10 +7,17 @@ import { useCart, CartItem } from '@/contexts/CartContext';
 import { getShopCoupons, Coupon } from '@/lib/supabase/coupons';
 import { saveConsent } from '@/lib/supabase/emailConsents';
 import { validateFutureDateTime } from '@/lib/utils/validation';
+import { ReservationForm, ReservationValue, combineReservationDateTime } from '@/components/checkout/ReservationForm';
 import Link from 'next/link';
-import { ChevronLeft, CalendarClock, Tag, CheckCircle, Truck, Store } from 'lucide-react';
+import { ChevronLeft, CalendarClock, Tag, CheckCircle, Truck, Store, CalendarDays } from 'lucide-react';
 
-type Fulfillment = 'pickup' | 'delivery';
+type Fulfillment = 'pickup' | 'reservation' | 'delivery';
+
+const FULFILLMENT_OPTIONS: { key: Fulfillment; label: string; icon: typeof Store; desc: string }[] = [
+  { key: 'pickup',      label: 'Pickup',      icon: Store,        desc: 'Free · collect in store' },
+  { key: 'reservation', label: 'Reservation', icon: CalendarDays, desc: 'Free · book a table' },
+  { key: 'delivery',    label: 'Delivery',    icon: Truck,        desc: '5% fee · to your door' },
+];
 
 function CheckoutContent() {
   const searchParams = useSearchParams();
@@ -32,7 +39,16 @@ function CheckoutContent() {
   const groupOrderId = searchParams.get('groupOrderId');
   const promoCodeParam = searchParams.get('promoCode');
   const couponCodeParam = searchParams.get('couponCode');
-  const fulfillment: Fulfillment = searchParams.get('fulfillment') === 'pickup' ? 'pickup' : 'delivery';
+
+  // Fulfillment is chosen live on this page (updates the total). Initialise from
+  // the cart's choice when present; defaults to delivery.
+  const fulfillmentParam = searchParams.get('fulfillment');
+  const [fulfillment, setFulfillment] = useState<Fulfillment>(
+    fulfillmentParam === 'pickup' ? 'pickup' : fulfillmentParam === 'reservation' ? 'reservation' : 'delivery'
+  );
+  // Reservation details — date defaults to today; party defaults to 2; a time
+  // must be chosen before continuing. // MOCK availability handled in the form.
+  const [reservation, setReservation] = useState<ReservationValue>({ date: new Date(), party: 2, time: null, comments: '' });
 
   useEffect(() => {
     if (!user) { router.push('/login'); return; }
@@ -103,7 +119,12 @@ function CheckoutContent() {
   const tax = Math.round(taxableBase * TAX_RATE * 100) / 100;
   const localyFee = Math.round(taxableBase * LOCALY_FEE_RATE * 100) / 100;
   const businessNet = Math.round(taxableBase * (1 - LOCALY_FEE_RATE) * 100) / 100;
-  const total = Math.round((taxableBase + tax) * 100) / 100;
+
+  // Fee rules: pickup & reservation are FREE; delivery adds 5% of the subtotal.
+  // The server recomputes this from trusted prices — the client value is display.
+  const DELIVERY_FEE_RATE = 0.05;
+  const deliveryFee = fulfillment === 'delivery' ? Math.round(subtotal * DELIVERY_FEE_RATE * 100) / 100 : 0;
+  const total = Math.round((taxableBase + tax + deliveryFee) * 100) / 100;
 
   const handleProceedToPayment = async () => {
     if (checkoutItems.length === 0) return;
@@ -114,6 +135,20 @@ function CheckoutContent() {
       const scheduleErr = validateFutureDateTime(scheduledAt, { label: 'Scheduled time' });
       if (scheduleErr) { setError(scheduleErr); return; }
     }
+
+    // Reservation requires a party size and a time before continuing.
+    let reservationPayload: { party: number; time: string; comments?: string } | null = null;
+    if (fulfillment === 'reservation') {
+      const time = combineReservationDateTime(reservation.date, reservation.time);
+      if (!reservation.party || reservation.party < 1) { setError('Please choose a party size for your reservation.'); return; }
+      if (!reservation.date || !time) { setError('Please pick a date and time for your reservation.'); return; }
+      reservationPayload = {
+        party: reservation.party,
+        time,
+        ...(reservation.comments.trim() ? { comments: reservation.comments.trim().slice(0, 280) } : {}),
+      };
+    }
+
     setProcessing(true);
     setError(null);
 
@@ -149,6 +184,7 @@ function CheckoutContent() {
           scheduledAt: scheduledAt || null,
           groupOrderId: groupOrderId || null,
           fulfillment,
+          reservation: reservationPayload,
         }),
       });
       const data = await response.json();
@@ -192,18 +228,38 @@ function CheckoutContent() {
           <h1 className="text-2xl font-bold text-gray-900">Checkout</h1>
         </div>
 
-        {/* Fulfillment notice */}
-        <div className="bg-orange-50 border border-orange-200 rounded-2xl p-4 mb-4 flex items-start gap-3">
-          {fulfillment === 'pickup'
-            ? <Store className="h-5 w-5 text-[#f97316] shrink-0 mt-0.5" />
-            : <Truck className="h-5 w-5 text-[#f97316] shrink-0 mt-0.5" />}
-          <div>
-            <p className="text-sm font-semibold text-gray-900">{fulfillment === 'pickup' ? 'Pickup' : 'Delivery'}</p>
-            <p className="text-sm text-gray-600">
-              {fulfillment === 'pickup' ? 'Pick this order up at the store' : 'This order will be delivered to you'}
-            </p>
+        {/* Fulfillment options — selecting one updates the total live */}
+        <div className="bg-white border border-gray-200 rounded-2xl p-4 mb-4 shadow-sm">
+          <h2 className="text-sm font-semibold text-gray-900 mb-3">How would you like this order?</h2>
+          <div className="grid grid-cols-3 gap-2">
+            {FULFILLMENT_OPTIONS.map((opt) => {
+              const Icon = opt.icon;
+              const active = fulfillment === opt.key;
+              return (
+                <button
+                  key={opt.key}
+                  type="button"
+                  onClick={() => { setFulfillment(opt.key); setError(null); }}
+                  aria-pressed={active}
+                  className={`flex flex-col items-center gap-1.5 rounded-xl border-2 px-2 py-3 text-center transition-colors ${
+                    active ? 'border-[#f97316] bg-orange-50' : 'border-gray-200 hover:border-orange-300'
+                  }`}
+                >
+                  <Icon className={`h-5 w-5 ${active ? 'text-[#f97316]' : 'text-gray-500'}`} />
+                  <span className={`text-sm font-semibold ${active ? 'text-[#f97316]' : 'text-gray-900'}`}>{opt.label}</span>
+                  <span className="text-[11px] leading-tight text-gray-500">{opt.desc}</span>
+                </button>
+              );
+            })}
           </div>
         </div>
+
+        {/* Reservation form — only when Reservation is selected */}
+        {fulfillment === 'reservation' && (
+          <div className="mb-4">
+            <ReservationForm value={reservation} onChange={setReservation} />
+          </div>
+        )}
 
         {/* Scheduled notice */}
         {scheduledAt && (
@@ -300,6 +356,12 @@ function CheckoutContent() {
           <div className="flex justify-between text-sm text-gray-600">
             <span>Tax (8.25%)</span><span>${tax.toFixed(2)}</span>
           </div>
+          {/* Delivery fee only applies to Delivery; Pickup & Reservation are free */}
+          {fulfillment === 'delivery' && (
+            <div className="flex justify-between text-sm text-gray-600">
+              <span>Delivery fee (5%)</span><span>${deliveryFee.toFixed(2)}</span>
+            </div>
+          )}
           <div className="border-t border-gray-100 pt-2 flex justify-between">
             <span className="font-semibold text-gray-900">Total</span>
             <span className="text-xl font-bold text-gray-900">${total.toFixed(2)}</span>
@@ -325,15 +387,17 @@ function CheckoutContent() {
           </div>
         )}
 
-        {/* Email/notifications consent — opt-in, unchecked by default */}
-        <label className="mb-4 flex cursor-pointer items-start gap-3 rounded-2xl border border-gray-200 p-4">
+        {/* Email/notifications consent — opt-in, unchecked by default.
+            Checkbox and text share a 20px line box so the box lines up with the
+            first text line (no vertical drift). */}
+        <label className="mb-4 flex cursor-pointer items-start gap-3 rounded-2xl border border-gray-200 p-4 dark:border-white/10">
           <input
             type="checkbox"
             checked={emailConsent}
             onChange={(e) => setEmailConsent(e.target.checked)}
-            className="mt-0.5 h-4 w-4 shrink-0 accent-[#f97316]"
+            className="h-5 w-5 shrink-0 accent-[#f97316]"
           />
-          <span className="text-sm text-gray-700">
+          <span className="text-sm leading-5 text-gray-700 dark:text-gray-300">
             Allow this business to send me emails and notifications about deals and updates.
           </span>
         </label>
