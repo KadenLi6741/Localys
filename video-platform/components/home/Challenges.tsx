@@ -6,13 +6,10 @@ function ChallengeCard({ challenge }: { challenge: Challenge }) {
   const done = pct >= 100;
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm transition hover:shadow-md dark:border-gray-700 dark:bg-gray-900">
+    <div className="flex h-full flex-col rounded-2xl border border-gray-200 bg-white p-4 shadow-sm transition hover:shadow-md dark:border-gray-700 dark:bg-gray-900">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="truncate text-sm font-semibold text-black dark:text-white">{challenge.title}</p>
-          {challenge.description && (
-            <p className="mt-0.5 truncate text-xs text-gray-500 dark:text-gray-400">{challenge.description}</p>
-          )}
         </div>
         <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-orange-50 px-2.5 py-1 text-xs font-bold text-[#f97316] dark:bg-[#f97316]/15">
           <Coins className="h-3.5 w-3.5" />+{challenge.reward}
@@ -22,12 +19,12 @@ function ChallengeCard({ challenge }: { challenge: Challenge }) {
       <div className="mt-3 flex items-center gap-3">
         <div className="h-2 flex-1 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-800">
           <div
-            className={`h-full rounded-full transition-all ${done ? 'bg-green-500' : 'bg-[#f97316]'}`}
+            className="h-full rounded-full bg-[#f97316] transition-all"
             style={{ width: `${pct}%` }}
           />
         </div>
         {done ? (
-          <span className="inline-flex shrink-0 items-center gap-1 text-xs font-bold text-green-600 dark:text-green-400">
+          <span className="inline-flex shrink-0 items-center gap-1 text-xs font-bold text-[#f97316]">
             <Check className="h-3.5 w-3.5" strokeWidth={3} />Done
           </span>
         ) : (
@@ -42,9 +39,9 @@ function ChallengeCard({ challenge }: { challenge: Challenge }) {
 
 function ChallengeGroup({ title, challenges }: { title: string; challenges: Challenge[] }) {
   return (
-    <div>
+    <div className="flex flex-col">
       <h3 className="mb-2 text-sm font-bold uppercase tracking-wide text-gray-500 dark:text-gray-400">{title}</h3>
-      <div className="grid gap-3">
+      <div className="grid flex-1 auto-rows-fr gap-3">
         {challenges.map((c) => <ChallengeCard key={c.id} challenge={c} />)}
       </div>
     </div>

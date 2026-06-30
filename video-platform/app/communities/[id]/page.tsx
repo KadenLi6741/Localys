@@ -203,22 +203,22 @@ function CommunityContent() {
                       onClick={(e) => { e.stopPropagation(); vote(t.id, 1); }}
                       aria-label="Upvote"
                       className={`flex h-8 w-8 items-center justify-center rounded-full transition-colors ${
-                        t.userVote === 1 ? 'text-[#f97316]' : 'text-gray-500 dark:text-gray-400 hover:text-[#f97316]'
+                        t.userVote === 1 ? 'text-[#f97316]' : 'text-black dark:text-white hover:text-[#f97316]'
                       }`}
                     >
-                      <ChevronUp className="h-4 w-4" />
+                      <ChevronUp className="h-4 w-4" strokeWidth={2.5} />
                     </button>
                     <span className={`min-w-[20px] text-center text-xs font-bold tabular-nums ${
-                      t.userVote === 1 ? 'text-[#f97316]' : t.userVote === -1 ? 'text-gray-500' : 'text-gray-700 dark:text-gray-300'
+                      t.userVote !== 0 ? 'text-[#f97316]' : 'text-black dark:text-white'
                     }`}>{t.votes}</span>
                     <button
                       onClick={(e) => { e.stopPropagation(); vote(t.id, -1); }}
                       aria-label="Downvote"
                       className={`flex h-8 w-8 items-center justify-center rounded-full transition-colors ${
-                        t.userVote === -1 ? 'text-gray-500' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                        t.userVote === -1 ? 'text-[#f97316]' : 'text-black dark:text-white hover:text-[#f97316]'
                       }`}
                     >
-                      <ChevronDown className="h-4 w-4" />
+                      <ChevronDown className="h-4 w-4" strokeWidth={2.5} />
                     </button>
                   </div>
 

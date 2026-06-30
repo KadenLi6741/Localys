@@ -266,7 +266,7 @@ function CommunitiesContent() {
                     <ChevronUp className="h-4 w-4" strokeWidth={2.5} />
                   </button>
                   <span className={`min-w-[20px] text-center text-xs font-bold tabular-nums ${
-                    t.userVote === 1 ? 'text-[#f97316]' : 'text-black dark:text-white'
+                    t.userVote !== 0 ? 'text-[#f97316]' : 'text-black dark:text-white'
                   }`}>{t.votes}</span>
                   <button
                     onClick={(e) => { e.stopPropagation(); vote(t.id, -1); }}
