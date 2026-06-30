@@ -1,3 +1,4 @@
 # Ignore Claude-related temp files with no extension
 tmpclaude-*-cwd"video-platform/public/Bizness/*diningMode*" 
 video-platform/public/Bizness/*diningMode* 
+**/tmpclaude*

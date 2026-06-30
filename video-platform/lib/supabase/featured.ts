@@ -28,6 +28,7 @@ const MENUS = storeMenus as Record<string, ManifestStore>;
 export interface LocalBusiness {
   id: string; // profile id (== owner_id)
   username: string;
+  slug: string; // manifest slug (stable key for allergen lookup, etc.)
   name: string;
   image?: string; // real business photo (or undefined → neutral placeholder)
   category: string; // department label, e.g. "Restaurants", "Flowers"
@@ -82,7 +83,7 @@ function menuToBusiness(
     hq: it.hq,
   }));
 
-  return { id, username, name, image, category, type, href, rating, reviewCount, address: menu.address, products };
+  return { id, username, slug: menu.slug, name, image, category, type, href, rating, reviewCount, address: menu.address, products };
 }
 
 export async function getLocalBusinesses(): Promise<LocalBusiness[]> {

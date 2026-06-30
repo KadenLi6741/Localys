@@ -7,6 +7,7 @@ import { ThemeProvider } from "@/contexts/ThemeContext";
 import { CartProvider } from "@/contexts/CartContext";
 import { ActivityProvider } from "@/contexts/ActivityContext";
 import { DeliveryLocationProvider } from "@/contexts/DeliveryLocationContext";
+import { AllergenProvider } from "@/contexts/AllergenContext";
 import { AppChrome } from "@/components/AppChrome";
 
 const outfit = Outfit({
@@ -66,7 +67,9 @@ export default function RootLayout({
               <CartProvider>
                 <ActivityProvider>
                   <DeliveryLocationProvider>
-                    <AppChrome>{children}</AppChrome>
+                    <AllergenProvider>
+                      <AppChrome>{children}</AppChrome>
+                    </AllergenProvider>
                   </DeliveryLocationProvider>
                 </ActivityProvider>
               </CartProvider>
