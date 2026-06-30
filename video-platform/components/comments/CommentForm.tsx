@@ -188,7 +188,7 @@ export default function CommentForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex gap-3">
+    <form onSubmit={handleSubmit} className="flex w-full min-w-0 gap-3">
       {/* Avatar */}
       <div className="flex-shrink-0">
         {user.user_metadata?.avatar_url ? (
@@ -206,8 +206,9 @@ export default function CommentForm({
         )}
       </div>
 
-      {/* Input */}
-      <div className="flex-1">
+      {/* Input — min-w-0 lets this flex child shrink so the textarea + action
+          row never push past the panel width (no horizontal scroll). */}
+      <div className="min-w-0 flex-1">
         <textarea
           ref={textareaRef}
           value={content}
@@ -285,9 +286,10 @@ export default function CommentForm({
           </div>
         )}
 
-        {/* Image Upload Button and Submit */}
-        <div className="flex justify-between items-center mt-2 gap-2">
-          <div className="flex items-center gap-2">
+        {/* Image Upload Button and Submit — Post is fixed-width and shrink-0 so it
+            stays fully visible on narrow/mobile widths without horizontal scroll. */}
+        <div className="flex justify-between items-center mt-2 gap-2 min-w-0">
+          <div className="flex min-w-0 items-center gap-2">
             <input
               type="file"
               ref={fileInputRef}
@@ -309,7 +311,7 @@ export default function CommentForm({
           <button
             type="submit"
             disabled={!content.trim() || loading || uploading}
-            className={`px-4 py-1.5 rounded-lg font-semibold text-sm bg-[#f97316] text-white hover:bg-[#ea6a0c] disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed transition-all duration-200 ${
+            className={`shrink-0 whitespace-nowrap px-4 py-1.5 rounded-lg font-semibold text-sm bg-[#f97316] text-white hover:bg-[#ea6a0c] disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed transition-all duration-200 ${
               compact ? 'active:scale-95' : ''
             }`}
           >

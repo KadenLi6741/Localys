@@ -212,14 +212,15 @@ export default function CommentItem({ comment, videoId, onLikeUpdate, onCommentD
             </span>
           </div>
 
-          {/* Rating Display */}
-          {comment.rating && (
+          {/* Rating Display — shown for every comment that carries a rating; a
+              comment with no rating cleanly renders nothing (no empty star row). */}
+          {comment.rating != null && comment.rating > 0 && (
             <div className="flex items-center gap-1 mb-2">
               {[1, 2, 3, 4, 5].map((star) => (
                 <svg
                   key={star}
                   className={`w-4 h-4 ${
-                    comment.rating && comment.rating >= star ? 'fill-[#f97316] text-[#f97316]' : 'text-gray-600'
+                    comment.rating! >= star ? 'fill-[#f97316] text-[#f97316]' : 'fill-none text-gray-400 dark:text-gray-500'
                   }`}
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -228,7 +229,7 @@ export default function CommentItem({ comment, videoId, onLikeUpdate, onCommentD
                   <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                 </svg>
               ))}
-              <span className="text-xs text-gray-400 ml-1">{comment.rating}/5</span>
+              <span className="text-xs text-gray-500 dark:text-gray-400 ml-1">{comment.rating}/5</span>
             </div>
           )}
 
