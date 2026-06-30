@@ -26,7 +26,7 @@ import { getSavedItems, getLikedItemIds, getLikedMenuItems, subscribeEngagement,
 import { getUserLikedItems } from '@/lib/supabase/likedItems';
 import { isDemoId } from '@/lib/utils/ids';
 import { DEMO_VIDEOS, buildFeedVideos } from '@/lib/demoVideos';
-import { ChevronRight, Store, DollarSign, MapPin, ShoppingBag, Heart, Trophy, Star, MessageCircle, Award, Play, Crown, ListChecks } from 'lucide-react';
+import { ChevronRight, Store, DollarSign, MapPin, ShoppingBag, Heart, Trophy, Star, MessageCircle, Award, Play, Crown, ListChecks, User, Settings } from 'lucide-react';
 
 // Demo feed (videos for slug/local content) keyed for quick enrichment of the
 // profile Saved/Liked cards — same source the Home "Featured in Videos" cards use.
@@ -532,6 +532,76 @@ function ProfileContent() {
   );
 }
 
+// ── In-page section sidenav (desktop only) ────────────────────────────────────
+// Sticky left rail on the own-profile page that scroll-links to each section and
+// highlights the one currently in view (IntersectionObserver scroll-spy).
+const PROFILE_SECTIONS = [
+  { id: 'overview',     label: 'Overview',      Icon: User },
+  { id: 'achievements', label: 'Achievements',  Icon: Award },
+  { id: 'activity',     label: 'My Activity',   Icon: Heart },
+  { id: 'orders',       label: 'Order History', Icon: ShoppingBag },
+  { id: 'settings',     label: 'Settings',      Icon: Settings },
+] as const;
+
+function ProfileSideNav() {
+  const [active, setActive] = useState<string>(PROFILE_SECTIONS[0].id);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+        if (visible[0]) setActive(visible[0].target.id);
+      },
+      // Account for the sticky global + page headers at the top; bias toward the
+      // section near the upper third of the viewport.
+      { rootMargin: '-120px 0px -55% 0px', threshold: 0 },
+    );
+    PROFILE_SECTIONS.forEach((s) => {
+      const el = document.getElementById(s.id);
+      if (el) observer.observe(el);
+    });
+    return () => observer.disconnect();
+  }, []);
+
+  const handleClick = (e: React.MouseEvent, id: string) => {
+    e.preventDefault();
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setActive(id);
+      history.replaceState(null, '', `#${id}`);
+    }
+  };
+
+  return (
+    <aside className="hidden lg:block w-52 shrink-0">
+      <nav className="sticky top-28 space-y-1" aria-label="Profile sections">
+        {PROFILE_SECTIONS.map(({ id, label, Icon }) => {
+          const isActive = active === id;
+          return (
+            <a
+              key={id}
+              href={`#${id}`}
+              onClick={(e) => handleClick(e, id)}
+              aria-current={isActive ? 'true' : undefined}
+              className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
+                isActive
+                  ? 'bg-[#f97316]/10 text-[#f97316]'
+                  : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+              }`}
+            >
+              <Icon className="h-4 w-4 shrink-0" />
+              {label}
+            </a>
+          );
+        })}
+      </nav>
+    </aside>
+  );
+}
+
 interface ProfileViewProps {
   profile: Profile | null;
   user: any;
@@ -570,9 +640,12 @@ function ProfileView({ profile, user, onEditClick, onSignOut, onProfileUpdated }
     : null;
 
   return (
-    <div className="w-full px-4 lg:px-12 py-8 max-w-3xl mx-auto">
+    <div className="w-full px-4 lg:px-12 py-8">
+      <div className="mx-auto flex max-w-5xl gap-10">
+        <ProfileSideNav />
+        <div className="min-w-0 flex-1 lg:max-w-3xl">
       {/* Profile header */}
-      <div className="flex items-center gap-5 mb-5">
+      <div id="overview" className="flex items-center gap-5 mb-5 scroll-mt-28">
         <EditableProfilePicture
           userId={user.id}
           currentImageUrl={profile?.profile_picture_url}
@@ -635,7 +708,9 @@ function ProfileView({ profile, user, onEditClick, onSignOut, onProfileUpdated }
       )}
 
       {/* Badges */}
-      <BadgesSection userId={user.id} />
+      <div id="achievements" className="scroll-mt-28">
+        <BadgesSection userId={user.id} />
+      </div>
 
       {/* Edit Profile */}
       <button
@@ -646,10 +721,12 @@ function ProfileView({ profile, user, onEditClick, onSignOut, onProfileUpdated }
       </button>
 
       {/* Saved videos / Liked stores toggle */}
-      <SavedLikedSection userId={user.id} />
+      <div id="activity" className="scroll-mt-28">
+        <SavedLikedSection userId={user.id} />
+      </div>
 
       {/* Order History */}
-      <section className="mb-6">
+      <section id="orders" className="mb-6 scroll-mt-28">
         <h3 className="text-base font-semibold text-gray-900 mb-3">Order History</h3>
         <div className="bg-white border border-gray-200 rounded-2xl p-4">
           <OrderHistory userId={user.id} isBusiness={false} />
@@ -657,7 +734,7 @@ function ProfileView({ profile, user, onEditClick, onSignOut, onProfileUpdated }
       </section>
 
       {/* Settings */}
-      <section className="mb-6">
+      <section id="settings" className="mb-6 scroll-mt-28">
         <h3 className="text-base font-semibold text-gray-900 mb-3">{t('common.settings')}</h3>
         <div className="space-y-2">
           <Link
@@ -704,6 +781,8 @@ function ProfileView({ profile, user, onEditClick, onSignOut, onProfileUpdated }
           <a href="#" className="text-gray-400 text-xs hover:text-gray-700 transition-colors">Terms &amp; Policies</a>
         </div>
         <p className="text-gray-400 text-xs">2026 Localy</p>
+      </div>
+        </div>
       </div>
     </div>
   );
