@@ -44,20 +44,21 @@ import {
   TrendingUp, TrendingDown, QrCode, Clock, Save, CheckCircle,
   ArrowUpRight, ArrowDownRight, LayoutDashboard, PackageCheck,
   Star, Tag, Settings, Phone, MapPin, FileText, Trash2, Plus,
-  Users, CalendarClock, Video, BarChart3,
+  Users, CalendarClock, Video, BarChart3, Mail,
 } from 'lucide-react';
 
 export default function DashboardPage() {
   return <ProtectedRoute><DashboardContent /></ProtectedRoute>;
 }
 
-type Tab = 'overview' | 'orders' | 'reports' | 'reviews' | 'promos' | 'videos' | 'business';
+type Tab = 'overview' | 'orders' | 'reports' | 'reviews' | 'emails' | 'promos' | 'videos' | 'business';
 
 const TABS: { key: Tab; label: string; icon: React.ReactNode }[] = [
   { key: 'overview', label: 'Dashboard',  icon: <LayoutDashboard className="h-4 w-4" /> },
   { key: 'orders',   label: 'Orders',     icon: <PackageCheck className="h-4 w-4" /> },
   { key: 'reports',  label: 'Reports',    icon: <BarChart3 className="h-4 w-4" /> },
   { key: 'reviews',  label: 'Reviews',    icon: <Star className="h-4 w-4" /> },
+  { key: 'emails',   label: 'Emails',     icon: <Mail className="h-4 w-4" /> },
   { key: 'promos',   label: 'Promos',     icon: <Tag className="h-4 w-4" /> },
   { key: 'videos',   label: 'Videos',     icon: <Video className="h-4 w-4" /> },
   { key: 'business', label: 'Business',   icon: <Settings className="h-4 w-4" /> },
@@ -648,25 +649,28 @@ function DashboardContent() {
               businessImage={business?.profile_picture_url}
             />
 
-            {/* ── Customer Engagement: outreach emails first, community feedback below ── */}
-            <section className="space-y-4 border-t border-border pt-6">
-              <div>
-                <h2 className="text-lg font-bold text-foreground">Customer Engagement</h2>
-                <p className="text-sm text-muted-foreground mt-0.5">
-                  Reach opted-in customers with Localy Emails, then review what the community is asking for.
-                </p>
-              </div>
+          </div>
+        )}
 
-              {/* Localy Emails — opted-in list, compose/send, AI writing + automation (Premium) */}
-              <LocalyEmailsPanel
-                businessId={business?.id || ''}
-                businessName={business?.business_name || 'your business'}
-                isPremium={isPremium}
-              />
+        {/* EMAILS — Customer Engagement: outreach emails first, community feedback below */}
+        {activeTab === 'emails' && (
+          <div className="space-y-4">
+            <div>
+              <h2 className="text-lg font-bold text-foreground">Customer Engagement</h2>
+              <p className="text-sm text-muted-foreground mt-0.5">
+                Reach opted-in customers with Localy Emails, then review what the community is asking for.
+              </p>
+            </div>
 
-              {/* Community Feedback — customer wishlist/requests (secondary; sits below the emails) */}
-              <CommunityFeedbackPanel businessId={business?.id} />
-            </section>
+            {/* Localy Emails — opted-in list, compose/send, AI writing + automation (Premium) */}
+            <LocalyEmailsPanel
+              businessId={business?.id || ''}
+              businessName={business?.business_name || 'your business'}
+              isPremium={isPremium}
+            />
+
+            {/* Community Feedback — customer wishlist/requests (secondary; sits below the emails) */}
+            <CommunityFeedbackPanel businessId={business?.id} />
           </div>
         )}
 
