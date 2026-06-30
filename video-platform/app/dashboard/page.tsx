@@ -16,7 +16,7 @@ import { LocalyEmailsPanel } from '@/components/dashboard/LocalyEmailsPanel';
 // reports, jsQR + camera for the scanner) load only when actually opened.
 const BusinessReports = dynamic(
   () => import('@/components/dashboard/BusinessReports').then((m) => m.BusinessReports),
-  { ssr: false, loading: () => <div className="h-96 animate-pulse rounded-xl bg-muted" /> },
+  { ssr: false, loading: () => <div className="h-96 animate-pulse rounded-md bg-muted" /> },
 );
 const QRScanner = dynamic(
   () => import('@/components/QRScanner').then((m) => m.QRScanner),
@@ -270,26 +270,26 @@ function DashboardContent() {
   return (
     <div className="min-h-screen bg-background text-foreground pb-24">
       {/* Header */}
-      <div className="bg-card border-b border-border px-4 lg:px-10 pt-6 pb-0">
+      <div className="bg-card border-b border-border px-4 lg:px-10 pt-3 pb-0">
         <div className="max-w-screen-2xl mx-auto">
-          <div className="flex items-end justify-between mb-4">
+          <div className="flex items-end justify-between mb-2">
             <div>
-              <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide mb-1">Business Manager</p>
-              <p className="text-3xl font-bold text-foreground">${displayRevenue.toLocaleString('en-US', { minimumFractionDigits: 2 })}</p>
-              <div className="flex items-center gap-1.5 mt-1">
-                {revenueChange >= 0 ? <ArrowUpRight className="h-3.5 w-3.5 text-[#f97316]" /> : <ArrowDownRight className="h-3.5 w-3.5 text-red-500" />}
-                <span className={`text-xs font-medium ${revenueChange >= 0 ? 'text-[#f97316]' : 'text-red-500'}`}>{Math.abs(revenueChange).toFixed(1)}%</span>
+              <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide">Business Manager</p>
+              <p className="text-2xl font-bold text-foreground leading-tight">${displayRevenue.toLocaleString('en-US', { minimumFractionDigits: 2 })}</p>
+              <div className="flex items-center gap-1.5">
+                {revenueChange >= 0 ? <ArrowUpRight className="h-3.5 w-3.5 text-green-600 dark:text-green-400" /> : <ArrowDownRight className="h-3.5 w-3.5 text-red-500" />}
+                <span className={`text-xs font-semibold ${revenueChange >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>{Math.abs(revenueChange).toFixed(1)}%</span>
                 <span className="text-xs text-muted-foreground">vs last period</span>
               </div>
             </div>
-            <button onClick={() => { setScanResult(null); setShowScanner(true); }} className="flex items-center gap-1.5 bg-[#f97316] hover:opacity-90 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-opacity mb-1">
+            <button onClick={() => { setScanResult(null); setShowScanner(true); }} className="flex items-center gap-1.5 bg-[#f97316] hover:opacity-90 text-white text-sm font-semibold px-3 py-1.5 rounded-md transition-opacity mb-1">
               <QrCode className="h-4 w-4" /><span className="hidden sm:inline">Scan QR</span>
             </button>
           </div>
           {/* Tabs */}
           <div className="flex gap-0.5 overflow-x-auto">
             {TABS.map(t => (
-              <button key={t.key} onClick={() => setActiveTab(t.key)} className={`flex items-center gap-1.5 px-3 py-2.5 text-sm font-medium rounded-t-lg border-b-2 transition-colors whitespace-nowrap ${activeTab === t.key ? 'text-[#f97316] border-[#f97316] bg-[#f97316]/10/60' : 'text-muted-foreground border-transparent hover:text-foreground hover:bg-muted'}`}>
+              <button key={t.key} onClick={() => setActiveTab(t.key)} className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-t-md border-b-2 transition-colors whitespace-nowrap ${activeTab === t.key ? 'text-[#f97316] border-[#f97316] bg-[#f97316]/10' : 'text-muted-foreground border-transparent hover:text-foreground hover:bg-muted'}`}>
                 {t.icon}<span>{t.label}</span>
               </button>
             ))}
@@ -297,32 +297,9 @@ function DashboardContent() {
         </div>
       </div>
 
-      <div className="max-w-screen-2xl mx-auto px-4 lg:px-10 py-6 lg:flex lg:gap-6">
-        {/* Side nav (desktop) — mirrors the top tabs; active item highlighted orange */}
-        <aside className="hidden lg:block lg:w-52 lg:shrink-0">
-          <nav className="sticky top-6 space-y-0.5">
-            {TABS.map((t) => {
-              const active = activeTab === t.key;
-              return (
-                <button
-                  key={t.key}
-                  onClick={() => setActiveTab(t.key)}
-                  className={`flex w-full items-center gap-2.5 rounded-lg border-l-2 px-3 py-2 text-sm transition-colors ${
-                    active
-                      ? 'border-[#f97316] bg-[#f97316]/10 font-semibold text-[#f97316]'
-                      : 'border-transparent text-foreground hover:bg-muted'
-                  }`}
-                >
-                  {t.icon}<span>{t.label}</span>
-                </button>
-              );
-            })}
-          </nav>
-        </aside>
-
-        <div className="min-w-0 flex-1">
+      <div className="max-w-screen-2xl mx-auto px-4 lg:px-10 py-4">
         {scanResult && (
-          <div className={`mb-3 p-3 rounded-xl border flex items-start justify-between ${scanResult.success ? 'bg-green-500/10 border-green-500/30' : 'bg-red-500/10 border-red-500/30'}`}>
+          <div className={`mb-3 p-3 rounded-md border flex items-start justify-between ${scanResult.success ? 'bg-green-500/10 border-green-500/30' : 'bg-red-500/10 border-red-500/30'}`}>
             <p className={`font-medium text-sm ${scanResult.success ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>{scanResult.message}</p>
             <button onClick={() => setScanResult(null)} className="text-muted-foreground hover:text-foreground ml-4 shrink-0"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg></button>
           </div>
@@ -330,18 +307,18 @@ function DashboardContent() {
 
         {/* OVERVIEW */}
         {activeTab === 'overview' && (
-          <div className="space-y-3">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+          <div className="space-y-2">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-2">
               <div className="lg:col-span-2">
                 <RevenueChart data={hasRevenue ? chartData : MOCK_ANALYTICS} total={displayRevenue} change={displayChange} />
               </div>
-              <div className="flex flex-col gap-3">
-                <div className="flex-1 bg-card border border-border rounded-xl p-4 shadow-sm">
+              <div className="flex flex-col gap-2">
+                <div className="flex-1 bg-card border border-border rounded-md p-3 shadow-sm">
                   <div className="flex items-center gap-2 mb-2"><div className="w-6 h-6 rounded-md bg-[#f97316]/10 flex items-center justify-center"><TrendingUp className="h-3.5 w-3.5 text-[#f97316]" /></div><p className="text-xs font-medium text-foreground">Income</p></div>
                   <p className="text-2xl font-bold text-foreground">${displayRevenue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                   <div className="mt-1"><Trend value={Math.abs(displayChange)} /></div>
                 </div>
-                <div className="flex-1 bg-card border border-border rounded-xl p-4 shadow-sm">
+                <div className="flex-1 bg-card border border-border rounded-md p-3 shadow-sm">
                   <div className="flex items-center gap-2 mb-2"><div className="w-6 h-6 rounded-md bg-red-500/10 flex items-center justify-center"><TrendingDown className="h-3.5 w-3.5 text-red-500" /></div><p className="text-xs font-medium text-foreground">Expense</p></div>
                   <p className="text-2xl font-bold text-foreground">${(displayRevenue * 0.32).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                   <div className="mt-1"><Trend value={-12.5} /></div>
@@ -350,12 +327,12 @@ function DashboardContent() {
             </div>
 
             {/* Earnings breakdown — 5% Localy fee, 95% net, 8.25% tax (consistent with checkout) */}
-            <div className="bg-card border border-border rounded-xl p-4 shadow-sm">
-              <div className="flex items-center justify-between mb-4">
+            <div className="bg-card border border-border rounded-md p-3 shadow-sm">
+              <div className="flex items-center justify-between mb-2">
                 <p className="text-sm font-semibold text-foreground">Earnings breakdown</p>
                 <span className="text-[11px] font-semibold text-[#f97316] bg-[#f97316]/10 px-2 py-0.5 rounded-lg">Localy takes just 5%</span>
               </div>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 <div>
                   <p className="text-xs text-muted-foreground mb-1">Gross sales</p>
                   <p className="text-xl font-bold text-foreground">${money(grossSales)}</p>
@@ -378,25 +355,25 @@ function DashboardContent() {
               </p>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               <StatCard label="Live Orders" value={String(pendingOrders.length || 3)} />
               <StatCard label="Scheduled" value={String(scheduledOrders.length || 2)} />
               <StatCard label="Avg Rating" value={avgRating > 0 ? avgRating.toFixed(1) : '4.8'} />
               <StatCard label="Reviews" value={String(reviews.length || 24)} />
             </div>
 
-            <div className="bg-card border border-border rounded-xl p-4 shadow-sm">
+            <div className="bg-card border border-border rounded-md p-3 shadow-sm">
               <p className="text-sm font-semibold text-foreground mb-3">Most Popular Order</p>
               {mostPopularOrder ? (
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
                   {(itemImages[mostPopularOrder.itemId] || itemNameImages[mostPopularOrder.name]) ? (
                     <img
                       src={itemImages[mostPopularOrder.itemId] || itemNameImages[mostPopularOrder.name]}
                       alt={mostPopularOrder.name}
-                      className="w-14 h-14 rounded-xl object-cover shrink-0"
+                      className="w-14 h-14 rounded-md object-cover shrink-0"
                     />
                   ) : (
-                    <div className="w-14 h-14 rounded-xl bg-[#f97316]/10 flex items-center justify-center shrink-0">
+                    <div className="w-14 h-14 rounded-md bg-[#f97316]/10 flex items-center justify-center shrink-0">
                       <span className="text-xl font-bold text-[#f97316]">{mostPopularOrder.name[0].toUpperCase()}</span>
                     </div>
                   )}
@@ -406,8 +383,8 @@ function DashboardContent() {
                   </div>
                 </div>
               ) : (
-                <div className="flex items-center gap-3">
-                  <img src="/Menu/Jays%20Burger/Classic%20Burger.jpg" alt="Classic Burger" className="w-14 h-14 rounded-xl object-cover shrink-0" onError={(e) => { (e.target as HTMLImageElement).style.display='none'; }} />
+                <div className="flex items-center gap-2">
+                  <img src="/Menu/Jays%20Burger/Classic%20Burger.jpg" alt="Classic Burger" className="w-14 h-14 rounded-md object-cover shrink-0" onError={(e) => { (e.target as HTMLImageElement).style.display='none'; }} />
                   <div>
                     <p className="font-semibold text-foreground">Classic Burger</p>
                     <p className="text-xs text-muted-foreground">47 orders &middot; $11.99 avg</p>
@@ -425,9 +402,9 @@ function DashboardContent() {
             </div>
 
             {/* ── Extra Analytics ── */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {/* Top Items */}
-              <div className="bg-card border border-border rounded-xl p-4 shadow-sm">
+              <div className="bg-card border border-border rounded-md p-3 shadow-sm">
                 <p className="text-sm font-semibold text-foreground mb-3">Top Sellers</p>
                 <div className="space-y-2">
                   {(() => {
@@ -472,7 +449,7 @@ function DashboardContent() {
               </div>
 
               {/* Busiest Hours */}
-              <div className="bg-card border border-border rounded-xl p-4 shadow-sm">
+              <div className="bg-card border border-border rounded-md p-3 shadow-sm">
                 <p className="text-sm font-semibold text-foreground mb-3">Busiest Hours</p>
                 {(() => {
                   const real: Record<number, number> = {};
@@ -508,8 +485,8 @@ function DashboardContent() {
             </div>
 
             {/* Revenue Trend + Insights row */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              <div className="bg-card border border-border rounded-xl p-4 shadow-sm">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <div className="bg-card border border-border rounded-md p-3 shadow-sm">
                 <p className="text-[11px] font-medium text-foreground mb-1">Avg Order Value</p>
                 <p className="text-xl font-bold text-foreground">
                   {completedOrders.length > 0
@@ -518,7 +495,7 @@ function DashboardContent() {
                 </p>
                 <div className="mt-1"><Trend value={8.3} /></div>
               </div>
-              <div className="bg-card border border-border rounded-xl p-4 shadow-sm">
+              <div className="bg-card border border-border rounded-md p-3 shadow-sm">
                 <p className="text-[11px] font-medium text-foreground mb-1">Repeat Customers</p>
                 <p className="text-xl font-bold text-foreground">
                   {completedOrders.length > 0
@@ -527,7 +504,7 @@ function DashboardContent() {
                 </p>
                 <span className="text-[10px] font-semibold text-[#f97316] bg-[#f97316]/10 px-1.5 py-0.5 rounded mt-1 inline-block">Strong</span>
               </div>
-              <div className="bg-card border border-border rounded-xl p-4 shadow-sm">
+              <div className="bg-card border border-border rounded-md p-3 shadow-sm">
                 <p className="text-[11px] font-medium text-foreground mb-1">Highest Rated</p>
                 <p className="text-sm font-bold text-foreground truncate">
                   {reviews.length > 0
@@ -538,7 +515,7 @@ function DashboardContent() {
                   {reviews.length > 0 ? `${avgRating.toFixed(1)} avg` : '4.9 avg, 23 reviews'}
                 </p>
               </div>
-              <div className="bg-card border border-border rounded-xl p-4 shadow-sm">
+              <div className="bg-card border border-border rounded-md p-3 shadow-sm">
                 <p className="text-[11px] font-medium text-foreground mb-1">This Month</p>
                 <p className="text-xl font-bold text-foreground">
                   {completedOrders.length > 0
@@ -550,8 +527,8 @@ function DashboardContent() {
             </div>
 
             {/* ── Sales Insights ── */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="bg-card border border-border rounded-xl p-4 shadow-sm">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              <div className="bg-card border border-border rounded-md p-3 shadow-sm">
                 <p className="text-[11px] font-medium text-foreground mb-1">Order Completion Rate</p>
                 <p className="text-2xl font-bold text-foreground">
                   {(completedOrders.length + pendingOrders.length) > 0
@@ -561,7 +538,7 @@ function DashboardContent() {
                 <p className="text-[10px] text-muted-foreground mt-0.5">Orders fulfilled on time</p>
                 <span className="text-[10px] font-semibold text-[#f97316] bg-[#f97316]/10 px-1.5 py-0.5 rounded mt-1.5 inline-block">Excellent</span>
               </div>
-              <div className="bg-card border border-border rounded-xl p-4 shadow-sm">
+              <div className="bg-card border border-border rounded-md p-3 shadow-sm">
                 <p className="text-[11px] font-medium text-foreground mb-1">Revenue / Customer</p>
                 <p className="text-2xl font-bold text-foreground">
                   {completedOrders.length > 0
@@ -571,7 +548,7 @@ function DashboardContent() {
                 <p className="text-[10px] text-muted-foreground mt-0.5">Avg lifetime value</p>
                 <div className="mt-1.5"><Trend value={5.2} /></div>
               </div>
-              <div className="bg-card border border-border rounded-xl p-4 shadow-sm">
+              <div className="bg-card border border-border rounded-md p-3 shadow-sm">
                 <p className="text-[11px] font-medium text-foreground mb-1">Items Sold (Month)</p>
                 <p className="text-2xl font-bold text-foreground">
                   {completedOrders.length > 0
@@ -584,8 +561,8 @@ function DashboardContent() {
             </div>
 
             {/* ── Revenue Forecast ── */}
-            <div className="bg-card border border-border rounded-xl p-4 shadow-sm">
-              <div className="flex items-center justify-between mb-4">
+            <div className="bg-card border border-border rounded-md p-3 shadow-sm">
+              <div className="flex items-center justify-between mb-2">
                 <div>
                   <p className="text-sm font-semibold text-foreground">Revenue Forecast</p>
                   <p className="text-[11px] text-muted-foreground mt-0.5">Projected next 7 days based on trend</p>
@@ -611,16 +588,16 @@ function DashboardContent() {
                   </div>
                 );
               })()}
-              <div className="flex items-center gap-4 mt-3">
+              <div className="flex items-center gap-2 mt-3">
                 <div className="flex items-center gap-1.5"><div className="w-3 h-2 rounded-sm bg-gray-200" /><span className="text-[10px] text-foreground">Actual</span></div>
                 <div className="flex items-center gap-1.5"><div className="w-3 h-2 rounded-sm bg-[#f97316]/40 border border-[#f97316]/40" /><span className="text-[10px] text-foreground">Forecast</span></div>
               </div>
             </div>
 
             {/* ── Customer Insights ── */}
-            <div className="bg-card border border-border rounded-xl p-4 shadow-sm">
-              <p className="text-sm font-semibold text-foreground mb-4">Customer Insights</p>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div className="bg-card border border-border rounded-md p-3 shadow-sm">
+              <p className="text-sm font-semibold text-foreground mb-2">Customer Insights</p>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 <div className="text-center">
                   <p className="text-2xl font-bold text-foreground">
                     {(() => { const s = new Set(completedOrders.map(o=>o.buyer_id)); return s.size > 0 ? s.size : 89; })()}
@@ -699,8 +676,8 @@ function DashboardContent() {
 
         {/* ORDERS */}
         {activeTab === 'orders' && (
-          <div className="space-y-3">
-            <button onClick={() => { setScanResult(null); setShowScanner(true); }} className="w-full flex items-center justify-center gap-2 bg-[#f97316] hover:opacity-90 text-white font-semibold py-2.5 rounded-xl transition-opacity">
+          <div className="space-y-2">
+            <button onClick={() => { setScanResult(null); setShowScanner(true); }} className="w-full flex items-center justify-center gap-2 bg-[#f97316] hover:opacity-90 text-white font-semibold py-2.5 rounded-md transition-opacity">
               <QrCode className="h-4 w-4" /> Scan Customer QR Code to Complete Order
             </button>
 
@@ -709,7 +686,7 @@ function DashboardContent() {
             {groupOrders.length > 0 && (
               <Section title="Group Orders" count={groupOrders.length} countColor="gray">
                 {groupOrders.map(go => (
-                  <div key={go.id} className="bg-card border border-border rounded-xl p-3">
+                  <div key={go.id} className="bg-card border border-border rounded-md p-3">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <Users className="h-4 w-4 text-muted-foreground" />
@@ -738,24 +715,24 @@ function DashboardContent() {
         {/* REVIEWS */}
         {activeTab === 'reviews' && (
           <div className="space-y-4">
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-              <div className="bg-card border border-border rounded-xl p-4 shadow-sm text-center">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              <div className="bg-card border border-border rounded-md p-3 shadow-sm text-center">
                 <p className="text-3xl font-bold text-foreground">{avgRating > 0 ? avgRating.toFixed(1) : '—'}</p>
                 <div className="flex justify-center gap-0.5 my-1">{[1,2,3,4,5].map(s => <Star key={s} className={`h-3.5 w-3.5 ${s <= Math.round(avgRating) ? 'text-[#f97316] fill-[#f97316]' : 'text-gray-200 fill-gray-200'}`} />)}</div>
                 <p className="text-xs text-foreground">Average Rating</p>
               </div>
-              <div className="bg-card border border-border rounded-xl p-4 shadow-sm text-center">
+              <div className="bg-card border border-border rounded-md p-3 shadow-sm text-center">
                 <p className="text-3xl font-bold text-foreground">{reviews.length}</p>
                 <p className="text-xs text-foreground mt-1">Total Reviews</p>
               </div>
-              <div className="bg-card border border-border rounded-xl p-4 shadow-sm text-center col-span-2 sm:col-span-1">
+              <div className="bg-card border border-border rounded-md p-3 shadow-sm text-center col-span-2 sm:col-span-1">
                 <p className="text-3xl font-bold text-foreground">{reviews.filter(r => r.rating >= 4).length}</p>
                 <p className="text-xs text-foreground mt-1">4+ Stars</p>
               </div>
             </div>
 
             {reviews.length === 0 ? (
-              <div className="bg-card border border-border rounded-xl p-10 text-center">
+              <div className="bg-card border border-border rounded-md p-10 text-center">
                 <Star className="h-10 w-10 text-gray-200 mx-auto mb-3" />
                 <p className="font-semibold text-foreground">No reviews yet</p>
                 <p className="text-muted-foreground text-sm mt-1">Reviews appear here when customers rate your videos</p>
@@ -763,7 +740,7 @@ function DashboardContent() {
             ) : (
               <div className="space-y-2">
                 {reviews.map(r => (
-                  <div key={r.id} className="bg-card border border-border rounded-xl p-3 shadow-sm">
+                  <div key={r.id} className="bg-card border border-border rounded-md p-3 shadow-sm">
                     <div className="flex items-start gap-2.5">
                       <div className="w-8 h-8 rounded-full bg-muted overflow-hidden shrink-0 flex items-center justify-center">
                         {r.reviewer_avatar ? <img src={r.reviewer_avatar} alt={r.reviewer_name} className="w-full h-full object-cover" /> : <span className="text-xs font-semibold text-muted-foreground">{r.reviewer_name[0]?.toUpperCase()}</span>}
@@ -794,24 +771,23 @@ function DashboardContent() {
 
         {/* VIDEOS */}
         {activeTab === 'videos' && user && (
-          <div className="bg-card border border-border rounded-xl p-4 shadow-sm">
-            <h2 className="text-sm font-semibold text-foreground mb-4">Your Videos</h2>
+          <div className="bg-card border border-border rounded-md p-3 shadow-sm">
+            <h2 className="text-sm font-semibold text-foreground mb-2">Your Videos</h2>
             <PostedVideos userId={user.id} isOwnProfile={true} />
           </div>
         )}
 
         {/* BUSINESS */}
         {activeTab === 'business' && user && business && (
-          <div className="space-y-3">
+          <div className="space-y-2">
             <BusinessInfoEditor business={business} onSaved={setBusiness} />
             <BusinessHoursEditor business={business} onSaved={setBusiness} />
-            <div className="bg-card border border-border rounded-xl p-4 shadow-sm">
-              <h2 className="text-sm font-semibold text-foreground mb-4">Services &amp; Menu</h2>
+            <div className="bg-card border border-border rounded-md p-3 shadow-sm">
+              <h2 className="text-sm font-semibold text-foreground mb-2">Services &amp; Menu</h2>
               <MenuList userId={user.id} businessId={business.id} isOwnProfile={true} layout="list" />
             </div>
           </div>
         )}
-        </div>
       </div>
 
       {showScanner && <QRScanner onScan={handleScan} onClose={() => setShowScanner(false)} />}
@@ -823,7 +799,7 @@ function DashboardContent() {
 
 function StatCard({ label, value, change }: { label: string; value: string; change?: number }) {
   return (
-    <div className="bg-card border border-border rounded-xl p-3 shadow-sm text-center">
+    <div className="bg-card border border-border rounded-md p-3 shadow-sm text-center">
       <p className="text-2xl font-bold text-foreground">{value}</p>
       <p className="text-xs font-medium text-foreground mt-0.5">{label}</p>
       {change !== undefined && <div className="mt-1 flex justify-center"><Trend value={change} /></div>}
@@ -845,18 +821,18 @@ function Trend({ value, suffix = '%' }: { value: number; suffix?: string }) {
 /** Yahoo-Finance-style revenue area chart (hero). Renders in light + dark mode. */
 function RevenueChart({ data, total, change }: { data: { label: string; revenue: number }[]; total: number; change: number }) {
   return (
-    <div className="bg-card border border-border rounded-xl p-4 shadow-sm">
-      <div className="mb-3 flex items-start justify-between">
+    <div className="bg-card border border-border rounded-md p-3 shadow-sm">
+      <div className="mb-1.5 flex items-start justify-between">
         <div>
-          <p className="text-xs font-medium text-muted-foreground">Revenue · last 30 days</p>
-          <p className="text-3xl font-bold leading-tight text-foreground">
+          <p className="text-[11px] font-medium text-muted-foreground">Revenue · last 30 days</p>
+          <p className="text-2xl font-bold leading-tight text-foreground">
             ${total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </p>
           <div className="mt-0.5"><Trend value={change} /></div>
         </div>
-        <span className="rounded-lg border border-border px-2 py-1 text-[11px] font-medium text-muted-foreground">30D</span>
+        <span className="rounded-md border border-border px-2 py-0.5 text-[11px] font-medium text-muted-foreground">30D</span>
       </div>
-      <div className="h-56">
+      <div className="h-44">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={data} margin={{ top: 6, right: 8, left: -6, bottom: 0 }}>
             <defs>
@@ -938,7 +914,7 @@ function OrdersTable({ pending, scheduled, completed, limit }: {
   );
 
   return (
-    <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+    <div className="overflow-hidden rounded-md border border-border bg-card shadow-sm">
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="border-b border-border text-[11px] uppercase tracking-wide text-muted-foreground">
@@ -993,7 +969,7 @@ function Section({ title, count, countColor = 'gray', children }: { title: strin
 
 function Empty({ icon, text }: { icon: React.ReactNode; text: string }) {
   return (
-    <div className="bg-card border border-border rounded-xl p-8 text-center">
+    <div className="bg-card border border-border rounded-md p-8 text-center">
       <div className="mx-auto mb-2 flex justify-center">{icon}</div>
       <p className="text-muted-foreground text-sm">{text}</p>
     </div>
@@ -1029,24 +1005,24 @@ function BusinessInfoEditor({ business, onSaved }: { business: Business; onSaved
   };
 
   return (
-    <div className="bg-card border border-border rounded-xl p-4 shadow-sm">
-      <div className="flex items-center justify-between mb-4">
+    <div className="bg-card border border-border rounded-md p-3 shadow-sm">
+      <div className="flex items-center justify-between mb-2">
         <h2 className="text-sm font-semibold text-foreground">Business Info</h2>
-        <button onClick={handleSave} disabled={saving} className={`flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-xl transition-colors ${saved ? 'bg-[#f97316]/10 text-[#f97316] border border-orange-200' : 'bg-[#f97316] text-white hover:opacity-90'} disabled:opacity-50`}>
+        <button onClick={handleSave} disabled={saving} className={`flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-md transition-colors ${saved ? 'bg-[#f97316]/10 text-[#f97316] border border-orange-200' : 'bg-[#f97316] text-white hover:opacity-90'} disabled:opacity-50`}>
           <Save className="h-3.5 w-3.5" />
           {saving ? 'Saving…' : saved ? 'Saved!' : 'Save'}
         </button>
       </div>
-      {error && <div className="mb-3 bg-red-50 border border-red-200 text-red-600 rounded-xl p-3 text-sm">{error}</div>}
-      <div className="space-y-3">
+      {error && <div className="mb-3 bg-red-50 border border-red-200 text-red-600 rounded-md p-3 text-sm">{error}</div>}
+      <div className="space-y-2">
         <div>
           <LabeledInput icon={<Phone className="h-4 w-4 text-muted-foreground" />} type="tel" value={phone} onChange={(v) => { setPhone(v); if (phoneError) setPhoneError(null); }} placeholder="Phone number" />
           <FieldError message={phoneError} className="ml-11" />
         </div>
         <LabeledInput icon={<MapPin className="h-4 w-4 text-muted-foreground" />} type="text" value={address} onChange={setAddress} placeholder="Address" />
-        <div className="flex items-start gap-3">
+        <div className="flex items-start gap-2">
           <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center shrink-0 mt-0.5"><FileText className="h-4 w-4 text-muted-foreground" /></div>
-          <textarea value={miscInfo} onChange={e => setMiscInfo(e.target.value)} placeholder="Website, description, notes, etc." rows={3} maxLength={1000} className="flex-1 bg-muted border border-border rounded-xl px-3 py-2 text-sm text-foreground placeholder-gray-400 focus:outline-none focus:border-[#f97316] resize-none" />
+          <textarea value={miscInfo} onChange={e => setMiscInfo(e.target.value)} placeholder="Website, description, notes, etc." rows={3} maxLength={1000} className="flex-1 bg-muted border border-border rounded-md px-3 py-2 text-sm text-foreground placeholder-gray-400 focus:outline-none focus:border-[#f97316] resize-none" />
         </div>
       </div>
     </div>
@@ -1055,9 +1031,9 @@ function BusinessInfoEditor({ business, onSaved }: { business: Business; onSaved
 
 function LabeledInput({ icon, type, value, onChange, placeholder }: { icon: React.ReactNode; type: string; value: string; onChange: (v: string) => void; placeholder: string }) {
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex items-center gap-2">
       <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center shrink-0">{icon}</div>
-      <input type={type} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} className="flex-1 bg-muted border border-border rounded-xl px-3 py-2 text-sm text-foreground placeholder-gray-400 focus:outline-none focus:border-[#f97316]" />
+      <input type={type} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} className="flex-1 bg-muted border border-border rounded-md px-3 py-2 text-sm text-foreground placeholder-gray-400 focus:outline-none focus:border-[#f97316]" />
     </div>
   );
 }
@@ -1102,17 +1078,17 @@ function BusinessHoursEditor({ business, onSaved }: { business: Business; onSave
   };
 
   return (
-    <div className="bg-card border border-border rounded-xl p-4 shadow-sm">
-      <div className="flex items-center justify-between mb-4">
+    <div className="bg-card border border-border rounded-md p-3 shadow-sm">
+      <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2"><Clock className="h-4 w-4 text-[#f97316]" /><h2 className="text-sm font-semibold text-foreground">Business Hours</h2></div>
-        <button onClick={save} disabled={saving} className={`flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-xl transition-colors ${saved ? 'bg-[#f97316]/10 text-[#f97316] border border-orange-200' : 'bg-[#f97316] text-white hover:opacity-90'} disabled:opacity-50`}>
+        <button onClick={save} disabled={saving} className={`flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-md transition-colors ${saved ? 'bg-[#f97316]/10 text-[#f97316] border border-orange-200' : 'bg-[#f97316] text-white hover:opacity-90'} disabled:opacity-50`}>
           <Save className="h-3.5 w-3.5" />{saving ? 'Saving…' : saved ? 'Saved!' : 'Save Hours'}
         </button>
       </div>
-      {error && <div className="mb-3 bg-red-50 border border-red-200 text-red-600 rounded-xl p-3 text-sm">{error}</div>}
-      <div className="space-y-3">
+      {error && <div className="mb-3 bg-red-50 border border-red-200 text-red-600 rounded-md p-3 text-sm">{error}</div>}
+      <div className="space-y-2">
         {DAYS.map(day => (
-          <div key={day} className="flex items-center gap-3">
+          <div key={day} className="flex items-center gap-2">
             <label className="w-24 text-sm text-foreground capitalize shrink-0">{day}</label>
             <input type="checkbox" checked={!hours[day]?.closed} onChange={e => setHours({ ...hours, [day]: e.target.checked ? { open: '09:00', close: '17:00' } : { closed: true } })} className="w-4 h-4 accent-[#f97316] rounded" />
             {!hours[day]?.closed ? (
@@ -1166,45 +1142,45 @@ function PromoCodesManager({ userId, promoCodes, onChanged }: { userId: string; 
           <h2 className="text-sm font-semibold text-foreground">Promo Codes</h2>
           <p className="text-xs text-muted-foreground mt-0.5">Customers enter these at checkout to get a discount</p>
         </div>
-        <button onClick={() => setShowForm(!showForm)} className="flex items-center gap-1.5 bg-[#f97316] hover:opacity-90 text-white text-sm font-semibold px-3 py-2 rounded-xl transition-opacity">
+        <button onClick={() => setShowForm(!showForm)} className="flex items-center gap-1.5 bg-[#f97316] hover:opacity-90 text-white text-sm font-semibold px-3 py-2 rounded-md transition-opacity">
           <Plus className="h-4 w-4" /> New Code
         </button>
       </div>
 
       {showForm && (
-        <div className="bg-card border border-border rounded-xl p-4 shadow-sm space-y-4">
+        <div className="bg-card border border-border rounded-md p-3 shadow-sm space-y-4">
           <h3 className="text-sm font-semibold text-foreground">Create Promo Code</h3>
-          {formError && <div className="bg-red-50 border border-red-200 text-red-600 text-sm rounded-xl p-3">{formError}</div>}
-          <div className="grid grid-cols-2 gap-3">
+          {formError && <div className="bg-red-50 border border-red-200 text-red-600 text-sm rounded-md p-3">{formError}</div>}
+          <div className="grid grid-cols-2 gap-2">
             <div className="col-span-2">
               <label className="block text-xs font-medium text-muted-foreground mb-1">Code</label>
-              <input type="text" value={code} onChange={e => setCode(e.target.value.toUpperCase())} placeholder="e.g. SAVE20" maxLength={20} className="w-full bg-muted border border-border rounded-xl px-3 py-2 text-sm font-mono text-foreground placeholder-gray-400 focus:outline-none focus:border-[#f97316] uppercase" />
+              <input type="text" value={code} onChange={e => setCode(e.target.value.toUpperCase())} placeholder="e.g. SAVE20" maxLength={20} className="w-full bg-muted border border-border rounded-md px-3 py-2 text-sm font-mono text-foreground placeholder-gray-400 focus:outline-none focus:border-[#f97316] uppercase" />
             </div>
             <div>
               <label className="block text-xs font-medium text-muted-foreground mb-1">Type</label>
-              <select value={discountType} onChange={e => setDiscountType(e.target.value as 'percent' | 'fixed')} className="w-full bg-muted border border-border rounded-xl px-3 py-2 text-sm text-foreground focus:outline-none focus:border-[#f97316]">
+              <select value={discountType} onChange={e => setDiscountType(e.target.value as 'percent' | 'fixed')} className="w-full bg-muted border border-border rounded-md px-3 py-2 text-sm text-foreground focus:outline-none focus:border-[#f97316]">
                 <option value="percent">Percentage (%)</option>
                 <option value="fixed">Fixed ($)</option>
               </select>
             </div>
             <div>
               <label className="block text-xs font-medium text-muted-foreground mb-1">Value</label>
-              <input type="number" value={discountValue} onChange={e => setDiscountValue(e.target.value)} placeholder={discountType === 'percent' ? '20' : '5.00'} min="0" step={discountType === 'percent' ? '1' : '0.01'} className="w-full bg-muted border border-border rounded-xl px-3 py-2 text-sm text-foreground placeholder-gray-400 focus:outline-none focus:border-[#f97316]" />
+              <input type="number" value={discountValue} onChange={e => setDiscountValue(e.target.value)} placeholder={discountType === 'percent' ? '20' : '5.00'} min="0" step={discountType === 'percent' ? '1' : '0.01'} className="w-full bg-muted border border-border rounded-md px-3 py-2 text-sm text-foreground placeholder-gray-400 focus:outline-none focus:border-[#f97316]" />
             </div>
             <div>
               <label className="block text-xs font-medium text-muted-foreground mb-1">Max Uses</label>
-              <input type="number" value={maxUses} onChange={e => setMaxUses(e.target.value)} placeholder="Unlimited" min="1" className="w-full bg-muted border border-border rounded-xl px-3 py-2 text-sm text-foreground placeholder-gray-400 focus:outline-none focus:border-[#f97316]" />
+              <input type="number" value={maxUses} onChange={e => setMaxUses(e.target.value)} placeholder="Unlimited" min="1" className="w-full bg-muted border border-border rounded-md px-3 py-2 text-sm text-foreground placeholder-gray-400 focus:outline-none focus:border-[#f97316]" />
             </div>
             <div>
               <label className="block text-xs font-medium text-muted-foreground mb-1">Expiry Date</label>
-              <input type="date" value={expiryDate} onChange={e => setExpiryDate(e.target.value)} min={new Date().toISOString().slice(0, 10)} className="w-full bg-muted border border-border rounded-xl px-3 py-2 text-sm text-foreground focus:outline-none focus:border-[#f97316]" />
+              <input type="date" value={expiryDate} onChange={e => setExpiryDate(e.target.value)} min={new Date().toISOString().slice(0, 10)} className="w-full bg-muted border border-border rounded-md px-3 py-2 text-sm text-foreground focus:outline-none focus:border-[#f97316]" />
             </div>
           </div>
           <div className="flex gap-2">
-            <button onClick={handleCreate} disabled={saving} className="flex-1 bg-[#f97316] hover:opacity-90 text-white text-sm font-semibold py-2.5 rounded-xl transition-opacity disabled:opacity-50">
+            <button onClick={handleCreate} disabled={saving} className="flex-1 bg-[#f97316] hover:opacity-90 text-white text-sm font-semibold py-2.5 rounded-md transition-opacity disabled:opacity-50">
               {saving ? 'Creating…' : 'Create Code'}
             </button>
-            <button onClick={() => setShowForm(false)} className="flex-1 bg-muted hover:bg-gray-200 text-foreground text-sm font-medium py-2.5 rounded-xl transition-colors">
+            <button onClick={() => setShowForm(false)} className="flex-1 bg-muted hover:bg-gray-200 text-foreground text-sm font-medium py-2.5 rounded-md transition-colors">
               Cancel
             </button>
           </div>
@@ -1212,7 +1188,7 @@ function PromoCodesManager({ userId, promoCodes, onChanged }: { userId: string; 
       )}
 
       {promoCodes.length === 0 && !showForm ? (
-        <div className="bg-card border border-border rounded-xl p-10 text-center">
+        <div className="bg-card border border-border rounded-md p-10 text-center">
           <Tag className="h-10 w-10 text-gray-200 mx-auto mb-3" />
           <p className="font-semibold text-foreground">No promo codes yet</p>
           <p className="text-muted-foreground text-sm mt-1">Create codes to offer discounts to your customers</p>
@@ -1223,8 +1199,8 @@ function PromoCodesManager({ userId, promoCodes, onChanged }: { userId: string; 
             const expired = p.expiry_date && new Date(p.expiry_date) < new Date();
             const maxed = p.max_uses != null && p.used_count >= p.max_uses;
             return (
-              <div key={p.id} className="bg-card border border-border rounded-xl p-4 shadow-sm">
-                <div className="flex items-center justify-between gap-3">
+              <div key={p.id} className="bg-card border border-border rounded-md p-3 shadow-sm">
+                <div className="flex items-center justify-between gap-2">
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="font-mono font-bold text-foreground text-sm">{p.code}</span>
