@@ -1421,7 +1421,7 @@ export function HomeContent({ isActive }: HomeContentProps) {
         >
           <X className="h-4 w-4" color="currentColor" strokeWidth={2.5} />
         </button>
-        <CommentSection videoId={currentVideo.id} className="h-full w-full overflow-y-auto" />
+        <CommentSection videoId={currentVideo.id} className="h-full w-full" />
       </div>
 
       {/* Engagement Action Rail — beside the video on its right (see .feed-action-rail CSS above) */}

@@ -18,7 +18,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
   Heart, Share2, Search, Users, ChevronLeft, ChevronRight,
-  Info, Clock, Star, DollarSign, MapPin, MessageCircle,
+  Info, Clock, Star, DollarSign, MapPin, MessageCircle, Sparkles,
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { getOrCreateOneToOneChat } from '@/lib/supabase/messaging';
@@ -28,8 +28,10 @@ import { useStoreDistance } from '@/lib/utils/useStoreDistance';
 import { ItemImage, Stars } from './StorePrimitives';
 import { useAddToCart, FeaturedItemCard, MenuItemRow } from './StoreItemCards';
 import { InfoModal } from './InfoModal';
+import { StoreInfoSections } from './StoreInfoSections';
 import type { StoreItem, StoreMenu } from './types';
 import { isItemBookmarked, toggleItemBookmark } from '@/lib/clientEngagement';
+import { getBusinessSummary } from '@/lib/businessSummaries';
 
 // Re-export the store types so existing importers (e.g. the profile page) keep
 // importing them from this module.
@@ -44,6 +46,8 @@ export function StorePage({ storeName, sellerId, menu }: { storeName: string; se
   const { user } = useAuth();
   const router = useRouter();
   const { label: distanceLabel } = useStoreDistance(menu.address);
+  // AI-generated business summary (precomputed/cached in lib/businessSummaries).
+  const aiSummary = useMemo(() => getBusinessSummary(storeName), [storeName]);
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [messagingLoading, setMessagingLoading] = useState(false);
 
@@ -211,6 +215,12 @@ export function StorePage({ storeName, sellerId, menu }: { storeName: string; se
               </button>
               <button onClick={() => setShowInfoModal(true)} className="font-medium text-black underline-offset-2 hover:underline">Info</button>
             </div>
+            {aiSummary && (
+              <p className="mt-2 flex items-start gap-1.5 max-w-prose text-sm text-gray-600">
+                <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-[#f97316]" strokeWidth={2} />
+                <span>{aiSummary}</span>
+              </p>
+            )}
             {distanceLabel && (
               <div className="mt-1.5 flex items-center gap-1.5 text-sm text-gray-600">
                 <MapPin className="h-4 w-4 shrink-0 text-[#f97316]" strokeWidth={2} />
@@ -288,6 +298,12 @@ export function StorePage({ storeName, sellerId, menu }: { storeName: string; se
 
           {/* main content */}
           <div className="min-w-0 flex-1">
+            {/* Store info — Founder Story, Things to Look Out For, Common Questions.
+                Placed at the TOP of the content area, above Featured / Picked + menu. */}
+            <div className="mb-8">
+              <StoreInfoSections slug={menu.slug} />
+            </div>
+
             {/* Savings and more */}
             <section>
               <h2 className="mb-3 text-2xl font-bold text-black">Savings and more</h2>

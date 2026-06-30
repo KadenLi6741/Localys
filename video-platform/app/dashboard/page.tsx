@@ -9,10 +9,14 @@ import { QRScanner } from '@/components/QRScanner';
 import { PostedVideos } from '@/components/PostedVideos';
 import { MenuList } from '@/components/MenuList';
 import { BusinessReports } from '@/components/dashboard/BusinessReports';
+import { CommunityFeedbackPanel } from '@/components/dashboard/CommunityFeedbackPanel';
+import { LocalyEmailsPanel } from '@/components/dashboard/LocalyEmailsPanel';
+import { MyEventsPanel } from '@/components/dashboard/MyEventsPanel';
 import {
   ensureUserBusiness,
   updateBusinessInfo,
   getUserMenu,
+  getUserPremiumStatus,
   Business,
   BusinessHours,
   BusinessUpdateData,
@@ -63,6 +67,7 @@ function DashboardContent() {
   const [activeTab, setActiveTab] = useState<Tab>('overview');
   const [isBusiness, setIsBusiness] = useState<boolean | null>(null);
   const [business, setBusiness] = useState<Business | null>(null);
+  const [isPremium, setIsPremium] = useState(false);
   const [pendingOrders, setPendingOrders] = useState<ItemPurchase[]>([]);
   const [completedOrders, setCompletedOrders] = useState<ItemPurchase[]>([]);
   const [scheduledOrders, setScheduledOrders] = useState<ItemPurchase[]>([]);
@@ -139,6 +144,9 @@ function DashboardContent() {
         if (data.business_hours && typeof data.business_hours === 'string') data.business_hours = JSON.parse(data.business_hours);
         setBusiness(data);
       }
+      // Premium gates the Localy Emails AI + automation tools.
+      const { isPremium: premium } = await getUserPremiumStatus(user.id);
+      setIsPremium(premium);
       if (menuData?.menu_items) {
         const byId: Record<string, string> = {};
         const byName: Record<string, string> = {};
@@ -622,6 +630,23 @@ function DashboardContent() {
                 })}
               </div>
             </div>
+
+            {/* My Events — create/edit/delete events shown on the customer Events page */}
+            <MyEventsPanel
+              businessId={business?.id}
+              businessName={business?.business_name}
+              businessImage={business?.profile_picture_url}
+            />
+
+            {/* Community Feedback — customer wishlist/requests, owner-managed */}
+            <CommunityFeedbackPanel businessId={business?.id} />
+
+            {/* Localy Emails — opted-in list, compose/send, AI writing + automation (Premium) */}
+            <LocalyEmailsPanel
+              businessId={business?.id || ''}
+              businessName={business?.business_name || 'your business'}
+              isPremium={isPremium}
+            />
           </div>
         )}
 

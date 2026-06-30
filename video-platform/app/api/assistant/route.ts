@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { geminiUrl } from '@/lib/gemini';
 
 const SYSTEM_PROMPT = `You are the Localy Assistant, the in-app help guide for Localy — a web app that helps people discover and support small local businesses. Localy blends a TikTok-style video feed, Reddit-style communities, and Uber Eats-style ordering. Your job is to help users navigate the app and answer questions clearly, briefly, and in a friendly tone.
 
@@ -148,9 +149,10 @@ export async function POST(req: NextRequest) {
     }
     contents.push({ role: 'user', parts: [{ text: message }] });
 
-    // gemini-2.5-flash: disable thinking for fast chat responses
+    // Model id is centralized in lib/gemini.ts (GEMINI_MODEL); thinking disabled
+    // below for fast chat responses.
     const geminiRes = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+      geminiUrl(apiKey),
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

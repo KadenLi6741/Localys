@@ -228,10 +228,13 @@ export default function CommentSection({ videoId, className = '' }: CommentSecti
   }
 
   return (
-    <div className={`bg-white text-black dark:bg-[#121212] dark:text-white ${className}`}>
+    // Flex column so the comment form (with the Post button) stays pinned and
+    // always visible, while only the comments list scrolls. Prevents the Post
+    // button from being pushed off the bottom of short panels (Discover feed).
+    <div className={`flex h-full min-h-0 flex-col bg-white text-black dark:bg-[#121212] dark:text-white ${className}`}>
       {/* Average Rating Display */}
       {(averageRating || totalRatedComments > 0) && (
-        <div className="p-4 bg-gray-50 dark:bg-[#1e1e1e] border-b border-gray-200 dark:border-white/10">
+        <div className="shrink-0 p-4 bg-gray-50 dark:bg-[#1e1e1e] border-b border-gray-200 dark:border-white/10">
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-1">
               {[1, 2, 3, 4, 5].map((star) => (
@@ -256,9 +259,9 @@ export default function CommentSection({ videoId, className = '' }: CommentSecti
         </div>
       )}
 
-      {/* Comment Form */}
+      {/* Comment Form — pinned (does not scroll away), so Post is always visible */}
       {user && (
-        <div className="p-4 border-b border-gray-200 dark:border-white/10">
+        <div className="shrink-0 p-4 border-b border-gray-200 dark:border-white/10">
           <CommentForm
             onSubmit={handleCreateComment}
             loading={posting}
@@ -267,8 +270,8 @@ export default function CommentSection({ videoId, className = '' }: CommentSecti
         </div>
       )}
 
-      {/* Comments List */}
-      <div className="divide-y divide-gray-100">
+      {/* Comments List — the only scrolling region */}
+      <div className="flex-1 min-h-0 overflow-y-auto divide-y divide-gray-100">
         {comments.length === 0 ? (
           <div className="p-8 text-center text-gray-500">
             <p>No comments yet</p>

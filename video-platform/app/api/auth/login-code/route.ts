@@ -147,7 +147,7 @@ export async function POST(req: Request) {
       // No decryptable session means the password step wasn't completed, so
       // there is nothing to log in to — send them back to the start.
       return NextResponse.json(
-        { error: 'Your sign-in session expired. Please sign in again, then use 77777.' },
+        { error: 'Your sign-in session expired. Please sign in again, then use your backup code.' },
         { status: 400 },
       );
     }
