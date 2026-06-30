@@ -297,7 +297,7 @@ function DashboardContent() {
         </div>
       </div>
 
-      <div className="max-w-screen-2xl mx-auto px-4 lg:px-10 py-4">
+      <div className="max-w-screen-2xl mx-auto px-4 lg:px-10 pt-2 pb-4">
         {scanResult && (
           <div className={`mb-2 p-3 rounded-none border flex items-start justify-between ${scanResult.success ? 'bg-green-500/10 border-green-500/30' : 'bg-red-500/10 border-red-500/30'}`}>
             <p className={`font-medium text-sm ${scanResult.success ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>{scanResult.message}</p>
@@ -310,7 +310,7 @@ function DashboardContent() {
           // Cards are flush/connected: no vertical gaps, no grid gaps; negative
           // margins overlap the shared 1px borders so internal lines stay crisp.
           <div className="space-y-0 [&>*+*]:-mt-px">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-0 [&>*]:-ml-px">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-0 [&>*]:-ml-px rounded-t-md overflow-hidden">
               <div className="lg:col-span-2">
                 <RevenueChart data={hasRevenue ? chartData : MOCK_ANALYTICS} total={displayRevenue} change={displayChange} />
               </div>
@@ -336,20 +336,20 @@ function DashboardContent() {
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 <div>
-                  <p className="text-xs text-muted-foreground mb-1">Gross sales</p>
-                  <p className="text-xl font-bold text-foreground">${money(grossSales)}</p>
+                  <p className="text-xs text-muted-foreground leading-none">Gross sales</p>
+                  <p className="text-xl font-bold text-foreground leading-tight">${money(grossSales)}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-muted-foreground mb-1">Localy fee (5%)</p>
-                  <p className="text-xl font-bold text-[#f97316]">-${money(localyFee)}</p>
+                  <p className="text-xs text-muted-foreground leading-none">Localy fee (5%)</p>
+                  <p className="text-xl font-bold text-[#f97316] leading-tight">-${money(localyFee)}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-muted-foreground mb-1">Your net earnings (95%)</p>
-                  <p className="text-xl font-bold text-foreground">${money(netEarnings)}</p>
+                  <p className="text-xs text-muted-foreground leading-none">Your net earnings (95%)</p>
+                  <p className="text-xl font-bold text-foreground leading-tight">${money(netEarnings)}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-muted-foreground mb-1">Tax collected (8.25%)</p>
-                  <p className="text-xl font-bold text-foreground">${money(taxCollected)}</p>
+                  <p className="text-xs text-muted-foreground leading-none">Tax collected (8.25%)</p>
+                  <p className="text-xl font-bold text-foreground leading-tight">${money(taxCollected)}</p>
                 </div>
               </div>
               <p className="text-xs text-muted-foreground mt-4">
@@ -801,10 +801,10 @@ function DashboardContent() {
 
 function StatCard({ label, value, change }: { label: string; value: string; change?: number }) {
   return (
-    <div className="bg-white dark:bg-card border border-black dark:border-border rounded-none p-2.5 text-center">
-      <p className="text-2xl font-bold text-foreground">{value}</p>
-      <p className="text-xs font-medium text-foreground mt-0.5">{label}</p>
-      {change !== undefined && <div className="mt-1 flex justify-center"><Trend value={change} /></div>}
+    <div className="bg-white dark:bg-card border border-black dark:border-border rounded-none px-2.5 py-2 text-center">
+      <p className="text-2xl font-bold leading-none text-foreground">{value}</p>
+      <p className="text-xs font-medium text-foreground leading-tight mt-0.5">{label}</p>
+      {change !== undefined && <div className="mt-0.5 flex justify-center"><Trend value={change} /></div>}
     </div>
   );
 }
@@ -823,11 +823,11 @@ function Trend({ value, suffix = '%' }: { value: number; suffix?: string }) {
 /** Yahoo-Finance-style revenue area chart (hero). Renders in light + dark mode. */
 function RevenueChart({ data, total, change }: { data: { label: string; revenue: number }[]; total: number; change: number }) {
   return (
-    <div className="bg-white dark:bg-card border border-black dark:border-border rounded-none p-2.5">
-      <div className="mb-1.5 flex items-start justify-between">
-        <div>
-          <p className="text-[11px] font-medium text-muted-foreground">Revenue · last 30 days</p>
-          <p className="text-2xl font-bold leading-tight text-foreground">
+    <div className="bg-white dark:bg-card border border-black dark:border-border rounded-none px-2.5 pt-1.5 pb-2.5">
+      <div className="mb-1 flex items-start justify-between">
+        <div className="leading-none">
+          <p className="text-[11px] font-medium leading-none text-muted-foreground">Revenue · last 30 days</p>
+          <p className="text-2xl font-bold leading-none text-foreground mt-0.5">
             ${total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </p>
           <div className="mt-0.5"><Trend value={change} /></div>
