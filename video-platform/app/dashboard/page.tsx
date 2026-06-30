@@ -8,6 +8,9 @@ import { supabase } from '@/lib/supabase/client';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { PostedVideos } from '@/components/PostedVideos';
 import { MenuList } from '@/components/MenuList';
+import { MyEventsPanel } from '@/components/dashboard/MyEventsPanel';
+import { CommunityFeedbackPanel } from '@/components/dashboard/CommunityFeedbackPanel';
+import { LocalyEmailsPanel } from '@/components/dashboard/LocalyEmailsPanel';
 
 // Heavy, tab-gated widgets — code-split so their bundles (recharts + jsPDF for
 // reports, jsQR + camera for the scanner) load only when actually opened.
