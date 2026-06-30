@@ -216,16 +216,16 @@ export default function CommentForm({
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
           disabled={loading}
-          rows={compact ? 1 : 3}
+          rows={compact ? 1 : 2}
           className={`w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-black placeholder-gray-400 focus:outline-none focus:border-[#f97316] focus:ring-1 focus:ring-[#f97316]/20 disabled:opacity-50 disabled:cursor-not-allowed resize-none ${
-            compact ? 'text-sm min-h-[32px]' : 'text-sm min-h-[96px]'
+            compact ? 'text-sm min-h-[32px]' : 'text-sm min-h-[56px]'
           }`}
-          style={{ maxHeight: compact ? '80px' : '160px' }}
+          style={{ maxHeight: compact ? '80px' : '120px' }}
         />
 
         {/* Star Rating */}
         {!compact && (
-          <div className="flex items-center gap-2 mt-3 mb-2">
+          <div className="flex items-center gap-2 mt-2 mb-1">
             <span className="text-xs text-gray-500">Rate:</span>
             <div className="flex gap-1">
               {[1, 2, 3, 4, 5].map((star) => (
