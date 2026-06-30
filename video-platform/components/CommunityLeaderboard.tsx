@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { MapPin, ChevronUp } from 'lucide-react';
+import { MapPin, ChevronUp, Star } from 'lucide-react';
 
 /* ────────────────────────────────────────────────────────────────────────────
  * MOCK leaderboard + rank rewards — wire to real 5km query later.
@@ -59,8 +59,8 @@ const CURRENT_USER_RANK = 7;
 const NEARBY_TOTAL = 42;
 /* ──────────────────────────────────────────────────────────────────────────── */
 
-/** Small rank badge image; falls back to a clean text badge if the file is missing. */
-function MiniBadge({ tier }: { tier: RankTier }) {
+/** Rank badge image; falls back to a clean text badge if the file is missing. */
+function MiniBadge({ tier, className = 'h-7 w-7' }: { tier: RankTier; className?: string }) {
   const [failed, setFailed] = useState(false);
   if (failed) {
     return (
@@ -78,17 +78,36 @@ function MiniBadge({ tier }: { tier: RankTier }) {
       src={tier.image}
       alt={tier.name}
       title={tier.name}
-      className="h-7 w-7 shrink-0 object-contain"
+      className={`shrink-0 object-contain ${className}`}
       onError={() => setFailed(true)}
     />
   );
 }
 
+/** Square initials avatar for a leaderboard row (reference uses square thumbnails). */
+function RowAvatar({ name, isYou }: { name: string; isYou?: boolean }) {
+  const initial = (name.trim()[0] || '?').toUpperCase();
+  return (
+    <div
+      className={[
+        'flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-sm font-bold',
+        isYou
+          ? 'bg-[#f97316] text-white'
+          : 'bg-gray-100 text-gray-500 dark:bg-white/10 dark:text-gray-300',
+      ].join(' ')}
+      aria-hidden="true"
+    >
+      {initial}
+    </div>
+  );
+}
+
 /**
- * Community leaderboard for the profile page: the user's rank within a 5 km
- * radius, the ranked list of nearby supporters (own row highlighted, people just
- * above clearly marked), and a Rank Rewards section with progress to the next
- * rank. Palette: black / white / #f97316 only; readable in light + dark mode.
+ * Community leaderboard for the profile page — laid out like a competitive
+ * ranked ladder (emblem banner + RANK/RATING column headers + full-width rows
+ * with a distinct rank-number column, tier emblem, avatar and name). Keeps the
+ * existing 5 km data/logic; only the composition mirrors the reference.
+ * Palette: black / white / #f97316 only; readable in light + dark mode.
  */
 export function CommunityLeaderboard() {
   const you = NEARBY.find((u) => u.isYou)!;
@@ -103,97 +122,125 @@ export function CommunityLeaderboard() {
   const pointsToNext = nextTier ? nextTier.min - you.impact : 0;
 
   return (
-    <div className="mb-4 rounded-2xl border border-gray-200 bg-white p-4 dark:border-white/10 dark:bg-[#1a1a1a]">
-      {/* Header */}
-      <div className="mb-3 flex items-center justify-between">
-        <h3 className="text-xs font-bold uppercase tracking-widest text-gray-900 dark:text-white">
-          Your Community
-        </h3>
-        <span className="inline-flex items-center gap-1 rounded-full border border-[#f97316]/40 px-2.5 py-0.5 text-[11px] font-semibold text-[#f97316]">
-          <MapPin className="h-3 w-3" /> within 5 km
-        </span>
-      </div>
-
-      {/* Your standing */}
-      <div className="mb-4 rounded-xl bg-[#f97316]/10 px-4 py-3 text-center">
-        <p className="text-sm text-gray-600 dark:text-gray-300">You&apos;re ranked</p>
-        <p className="text-2xl font-extrabold text-[#f97316]">
-          #{CURRENT_USER_RANK}
-          <span className="ml-1 text-base font-semibold text-gray-500 dark:text-gray-400">
-            of {NEARBY_TOTAL} nearby
+    <div className="mb-4 overflow-hidden rounded-2xl border border-gray-200 bg-white dark:border-white/10 dark:bg-[#1a1a1a]">
+      {/* ── Banner: emblem cell + centered title (mirrors the reference top bar) ── */}
+      <div className="flex items-stretch border-b border-gray-200 dark:border-white/10">
+        {/* Emblem cell */}
+        <div className="flex w-20 shrink-0 items-center justify-center border-r border-gray-200 bg-[#f97316]/10 sm:w-24 dark:border-white/10">
+          <MiniBadge tier={tier} className="h-12 w-12 sm:h-14 sm:w-14" />
+        </div>
+        {/* Title block */}
+        <div className="relative flex flex-1 flex-col items-center justify-center px-3 py-4">
+          <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-gray-500 dark:text-gray-400">
+            Community Leaderboard
+          </p>
+          <p className="text-2xl font-black uppercase tracking-wider text-gray-900 sm:text-3xl dark:text-white">
+            Top {NEARBY_TOTAL}
+          </p>
+          <span className="mt-1 inline-flex items-center gap-1 rounded-full border border-[#f97316]/40 px-2.5 py-0.5 text-[11px] font-semibold text-[#f97316]">
+            <MapPin className="h-3 w-3" /> within 5 km
           </span>
-        </p>
+        </div>
+        {/* Your standing chip (top-right corner) */}
+        <div className="hidden shrink-0 flex-col items-end justify-center pr-4 sm:flex">
+          <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500">You</span>
+          <span className="text-lg font-black text-[#f97316]">#{CURRENT_USER_RANK}</span>
+          <span className="text-[10px] text-gray-400 dark:text-gray-500">of {NEARBY_TOTAL}</span>
+        </div>
       </div>
 
-      {/* Ranked list (top ~10) */}
-      <ul className="space-y-1.5">
+      {/* ── Column headers ── */}
+      <div className="flex items-center border-b border-gray-200 bg-gray-50 text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:border-white/10 dark:bg-white/[0.03] dark:text-gray-500">
+        <span className="w-12 shrink-0 py-2 text-center sm:w-14">Rank</span>
+        <span className="py-2 pl-3">Rating</span>
+      </div>
+
+      {/* ── Ranked rows ── */}
+      <ul>
         {NEARBY.map((u) => {
           const uTier = tierForScore(u.impact);
           const aheadOfYou = !u.isYou && u.position < CURRENT_USER_RANK;
           const gap = aheadOfYou ? u.impact - you.impact : 0;
+          const accent = u.isYou || u.position === 1;
           return (
             <li
               key={u.position}
               className={[
-                'flex items-center gap-3 rounded-xl border px-3 py-2 transition-colors',
+                'flex items-stretch border-b last:border-b-0 transition-colors',
                 u.isYou
-                  ? 'border-[#f97316] bg-[#f97316]/10'
-                  : aheadOfYou
-                    ? 'border-[#f97316]/30 bg-[#f97316]/[0.04] dark:bg-[#f97316]/[0.06]'
-                    : 'border-gray-200 bg-white dark:border-white/10 dark:bg-transparent',
+                  ? 'border-[#f97316]/40 bg-[#f97316]/10'
+                  : 'border-gray-100 bg-white hover:bg-gray-50 dark:border-white/[0.06] dark:bg-transparent dark:hover:bg-white/[0.03]',
               ].join(' ')}
             >
-              {/* Position */}
-              <span
+              {/* Rank-number column (distinct panel, like the reference left cell) */}
+              <div
                 className={[
-                  'w-8 shrink-0 text-center text-sm font-extrabold tabular-nums',
-                  u.position === 1 || u.isYou ? 'text-[#f97316]' : 'text-gray-400 dark:text-gray-500',
+                  'flex w-12 shrink-0 flex-col items-center justify-center gap-0.5 sm:w-14',
+                  u.isYou ? 'bg-[#f97316]/15' : 'bg-gray-50 dark:bg-white/[0.04]',
                 ].join(' ')}
               >
-                #{u.position}
-              </span>
-
-              {/* Badge */}
-              <MiniBadge tier={uTier} />
-
-              {/* Name + tier name */}
-              <div className="min-w-0 flex-1">
-                <p
+                {u.position === 1 && <Star className="h-3 w-3 fill-[#f97316] text-[#f97316]" />}
+                <span
                   className={[
-                    'truncate text-sm font-bold',
-                    u.isYou ? 'text-[#f97316]' : 'text-gray-900 dark:text-white',
+                    'text-lg font-black tabular-nums sm:text-xl',
+                    accent ? 'text-[#f97316]' : 'text-gray-400 dark:text-gray-500',
                   ].join(' ')}
                 >
-                  {u.name}
-                  {u.isYou && (
-                    <span className="ml-1.5 align-middle text-[10px] font-bold uppercase tracking-wide text-[#f97316]">
-                      You
-                    </span>
-                  )}
-                </p>
-                <p className="truncate text-[11px] text-gray-500 dark:text-gray-400">{uTier.name}</p>
+                  {u.position}
+                </span>
               </div>
 
-              {/* Impact score + gap to overtake */}
-              <div className="shrink-0 text-right">
-                <p className="text-sm font-bold text-gray-900 tabular-nums dark:text-white">
-                  {u.impact.toLocaleString()}
-                </p>
-                {aheadOfYou ? (
-                  <p className="inline-flex items-center gap-0.5 text-[10px] font-semibold text-[#f97316]">
-                    <ChevronUp className="h-3 w-3" /> +{gap.toLocaleString()} ahead
+              {/* Content: emblem + rating, avatar, name */}
+              <div className="flex min-w-0 flex-1 items-center gap-3 px-3 py-2.5">
+                {/* Tier emblem + rating value */}
+                <div className="flex shrink-0 items-center gap-2">
+                  <MiniBadge tier={uTier} className="h-8 w-8" />
+                  <span
+                    className={[
+                      'w-12 text-right text-sm font-extrabold tabular-nums sm:w-14',
+                      u.isYou ? 'text-[#f97316]' : 'text-gray-900 dark:text-white',
+                    ].join(' ')}
+                  >
+                    {u.impact.toLocaleString()}
+                  </span>
+                </div>
+
+                {/* Avatar */}
+                <RowAvatar name={u.name} isYou={u.isYou} />
+
+                {/* Name + tier / standing */}
+                <div className="min-w-0 flex-1">
+                  <p
+                    className={[
+                      'flex items-center gap-1.5 truncate text-sm font-bold',
+                      u.isYou ? 'text-[#f97316]' : 'text-gray-900 dark:text-white',
+                    ].join(' ')}
+                  >
+                    <span className="truncate">{u.name}</span>
+                    {u.isYou && (
+                      <span className="shrink-0 rounded bg-[#f97316] px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white">
+                        You
+                      </span>
+                    )}
                   </p>
-                ) : (
-                  <p className="text-[10px] text-gray-400 dark:text-gray-500">Impact</p>
-                )}
+                  {aheadOfYou ? (
+                    <p className="inline-flex items-center gap-0.5 truncate text-[11px] font-semibold uppercase tracking-wide text-[#f97316]">
+                      <ChevronUp className="h-3 w-3" /> +{gap.toLocaleString()} ahead
+                    </p>
+                  ) : (
+                    <p className="truncate text-[11px] uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                      {uTier.name}
+                    </p>
+                  )}
+                </div>
               </div>
             </li>
           );
         })}
       </ul>
 
-      {/* Rank Rewards + progress to next rank */}
-      <div className="mt-5 border-t border-gray-200 pt-4 dark:border-white/10">
+      {/* ── Rank Rewards + progress to next rank ── */}
+      <div className="border-t border-gray-200 p-4 dark:border-white/10">
         <h4 className="mb-2 text-xs font-bold uppercase tracking-widest text-gray-900 dark:text-white">
           Rank Rewards
         </h4>

@@ -47,43 +47,56 @@ export function RankSection({ moneySpent, points, bizCount }: ImpactInputs) {
   const { current, next, pctToNext, isMax } = getRankProgress(score);
 
   return (
-    <div className="mb-4 rounded-2xl border border-gray-200 bg-white p-4">
-      <div className="mb-3 flex items-center justify-between">
-        <h3 className="text-xs font-bold uppercase tracking-widest text-gray-900">Your Rank</h3>
+    <div className="mb-4 overflow-hidden rounded-2xl border border-gray-200 bg-white dark:border-white/10 dark:bg-[#1a1a1a]">
+      {/* ── Banner: emblem cell + title block (mirrors the reference top bar) ── */}
+      <div className="relative flex items-stretch border-b border-gray-200 dark:border-white/10">
+        {/* Emblem cell */}
+        <div className="flex w-24 shrink-0 items-center justify-center border-r border-gray-200 bg-[#f97316]/10 sm:w-28 dark:border-white/10">
+          <RankBadge src={current.image} alt={current.name} className="h-16 w-16 sm:h-20 sm:w-20" />
+        </div>
+
+        {/* Title block */}
+        <div className="flex flex-1 flex-col justify-center px-4 py-4 pr-20">
+          <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-gray-500 dark:text-gray-400">
+            Your Rank
+          </p>
+          <p className="text-2xl font-black uppercase leading-tight tracking-wide text-gray-900 sm:text-3xl dark:text-white">
+            {current.name}
+          </p>
+          <p className="mt-0.5 text-sm text-gray-500 dark:text-gray-400">
+            Impact Score {score.toLocaleString()}
+          </p>
+        </div>
+
+        {/* Ranks button (top-right of the banner) */}
         <button
           onClick={() => setOpen(true)}
-          className="rounded-full border border-[#f97316] px-3 py-1 text-xs font-semibold text-[#f97316] transition-colors hover:bg-[#f97316] hover:text-white"
+          className="absolute right-3 top-3 rounded-full border border-[#f97316] px-3 py-1 text-xs font-semibold text-[#f97316] transition-colors hover:bg-[#f97316] hover:text-white"
         >
           Ranks
         </button>
       </div>
 
-      <div className="flex flex-col items-center gap-3">
-        {/* Rank badge — ~2x larger, borderless, sits cleanly on the white card */}
-        <RankBadge src={current.image} alt={current.name} className="h-80 w-80 max-w-full sm:h-96 sm:w-96" />
-        <div className="w-full text-center">
-          <p className="text-2xl font-extrabold leading-tight text-gray-900 sm:text-3xl">{current.name}</p>
-          <p className="mt-0.5 text-sm text-gray-500">Impact Score {score.toLocaleString()}</p>
-
-          {isMax ? (
-            <div className="mt-3 inline-flex items-center rounded-full bg-[#f97316] px-4 py-1.5 text-sm font-semibold text-white">
-              Max rank reached
+      {/* ── Progress to next rank (or max state) ── */}
+      <div className="p-4">
+        {isMax ? (
+          <div className="inline-flex items-center rounded-full bg-[#f97316] px-4 py-1.5 text-sm font-semibold text-white">
+            Max rank reached
+          </div>
+        ) : (
+          <>
+            <div className="mb-1.5 flex items-center justify-between text-sm">
+              <span className="font-semibold text-[#f97316]">{pctToNext}% to {next!.name}</span>
+              <span className="text-gray-400 dark:text-gray-500">{score.toLocaleString()} / {next!.threshold.toLocaleString()}</span>
             </div>
-          ) : (
-            <div className="mt-3 w-full">
-              <div className="mb-1.5 flex items-center justify-between text-sm">
-                <span className="font-semibold text-[#f97316]">{pctToNext}% to {next!.name}</span>
-                <span className="text-gray-400">{score.toLocaleString()} / {next!.threshold.toLocaleString()}</span>
-              </div>
-              <div className="h-3 w-full overflow-hidden rounded-full bg-gray-200">
-                <div
-                  className="h-full rounded-full bg-[#f97316] transition-[width] duration-500"
-                  style={{ width: `${pctToNext}%` }}
-                />
-              </div>
+            <div className="h-3 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-white/10">
+              <div
+                className="h-full rounded-full bg-[#f97316] transition-[width] duration-500"
+                style={{ width: `${pctToNext}%` }}
+              />
             </div>
-          )}
-        </div>
+          </>
+        )}
       </div>
 
       {open && <RanksModal currentId={current.id} score={score} onClose={() => setOpen(false)} />}
