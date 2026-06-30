@@ -71,9 +71,9 @@ export function CommentModal({ isOpen, onClose, postId, businessName }: CommentM
           </button>
         </div>
 
-        {/* Content */}
-        <div className="flex-1 overflow-y-auto">
-          <CommentSection videoId={postId} />
+        {/* Content — CommentSection manages its own internal scroll (pinned form) */}
+        <div className="flex-1 min-h-0">
+          <CommentSection videoId={postId} className="h-full" />
         </div>
       </div>
     </div>
