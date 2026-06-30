@@ -4,10 +4,12 @@ import { useEffect, useState } from 'react';
 import { X, Lock } from 'lucide-react';
 import {
   RANKS,
+  buildLeaderboard,
   computeImpactScore,
   getRankProgress,
   resolveImpactInputs,
   type ImpactInputs,
+  type Rank,
 } from '@/lib/ranks';
 
 /** Badge image; falls back to a visible placeholder disc if a file is missing. */
@@ -16,10 +18,10 @@ function RankBadge({ src, alt, className = '' }: { src: string; alt: string; cla
   if (failed) {
     return (
       <div
-        className={`rounded-full border-2 border-gray-200 bg-gray-100 flex items-center justify-center ${className}`}
+        className={`rounded-full border border-gray-200 bg-gray-100 flex items-center justify-center ${className}`}
         aria-label={alt}
       >
-        <span className="text-2xl font-black text-gray-400 select-none">{alt[0]}</span>
+        <span className="text-xs font-black text-gray-400 select-none">{alt[0]}</span>
       </div>
     );
   }
@@ -35,63 +37,96 @@ function RankBadge({ src, alt, className = '' }: { src: string; alt: string; cla
 }
 
 /**
- * Profile rank/tier display: current rank badge + name, a progress bar to the next
- * rank (or a "max rank" state at the top), and a "Ranks" button that opens a pop-up
- * of all six rank images. Palette: black / white / #f97316 only.
+ * Compact profile rank summary: small current-rank badge + name + a thin progress
+ * bar, plus a "Ranks" button that opens a pop-up with the full tiers and the
+ * community leaderboard. The user's rank comes from a single source of truth
+ * (`getRankProgress`) and is reused everywhere. Palette: black / white / #f97316.
  */
-export function RankSection({ moneySpent, points, bizCount }: ImpactInputs) {
+export function RankSection({
+  moneySpent,
+  points,
+  bizCount,
+  userName = 'You',
+}: ImpactInputs & { userName?: string }) {
   const [open, setOpen] = useState(false);
 
   const inputs = resolveImpactInputs({ moneySpent, points, bizCount });
   const score = computeImpactScore(inputs);
+  // Single source of truth for the user's rank — reused by the summary AND the modal.
   const { current, next, pctToNext, isMax } = getRankProgress(score);
 
   return (
-    <div className="mb-4 rounded-2xl border border-gray-200 bg-white p-4">
-      <div className="mb-3 flex items-center justify-between">
-        <h3 className="text-xs font-bold uppercase tracking-widest text-gray-900">Your Rank</h3>
-        <button
-          onClick={() => setOpen(true)}
-          className="rounded-full border border-[#f97316] px-3 py-1 text-xs font-semibold text-[#f97316] transition-colors hover:bg-[#f97316] hover:text-white"
-        >
-          Ranks
-        </button>
-      </div>
+    <div className="mb-3 rounded-2xl border border-gray-200 bg-white px-3 py-2.5">
+      <div className="flex items-center gap-3">
+        <RankBadge src={current.image} alt={current.name} className="h-11 w-11 shrink-0" />
 
-      <div className="flex flex-col items-center gap-3">
-        {/* Rank badge — ~2x larger, borderless, sits cleanly on the white card */}
-        <RankBadge src={current.image} alt={current.name} className="h-80 w-80 max-w-full sm:h-96 sm:w-96" />
-        <div className="w-full text-center">
-          <p className="text-2xl font-extrabold leading-tight text-gray-900 sm:text-3xl">{current.name}</p>
-          <p className="mt-0.5 text-sm text-gray-500">Impact Score {score.toLocaleString()}</p>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center justify-between gap-2">
+            <div className="min-w-0">
+              <p className="truncate text-sm font-bold leading-tight text-gray-900">{current.name}</p>
+              <p className="text-[11px] leading-tight text-gray-500">Impact Score {score.toLocaleString()}</p>
+            </div>
+            <button
+              onClick={() => setOpen(true)}
+              className="shrink-0 rounded-full border border-[#f97316] px-3 py-1 text-xs font-semibold text-[#f97316] transition-colors hover:bg-[#f97316] hover:text-white"
+            >
+              Ranks
+            </button>
+          </div>
 
-          {isMax ? (
-            <div className="mt-3 inline-flex items-center rounded-full bg-[#f97316] px-4 py-1.5 text-sm font-semibold text-white">
-              Max rank reached
-            </div>
-          ) : (
-            <div className="mt-3 w-full">
-              <div className="mb-1.5 flex items-center justify-between text-sm">
-                <span className="font-semibold text-[#f97316]">{pctToNext}% to {next!.name}</span>
-                <span className="text-gray-400">{score.toLocaleString()} / {next!.threshold.toLocaleString()}</span>
-              </div>
-              <div className="h-3 w-full overflow-hidden rounded-full bg-gray-200">
-                <div
-                  className="h-full rounded-full bg-[#f97316] transition-[width] duration-500"
-                  style={{ width: `${pctToNext}%` }}
-                />
-              </div>
-            </div>
-          )}
+          <div className="mt-1.5">
+            {isMax ? (
+              <p className="text-[11px] font-semibold text-[#f97316]">Max rank reached</p>
+            ) : (
+              <>
+                <div className="h-1.5 w-full overflow-hidden rounded-full bg-gray-200">
+                  <div
+                    className="h-full rounded-full bg-[#f97316] transition-[width] duration-500"
+                    style={{ width: `${pctToNext}%` }}
+                  />
+                </div>
+                <div className="mt-0.5 flex items-center justify-between text-[10px]">
+                  <span className="font-semibold text-[#f97316]">{pctToNext}% to {next!.name}</span>
+                  <span className="text-gray-400">{score.toLocaleString()} / {next!.threshold.toLocaleString()}</span>
+                </div>
+              </>
+            )}
+          </div>
         </div>
       </div>
 
-      {open && <RanksModal currentId={current.id} score={score} onClose={() => setOpen(false)} />}
+      {open && (
+        <RanksModal
+          current={current}
+          next={next}
+          pctToNext={pctToNext}
+          isMax={isMax}
+          score={score}
+          userName={userName}
+          onClose={() => setOpen(false)}
+        />
+      )}
     </div>
   );
 }
 
-function RanksModal({ currentId, score, onClose }: { currentId: string; score: number; onClose: () => void }) {
+function RanksModal({
+  current,
+  next,
+  pctToNext,
+  isMax,
+  score,
+  userName,
+  onClose,
+}: {
+  current: Rank;
+  next: Rank | null;
+  pctToNext: number;
+  isMax: boolean;
+  score: number;
+  userName: string;
+  onClose: () => void;
+}) {
   // Close on Escape; lock body scroll while open.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
@@ -101,82 +136,127 @@ function RanksModal({ currentId, score, onClose }: { currentId: string; score: n
     return () => { document.removeEventListener('keydown', onKey); document.body.style.overflow = prev; };
   }, [onClose]);
 
+  const board = buildLeaderboard(score, userName);
+
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center p-0 sm:items-center sm:p-4">
+    <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center sm:p-4">
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative flex max-h-[92vh] w-full max-w-3xl flex-col overflow-hidden rounded-t-2xl bg-white shadow-2xl sm:rounded-2xl">
+      <div className="relative flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-t-2xl bg-white shadow-2xl sm:rounded-2xl">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-gray-200 px-5 py-4">
-          <div>
-            <h2 className="text-lg font-extrabold uppercase tracking-widest text-gray-900">Ranks</h2>
-            <p className="mt-0.5 text-xs text-gray-500">
-              Support local businesses to raise your Impact Score and climb the tiers.
-            </p>
-          </div>
+        <div className="flex items-center justify-between border-b border-gray-200 px-4 py-3">
+          <h2 className="text-base font-extrabold uppercase tracking-widest text-gray-900">Ranks</h2>
           <button onClick={onClose} aria-label="Close" className="text-gray-400 transition-colors hover:text-gray-700">
             <X className="h-5 w-5" />
           </button>
         </div>
 
-        {/* Tiers — lowest to highest */}
-        <div className="overflow-y-auto px-5 py-5">
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-            {RANKS.map((rank) => {
-              const isCurrent = rank.id === currentId;
-              const unlocked = score >= rank.threshold;
-              // Localy Philanthropist shows with no box/outline — just image + label on white.
-              const isPhil = rank.id === 'philanthropist';
-              return (
-                <div
-                  key={rank.id}
-                  className={`relative flex flex-col items-center rounded-xl p-3 text-center transition-colors ${
-                    isPhil
-                      ? 'border-0 bg-transparent'
-                      : isCurrent
-                        ? 'border border-[#f97316] bg-[#f97316]/10'
+        <div className="space-y-4 overflow-y-auto px-4 py-4">
+          {/* Your rank — same `current` as the profile summary */}
+          <div className="flex items-center gap-3 rounded-xl border border-[#f97316] bg-[#f97316]/10 p-3">
+            <RankBadge src={current.image} alt={current.name} className="h-12 w-12 shrink-0" />
+            <div className="min-w-0 flex-1">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-[#f97316]">Your rank</p>
+              <p className="truncate text-base font-extrabold leading-tight text-gray-900">{current.name}</p>
+              {isMax ? (
+                <p className="mt-0.5 text-[11px] font-semibold text-[#f97316]">
+                  Max rank reached · Impact Score {score.toLocaleString()}
+                </p>
+              ) : (
+                <div className="mt-1">
+                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-white">
+                    <div className="h-full rounded-full bg-[#f97316]" style={{ width: `${pctToNext}%` }} />
+                  </div>
+                  <p className="mt-0.5 text-[11px] text-gray-500">
+                    {pctToNext}% to {next!.name} · {score.toLocaleString()} / {next!.threshold.toLocaleString()}
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* All tiers — lowest to highest; only the actual current rank is highlighted */}
+          <div>
+            <h3 className="mb-2 text-[11px] font-bold uppercase tracking-widest text-gray-500">All tiers</h3>
+            <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
+              {RANKS.map((rank) => {
+                const isCurrent = rank.id === current.id;
+                const unlocked = score >= rank.threshold;
+                return (
+                  <div
+                    key={rank.id}
+                    className={`flex flex-col items-center rounded-lg border p-2 text-center ${
+                      isCurrent
+                        ? 'border-[#f97316] bg-[#f97316]/10'
                         : unlocked
-                          ? 'border border-gray-200 bg-gray-50'
-                          : 'border border-gray-100 bg-gray-50 opacity-60'
-                  }`}
-                >
-                  <p
-                    className={`mb-2 text-[11px] font-bold uppercase tracking-wider ${
-                      unlocked ? 'text-[#f97316]' : 'text-gray-400'
+                          ? 'border-gray-200 bg-gray-50'
+                          : 'border-gray-100 bg-gray-50 opacity-60'
                     }`}
                   >
-                    {rank.name}
-                  </p>
-
-                  <div className="relative">
-                    {/* Borderless, ~2x larger rank image */}
-                    <div className={`flex h-32 w-32 items-center justify-center ${!unlocked ? 'opacity-30 grayscale' : ''}`}>
+                    <div className="relative flex h-12 w-12 items-center justify-center">
                       <RankBadge
                         src={rank.image}
                         alt={rank.name}
-                        className="h-32 w-32"
+                        className={`h-12 w-12 ${!unlocked ? 'opacity-30 grayscale' : ''}`}
                       />
+                      {!unlocked && (
+                        <span className="absolute inset-0 flex items-center justify-center">
+                          <Lock className="h-4 w-4 text-gray-400" />
+                        </span>
+                      )}
                     </div>
-                    {!unlocked && (
-                      <span className="absolute inset-0 flex items-center justify-center">
-                        <Lock className="h-6 w-6 text-gray-400" />
+                    <p
+                      className={`mt-1 text-[10px] font-bold uppercase leading-tight ${
+                        isCurrent ? 'text-[#f97316]' : unlocked ? 'text-gray-700' : 'text-gray-400'
+                      }`}
+                    >
+                      {rank.name}
+                    </p>
+                    {isCurrent && (
+                      <span className="mt-1 rounded-full bg-[#f97316] px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white">
+                        Current
                       </span>
                     )}
                   </div>
+                );
+              })}
+            </div>
+          </div>
 
-                  <p className="mt-2 text-[11px] leading-snug text-gray-500">{rank.requirement}</p>
-
-                  {isCurrent ? (
-                    <span className="mt-2 rounded-full bg-[#f97316] px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
-                      Current
-                    </span>
-                  ) : unlocked ? (
-                    <span className="mt-2 text-[10px] font-semibold uppercase tracking-wide text-gray-400">Unlocked</span>
-                  ) : (
-                    <span className="mt-2 text-[10px] font-semibold uppercase tracking-wide text-gray-300">Locked</span>
-                  )}
+          {/* Community leaderboard — rank number sits right next to the name */}
+          <div>
+            <h3 className="mb-2 text-[11px] font-bold uppercase tracking-widest text-gray-500">Top supporters</h3>
+            <div className="overflow-hidden rounded-xl border border-gray-200">
+              {board.map((e, i) => (
+                <div
+                  key={`${e.name}-${i}`}
+                  className={`flex items-center gap-2 px-3 py-1.5 ${i > 0 ? 'border-t border-gray-100' : ''} ${
+                    e.isYou ? 'bg-[#f97316]/10' : 'bg-white'
+                  }`}
+                >
+                  <span
+                    className={`w-5 text-right text-xs font-bold tabular-nums ${
+                      e.isYou ? 'text-[#f97316]' : 'text-gray-400'
+                    }`}
+                  >
+                    {e.rank}
+                  </span>
+                  <span
+                    className={`min-w-0 flex-1 truncate text-sm font-semibold ${
+                      e.isYou ? 'text-[#f97316]' : 'text-gray-900'
+                    }`}
+                  >
+                    {e.isYou ? `${e.name} (You)` : e.name}
+                  </span>
+                  <span
+                    className={`shrink-0 text-xs tabular-nums ${
+                      e.isYou ? 'font-semibold text-[#f97316]' : 'text-gray-400'
+                    }`}
+                  >
+                    {e.score.toLocaleString()}
+                  </span>
                 </div>
-              );
-            })}
+              ))}
+            </div>
           </div>
         </div>
       </div>

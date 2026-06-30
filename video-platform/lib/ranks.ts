@@ -70,6 +70,37 @@ export interface RankProgress {
   isMax: boolean;
 }
 
+export interface LeaderboardEntry {
+  name: string;
+  score: number;
+  isYou?: boolean;
+}
+
+/** Mock "top supporters" used to seed the community leaderboard in the Ranks pop-up. */
+export const LEADERBOARD_SEED: { name: string; score: number }[] = [
+  { name: 'Maya R.',  score: 21450 },
+  { name: 'Devon K.', score: 12880 },
+  { name: 'Priya S.', score: 7320 },
+  { name: 'Liam T.',  score: 5010 },
+  { name: 'Noah W.',  score: 3950 },
+  { name: 'Sofia L.', score: 2880 },
+  { name: 'Ethan M.', score: 1620 },
+  { name: 'Ava P.',   score: 940 },
+];
+
+/** Inserts the current user into the seeded leaderboard, ranked by Impact Score (desc). */
+export function buildLeaderboard(
+  userScore: number,
+  userName: string,
+): (LeaderboardEntry & { rank: number })[] {
+  const all: LeaderboardEntry[] = [
+    ...LEADERBOARD_SEED,
+    { name: userName, score: userScore, isYou: true },
+  ];
+  all.sort((a, b) => b.score - a.score);
+  return all.map((e, i) => ({ ...e, rank: i + 1 }));
+}
+
 /** Maps an Impact Score to the held rank + progress toward the next rank. */
 export function getRankProgress(score: number): RankProgress {
   let idx = 0;
