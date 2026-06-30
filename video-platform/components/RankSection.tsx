@@ -10,7 +10,6 @@ import {
   rankRange,
   resolveImpactInputs,
   type ImpactInputs,
-  type Rank,
 } from '@/lib/ranks';
 
 /** Badge image; falls back to a visible placeholder disc if a file is missing. */
@@ -98,10 +97,6 @@ export function RankSection({
 
       {open && (
         <RanksModal
-          current={current}
-          next={next}
-          pctToNext={pctToNext}
-          isMax={isMax}
           score={score}
           userName={userName}
           onClose={() => setOpen(false)}
@@ -111,23 +106,23 @@ export function RankSection({
   );
 }
 
-function RanksModal({
-  current,
-  next,
-  pctToNext,
-  isMax,
+/**
+ * The Ranks pop-up: full tier list + rewards + top-supporters board. Computes
+ * the user's rank from `score` (single source of truth) so any caller — the
+ * profile rank card OR the community leaderboard's "Ranks" button — can open it
+ * with just the score + name.
+ */
+export function RanksModal({
   score,
-  userName,
+  userName = 'You',
   onClose,
 }: {
-  current: Rank;
-  next: Rank | null;
-  pctToNext: number;
-  isMax: boolean;
   score: number;
-  userName: string;
+  userName?: string;
   onClose: () => void;
 }) {
+  const { current, next, pctToNext, isMax } = getRankProgress(score);
+
   // Close on Escape; lock body scroll while open.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };

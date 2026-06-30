@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { MapPin, ChevronUp, Star } from 'lucide-react';
 import { getRankProgress, type Rank } from '@/lib/ranks';
+import { RanksModal } from './RankSection';
 
 /* ────────────────────────────────────────────────────────────────────────────
  * MOCK leaderboard — wire to real 5km query later.
@@ -112,10 +113,20 @@ export function CommunityLeaderboard({ score, userName = 'You' }: { score: numbe
   const you = rows.find((u) => u.isYou)!;
   const currentUserRank = you.position;
 
+  // The Ranks pop-up (full tier list + rewards) opens from the corner button.
+  const [ranksOpen, setRanksOpen] = useState(false);
+
   return (
     <div className="mb-4 overflow-hidden rounded-2xl border border-gray-200 bg-white dark:border-white/10 dark:bg-[#1a1a1a]">
       {/* ── Banner: emblem cell + centered title (mirrors the reference top bar) ── */}
-      <div className="flex items-stretch border-b border-gray-200 dark:border-white/10">
+      <div className="relative flex items-stretch border-b border-gray-200 dark:border-white/10">
+        {/* Ranks pop-up trigger — top corner of the leaderboard */}
+        <button
+          onClick={() => setRanksOpen(true)}
+          className="absolute right-2.5 top-2.5 z-10 rounded-full border border-[#f97316] bg-white/90 px-3 py-1 text-xs font-semibold text-[#f97316] transition-colors hover:bg-[#f97316] hover:text-white dark:bg-white/10"
+        >
+          Ranks
+        </button>
         {/* Emblem cell */}
         <div className="flex w-20 shrink-0 items-center justify-center border-r border-gray-200 bg-[#f97316]/10 sm:w-24 dark:border-white/10">
           <MiniBadge rank={tier} className="h-12 w-12 sm:h-14 sm:w-14" />
@@ -132,8 +143,8 @@ export function CommunityLeaderboard({ score, userName = 'You' }: { score: numbe
             <MapPin className="h-3 w-3" /> within 5 km
           </span>
         </div>
-        {/* Your standing chip (top-right corner) */}
-        <div className="hidden shrink-0 flex-col items-end justify-center pr-4 sm:flex">
+        {/* Your standing chip (bottom-right, clear of the top-corner Ranks button) */}
+        <div className="hidden shrink-0 flex-col items-end justify-end pb-2 pr-4 sm:flex">
           <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500">You</span>
           <span className="text-lg font-black text-[#f97316]">#{currentUserRank}</span>
           <span className="text-[10px] text-gray-400 dark:text-gray-500">of {NEARBY_TOTAL}</span>
@@ -229,6 +240,10 @@ export function CommunityLeaderboard({ score, userName = 'You' }: { score: numbe
           );
         })}
       </ul>
+
+      {ranksOpen && (
+        <RanksModal score={score} userName={userName} onClose={() => setRanksOpen(false)} />
+      )}
     </div>
   );
 }
