@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { MapPin, ChevronUp, Star } from 'lucide-react';
-import { RANKS, getRankProgress, type Rank } from '@/lib/ranks';
+import { getRankProgress, type Rank } from '@/lib/ranks';
 
 /* ────────────────────────────────────────────────────────────────────────────
  * MOCK leaderboard — wire to real 5km query later.
@@ -15,18 +15,9 @@ import { RANKS, getRankProgress, type Rank } from '@/lib/ranks';
  * RANK IS A SINGLE SOURCE OF TRUTH: tiers, thresholds, names and badge images
  * all come from `RANKS` in lib/ranks.ts (via getRankProgress) — the exact same
  * computation used by the profile rank summary and the Ranks pop-up. This
- * component owns NO rank thresholds of its own, only the per-rank reward copy.
+ * component owns NO rank thresholds of its own. The full tier list + rewards
+ * are shown ONLY in the Ranks modal (RankSection), never inline here.
  * ──────────────────────────────────────────────────────────────────────────── */
-
-/** Per-rank reward copy, keyed by the canonical rank id from lib/ranks.ts. */
-const REWARDS_BY_ID: Record<string, string> = {
-  bronze:         'Welcome badge + standard coins',
-  silver:         '+5% bonus coins',
-  gold:           '5% off one order/month + 10% bonus coins',
-  diamond:        'Free delivery perk + 15% bonus coins',
-  ascendant:      'Early access to deals + 20% bonus coins',
-  philanthropist: 'Top-supporter status + 25% bonus coins + featured',
-};
 
 /** Other nearby supporters (the signed-in user is inserted by Impact Score). */
 const NEARBY_OTHERS: { name: string; impact: number }[] = [
@@ -51,15 +42,6 @@ interface NearbyUser {
   impact: number;
   /** True for the signed-in user (their own row). */
   isYou?: boolean;
-}
-
-/** Inclusive Impact range a rank covers, derived from the canonical RANKS list. */
-function rankRange(rank: Rank): string {
-  const idx = RANKS.findIndex((r) => r.id === rank.id);
-  const next = RANKS[idx + 1];
-  return next
-    ? `${rank.threshold.toLocaleString()}–${(next.threshold - 1).toLocaleString()}`
-    : `${rank.threshold.toLocaleString()}+`;
 }
 
 /** Rank badge image; falls back to a clean text badge if the file is missing. */
@@ -115,8 +97,9 @@ function RowAvatar({ name, isYou }: { name: string; isYou?: boolean }) {
 export function CommunityLeaderboard({ score, userName = 'You' }: { score: number; userName?: string }) {
   // The user's rank comes from the SAME single source of truth as the profile
   // summary and the Ranks pop-up — getRankProgress(score) over lib/ranks.ts.
-  const { current: tier, next: nextTier, pctToNext } = getRankProgress(score);
-  const pointsToNext = nextTier ? nextTier.threshold - score : 0;
+  // The full tier list + rewards live ONLY in the Ranks modal (RankSection),
+  // never inline here.
+  const { current: tier } = getRankProgress(score);
 
   // Insert the signed-in user into the nearby list by Impact Score, then rank.
   const rows: NearbyUser[] = [
@@ -246,76 +229,6 @@ export function CommunityLeaderboard({ score, userName = 'You' }: { score: numbe
           );
         })}
       </ul>
-
-      {/* ── Rank Rewards + progress to next rank ── */}
-      <div className="border-t border-gray-200 p-4 dark:border-white/10">
-        <h4 className="mb-2 text-xs font-bold uppercase tracking-widest text-gray-900 dark:text-white">
-          Rank Rewards
-        </h4>
-
-        {/* Progress to next rank */}
-        {nextTier ? (
-          <div className="mb-4 rounded-xl border border-gray-200 bg-white p-3 dark:border-white/10 dark:bg-transparent">
-            <div className="mb-1.5 flex items-center justify-between text-sm">
-              <span className="font-semibold text-gray-900 dark:text-white">{tier.name}</span>
-              <span className="font-semibold text-[#f97316]">{pctToNext}% to {nextTier.name}</span>
-            </div>
-            <div className="h-3 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-white/10">
-              <div
-                className="h-full rounded-full bg-[#f97316] transition-[width] duration-500"
-                style={{ width: `${pctToNext}%` }}
-              />
-            </div>
-            <p className="mt-1.5 text-[11px] text-gray-500 dark:text-gray-400">
-              {pointsToNext.toLocaleString()} more Impact to reach {nextTier.name} — unlocks {REWARDS_BY_ID[nextTier.id].toLowerCase()}.
-            </p>
-          </div>
-        ) : (
-          <div className="mb-4 inline-flex items-center rounded-full bg-[#f97316] px-4 py-1.5 text-sm font-semibold text-white">
-            Top rank reached
-          </div>
-        )}
-
-        {/* All tiers + their rewards — sourced from the canonical RANKS list */}
-        <ul className="space-y-1.5">
-          {RANKS.map((r) => {
-            const isCurrent = r.id === tier.id;
-            const reached = score >= r.threshold;
-            return (
-              <li
-                key={r.id}
-                className={[
-                  'flex items-center gap-3 rounded-xl border px-3 py-2',
-                  isCurrent
-                    ? 'border-[#f97316] bg-[#f97316]/10'
-                    : 'border-gray-200 bg-white dark:border-white/10 dark:bg-transparent',
-                ].join(' ')}
-              >
-                <MiniBadge rank={r} />
-                <div className="min-w-0 flex-1">
-                  <p
-                    className={[
-                      'flex items-center gap-1.5 text-sm font-bold',
-                      isCurrent ? 'text-[#f97316]' : reached ? 'text-gray-900 dark:text-white' : 'text-gray-400 dark:text-gray-500',
-                    ].join(' ')}
-                  >
-                    {r.name}
-                    {isCurrent && (
-                      <span className="rounded-full bg-[#f97316] px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white">
-                        Current
-                      </span>
-                    )}
-                  </p>
-                  <p className="truncate text-[11px] text-gray-500 dark:text-gray-400">{REWARDS_BY_ID[r.id]}</p>
-                </div>
-                <span className="shrink-0 text-[11px] font-semibold tabular-nums text-gray-400 dark:text-gray-500">
-                  {rankRange(r)}
-                </span>
-              </li>
-            );
-          })}
-        </ul>
-      </div>
     </div>
   );
 }

@@ -19,17 +19,28 @@ export interface Rank {
   threshold: number;
   /** Human-readable requirement shown in the ranks pop-up. */
   requirement: string;
+  /** Perk unlocked at this tier, shown in the ranks pop-up. */
+  reward: string;
 }
 
 /** Lowest → highest. Bronze is the start; Locally Philanthropist is the best/hardest. */
 export const RANKS: Rank[] = [
-  { id: 'bronze',         name: 'Bronze',                 image: '/Ranks/Bronze.png',                    threshold: 0,     requirement: 'Start supporting local businesses' },
-  { id: 'silver',         name: 'Silver',                 image: '/Ranks/silver.png',                    threshold: 500,   requirement: 'Reach an Impact Score of 500' },
-  { id: 'gold',           name: 'Gold',                   image: '/Ranks/gold.png',                      threshold: 1500,  requirement: 'Reach an Impact Score of 1,500' },
-  { id: 'diamond',        name: 'Diamond',                image: '/Ranks/diamond.png',                   threshold: 4000,  requirement: 'Reach an Impact Score of 4,000' },
-  { id: 'ascendant',      name: 'Ascendant',              image: '/Ranks/Ascendant.png',                 threshold: 9000,  requirement: 'Reach an Impact Score of 9,000' },
-  { id: 'philanthropist', name: 'Locally Philanthropist', image: '/Ranks/Locally%20Philanthorpist.png',  threshold: 20000, requirement: 'Reach an Impact Score of 20,000' },
+  { id: 'bronze',         name: 'Bronze',                 image: '/Ranks/Bronze.png',                    threshold: 0,     requirement: 'Start supporting local businesses', reward: 'Welcome badge + standard coins' },
+  { id: 'silver',         name: 'Silver',                 image: '/Ranks/silver.png',                    threshold: 500,   requirement: 'Reach an Impact Score of 500',       reward: '+5% bonus coins' },
+  { id: 'gold',           name: 'Gold',                   image: '/Ranks/gold.png',                      threshold: 1500,  requirement: 'Reach an Impact Score of 1,500',     reward: '5% off one order/month + 10% bonus coins' },
+  { id: 'diamond',        name: 'Diamond',                image: '/Ranks/diamond.png',                   threshold: 4000,  requirement: 'Reach an Impact Score of 4,000',     reward: 'Free delivery perk + 15% bonus coins' },
+  { id: 'ascendant',      name: 'Ascendant',              image: '/Ranks/Ascendant.png',                 threshold: 9000,  requirement: 'Reach an Impact Score of 9,000',     reward: 'Early access to deals + 20% bonus coins' },
+  { id: 'philanthropist', name: 'Locally Philanthropist', image: '/Ranks/Locally%20Philanthorpist.png',  threshold: 20000, requirement: 'Reach an Impact Score of 20,000',    reward: 'Top-supporter status + 25% bonus coins + featured' },
 ];
+
+/** Inclusive Impact-Score range a rank covers (e.g. "1,500–3,999" or "20,000+"). */
+export function rankRange(rank: Rank): string {
+  const idx = RANKS.findIndex((r) => r.id === rank.id);
+  const next = RANKS[idx + 1];
+  return next
+    ? `${rank.threshold.toLocaleString()}–${(next.threshold - 1).toLocaleString()}`
+    : `${rank.threshold.toLocaleString()}+`;
+}
 
 /** Weights — money matters most, then points, then businesses supported. */
 export const IMPACT_WEIGHTS = { money: 10, points: 1, businesses: 25 };
