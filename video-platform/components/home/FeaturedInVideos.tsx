@@ -44,9 +44,12 @@ export function FeaturedInVideos() {
           className="group/vid relative block aspect-[9/14] w-[180px] shrink-0 overflow-hidden rounded-2xl bg-black text-left focus:outline-none focus:ring-2 focus:ring-[#f97316] sm:w-[200px]"
           aria-label={`Watch ${v.businessName} video`}
         >
+          {/* `#t=0.1` makes the browser paint the first frame as a still poster on
+              metadata load (small byte range), so the card shows the real thumbnail
+              immediately instead of a black box until hover-play. */}
           <video
             ref={(el) => { refs.current[v.id] = el; }}
-            src={v.src}
+            src={`${v.src}#t=0.1`}
             className="absolute inset-0 h-full w-full object-cover object-center"
             muted
             loop

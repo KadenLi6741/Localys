@@ -50,6 +50,11 @@ const nextConfig: NextConfig = {
     return [{ source: '/(.*)', headers }];
   },
   images: {
+    // Serve AVIF first (≈20–30% smaller than WebP), then WebP, then the original.
+    formats: ['image/avif', 'image/webp'],
+    // Cache optimized images at the edge/browser for 31 days so repeat views and
+    // re-navigations don't re-hit the optimizer (the cold-optimize is the slow part).
+    minimumCacheTTL: 2678400,
     remotePatterns: [
       {
         protocol: 'https',
